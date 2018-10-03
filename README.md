@@ -1,2 +1,2 @@
 # Arduino
-Collection of Arduino projects
+This repo contains a collection of Arduino projects
