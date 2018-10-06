@@ -47,7 +47,7 @@ public:
   ~MicroTimer() {}
 
   /// Start timer, return timer value in [us]
-  tTimer start(unsigned long ulTime = 0)   { ulTimer = micros() + ulTime; return ulTimer; }
+  tTimer start(tTimer ulTime = 0)   { ulTimer = micros() + ulTime; return ulTimer; }
 
   /// Get time since start() in [us]
   tTimer getTimeSince(void) const          { return micros() - ulTimer; }
@@ -55,7 +55,7 @@ public:
   /// Return true if timer is elapsed; false otherwise
   /// micros() >= ulTimer: positive result: highest bit is 0
   /// micros() <  ulTimer: negative result: highest bit is 1
-  boolean timeout(void)                           { return (((tTimer) (micros() - ulTimer)) & (tTimer) 0x80000000u) == 0u; }
+  bool timeout(void)                           { return (((tTimer) (micros() - ulTimer)) & (tTimer) 0x80000000u) == 0u; }
 };
 
 /**

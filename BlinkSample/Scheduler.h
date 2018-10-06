@@ -1,4 +1,4 @@
-/**
+/*
  * Scheduler.h
  *
  *  Created on: 01.10.2018
@@ -28,9 +28,17 @@ public:
     } tRunable;
 
 protected:
+    class MyMicroTimer : public MicroTimer
+     {
+     public:
+         MyMicroTimer() {}
+         void init(tTimer ulTime)        { ulTimer  = ulTime; }
+         void increment(tTimer ulTime)   { ulTimer += ulTime; }
+         static tTimer getCurrentTime(void)  { return millis(); }
+     };
     typedef struct
     {
-        MicroTimer NextCall;
+        MyMicroTimer NextCall;
     } tRunTime;
 
     /// Array of runables.

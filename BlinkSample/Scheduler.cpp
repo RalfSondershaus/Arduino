@@ -48,14 +48,24 @@ bool Scheduler::add(tTimer ulStartOff, tTimer ulCycTime, Runable * runabl)
 void Scheduler::init(void)
 {
     unsigned int i;
+    tTimer ulTime;
 
-    for (i = 0; i < unNrRunables; i++)
+    if (unNrRunables > 0)
     {
-        aRunables[i].runable->init();
-    }
-    for (i = 0; i < unNrRunables; i++)
-    {
-        (void) aRunTime[i].NextCall.start(aRunables[i].ulStartOffset);
+        for (i = 0; i < unNrRunables; i++)
+        {
+            aRunables[i].runable->init();
+        }
+
+        ulTime = Scheduler::MyMicroTimer::getCurrentTime() / 1000u;
+        ulTime++;
+        ulTime *= 1000u;
+
+        for (i = 0; i < unNrRunables; i++)
+        {
+            (void) aRunTime[i].NextCall.init(ulTime);
+            (void) aRunTime[i].NextCall.increment(aRunables[i].ulStartOffset);
+        }
     }
 }
 
@@ -69,7 +79,7 @@ void Scheduler::schedule(void)
         if (aRunTime[i].NextCall.timeout())
         {
             aRunables[i].runable->run();
-            (void) aRunTime[i].NextCall.start(aRunables[i].ulCycleTime);
+            (void) aRunTime[i].NextCall.increment(aRunables[i].ulCycleTime);
         }
     }
 }
