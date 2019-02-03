@@ -2,7 +2,8 @@
 #include "Timer.h"
 #include "Scheduler.h"
 
-/// Interface class for runables
+/// Blink the LED on pin 13 (LED on board). Each time, run() is called,
+/// the LED is toggled.
 class RunableBlink : public Runable
 {
 protected:
@@ -29,7 +30,7 @@ public:
     }
 };
 
-/// Interface class for runables
+/// Print information to serial output
 class RunableSerial : public Runable
 {
 public:

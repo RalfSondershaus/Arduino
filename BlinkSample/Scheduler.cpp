@@ -7,6 +7,9 @@
 
 #include "Scheduler.h"
 
+#define MS2US(ms)   (1000u * (ms))
+#define US2MS(us)   ((us) / 1000u)
+
 /// Default constructor
 Scheduler::Scheduler() : unNrRunables(0)
 {
@@ -31,7 +34,7 @@ bool Scheduler::add(tTimer ulStartOff, tTimer ulCycTime, Runable * runabl)
     if ((unNrRunables < SCHEDULER_MAX_NR_RUNABLES) && (runabl != (Runable *) NULL))
     {
         aRunables[unNrRunables].ulStartOffset = ulStartOff;
-        aRunables[unNrRunables].ulCycleTime   = 1000u * ulCycTime;
+        aRunables[unNrRunables].ulCycleTime   = MS2US(ulCycTime);
         aRunables[unNrRunables].runable       = runabl;
         unNrRunables++;
         bRet = true;
@@ -57,9 +60,10 @@ void Scheduler::init(void)
             aRunables[i].runable->init();
         }
 
-        ulTime = Scheduler::MyMicroTimer::getCurrentTime() / 1000u;
+        // Start time is current time plus 1 millisec (plus offset)
+        ulTime = US2MS(Scheduler::MyMicroTimer::getCurrentTime());
         ulTime++;
-        ulTime *= 1000u;
+        ulTime = MS2US(ulTime);
 
         for (i = 0; i < unNrRunables; i++)
         {

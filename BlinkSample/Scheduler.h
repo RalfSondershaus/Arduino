@@ -23,7 +23,7 @@ public:
     typedef struct
     {
         tTimer      ulStartOffset;      ///< [us] Offset time at start up
-        tTimer      ulCycleTime;        ///< [us] Cycle time, 1 ms = 1000 us
+        tTimer      ulCycleTime;        ///< [us] Cycle time
         Runable*    runable;            ///< Pointer to runable
     } tRunable;
 
@@ -60,9 +60,11 @@ public:
     /// @param ulCycTime [ms] Cycle time of runable run()
     /// @runabl Pointer to Runable object; must not be NULL
     bool add(tTimer ulStartOff, tTimer ulCycTime, Runable * runabl);
-    /// initialize after start up
+    /// Initialize after start up. Set time for first call of runables
+    /// to current time (in millisec) + 1 millisec + ulStartOff
     void init(void);
-    /// schedule runables
+    /// Schedule runables. Call run() for each runable if its timer
+    /// is elapesd.
     void schedule(void);
 };
 
