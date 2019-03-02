@@ -8,8 +8,8 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
-#include "Runable.h"
-#include "Timer.h"
+#include <Runable/Runable.h>
+#include <Timer/Timer.h>
 
 #define SCHEDULER_MAX_NR_RUNABLES   20u
 

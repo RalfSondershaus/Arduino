@@ -5,7 +5,7 @@
  *      Author: Papi
  */
 
-#include "Scheduler.h"
+#include <Scheduler/Scheduler.h>
 
 #define MS2US(ms)   (1000u * (ms))
 #define US2MS(us)   ((us) / 1000u)

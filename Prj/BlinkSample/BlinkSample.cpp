@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include "Timer.h"
-#include "Scheduler.h"
+#include <Timer/Timer.h>
+#include <Scheduler/Scheduler.h>
 
 /// Blink the LED on pin 13 (LED on board). Each time, run() is called,
 /// the LED is toggled.
