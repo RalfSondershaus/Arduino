@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Gen">
+      <UniqueIdentifier>{4d3ab699-becd-48cc-b086-73e1afbf7253}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gen\Scheduler">
+      <UniqueIdentifier>{78c5bf83-da39-4df4-9394-845ea6e6f907}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gen\Timer">
+      <UniqueIdentifier>{60b01bf4-5b0e-4d74-92d1-4695b316994f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gen\Runable">
+      <UniqueIdentifier>{03de04fb-4759-4e5b-b4ac-358c3ac20049}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Prj">
+      <UniqueIdentifier>{efd91875-f19e-418a-bce3-af81dd5e9eae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Prj\BlinkSample">
+      <UniqueIdentifier>{32df3f31-8a79-442e-afa3-82c139ca71bd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Gen\Runable\Runable.cpp">
+      <Filter>Gen\Runable</Filter>
+    </ClCompile>
+    <ClCompile Include="Gen\Scheduler\Scheduler.cpp">
+      <Filter>Gen\Scheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\BlinkSample\BlinkSample.cpp">
+      <Filter>Prj\BlinkSample</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Gen\Runable\Runable.h">
+      <Filter>Gen\Runable</Filter>
+    </ClInclude>
+    <ClInclude Include="Gen\Timer\Timer.h">
+      <Filter>Gen\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Gen\Scheduler\Scheduler.h">
+      <Filter>Gen\Scheduler</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Prj\BlinkSample\Makefile_Prj.gmk">
+      <Filter>Prj\BlinkSample</Filter>
+    </None>
+  </ItemGroup>
+</Project>
