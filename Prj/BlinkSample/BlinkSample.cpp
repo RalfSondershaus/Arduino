@@ -53,7 +53,7 @@ Scheduler SchM;
 void setup()
 {
     Serial.begin(9600);
-    SchM.add(  0u,  500u, &rBlink);
+    SchM.add(  0u, 1000u, &rBlink);
     SchM.add(100u, 2000u, &rSerial);
     SchM.init();
 }

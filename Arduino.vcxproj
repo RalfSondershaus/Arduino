@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="BlinkSample Compile|Win32">
+      <Configuration>BlinkSample Compile</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="BlinkSample Program|Win32">
+      <Configuration>BlinkSample Program</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile.gmk" />
+    <None Include="Prj\BlinkSample\Makefile_Prj.gmk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Gen\Runable\Runable.cpp" />
+    <ClCompile Include="Gen\Scheduler\Scheduler.cpp" />
+    <ClCompile Include="Prj\BlinkSample\BlinkSample.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Gen\Runable\Runable.h" />
+    <ClInclude Include="Gen\Scheduler\Scheduler.h" />
+    <ClInclude Include="Gen\Timer\Timer.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{F1EA4A64-8F93-415E-9A1A-796AEA204A71}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'">
+    <NMakeBuildCommandLine>./Build BlinkSample all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build BlinkSample clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build BlinkSample rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'">
+    <NMakeBuildCommandLine>./Build BlinkSample program</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build BlinkSample clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build BlinkSample program</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Arduino", "Arduino.vcxproj", "{F1EA4A64-8F93-415E-9A1A-796AEA204A71}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		BlinkSample Compile|ARM = BlinkSample Compile|ARM
+		BlinkSample Compile|x86 = BlinkSample Compile|x86
+		BlinkSample Program|ARM = BlinkSample Program|ARM
+		BlinkSample Program|x86 = BlinkSample Program|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Compile|ARM.ActiveCfg = BlinkSample Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Compile|ARM.Build.0 = BlinkSample Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Compile|x86.ActiveCfg = BlinkSample Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Compile|x86.Build.0 = BlinkSample Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Program|ARM.ActiveCfg = BlinkSample Program|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Program|x86.ActiveCfg = BlinkSample Program|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Program|x86.Build.0 = BlinkSample Program|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F1987C21-825C-4FEE-A687-B9894EF4DAA7}
+	EndGlobalSection
+EndGlobal

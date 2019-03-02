@@ -7,5 +7,11 @@
 :: variable in the makefile are ignored; we say they have been overridden by the command line
 :: argument.
 
+:: Search directories for Makefile.gmk. Stop if found.
+:SearchArduinoDir
+IF EXIST Makefile.gmk GOTO AtArduinoDir
+cd ..
+GOTO SearchArduinoDir
+
+:AtArduinoDir
 make -f ./Makefile.gmk ARG_PROJECT=%1 %2
-pause

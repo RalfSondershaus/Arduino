@@ -195,6 +195,8 @@ TARGET = $(PATH_BIN)/$(TARGET_NAME)
 
 all: $(TARGET).hex
 
+rebuild: clean all
+
 .PHONY: clean
 clean:
 	@-if exist $(PATH_BIN)/*.elf $(RM) $(subst /,\,$(PATH_BIN)/*.elf)
