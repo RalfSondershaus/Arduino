@@ -1,0 +1,213 @@
+# 
+# Makefile for Arduino projects
+#
+# Cannot handle pathes with blanks, e.g. C:/Program Files/...
+# Mount such directories as network drives:
+# - Right click on "This PC" in Windows explorer
+# - Click "Mount network drive"
+# - Fill in \\localhost\C$\Program Files\...
+#
+
+TARGET_NAME         = BlinkSample
+MMCU                = atmega2560
+VARIANT             = mega
+
+# Pathes
+PATH_TMP              = ../Tmp
+PATH_BIN              = ../Bin
+PATH_ERR              = ../Tmp
+PATH_ARDUINO_IDE      = Z:
+PATH_ARDUINO_TOOLS    = $(PATH_ARDUINO_IDE)/hardware/tools
+PATH_ARDUINO_CORE     = $(PATH_ARDUINO_IDE)/hardware/arduino/avr/cores/arduino
+PATH_ARDUINO_VARIANT  = $(PATH_ARDUINO_IDE)/hardware/arduino/avr/variants
+PATH_AVR              = $(PATH_ARDUINO_IDE)/hardware/tools/avr
+PATH_OBJ              = $(PATH_TMP)
+
+# Tools
+GCC     = $(PATH_AVR)/bin/avr-gcc
+OBJCOPY = $(PATH_AVR)/bin/avr-objcopy
+SIZE    = $(PATH_AVR)/bin/avr-size
+AVRDUDE = $(PATH_AVR)/bin/avrdude
+RM      = del
+RMDIR   = del
+
+GCC     := $(subst /,\,$(GCC))
+OBJCOPY := $(subst /,\,$(OBJCOPY))
+SIZE    := $(subst /,\,$(SIZE))
+RM      := $(subst /,\,$(RM))
+RMDIR   := $(subst /,\,$(RMDIR))
+
+# Files
+FILES_PRJ = ./BlinkSample   \
+            ./Runable       \
+            ./Scheduler
+
+FILES_CORE = $(PATH_ARDUINO_CORE)/abi             \
+             $(PATH_ARDUINO_CORE)/CDC             \
+             $(PATH_ARDUINO_CORE)/HardwareSerial  \
+             $(PATH_ARDUINO_CORE)/HardwareSerial0 \
+             $(PATH_ARDUINO_CORE)/HardwareSerial1 \
+             $(PATH_ARDUINO_CORE)/HardwareSerial2 \
+             $(PATH_ARDUINO_CORE)/HardwareSerial3 \
+             $(PATH_ARDUINO_CORE)/hooks           \
+             $(PATH_ARDUINO_CORE)/IPAddress       \
+             $(PATH_ARDUINO_CORE)/main            \
+             $(PATH_ARDUINO_CORE)/new             \
+             $(PATH_ARDUINO_CORE)/PluggableUSB    \
+             $(PATH_ARDUINO_CORE)/Print           \
+             $(PATH_ARDUINO_CORE)/Stream          \
+             $(PATH_ARDUINO_CORE)/Tone            \
+             $(PATH_ARDUINO_CORE)/USBCore         \
+             $(PATH_ARDUINO_CORE)/WInterrupts     \
+             $(PATH_ARDUINO_CORE)/wiring          \
+             $(PATH_ARDUINO_CORE)/wiring_analog   \
+             $(PATH_ARDUINO_CORE)/wiring_digital  \
+             $(PATH_ARDUINO_CORE)/wiring_pulse    \
+             $(PATH_ARDUINO_CORE)/wiring_shift    \
+             $(PATH_ARDUINO_CORE)/WMath           \
+             $(PATH_ARDUINO_CORE)/WString
+
+FILES_O = $(addprefix $(PATH_OBJ)/, $(notdir $(addsuffix .o, $(FILES_PRJ) $(FILES_CORE))))
+
+CFLAGS =  -c                        \
+          -g                        \
+          -Os                       \
+          -w                        \
+          -std=gnu++11              \
+          -fpermissive              \
+          -fno-exceptions           \
+          -ffunction-sections       \
+          -fdata-sections           \
+          -fno-threadsafe-statics   \
+          -MMD                      \
+          -flto                     \
+          -mmcu=$(MMCU)
+
+C_DEFINES = -DF_CPU=16000000L       \
+            -DARDUINO=10608         \
+            -DARDUINO_AVR_MEGA2560  \
+            -DARDUINO_ARCH_AVR
+
+C_INCLUDES = -I$(PATH_ARDUINO_CORE) -I$(PATH_ARDUINO_VARIANT)/$(VARIANT)
+
+LFLAGS = -w                   \
+         -Os                  \
+         -g                   \
+         -flto                \
+         -fuse-linker-plugin  \
+         -mmcu=$(MMCU)        \
+         -L.                  \
+         -lm
+
+OBJCOPYFLAGS =  -O ihex \
+                -R .eeprom
+
+# -----------------------------------------------------------------------
+# See https://www.nongnu.org/avrdude/user-manual/avrdude_4.html
+# See http://savannah.nongnu.org/projects/avrdude
+# See https://www.avrfreaks.net/forum/cannot-connect-avrdude-mega2560
+
+# -p partno         This is the only mandatory option and it tells AVRDUDE what type of part (MCU) that is connected to the programmer.
+# -b baudrate       Override the RS-232 connection baud rate specified in the respective programmer’s entry of the configuration file. 
+# -B bitclock       Specify the bit clock period for the JTAG interface or the ISP clock (JTAG ICE only).
+# -c programmer-id  Specify the programmer to be used.
+# -C config-file    Use the specified config file for configuration data. This file contains all programmer and part definitions that AVRDUDE knows about.
+# -D                Disable auto erase for flash.
+# -e                Causes a chip erase to be executed. This will reset the contents of the flash ROM and EEPROM to the value ‘0xff’, and clear all lock bits.
+# -E exitspec[,...] By default, AVRDUDE leaves the parallel port in the same state at exit as it has been found at startup.
+#                   This option modifies the state of the ‘/RESET’ and ‘Vcc’ lines the parallel port is left at, according to the exitspec arguments provided.
+# -F                Normally, AVRDUDE tries to verify that the device signature read from the part is reasonable before continuing. 
+#                   Since it can happen from time to time that a device has a broken (erased or overwritten) device signature but is otherwise operating normally, 
+#                   this options is provided to override the check.
+# -i delay          For bitbang-type programmers, delay for approximately delay microseconds between each bit state change.
+# -l logfile        Use logfile rather than stderr for diagnostics output.
+# -n                No-write - disables actually writing data to the MCU (useful for debugging AVRDUDE).
+# -O                Perform a RC oscillator run-time calibration according to Atmel application note AVR053. 
+#                   This is only supported on the STK500v2, AVRISP mkII, and JTAG ICE mkII hardware.
+# -P port           Use port to identify the device to which the programmer is attached.
+# -q                Disable (or quell) output of the progress bar while reading or writing to the device.
+# -u                Disables the default behaviour of reading out the fuses three times before programming, 
+#                   then verifying at the end of programming that the fuses have not changed.
+# -s                Disable safemode prompting.
+# -t                Tells AVRDUDE to enter the interactive “terminal” mode instead of up- or downloading files.
+# -U memtype:op:filename[:format]
+#                   Perform a memory operation. Multiple ‘-U’ options can be specified in order to operate on multiple memories on the same command-line invocation.
+#                   The memtype field specifies the memory type to operate on. Use the ‘-v’ option on the command line or the part command from terminal mode 
+#                   to display all the memory types supported by a particular device. Typically, a device’s memory configuration at least contains the memory 
+#                   types flash and eeprom.
+#                   All memory types currently known are: 
+#                     flash    The flash ROM of the device. 
+#                     ...
+#                   The op field specifies what operation to perform: 
+#                     r    read the specified device memory and write to the specified file
+#                     w    read the specified file and write it to the specified device memory
+#                     v    read the specified device memory and the specified file and perform a verify operation
+#                   The filename field indicates the name of the file to read or write. 
+#                   The format field is optional and contains the format of the file to read or write. Possible values are:
+#                     i    Intel Hex
+#                     s    Motorola S-record
+#                     e    ELF (Executable and Linkable Format), the final output file from the linker; currently only accepted as an input file
+#                     a    auto detect; valid for input only, and only if the input is not provided at stdin.
+#                     ...
+# -v                Enable verbose output. More -v options increase verbosity level.
+# -V                Disable automatic verify check when uploading data.
+# -x extended_param Pass extended_param to the chosen programmer implementation as an extended parameter.
+# -----------------------------------------------------------------------
+AVRDUDE_FLAGS = -C$(PATH_AVR)/etc/avrdude.conf  \
+                -v                              \
+                -V                              \
+                -p m2560                        \
+                -c wiring                       \
+                -P COM3                         \
+                -D
+
+# ------------------------------------------------------------------------------
+# VPATH definition
+#
+# VPATH is required for make to locate C-Source files.
+# Abstract the directory/module names from the file list with the dir command
+# and remove the duplicated directory names with the sort command.
+# FILES_PRJ is listest first to make sure that C-Files in project directory
+# are searched first.
+#
+# Note: Changing VPATH will also require changing FILES_O
+# ------------------------------------------------------------------------------
+VPATH = $(sort $(dir $(FILES_PRJ))) $(sort $(dir $(FILES_CORE)))
+
+TARGET = $(PATH_BIN)/$(TARGET_NAME)
+
+# We do not work with implicit rules, we use pattern rules with %.c, see below
+.SUFFIXES:
+
+all: $(TARGET).hex
+
+.PHONY: clean
+clean:
+	@-if exist $(PATH_BIN)/*.elf $(RM) $(subst /,\,$(PATH_BIN)/*.elf)
+	@-if exist $(PATH_BIN)/*.hex $(RM) $(subst /,\,$(PATH_BIN)/*.hex)
+	@-if exist $(PATH_TMP)       $(RM) $(subst /,\,$(PATH_TMP)/*.o  )
+
+$(TARGET).elf: $(FILES_O)
+	@echo +++++ linking $(basename $@).elf +++++
+	@$(GCC) $(LFLAGS) $(FILES_O) -o $(basename $@).elf
+
+$(TARGET).hex: $(TARGET).elf
+	@echo +++++ converting $(basename $@).elf into $(basename $@).hex +++++
+	@$(OBJCOPY) $(OBJCOPYFLAGS) $(basename $@).elf $(basename $@).hex
+
+$(PATH_OBJ)/%.o: %.c
+	@echo +++ compile $< to $@
+	@-$(GCC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
+
+$(PATH_OBJ)/%.o: %.cpp
+	@echo +++ compile $< to $@
+	@-$(GCC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
+
+.PHONY: size
+size:
+	@echo +++++ size of $(basename $@).elf +++++
+	$(SIZE) -A $(TARGET).elf
+
+.PHONY: program
+program:
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -Uflash:w:$(TARGET).hex:i
