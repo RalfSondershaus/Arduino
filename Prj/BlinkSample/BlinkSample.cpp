@@ -2,39 +2,11 @@
 #include <Timer/Timer.h>
 #include <Scheduler/Scheduler.h>
 
-/// Blink the LED on pin 13 (LED on board). Each time, run() is called,
-/// the LED is toggled.
-class RunableBlink : public Runable
-{
-protected:
-    unsigned int unOutput = HIGH;
-public:
-    /// Initialization
-    virtual void init(void)
-    {
-        // Most Arduinos have an on-board LED you can control. On Mega, it is attached to digital pin 13.
-        pinMode(13, OUTPUT);
-    }
-    /// Main execution function
-    virtual void run(void)
-    {
-        digitalWrite(13, unOutput);
-        if (unOutput == HIGH)
-        {
-            unOutput  = LOW;
-        }
-        else
-        {
-            unOutput = HIGH;
-        }
-    }
-};
-
-/// Blink the LED on pin 7 (LED on board). Each time, run() is called,
-/// the LED is toggled.
+/// Blink the LED on pin 13 (LED on board).
 class RunableBlinkPWM : public Runable
 {
 protected:
+  const int nLedPin = 13;
   unsigned int unIntensity;   ///< [0...255] intensity value
   bool bUp;                   ///< upwards counting (true) or downwards counting (false)
   static const unsigned int aunIntensity2Pwm[256];  ///< for each brightness a corresponding PWM value. Necessary for ratio-based dim ramps.
@@ -49,12 +21,12 @@ public:
   virtual void init(void)
   {
     // Most Arduinos have an on-board LED you can control. On Mega, it is attached to digital pin 13.
-    pinMode(7, OUTPUT);
+    pinMode(nLedPin, OUTPUT);
   }
   /// Main execution function
   virtual void run(void)
   {
-    analogWrite(7, RunableBlinkPWM::aunIntensity2Pwm[unIntensity]);
+    analogWrite(nLedPin, RunableBlinkPWM::aunIntensity2Pwm[unIntensity]);
     
     if (bUp)
     {
@@ -119,34 +91,13 @@ static const unsigned int RunableBlinkPWM::aunIntensity2Pwm[256u] =
   /* 250 */ 229, 234, 239, 244, 250, 255
 };
 
-
-/// Print information to serial output
-class RunableSerial : public Runable
-{
-public:
-  /// Initialization
-  virtual void init(void)
-  {
-  }
-  /// Main execution function
-  virtual void run(void)
-  {
-    Serial.println(0u - 65535u, BIN);
-  }
-};
-
-RunableBlink     rBlink;
 RunableBlinkPWM  rBlinkPWM;
-RunableSerial    rSerial;
 
 Scheduler SchM;
 
 void setup()
 {
-    Serial.begin(9600);
     SchM.add(  0u,   1u, &rBlinkPWM);
-    //SchM.add(  0u, 1000u, &rBlink);
-    //SchM.add(100u, 2000u, &rSerial);
     SchM.init();
 }
 
