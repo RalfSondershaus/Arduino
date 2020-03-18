@@ -1,0 +1,6 @@
+# 
+# Project specific Makefile for SequenceBlink
+#
+
+# Files
+FILES_PRJ = $(PATH_PRJ_PROJECT)/SequenceBlink

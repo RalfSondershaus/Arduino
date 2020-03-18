@@ -9,20 +9,50 @@
       <Configuration>BlinkSample Program</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="DccDecoder Compile|Win32">
+      <Configuration>DccDecoder Compile</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DccDecoder Download|Win32">
+      <Configuration>DccDecoder Download</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DccDecoder Program|Win32">
+      <Configuration>DccDecoder Program</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="SequenceBlink Compile|Win32">
+      <Configuration>SequenceBlink Compile</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="SequenceBlink Program|Win32">
+      <Configuration>SequenceBlink Program</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile.gmk" />
     <None Include="Prj\BlinkSample\Makefile_Prj.gmk" />
+    <None Include="Prj\DccDecoder\Makefile_Prj.gmk" />
+    <None Include="Prj\SequenceBlink\Makefile_Prj.gmk" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Gen\Runable\Runable.cpp" />
     <ClCompile Include="Gen\Scheduler\Scheduler.cpp" />
     <ClCompile Include="Prj\BlinkSample\BlinkSample.cpp" />
+    <ClCompile Include="Prj\DccDecoder\DccDecoder.cpp" />
+    <ClCompile Include="Prj\DccDecoder\DccInterpreter.cpp" />
+    <ClCompile Include="Prj\DccDecoder\ISR_Dcc.cpp" />
+    <ClCompile Include="Prj\DccDecoder\PeriodSM.cpp" />
+    <ClCompile Include="Prj\SequenceBlink\SequenceBlink.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gen\Runable\Runable.h" />
     <ClInclude Include="Gen\Scheduler\Scheduler.h" />
     <ClInclude Include="Gen\Timer\Timer.h" />
+    <ClInclude Include="Prj\DccDecoder\ISR_Dcc.h" />
+    <ClInclude Include="Prj\DccDecoder\DccInterpreter.h" />
+    <ClInclude Include="Prj\DccDecoder\PeriodSM.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -35,9 +65,32 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Compile|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Compile|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Program|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Program|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='DccDecoder Download|Win32'">
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -48,7 +101,19 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Compile|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Compile|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Program|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Program|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -60,10 +125,42 @@
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Compile|Win32'">
+    <NMakeBuildCommandLine>./Build SequenceBlink all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build SequenceBlink clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build SequenceBlink rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Compile|Win32'">
+    <NMakeBuildCommandLine>./Build DccDecoder all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build DccDecoder clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build DccDecoder rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'">
     <NMakeBuildCommandLine>./Build BlinkSample program</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>./Build BlinkSample clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>./Build BlinkSample program</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Program|Win32'">
+    <NMakeBuildCommandLine>./Build SequenceBlink program</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build SequenceBlink clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build SequenceBlink program</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Program|Win32'">
+    <NMakeBuildCommandLine>./Build DccDecoder program</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build DccDecoder clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build DccDecoder program</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>

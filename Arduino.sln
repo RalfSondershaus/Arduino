@@ -11,6 +11,14 @@ Global
 		BlinkSample Compile|x86 = BlinkSample Compile|x86
 		BlinkSample Program|ARM = BlinkSample Program|ARM
 		BlinkSample Program|x86 = BlinkSample Program|x86
+		DccDecoder Compile|ARM = DccDecoder Compile|ARM
+		DccDecoder Compile|x86 = DccDecoder Compile|x86
+		DccDecoder Program|ARM = DccDecoder Program|ARM
+		DccDecoder Program|x86 = DccDecoder Program|x86
+		SequenceBlink Compile|ARM = SequenceBlink Compile|ARM
+		SequenceBlink Compile|x86 = SequenceBlink Compile|x86
+		SequenceBlink Program|ARM = SequenceBlink Program|ARM
+		SequenceBlink Program|x86 = SequenceBlink Program|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Compile|ARM.ActiveCfg = BlinkSample Compile|Win32
@@ -20,6 +28,15 @@ Global
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Program|ARM.ActiveCfg = BlinkSample Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Program|x86.ActiveCfg = BlinkSample Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Program|x86.Build.0 = BlinkSample Program|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Compile|ARM.ActiveCfg = DccDecoder Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Compile|x86.ActiveCfg = DccDecoder Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Program|ARM.ActiveCfg = DccDecoder Program|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Program|x86.ActiveCfg = DccDecoder Program|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Compile|ARM.ActiveCfg = SequenceBlink Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Compile|x86.ActiveCfg = SequenceBlink Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Compile|x86.Build.0 = SequenceBlink Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Program|ARM.ActiveCfg = SequenceBlink Program|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Program|x86.ActiveCfg = SequenceBlink Program|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

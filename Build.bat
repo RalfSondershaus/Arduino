@@ -14,4 +14,4 @@ cd ..
 GOTO SearchArduinoDir
 
 :AtArduinoDir
-make -f ./Makefile.gmk ARG_PROJECT=%1 %2
+make -s -f ./Makefile.gmk ARG_PROJECT=%1 %2

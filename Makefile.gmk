@@ -29,6 +29,7 @@ PATH_OBJ              = $(PATH_TMP)
 PATH_PRJ              = ./Prj
 PATH_GEN              = ./Gen
 PATH_PRJ_PROJECT      = $(PATH_PRJ)/$(TARGET_NAME)
+PATH_TOOLS            = ./Tools
 
 # Tools
 GCC     = $(PATH_AVR)/bin/avr-gcc
@@ -37,12 +38,15 @@ SIZE    = $(PATH_AVR)/bin/avr-size
 AVRDUDE = $(PATH_AVR)/bin/avrdude
 RM      = del
 RMDIR   = del
-
+SED     = $(PATH_TOOLS)/GNU/sed
+AWK     = $(PATH_TOOLS)/GNU/awk
 GCC     := $(subst /,\,$(GCC))
 OBJCOPY := $(subst /,\,$(OBJCOPY))
 SIZE    := $(subst /,\,$(SIZE))
 RM      := $(subst /,\,$(RM))
 RMDIR   := $(subst /,\,$(RMDIR))
+SED     := $(subst /,\,$(SED))
+AWK     := $(subst /,\,$(AWK))
 
 # ---------------------------------------------------
 # include project specific makefile
@@ -102,7 +106,8 @@ C_DEFINES = -DF_CPU=16000000L       \
 
 C_INCLUDES = -I$(PATH_ARDUINO_CORE)                 \
              -I$(PATH_GEN)                          \
-             -I$(PATH_ARDUINO_VARIANT)/$(VARIANT)
+             -I$(PATH_ARDUINO_VARIANT)/$(VARIANT)   \
+             -I$(PATH_PRJ_PROJECT)
 
 LFLAGS = -w                   \
          -Os                  \
@@ -214,11 +219,13 @@ $(TARGET).hex: $(TARGET).elf
 $(PATH_OBJ)/%.o: %.c
 	@echo +++ compile $< to $@
 	@-$(GCC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
+	@-$(AWK) -f $(subst /,\,$(PATH_TOOLS/GNU/gccerror.awk)) $(PATH_ERR)/$(basename $(@F)).err
 
 $(PATH_OBJ)/%.o: %.cpp
 	@echo +++ compile $< to $@
 	@-$(GCC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
-
+	@$(AWK) -f $(PATH_TOOLS)/GNU/gccerror.awk $(PATH_ERR)/$(basename $(@F)).err
+   
 .PHONY: size
 size:
 	@echo +++++ size of $(basename $@).elf +++++

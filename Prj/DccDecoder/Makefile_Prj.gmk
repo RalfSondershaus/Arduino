@@ -1,0 +1,14 @@
+# 
+# Project specific Makefile for DccDecoder
+#
+
+# Files
+FILES_PRJ = $(PATH_PRJ_PROJECT)/DccDecoder      \
+            $(PATH_PRJ_PROJECT)/DccInterpreter  \
+            $(PATH_PRJ_PROJECT)/ISR_Dcc         \
+            $(PATH_PRJ_PROJECT)/PeriodSM
+
+-include $(PATH_TMP)/DccDecoder.d
+-include $(PATH_TMP)/DccInterpreter.d
+-include $(PATH_TMP)/ISR_Dcc.d
+-include $(PATH_TMP)/PeriodSM.d

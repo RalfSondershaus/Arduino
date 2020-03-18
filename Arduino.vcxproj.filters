@@ -19,6 +19,12 @@
     <Filter Include="Prj\BlinkSample">
       <UniqueIdentifier>{32df3f31-8a79-442e-afa3-82c139ca71bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Prj\SequenceBlink">
+      <UniqueIdentifier>{5bf79947-0763-434a-b505-8ddf7d662923}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Prj\DccDecoder">
+      <UniqueIdentifier>{ed0532c4-2572-42b1-8b5c-1878e1d9f907}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Gen\Runable\Runable.cpp">
@@ -29,6 +35,21 @@
     </ClCompile>
     <ClCompile Include="Prj\BlinkSample\BlinkSample.cpp">
       <Filter>Prj\BlinkSample</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\SequenceBlink\SequenceBlink.cpp">
+      <Filter>Prj\SequenceBlink</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\DccDecoder\DccDecoder.cpp">
+      <Filter>Prj\DccDecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\DccDecoder\ISR_Dcc.cpp">
+      <Filter>Prj\DccDecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\DccDecoder\PeriodSM.cpp">
+      <Filter>Prj\DccDecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\DccDecoder\DccInterpreter.cpp">
+      <Filter>Prj\DccDecoder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,10 +62,26 @@
     <ClInclude Include="Gen\Scheduler\Scheduler.h">
       <Filter>Gen\Scheduler</Filter>
     </ClInclude>
+    <ClInclude Include="Prj\DccDecoder\PeriodSM.h">
+      <Filter>Prj\DccDecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="Prj\DccDecoder\ISR_Dcc.h">
+      <Filter>Prj\DccDecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="Prj\DccDecoder\DccInterpreter.h">
+      <Filter>Prj\DccDecoder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Prj\BlinkSample\Makefile_Prj.gmk">
       <Filter>Prj\BlinkSample</Filter>
+    </None>
+    <None Include="Makefile.gmk" />
+    <None Include="Prj\SequenceBlink\Makefile_Prj.gmk">
+      <Filter>Prj\SequenceBlink</Filter>
+    </None>
+    <None Include="Prj\DccDecoder\Makefile_Prj.gmk">
+      <Filter>Prj\DccDecoder</Filter>
     </None>
   </ItemGroup>
 </Project>
