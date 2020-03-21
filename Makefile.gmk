@@ -107,7 +107,8 @@ C_DEFINES = -DF_CPU=16000000L       \
 C_INCLUDES = -I$(PATH_ARDUINO_CORE)                 \
              -I$(PATH_GEN)                          \
              -I$(PATH_ARDUINO_VARIANT)/$(VARIANT)   \
-             -I$(PATH_PRJ_PROJECT)
+             -I$(PATH_PRJ_PROJECT)                  \
+             $(C_INCLUDES_PRJ)
 
 LFLAGS = -w                   \
          -Os                  \

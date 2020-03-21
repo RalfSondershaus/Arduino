@@ -2,153 +2,144 @@
 ///
 /// DCC Interpreter for Arduino
 
-#include <Arduino.h>
 #include <DccInterpreter.h>
 
-/// A preamble is valid if this number of "1" is transmitted (at least)
-#define DCCINTERPRETER_PREAMBLE_MIN_NR_ONES    10u
-
-// ---------------------------------------------------
-/// Returns true if unNr exceeds the minimal number of "1"
-// ---------------------------------------------------
-static inline bool isMinNumberOfOneTransmitted(unsigned int unNr) { return unNr >= DCCINTERPRETER_PREAMBLE_MIN_NR_ONES;  }
-
-// ---------------------------------------------------
-/// constructor
-// ---------------------------------------------------
-DccInterpreter::DccInterpreter() 
-  : unNrOne(0)
-  , unNrZero(0)
-  , unPacket(0)
-  , statePreamble(*this)
-  , stateByte(*this)
-  , aStates   // array initialization works with C++11 or beyond
-    {
-      &statePreamble,
-      &stateByte
-    }
+namespace Dcc
 {
-  invalid();
-}
+  /// A preamble is valid if this number of "1" is transmitted (at least)
+  #define DCCINTERPRETER_PREAMBLE_MIN_NR_ONES    10u
 
-// ---------------------------------------------------
-/// destructor
-// ---------------------------------------------------
-DccInterpreter::~DccInterpreter()
-{}
+  // ---------------------------------------------------
+  /// Returns true if unNr exceeds the minimal number of "1"
+  // ---------------------------------------------------
+  static inline bool isMinNumberOfOneTransmitted(unsigned int unNr) { return unNr >= DCCINTERPRETER_PREAMBLE_MIN_NR_ONES; }
 
-/// Execute state function
-void DccInterpreter::StatePreamble::entry()
-{
-  unNrOne = 0;
-}
-
-/// State function: check if a valid preamble is transmitted:
-/// Sequence of at least 10x "1", followed by a "0" 
-DccInterpreter::tState DccInterpreter::StatePreamble::execFunc(tState curState, tBit bitReceived)
-{
-  tState nextState = curState;
-
-  if (bitReceived == BIT_ONE)
+  // ---------------------------------------------------
+  /// constructor
+  // ---------------------------------------------------
+  DccInterpreter::DccInterpreter()
+    : unNrOne(0)
+    , unNrZero(0)
+    , unPacket(0)
   {
-    // prevent overflow
-    if (unNrOne < 255u)
-    {
-      unNrOne++;
-    }
+    invalid();
   }
-  else // BIT_ZERO
+
+  // ---------------------------------------------------
+  /// destructor
+  // ---------------------------------------------------
+  DccInterpreter::~DccInterpreter()
+  {}
+
+  // ---------------------------------------------------
+  /// State function: check if a valid preamble is transmitted:
+  /// Sequence of at least 10x "1", followed by a "0" 
+  // ---------------------------------------------------
+  DccInterpreter::eState DccInterpreter::executePreamble(eBit bitRcv)
   {
-    if (isMinNumberOfOneTransmitted(unNrOne))
+    eState nextState = state;
+
+    if (bitRcv == BIT_ONE)
     {
-      nextState = STATE_BYTE;
+      // prevent overflow
+      if (unNrOnePreamble < 255u)
+      {
+        unNrOnePreamble++;
+      }
+    }
+    else // BIT_ZERO
+    {
+      if (isMinNumberOfOneTransmitted(unNrOnePreamble))
+      {
+        nextState = STATE_DATA;
+      }
+      // reset counter because
+      // - min number of "1" not reached, invalid or waiting for first "1"
+      // - or valid preamble detected, switch to STATE_DATE but prepare next switch to STATE_PREAMBLE
+      unNrOnePreamble = 0;
+    }
+
+    return nextState;
+  }
+
+  // ---------------------------------------------------
+  /// State function: Interpret adress or data bytes bit by bit.
+  // ---------------------------------------------------
+  DccInterpreter::eState DccInterpreter::executeData(eBit bitRcv)
+  {
+    eState nextState = state;
+
+    if (unNrBitsData < 8u)
+    {
+      refCurrentPacket().addBit((unsigned int) bitRcv);
+      unNrBitsData++;
     }
     else
     {
-      // min number of "1" not reached, invalid or waiting for first "1", reset
-      unNrOne = 0;
+      unNrBitsData = 0;
+
+      // Bit 0 is expected at the end of a data / address byte
+      // If a 1 bit is received instead of a 0 bit, the packet is finished and the next packet is to be received
+      if (bitRcv == BIT_ONE)
+      {
+        nextState = STATE_PREAMBLE;
+        nextPacket();
+      }
     }
+
+    return nextState;
   }
 
-  return nextState;
-}
-
-/// Entry function for state STATE_BYTE: Reset counters to start a new interpretation
-void DccInterpreter::StateByte::entry()
-{
-  unNrBits = 0;
-  unNrBytes = 0;
-}
-
-/// State function: Interpret adress or data bytes bit by bit.
-DccInterpreter::tState DccInterpreter::StateByte::execFunc(tState curState, tBit bitReceived)
-{
-  tState nextState = curState;
-
-  unNrBits++;
-
-  if (unNrBits <= 8)
+  // ---------------------------------------------------
+  /// trigger state machine
+  // ---------------------------------------------------
+  void DccInterpreter::execute(eBit bitRcv)
   {
-    if (bitReceived == BIT_ONE)
+    switch (state)
     {
-      //aBytes[unNrBytes] = (aBytes[unNrBytes] << 1u) | 1u;
-      DccInterp.addOne();
-    }
-    else
-    {
-      //aBytes[unNrBytes] = (aBytes[unNrBytes] << 1u);
-      DccInterp.addZero();
+    case STATE_PREAMBLE: { state = executePreamble(bitRcv); } break;
+    case STATE_DATA    : { state = executeData    (bitRcv); } break;
+    default            : {} break;
     }
   }
-  else
+
+  // ---------------------------------------------------
+  /// Switch to the next packet
+  // ---------------------------------------------------
+  void DccInterpreter::nextPacket()
   {
-    if (bitReceived == BIT_ZERO)
-    {
-       DccInterp.nextByte();
-    }
-    else // BIT_ONE
-    {
-      nextState = STATE_PREAMBLE;
-    }
+    unPacket = (unPacket + 1u) % DCCINTERPRETER_MAXPACKETS; 
+    aPackets[unPacket].clear();
   }
 
-  return nextState;
-}
-
-/// trigger state machine
-void DccInterpreter::execute(tBit bitReceived)
-{
-  tState prevState = state;
-  state = aStates[state]->execFunc(state, bitReceived);
-  if (prevState != state)
+  // ---------------------------------------------------
+  /// "1" bit received
+  // ---------------------------------------------------
+  void DccInterpreter::one()
   {
-    aStates[state]->entry();
+    unNrOne++;
+    execute(BIT_ONE);
   }
-}
 
-// ---------------------------------------------------
-/// "1" bit received
-// ---------------------------------------------------
-void DccInterpreter::one()
-{
-  unNrOne++;
-  execute(BIT_ONE);
-}
+  // ---------------------------------------------------
+  /// "0" bit received
+  // ---------------------------------------------------
+  void DccInterpreter::zero()
+  {
+    unNrZero++;
+    execute(BIT_ZERO);
+  }
 
-// ---------------------------------------------------
-/// "0" bit received
-// ---------------------------------------------------
-void DccInterpreter::zero()
-{
-  unNrZero++;
-  execute(BIT_ZERO);
-}
+  // ---------------------------------------------------
+  /// Invalid received, reset
+  // ---------------------------------------------------
+  void DccInterpreter::invalid()
+  {
+    state = STATE_PREAMBLE;
+    unNrOnePreamble = 0;
+    refCurrentPacket().clear();
+  }
 
-// ---------------------------------------------------
-/// Invalid received, reset
-// ---------------------------------------------------
-void DccInterpreter::invalid()
-{
-  state = STATE_PREAMBLE;
-  aStates[state]->entry();
-}
+} // namespace Dcc
+
+// EOF

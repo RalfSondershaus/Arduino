@@ -21,6 +21,14 @@
       <Configuration>DccDecoder Program</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="DccDecoderTest Compile|Win32">
+      <Configuration>DccDecoderTest Compile</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DccDecoderTest Program|Win32">
+      <Configuration>DccDecoderTest Program</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="SequenceBlink Compile|Win32">
       <Configuration>SequenceBlink Compile</Configuration>
       <Platform>Win32</Platform>
@@ -31,8 +39,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Build.bat" />
     <None Include="Makefile.gmk" />
     <None Include="Prj\BlinkSample\Makefile_Prj.gmk" />
+    <None Include="Prj\DccDecoderTest\Makefile_Prj.gmk" />
     <None Include="Prj\DccDecoder\Makefile_Prj.gmk" />
     <None Include="Prj\SequenceBlink\Makefile_Prj.gmk" />
   </ItemGroup>
@@ -40,9 +50,10 @@
     <ClCompile Include="Gen\Runable\Runable.cpp" />
     <ClCompile Include="Gen\Scheduler\Scheduler.cpp" />
     <ClCompile Include="Prj\BlinkSample\BlinkSample.cpp" />
+    <ClCompile Include="Prj\DccDecoderTest\DccMain.cpp" />
     <ClCompile Include="Prj\DccDecoder\DccDecoder.cpp" />
     <ClCompile Include="Prj\DccDecoder\DccInterpreter.cpp" />
-    <ClCompile Include="Prj\DccDecoder\ISR_Dcc.cpp" />
+    <ClCompile Include="Prj\DccDecoder\DccMain.cpp" />
     <ClCompile Include="Prj\DccDecoder\PeriodSM.cpp" />
     <ClCompile Include="Prj\SequenceBlink\SequenceBlink.cpp" />
   </ItemGroup>
@@ -50,7 +61,7 @@
     <ClInclude Include="Gen\Runable\Runable.h" />
     <ClInclude Include="Gen\Scheduler\Scheduler.h" />
     <ClInclude Include="Gen\Timer\Timer.h" />
-    <ClInclude Include="Prj\DccDecoder\ISR_Dcc.h" />
+    <ClInclude Include="Prj\DccDecoder\DccDecoder.h" />
     <ClInclude Include="Prj\DccDecoder\DccInterpreter.h" />
     <ClInclude Include="Prj\DccDecoder\PeriodSM.h" />
   </ItemGroup>
@@ -75,6 +86,11 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -86,6 +102,11 @@
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Program|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Program|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -107,6 +128,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -114,6 +138,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Program|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Program|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -141,6 +168,14 @@
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'">
+    <NMakeBuildCommandLine>./Build DccDecoderTest all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build DccDecoderTest clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build DccDecoderTest rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'">
     <NMakeBuildCommandLine>./Build BlinkSample program</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>./Build BlinkSample clean</NMakeCleanCommandLine>
@@ -161,6 +196,14 @@
     <NMakeBuildCommandLine>./Build DccDecoder program</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>./Build DccDecoder clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>./Build DccDecoder program</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Program|Win32'">
+    <NMakeBuildCommandLine>./Build DccDecoderTest program</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build DccDecoderTest clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build DccDecoderTest program</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>

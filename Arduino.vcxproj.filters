@@ -25,6 +25,9 @@
     <Filter Include="Prj\DccDecoder">
       <UniqueIdentifier>{ed0532c4-2572-42b1-8b5c-1878e1d9f907}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Prj\DccDecoderTest">
+      <UniqueIdentifier>{a9c9a860-24a6-4717-a0ef-f5203c55520c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Gen\Runable\Runable.cpp">
@@ -42,14 +45,17 @@
     <ClCompile Include="Prj\DccDecoder\DccDecoder.cpp">
       <Filter>Prj\DccDecoder</Filter>
     </ClCompile>
-    <ClCompile Include="Prj\DccDecoder\ISR_Dcc.cpp">
-      <Filter>Prj\DccDecoder</Filter>
-    </ClCompile>
     <ClCompile Include="Prj\DccDecoder\PeriodSM.cpp">
       <Filter>Prj\DccDecoder</Filter>
     </ClCompile>
     <ClCompile Include="Prj\DccDecoder\DccInterpreter.cpp">
       <Filter>Prj\DccDecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\DccDecoder\DccMain.cpp">
+      <Filter>Prj\DccDecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\DccDecoderTest\DccMain.cpp">
+      <Filter>Prj\DccDecoderTest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -65,10 +71,10 @@
     <ClInclude Include="Prj\DccDecoder\PeriodSM.h">
       <Filter>Prj\DccDecoder</Filter>
     </ClInclude>
-    <ClInclude Include="Prj\DccDecoder\ISR_Dcc.h">
+    <ClInclude Include="Prj\DccDecoder\DccInterpreter.h">
       <Filter>Prj\DccDecoder</Filter>
     </ClInclude>
-    <ClInclude Include="Prj\DccDecoder\DccInterpreter.h">
+    <ClInclude Include="Prj\DccDecoder\DccDecoder.h">
       <Filter>Prj\DccDecoder</Filter>
     </ClInclude>
   </ItemGroup>
@@ -83,5 +89,9 @@
     <None Include="Prj\DccDecoder\Makefile_Prj.gmk">
       <Filter>Prj\DccDecoder</Filter>
     </None>
+    <None Include="Prj\DccDecoderTest\Makefile_Prj.gmk">
+      <Filter>Prj\DccDecoderTest</Filter>
+    </None>
+    <None Include="Build.bat" />
   </ItemGroup>
 </Project>
