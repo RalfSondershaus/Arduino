@@ -3,6 +3,7 @@
 /// DCC Interpreter for Arduino
 
 #include <DccInterpreter.h>
+#include <limits.h>
 
 namespace Dcc
 {
@@ -12,15 +13,14 @@ namespace Dcc
   // ---------------------------------------------------
   /// Returns true if unNr exceeds the minimal number of "1"
   // ---------------------------------------------------
-  static inline bool isMinNumberOfOneTransmitted(unsigned int unNr) { return unNr >= DCCINTERPRETER_PREAMBLE_MIN_NR_ONES; }
+  static inline bool isPreambleValid(unsigned int unNr) { return unNr >= DCCINTERPRETER_PREAMBLE_MIN_NR_ONES; }
 
   // ---------------------------------------------------
   /// constructor
   // ---------------------------------------------------
   DccInterpreter::DccInterpreter()
-    : unNrOne(0)
-    , unNrZero(0)
-    , unPacket(0)
+    : state(STATE_PREAMBLE)
+    , unNrBitsData(0u)
   {
     invalid();
   }
@@ -49,7 +49,7 @@ namespace Dcc
     }
     else // BIT_ZERO
     {
-      if (isMinNumberOfOneTransmitted(unNrOnePreamble))
+      if (isPreambleValid(unNrOnePreamble))
       {
         nextState = STATE_DATA;
       }
@@ -71,19 +71,22 @@ namespace Dcc
 
     if (unNrBitsData < 8u)
     {
-      refCurrentPacket().addBit((unsigned int) bitRcv);
+      CurrentPacket.addBit((unsigned int) bitRcv);
       unNrBitsData++;
     }
     else
     {
-      unNrBitsData = 0;
+      unNrBitsData = 0u;
 
       // Bit 0 is expected at the end of a data / address byte
       // If a 1 bit is received instead of a 0 bit, the packet is finished and the next packet is to be received
       if (bitRcv == BIT_ONE)
       {
         nextState = STATE_PREAMBLE;
-        nextPacket();
+        // store packet into the array (if it does not exist already)
+        packetReceived(CurrentPacket);
+        // prepare next reception
+        CurrentPacket.clear();
       }
     }
 
@@ -104,20 +107,10 @@ namespace Dcc
   }
 
   // ---------------------------------------------------
-  /// Switch to the next packet
-  // ---------------------------------------------------
-  void DccInterpreter::nextPacket()
-  {
-    unPacket = (unPacket + 1u) % DCCINTERPRETER_MAXPACKETS; 
-    aPackets[unPacket].clear();
-  }
-
-  // ---------------------------------------------------
   /// "1" bit received
   // ---------------------------------------------------
   void DccInterpreter::one()
   {
-    unNrOne++;
     execute(BIT_ONE);
   }
 
@@ -126,7 +119,6 @@ namespace Dcc
   // ---------------------------------------------------
   void DccInterpreter::zero()
   {
-    unNrZero++;
     execute(BIT_ZERO);
   }
 
@@ -136,10 +128,35 @@ namespace Dcc
   void DccInterpreter::invalid()
   {
     state = STATE_PREAMBLE;
-    unNrOnePreamble = 0;
-    refCurrentPacket().clear();
+    unNrOnePreamble = 0u;
+    unNrBitsData = 0u;
+    CurrentPacket.clear();
   }
 
+  // ---------------------------------------------------
+  /// Store the received packet into the list of packets (if it does not exist already)
+  // ---------------------------------------------------
+  void DccInterpreter::packetReceived(const Packet& pkt)
+  {
+    PacketContainer::iterator it;
+
+    it = aPackets.find(pkt);
+    if (it == aPackets.end())
+    {
+      if (aPackets.size() < DCCINTERPRETER_MAXPACKETS)
+      {
+        aPackets.push_back(pkt);
+        aPackets.back().unNrRcv++;
+      }
+    }
+    else
+    {
+      if (it->unNrRcv < UINT_MAX - 1u)
+      {
+        it->unNrRcv++;
+      }
+    }
+  }
 } // namespace Dcc
 
 // EOF

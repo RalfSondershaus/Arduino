@@ -28,6 +28,22 @@ extern unsigned int unDbgIdx;
 bool bPrintTime = false;
 bool bPrintPackets = false;
 
+void printBin(unsigned char b)
+{
+  int i;
+  for (i = 0; i < 8; i++)
+  {
+    if ((b & 0x80u) == 0)
+    {
+      Serial.print('0');
+    }
+    else
+    {
+      Serial.print('1');
+    }
+    b <<= 1u;
+  }
+}
 void loop()
 {
   MyDecoder.loop();
@@ -69,29 +85,22 @@ void loop()
   }
   if (bPrintPackets)
   {
-    for (i = 0; i < DCCINTERPRETER_MAXPACKETS; i++)
+    const DccInterpreter::PacketContainer& Container = MyDecoder.DccInterp.refPacketContainer();
+    DccInterpreter::PacketContainer::const_iterator cit;
+    for (cit = Container.begin(); cit != Container.end(); cit++)
     {
-      for (j = 0; j < MyDecoder.DccInterp.refPacket(i).getNrBytes(); j++)
+      Serial.print(cit->unNrRcv, DEC);
+      Serial.print(", ");
+      Serial.print(cit->unNrBits, DEC);
+      Serial.print(" -> ");
+      n = cit->byteIdx();
+      for (i = 0; i < n; i++)
       {
-        Serial.print(MyDecoder.DccInterp.refPacket(i).aBytes[j]);
+        printBin(cit->refByte(i));
         Serial.print(" ");
       }
       Serial.println();
     }
     bPrintPackets = false;
   }
-  //if (ulTimePrintCur - ulTimePrint > 1000u)
-  //{
-  //  Serial.print(MyDecoder.DccInterp.getNrOne());
-  //  Serial.print(" ");
-  //  Serial.print(MyDecoder.DccInterp.getNrZero());
-  //  n = MyDecoder.DccInterp.refCurrentPacket().getNrBytes();
-  //  for (i = 0; i < n; i++)
-  //  {
-  //    Serial.print(" ");
-  //    Serial.print(MyDecoder.DccInterp.refCurrentPacket().refByte(i));
-  //  }
-  //  Serial.println();
-  //  ulTimePrint = ulTimePrintCur;
-  //}
 }
