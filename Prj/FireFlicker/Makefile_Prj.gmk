@@ -1,0 +1,8 @@
+# 
+# Project specific Makefile for FireFlicker
+#
+
+# Files
+FILES_PRJ = $(PATH_PRJ_PROJECT)/FireFlicker
+
+-include $(PATH_TMP)/FireFlicker.d

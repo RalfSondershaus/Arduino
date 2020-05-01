@@ -28,6 +28,9 @@
     <Filter Include="Prj\DccDecoderTest">
       <UniqueIdentifier>{a9c9a860-24a6-4717-a0ef-f5203c55520c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Prj\FireFlicker">
+      <UniqueIdentifier>{d379be09-1af8-4343-a594-aaba65abcd8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Gen\Runable\Runable.cpp">
@@ -56,6 +59,9 @@
     </ClCompile>
     <ClCompile Include="Prj\DccDecoderTest\DccMain.cpp">
       <Filter>Prj\DccDecoderTest</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\FireFlicker\FireFlicker.cpp">
+      <Filter>Prj\FireFlicker</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -93,5 +99,8 @@
       <Filter>Prj\DccDecoderTest</Filter>
     </None>
     <None Include="Build.bat" />
+    <None Include="Prj\FireFlicker\Makefile_Prj.gmk">
+      <Filter>Prj\FireFlicker</Filter>
+    </None>
   </ItemGroup>
 </Project>

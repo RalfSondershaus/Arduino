@@ -13,10 +13,6 @@
       <Configuration>DccDecoder Compile</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="DccDecoder Download|Win32">
-      <Configuration>DccDecoder Download</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="DccDecoder Program|Win32">
       <Configuration>DccDecoder Program</Configuration>
       <Platform>Win32</Platform>
@@ -27,6 +23,10 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="DccDecoderTest Program|Win32">
       <Configuration>DccDecoderTest Program</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="FireFlicker Compile|Win32">
+      <Configuration>FireFlicker Compile</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="SequenceBlink Compile|Win32">
@@ -44,6 +44,7 @@
     <None Include="Prj\BlinkSample\Makefile_Prj.gmk" />
     <None Include="Prj\DccDecoderTest\Makefile_Prj.gmk" />
     <None Include="Prj\DccDecoder\Makefile_Prj.gmk" />
+    <None Include="Prj\FireFlicker\Makefile_Prj.gmk" />
     <None Include="Prj\SequenceBlink\Makefile_Prj.gmk" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +56,7 @@
     <ClCompile Include="Prj\DccDecoder\DccInterpreter.cpp" />
     <ClCompile Include="Prj\DccDecoder\DccMain.cpp" />
     <ClCompile Include="Prj\DccDecoder\PeriodSM.cpp" />
+    <ClCompile Include="Prj\FireFlicker\FireFlicker.cpp" />
     <ClCompile Include="Prj\SequenceBlink\SequenceBlink.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +74,11 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -111,15 +118,15 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='DccDecoder Download|Win32'">
-    <PlatformToolset>v141</PlatformToolset>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Compile|Win32'" Label="PropertySheets">
@@ -148,6 +155,14 @@
     <NMakeBuildCommandLine>./Build BlinkSample all</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>./Build BlinkSample clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>./Build BlinkSample rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'">
+    <NMakeBuildCommandLine>./Build FireFlicker all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build FireFlicker clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build FireFlicker rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
