@@ -289,6 +289,14 @@ class AusfahrSignal
     }
 };
 
+/*
+AusfahrSignal S2 (A0, 13, 12, 11, 10,  9);
+AusfahrSignal S4 (A1,  8,  7,  6,  5,  4);
+AusfahrSignal S6 (A2,  2, 22, 24,  3, 52);
+AusfahrSignal S8 (A3, 28, 30, 26, 32, 50);
+AusfahrSignal S10(A4, 40, 44, 46, 42, 48);
+*/
+
 //                    R1  R1   G   Y   W
 AusfahrSignal S2 (A4, 13, 12, 11, 10,  9);
 AusfahrSignal S4 (A3,  8,  7,  6,  5,  4);
