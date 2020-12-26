@@ -45,7 +45,6 @@
     <None Include="Prj\DccDecoderTest\Makefile_Prj.gmk" />
     <None Include="Prj\DccDecoder\Makefile_Prj.gmk" />
     <None Include="Prj\FireFlicker\Makefile_Prj.gmk" />
-    <None Include="Prj\SequenceBlink\Makefile_Prj.gmk" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Gen\Runable\Runable.cpp" />
@@ -57,7 +56,6 @@
     <ClCompile Include="Prj\DccDecoder\DccMain.cpp" />
     <ClCompile Include="Prj\DccDecoder\PeriodSM.cpp" />
     <ClCompile Include="Prj\FireFlicker\FireFlicker.cpp" />
-    <ClCompile Include="Prj\SequenceBlink\SequenceBlink.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gen\Runable\Runable.h" />

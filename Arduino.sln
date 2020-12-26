@@ -38,12 +38,6 @@ Global
 		Release|ARM = Release|ARM
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-		SequenceBlink Compile|ARM = SequenceBlink Compile|ARM
-		SequenceBlink Compile|x64 = SequenceBlink Compile|x64
-		SequenceBlink Compile|x86 = SequenceBlink Compile|x86
-		SequenceBlink Program|ARM = SequenceBlink Program|ARM
-		SequenceBlink Program|x64 = SequenceBlink Program|x64
-		SequenceBlink Program|x86 = SequenceBlink Program|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Compile|ARM.ActiveCfg = BlinkSample Compile|Win32
@@ -82,13 +76,6 @@ Global
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Release|x64.Build.0 = DccDecoderTest Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Release|x86.ActiveCfg = DccDecoderTest Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Release|x86.Build.0 = DccDecoderTest Program|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Compile|ARM.ActiveCfg = SequenceBlink Compile|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Compile|x64.ActiveCfg = SequenceBlink Compile|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Compile|x86.ActiveCfg = SequenceBlink Compile|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Compile|x86.Build.0 = SequenceBlink Compile|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Program|ARM.ActiveCfg = SequenceBlink Program|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Program|x64.ActiveCfg = SequenceBlink Program|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.SequenceBlink Program|x86.ActiveCfg = SequenceBlink Program|Win32
 		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.BlinkSample Compile|ARM.ActiveCfg = Release|x64
 		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.BlinkSample Compile|ARM.Build.0 = Release|x64
 		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.BlinkSample Compile|x64.ActiveCfg = Release|x64
@@ -140,18 +127,6 @@ Global
 		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.Release|x64.Build.0 = Release|x64
 		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.Release|x86.ActiveCfg = Release|Win32
 		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.Release|x86.Build.0 = Release|Win32
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Compile|ARM.ActiveCfg = Release|x64
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Compile|ARM.Build.0 = Release|x64
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Compile|x64.ActiveCfg = Release|x64
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Compile|x64.Build.0 = Release|x64
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Compile|x86.ActiveCfg = Release|Win32
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Compile|x86.Build.0 = Release|Win32
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Program|ARM.ActiveCfg = Release|x64
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Program|ARM.Build.0 = Release|x64
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Program|x64.ActiveCfg = Release|x64
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Program|x64.Build.0 = Release|x64
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Program|x86.ActiveCfg = Release|Win32
-		{6799375C-B4ED-4506-BE9B-E7BA2E542BF3}.SequenceBlink Program|x86.Build.0 = Release|Win32
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample Compile|ARM.ActiveCfg = Release|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample Compile|ARM.Build.0 = Release|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample Compile|x64.ActiveCfg = Release|x64
@@ -203,18 +178,6 @@ Global
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Release|x64.Build.0 = Release|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Release|x86.ActiveCfg = Release|Win32
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Release|x86.Build.0 = Release|Win32
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Compile|ARM.ActiveCfg = Release|x64
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Compile|ARM.Build.0 = Release|x64
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Compile|x64.ActiveCfg = Release|x64
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Compile|x64.Build.0 = Release|x64
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Compile|x86.ActiveCfg = Release|Win32
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Compile|x86.Build.0 = Release|Win32
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Program|ARM.ActiveCfg = Release|x64
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Program|ARM.Build.0 = Release|x64
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Program|x64.ActiveCfg = Release|x64
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Program|x64.Build.0 = Release|x64
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Program|x86.ActiveCfg = Release|Win32
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.SequenceBlink Program|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
