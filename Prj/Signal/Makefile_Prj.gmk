@@ -1,0 +1,6 @@
+# 
+# Project specific Makefile for BlinkSample
+#
+
+# Files
+FILES_PRJ = $(PATH_PRJ_PROJECT)/Signal

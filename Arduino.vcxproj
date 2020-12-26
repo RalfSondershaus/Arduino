@@ -29,12 +29,16 @@
       <Configuration>FireFlicker Compile</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="SequenceBlink Compile|Win32">
-      <Configuration>SequenceBlink Compile</Configuration>
+    <ProjectConfiguration Include="FireFlicker Program|Win32">
+      <Configuration>FireFlicker Program</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="SequenceBlink Program|Win32">
-      <Configuration>SequenceBlink Program</Configuration>
+    <ProjectConfiguration Include="Signal Compile|Win32">
+      <Configuration>Signal Compile</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Signal Program|Win32">
+      <Configuration>Signal Program</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -45,6 +49,7 @@
     <None Include="Prj\DccDecoderTest\Makefile_Prj.gmk" />
     <None Include="Prj\DccDecoder\Makefile_Prj.gmk" />
     <None Include="Prj\FireFlicker\Makefile_Prj.gmk" />
+    <None Include="Prj\Signal\Makefile_Prj.gmk" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Gen\Runable\Runable.cpp" />
@@ -56,6 +61,7 @@
     <ClCompile Include="Prj\DccDecoder\DccMain.cpp" />
     <ClCompile Include="Prj\DccDecoder\PeriodSM.cpp" />
     <ClCompile Include="Prj\FireFlicker\FireFlicker.cpp" />
+    <ClCompile Include="Prj\Signal\Signal.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gen\Runable\Runable.h" />
@@ -76,12 +82,12 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Signal Compile|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Compile|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -101,7 +107,12 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Program|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Program|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Signal Program|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -124,10 +135,10 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Signal Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Compile|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Compile|Win32'" Label="PropertySheets">
@@ -139,7 +150,10 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Program|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Program|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Signal Program|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Program|Win32'" Label="PropertySheets">
@@ -157,18 +171,18 @@
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'">
-    <NMakeBuildCommandLine>./Build FireFlicker all</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>./Build FireFlicker clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>./Build FireFlicker rebuild</NMakeReBuildCommandLine>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Signal Compile|Win32'">
+    <NMakeBuildCommandLine>./Build Signal all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build Signal clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build Signal rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Compile|Win32'">
-    <NMakeBuildCommandLine>./Build SequenceBlink all</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>./Build SequenceBlink clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>./Build SequenceBlink rebuild</NMakeReBuildCommandLine>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'">
+    <NMakeBuildCommandLine>./Build FireFlicker all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build FireFlicker clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build FireFlicker rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
@@ -197,10 +211,18 @@
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SequenceBlink Program|Win32'">
-    <NMakeBuildCommandLine>./Build SequenceBlink program</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>./Build SequenceBlink clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>./Build SequenceBlink program</NMakeReBuildCommandLine>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Program|Win32'">
+    <NMakeBuildCommandLine>./Build FireFlicker program</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build FireFlicker clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build FireFlicker program</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Signal Program|Win32'">
+    <NMakeBuildCommandLine>./Build Signal program</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build Signal clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build Signal program</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>

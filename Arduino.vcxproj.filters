@@ -28,6 +28,9 @@
     <Filter Include="Prj\FireFlicker">
       <UniqueIdentifier>{d379be09-1af8-4343-a594-aaba65abcd8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Prj\Signal">
+      <UniqueIdentifier>{18af9249-6742-446f-b2a8-8cd5d5d8e015}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Gen\Runable\Runable.cpp">
@@ -56,6 +59,9 @@
     </ClCompile>
     <ClCompile Include="Prj\FireFlicker\FireFlicker.cpp">
       <Filter>Prj\FireFlicker</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\Signal\Signal.cpp">
+      <Filter>Prj\Signal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +98,9 @@
     <None Include="Build.bat" />
     <None Include="Prj\FireFlicker\Makefile_Prj.gmk">
       <Filter>Prj\FireFlicker</Filter>
+    </None>
+    <None Include="Prj\Signal\Makefile_Prj.gmk">
+      <Filter>Prj\Signal</Filter>
     </None>
   </ItemGroup>
 </Project>
