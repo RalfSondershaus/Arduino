@@ -31,6 +31,12 @@
     <Filter Include="Prj\Signal">
       <UniqueIdentifier>{18af9249-6742-446f-b2a8-8cd5d5d8e015}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Gen\Util">
+      <UniqueIdentifier>{cbbd9e34-de6d-4e8b-a49c-293e16c5dcf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gen\Dcc">
+      <UniqueIdentifier>{dc665ebe-3f22-45a5-a8b5-aa7a1fcb866d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Gen\Runable\Runable.cpp">
@@ -42,15 +48,6 @@
     <ClCompile Include="Prj\BlinkSample\BlinkSample.cpp">
       <Filter>Prj\BlinkSample</Filter>
     </ClCompile>
-    <ClCompile Include="Prj\DccDecoder\DccDecoder.cpp">
-      <Filter>Prj\DccDecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="Prj\DccDecoder\PeriodSM.cpp">
-      <Filter>Prj\DccDecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="Prj\DccDecoder\DccInterpreter.cpp">
-      <Filter>Prj\DccDecoder</Filter>
-    </ClCompile>
     <ClCompile Include="Prj\DccDecoder\DccMain.cpp">
       <Filter>Prj\DccDecoder</Filter>
     </ClCompile>
@@ -60,8 +57,23 @@
     <ClCompile Include="Prj\FireFlicker\FireFlicker.cpp">
       <Filter>Prj\FireFlicker</Filter>
     </ClCompile>
-    <ClCompile Include="Prj\Signal\Signal.cpp">
+    <ClCompile Include="Prj\Signal\RailwaySignal.cpp">
       <Filter>Prj\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\Signal\RailwaySignalDO.cpp">
+      <Filter>Prj\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\Signal\DiagnoseCommander.cpp">
+      <Filter>Prj\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\Signal\Rnbl.cpp">
+      <Filter>Prj\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Prj\Signal\IfcM.cpp">
+      <Filter>Prj\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Gen\Dcc\Decoder.cpp">
+      <Filter>Gen\Dcc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -74,14 +86,56 @@
     <ClInclude Include="Gen\Scheduler\Scheduler.h">
       <Filter>Gen\Scheduler</Filter>
     </ClInclude>
-    <ClInclude Include="Prj\DccDecoder\PeriodSM.h">
-      <Filter>Prj\DccDecoder</Filter>
+    <ClInclude Include="Prj\Signal\InputClassifier.h">
+      <Filter>Prj\Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Prj\DccDecoder\DccInterpreter.h">
-      <Filter>Prj\DccDecoder</Filter>
+    <ClInclude Include="Prj\Signal\IfcClassifier.h">
+      <Filter>Prj\Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Prj\DccDecoder\DccDecoder.h">
-      <Filter>Prj\DccDecoder</Filter>
+    <ClInclude Include="Prj\Signal\InputButtonClassifier.h">
+      <Filter>Prj\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Prj\Signal\IfcSignalCommand.h">
+      <Filter>Prj\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Prj\Signal\IfcSignalTarget.h">
+      <Filter>Prj\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Prj\Signal\RailwaySignal.h">
+      <Filter>Prj\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Prj\Signal\RailwaySignalDO.h">
+      <Filter>Prj\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Prj\Signal\DiagnoseCommander.h">
+      <Filter>Prj\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Prj\Signal\IfcDiagnose.h">
+      <Filter>Prj\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Prj\Signal\PortMpx.h">
+      <Filter>Prj\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Prj\Signal\IfcM.h">
+      <Filter>Prj\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Gen\Util\Array.h">
+      <Filter>Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Gen\Util\Math.h">
+      <Filter>Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Gen\Dcc\Packet.h">
+      <Filter>Gen\Dcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Gen\Dcc\Decoder.h">
+      <Filter>Gen\Dcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Gen\Dcc\BitExtractor.h">
+      <Filter>Gen\Dcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Gen\Dcc\PacketExtractor.h">
+      <Filter>Gen\Dcc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,12 +6,55 @@
 /// - setup
 /// - loop
 
-#include <DccDecoder.h>
+#include <Dcc/Decoder.h>
 #include <Arduino.h>
+#include <limits.h>
 
 using namespace Dcc;
 
-DccDecoder MyDecoder;
+// ---------------------------------------------------
+/// Interface for a handler that is called if a packet is received
+// ---------------------------------------------------
+template<int MaxNrPackets = 60>
+class ArrayHandlerIfc : public Decoder::HandlerIfc
+{
+public:
+  /// Array of packets
+  typedef Array<MyPacket, MaxNrPackets> PacketArray;
+  /// received valid packets
+  PacketArray aPackets;
+
+  /// Default constructor
+  ArrayHandlerIfc() {}
+  /// Destructor
+  virtual ~ArrayHandlerIfc() {}
+
+  /// Store the received packet into the list of packets (if it does not exist already)
+  virtual void packetReceived(const MyPacket& pkt)
+  {
+    auto it = aPackets.find(pkt);
+    if (it == aPackets.end())
+    {
+      if (aPackets.size() < MaxNrPackets)
+      {
+        aPackets.push_back(pkt);
+        aPackets.back().unNrRcv++;
+      }
+    }
+    else
+    {
+      if (it->unNrRcv < UINT_MAX - 1u)
+      {
+        it->unNrRcv++;
+      }
+    }
+  }
+};
+
+typedef ArrayHandlerIfc<> MyArrayHandlerIfc;
+
+MyArrayHandlerIfc MyHandlerIfc;
+Decoder MyDecoder(MyHandlerIfc);
 
 void setup()
 {
@@ -22,9 +65,6 @@ void setup()
   Serial.begin(9600);
 }
 
-extern unsigned long aulDbgTimeDiff[100];
-extern unsigned char aucDbgState[100];
-extern unsigned int unDbgIdx;
 bool bPrintTime = false;
 bool bPrintPackets = false;
 
@@ -61,7 +101,6 @@ void loop()
     Serial.println();
     if (nRcv == 't')
     {
-      unDbgIdx = 0;
       bPrintTime = false;
     }
     else if (nRcv == 'b')
@@ -72,22 +111,9 @@ void loop()
     {
     }
   }
-  if ((unDbgIdx >= 100u) && (!bPrintTime))
-  {
-    for (i = 0; i < 100; i++)
-    {
-      Serial.print(aulDbgTimeDiff[i]);
-      Serial.print(" ");
-      Serial.print(aucDbgState[i]);
-      Serial.println();
-    }
-    bPrintTime = true;
-  }
   if (bPrintPackets)
   {
-    const DccInterpreter::PacketContainer& Container = MyDecoder.DccInterp.refPacketContainer();
-    DccInterpreter::PacketContainer::const_iterator cit;
-    for (cit = Container.begin(); cit != Container.end(); cit++)
+    for (auto cit = MyHandlerIfc.aPackets.begin(); cit != MyHandlerIfc.aPackets.end(); cit++)
     {
       Serial.print(cit->unNrRcv, DEC);
       Serial.print(", ");

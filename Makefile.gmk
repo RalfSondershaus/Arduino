@@ -208,6 +208,7 @@ clean:
 	@-if exist $(PATH_BIN)/*.elf $(RM) $(subst /,\,$(PATH_BIN)/*.elf)
 	@-if exist $(PATH_BIN)/*.hex $(RM) $(subst /,\,$(PATH_BIN)/*.hex)
 	@-if exist $(PATH_TMP)       $(RM) $(subst /,\,$(PATH_TMP)/*.o  )
+	@-if exist $(PATH_TMP)       $(RM) $(subst /,\,$(PATH_TMP)/*.d  )
 
 $(TARGET).elf: $(FILES_O)
 	@echo +++++ linking $(basename $@).elf +++++

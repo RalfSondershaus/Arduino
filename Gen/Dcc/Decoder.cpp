@@ -1,4 +1,4 @@
-/// DccDecoder.cpp
+/// @file DccDecoder.cpp
 ///
 /// DCC Decoder for Arduino
 ///
@@ -6,7 +6,7 @@
 /// - setup
 /// - loop
 
-#include <DccDecoder.h>
+#include <Dcc/Decoder.h>
 #include <Arduino.h>
 
 namespace Dcc
@@ -24,8 +24,8 @@ namespace Dcc
     TimeStampBuffer() : unIdxRead(0u), unIdxWrite(0u), bBufferFull(false) {}
     /// Destructor
     ~TimeStampBuffer() {}
-    /// called within loop() context, might be interrupted by a call to add()
-    /// Return true is a next value is available (and return value), return false otherwise (and keep parameter val unchanged)
+    /// called within loop() context, might be interrupted by a call to add().
+    /// Returns true if a value is available (written into parameter val), return false otherwise (and keep parameter val unchanged)
     bool get(unsigned long& val)
     {
       bool bRet;
@@ -101,7 +101,9 @@ namespace Dcc
   /// Shared data between ISR and DccDecoder::loop
   /// The time stamp ring buffer
   TimeStampBuffer DccTimeStampBuffer;
-  /// for debugging: number of interrupt (ISR) calls
+  /// for debugging: 
+  /// [0]: Number of interrupt (ISR) calls
+  /// [1]: Number of bitExtr.execute
   unsigned int unDebugVal[10] = { 0 };
 
   // ---------------------------------------------------
@@ -126,19 +128,19 @@ namespace Dcc
   }
 
   /// Initialize
-  void DccDecoder::setup(unsigned int unIntPin)
+  void Decoder::setup(unsigned int unIntPin)
   {
     attachInterrupt(digitalPinToInterrupt(unIntPin), ISR_Dcc, CHANGE);
   }
 
   /// Initialize
-  void DccDecoder::loop()
+  void Decoder::loop()
   {
     unsigned long ulTimeDiff;
     while (DccTimeStampBuffer.get(ulTimeDiff))
     {
       unDebugVal[1]++;
-      periodSM.execute(ulTimeDiff);
+      bitExtr.execute(ulTimeDiff);
     }
     if (DccTimeStampBuffer.isBufferFull())
     {
@@ -146,7 +148,7 @@ namespace Dcc
     }
   }
   /// for debugging: number of interrupt (ISR) calls
-  unsigned int DccDecoder::getDebugVal(int i)
+  unsigned int Decoder::getDebugVal(int i)
   {
     return unDebugVal[i];
   }

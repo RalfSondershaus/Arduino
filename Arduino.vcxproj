@@ -52,24 +52,40 @@
     <None Include="Prj\Signal\Makefile_Prj.gmk" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Gen\Dcc\Decoder.cpp" />
     <ClCompile Include="Gen\Runable\Runable.cpp" />
     <ClCompile Include="Gen\Scheduler\Scheduler.cpp" />
     <ClCompile Include="Prj\BlinkSample\BlinkSample.cpp" />
     <ClCompile Include="Prj\DccDecoderTest\DccMain.cpp" />
-    <ClCompile Include="Prj\DccDecoder\DccDecoder.cpp" />
-    <ClCompile Include="Prj\DccDecoder\DccInterpreter.cpp" />
     <ClCompile Include="Prj\DccDecoder\DccMain.cpp" />
-    <ClCompile Include="Prj\DccDecoder\PeriodSM.cpp" />
     <ClCompile Include="Prj\FireFlicker\FireFlicker.cpp" />
-    <ClCompile Include="Prj\Signal\Signal.cpp" />
+    <ClCompile Include="Prj\Signal\DiagnoseCommander.cpp" />
+    <ClCompile Include="Prj\Signal\IfcM.cpp" />
+    <ClCompile Include="Prj\Signal\RailwaySignal.cpp" />
+    <ClCompile Include="Prj\Signal\RailwaySignalDO.cpp" />
+    <ClCompile Include="Prj\Signal\Rnbl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Gen\Dcc\Decoder.h" />
+    <ClInclude Include="Gen\Dcc\Packet.h" />
+    <ClInclude Include="Gen\Dcc\PacketExtractor.h" />
+    <ClInclude Include="Gen\Dcc\BitExtractor.h" />
     <ClInclude Include="Gen\Runable\Runable.h" />
     <ClInclude Include="Gen\Scheduler\Scheduler.h" />
     <ClInclude Include="Gen\Timer\Timer.h" />
-    <ClInclude Include="Prj\DccDecoder\DccDecoder.h" />
-    <ClInclude Include="Prj\DccDecoder\DccInterpreter.h" />
-    <ClInclude Include="Prj\DccDecoder\PeriodSM.h" />
+    <ClInclude Include="Gen\Util\Array.h" />
+    <ClInclude Include="Gen\Util\Math.h" />
+    <ClInclude Include="Prj\Signal\DiagnoseCommander.h" />
+    <ClInclude Include="Prj\Signal\IfcDiagnose.h" />
+    <ClInclude Include="Prj\Signal\IfcM.h" />
+    <ClInclude Include="Prj\Signal\IfcSignalCommand.h" />
+    <ClInclude Include="Prj\Signal\IfcClassifier.h" />
+    <ClInclude Include="Prj\Signal\IfcSignalTarget.h" />
+    <ClInclude Include="Prj\Signal\InputButtonClassifier.h" />
+    <ClInclude Include="Prj\Signal\InputClassifier.h" />
+    <ClInclude Include="Prj\Signal\PortMpx.h" />
+    <ClInclude Include="Prj\Signal\RailwaySignal.h" />
+    <ClInclude Include="Prj\Signal\RailwaySignalDO.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -186,6 +202,8 @@
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <NMakeIncludeSearchPath>.\Gen;$(NMakeIncludeSearchPath);Z:/hardware/arduino/avr/cores/arduino</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Compile|Win32'">
     <NMakeBuildCommandLine>./Build DccDecoder all</NMakeBuildCommandLine>
@@ -194,6 +212,7 @@
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
+    <NMakeIncludeSearchPath>.\Gen;$(NMakeIncludeSearchPath);Z:/hardware/arduino/avr/cores/arduino</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'">
     <NMakeBuildCommandLine>./Build DccDecoderTest all</NMakeBuildCommandLine>

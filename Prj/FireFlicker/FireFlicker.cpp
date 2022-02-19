@@ -8,6 +8,54 @@
 
 #include <Arduino.h>
 
+class Rnbl
+{
+public:
+  Rnbl() {}
+  virtual ~Rnbl() {}
+  virtual void run() = 0;
+};
+
+template<class C, >
+class Functionoid : public Rnbl
+{
+public:
+  typedef C ThisC;
+  typedef Functionoid<C>  This;
+protected:
+  C& refC;
+public:
+  Functionoid(C& rC) : refC(rC)
+  {}
+  virtual ~Functionoid()
+  {}
+  virtual void init()
+  {
+    refC.init();
+  }
+  virtual void run()
+  {
+    refC.run();
+  }
+};
+
+
+//class MyRnbl : public Rnbl
+//{
+//public:
+//  void runableFnc() {}
+//};
+//
+//class SchM
+//{
+//public:
+//  typedef void (Rnbl::*tRnblFnc)();
+//  
+//  MyRnbl rnbl;
+//
+//  tRnblFnc aRnblFnc[1] = { (tRnblFnc)&rnbl.runableFnc };
+//};
+
 // ----------------------------------------------------------
 /// Define settings for Fire Flicker
 // ----------------------------------------------------------
@@ -53,7 +101,7 @@ public:
     }
   }
   /// Loop function, to be called from Arduino's loop function
-  void loop(void)
+  void run(void)
   {
     int i;
     unsigned long ulTimeCurrent;
@@ -86,12 +134,23 @@ public:
 FireFlickerSetting<3> MyFireFlickerSetting = { { 2, 3, 4 } };
 FireFlicker<3> MyFireFlicker(MyFireFlickerSetting);
 
+typedef FireFlicker<3> FireFlicker3;
+
+Functionoid<FireFlicker3> FctFF(MyFireFlicker);
+
+//typedef void (Rnbl::*tRnblRunFnc)();
+
+Rnbl * aRnbl[] = 
+{
+  &FctFF
+};
+
 // ----------------------------------------------------------
 /// setup is called once at start up
 // ----------------------------------------------------------
 void setup()
 {
-  MyFireFlicker.init();
+  FctFF.init();
 }
 
 // ----------------------------------------------------------
@@ -99,5 +158,6 @@ void setup()
 // ----------------------------------------------------------
 void loop()
 {
-  MyFireFlicker.loop();
+  aRnbl[0]->run();
+  //FctFF.run();
 }
