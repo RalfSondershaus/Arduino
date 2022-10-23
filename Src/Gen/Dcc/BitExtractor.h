@@ -9,7 +9,7 @@
 #ifndef DCC_BITEXTRACTOR_H
 #define DCC_BITEXTRACTOR_H
 
-#include <Std_Ty pes.h> // for uint32_t
+#include <Std_Types.h> // for uint32_t
 #include <Dcc/PacketExtractor.h>
 #include <Util/Array.h> // for debugging
 

@@ -39,6 +39,8 @@ Global
 		Signal Program|x86 = Signal Program|x86
 		Ut_Gen_Dcc_Packet Build|x64 = Ut_Gen_Dcc_Packet Build|x64
 		Ut_Gen_Dcc_Packet Build|x86 = Ut_Gen_Dcc_Packet Build|x86
+		Ut_Gen_Dcc_PacketExtractor Build|x64 = Ut_Gen_Dcc_PacketExtractor Build|x64
+		Ut_Gen_Dcc_PacketExtractor Build|x86 = Ut_Gen_Dcc_PacketExtractor Build|x86
 		Ut_Gen_Util_Array Build|x64 = Ut_Gen_Util_Array Build|x64
 		Ut_Gen_Util_Array Build|x86 = Ut_Gen_Util_Array Build|x86
 	EndGlobalSection
@@ -91,8 +93,11 @@ Global
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Program|x86.Build.0 = Signal Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Dcc_Packet Build|x64.ActiveCfg = Ut_Gen_Util_Array Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Dcc_Packet Build|x64.Build.0 = Ut_Gen_Util_Array Build|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Dcc_Packet Build|x86.ActiveCfg = Ut_Gen_Dcc_Packet|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Dcc_Packet Build|x86.Build.0 = Ut_Gen_Dcc_Packet|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Dcc_Packet Build|x86.ActiveCfg = Ut_Gen_Dcc_Packet Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Dcc_Packet Build|x86.Build.0 = Ut_Gen_Dcc_Packet Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Dcc_PacketExtractor Build|x64.ActiveCfg = Ut_Gen_Dcc_PacketExtractor Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Dcc_PacketExtractor Build|x86.ActiveCfg = Ut_Gen_Dcc_PacketExtractor Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Dcc_PacketExtractor Build|x86.Build.0 = Ut_Gen_Dcc_PacketExtractor Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Array Build|x64.ActiveCfg = Ut_Gen_Util_Array Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Array Build|x86.ActiveCfg = Ut_Gen_Util_Array Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Array Build|x86.Build.0 = Ut_Gen_Util_Array Build|Win32
@@ -153,6 +158,8 @@ Global
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Dcc_Packet Build|x64.ActiveCfg = Signal Compile|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Dcc_Packet Build|x64.Build.0 = Signal Compile|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Dcc_Packet Build|x86.ActiveCfg = Debug|Win32
+		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Dcc_PacketExtractor Build|x64.ActiveCfg = Ut_Gen_Dcc_PacketExtractor Build|x64
+		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Dcc_PacketExtractor Build|x86.ActiveCfg = Ut_Gen_Dcc_PacketExtractor Build|Win32
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Util_Array Build|x64.ActiveCfg = Signal Compile|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Util_Array Build|x64.Build.0 = Signal Compile|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Util_Array Build|x86.ActiveCfg = Debug|Win32

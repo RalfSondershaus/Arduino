@@ -49,12 +49,16 @@
       <Configuration>Signal Program</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Ut_Gen_Dcc_PacketExtractor Build|Win32">
+      <Configuration>Ut_Gen_Dcc_PacketExtractor Build</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Ut_Gen_Util_Array Build|Win32">
       <Configuration>Ut_Gen_Util_Array Build</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Ut_Gen_Dcc_Packet|Win32">
-      <Configuration>Ut_Gen_Dcc_Packet</Configuration>
+    <ProjectConfiguration Include="Ut_Gen_Dcc_Packet Build|Win32">
+      <Configuration>Ut_Gen_Dcc_Packet Build</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -65,7 +69,8 @@
     <None Include="Build\make\Gen\Target\mega\Makefile_Target.gmk" />
     <None Include="Build\make\Gen\Target\win32\Makefile_Target.gmk" />
     <None Include="Build\make\Makefile.gmk" />
-    <None Include="Build\make\Prj\BlinkSample\Makefile_Prj.gmk" />
+    <None Include="Build\make\Prj\App\BlinkSample\Makefile_Prj.gmk" />
+    <None Include="Build\make\Prj\UnitTest\Gen\Dcc\Ut_PacketExtractor\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Gen\Dcc\Ut_Packet\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Array\Makefile_Prj.gmk" />
     <None Include="Src\Gen\Os\FreeRTOS\v202112.00\include\stdint.readme" />
@@ -81,7 +86,8 @@
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\stream_buffer.c" />
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\tasks.c" />
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\timers.c" />
-    <ClCompile Include="Src\Prj\BlinkSample\BlinkSample.cpp" />
+    <ClCompile Include="Src\Prj\App\BlinkSample\BlinkSample.cpp" />
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Dcc\Ut_PacketExtractor\test.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Gen\Dcc\Ut_Packet\test.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Array\Test.cpp" />
   </ItemGroup>
@@ -159,7 +165,12 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet Build|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_PacketExtractor Build|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -222,7 +233,10 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Array Build|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet Build|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_PacketExtractor Build|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'" Label="PropertySheets">
@@ -248,9 +262,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'">
-    <NMakeBuildCommandLine>./Build/Build BlinkSample mega avrgcc arduino none all</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>./Build/Build BlinkSample mega avrgcc arduino none clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>./Build/Build BlinkSample mega avrgcc arduino none rebuild</NMakeReBuildCommandLine>
+    <NMakeBuildCommandLine>./Build/Build App/BlinkSample mega avrgcc arduino none all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build App/BlinkSample mega avrgcc arduino none clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build App/BlinkSample mega avrgcc arduino none rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Build\Bin</OutDir>
     <IntDir>.\Build\Tmp</IntDir>
@@ -307,7 +321,7 @@
     <NMakeOutput>./Build/Bin/Ut_Array.exe</NMakeOutput>
     <SourcePath>$(VC_SourcePath);$(SolutionDir)Src\Prj\Ut_Array;$(SolutionDir)Src</SourcePath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet Build|Win32'">
     <NMakeBuildCommandLine>./Build/Build UnitTest/Gen/Dcc/Ut_Packet win32 msvc none googletest all</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>./Build/Build UnitTest/Gen/Dcc/Ut_Packet win32 msvc none googletest clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>./Build/Build UnitTest/Gen/Dcc/Ut_Packet win32 msvc none googletest rebuild</NMakeReBuildCommandLine>
@@ -317,6 +331,18 @@
     <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/Ut_Array;$(SolutionDir)Src/Gen</NMakeIncludeSearchPath>
     <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
     <NMakeOutput>./Build/Bin/Ut_Packet.exe</NMakeOutput>
+    <SourcePath>$(VC_SourcePath);$(SolutionDir)Src</SourcePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_PacketExtractor Build|Win32'">
+    <NMakeBuildCommandLine>./Build/Build UnitTest/Gen/Dcc/Ut_PacketExtractor win32 msvc none googletest all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build UnitTest/Gen/Dcc/Ut_PacketExtractor win32 msvc none googletest clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build UnitTest/Gen/Dcc/Ut_PacketExtractor win32 msvc none googletest rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Build\Bin</OutDir>
+    <IntDir>.\Build\Tmp</IntDir>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/Ut_Array;$(SolutionDir)Src/Gen</NMakeIncludeSearchPath>
+    <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
+    <NMakeOutput>./Build/Bin/Ut_PacketExtractor.exe</NMakeOutput>
     <SourcePath>$(VC_SourcePath);$(SolutionDir)Src</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'">
