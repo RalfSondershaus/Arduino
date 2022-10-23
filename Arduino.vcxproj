@@ -33,6 +33,14 @@
       <Configuration>FireFlicker Program</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="FreeRTOSDemo Build|Win32">
+      <Configuration>FreeRTOSDemo Build</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="FreeRTOSDemo Program|Win32">
+      <Configuration>FreeRTOSDemo Program</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Signal Compile|Win32">
       <Configuration>Signal Compile</Configuration>
       <Platform>Win32</Platform>
@@ -41,51 +49,79 @@
       <Configuration>Signal Program</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Ut_Gen_Util_Array Build|Win32">
+      <Configuration>Ut_Gen_Util_Array Build</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Ut_Gen_Dcc_Packet|Win32">
+      <Configuration>Ut_Gen_Dcc_Packet</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Build.bat" />
-    <None Include="Makefile.gmk" />
-    <None Include="Prj\BlinkSample\Makefile_Prj.gmk" />
-    <None Include="Prj\DccDecoderTest\Makefile_Prj.gmk" />
-    <None Include="Prj\DccDecoder\Makefile_Prj.gmk" />
-    <None Include="Prj\FireFlicker\Makefile_Prj.gmk" />
-    <None Include="Prj\Signal\Makefile_Prj.gmk" />
+    <None Include="Build\Build.bat" />
+    <None Include="Build\make\Gen\Bsw\Makefile_Bsw.gmk" />
+    <None Include="Build\make\Gen\Rules\Makefile_Rules.gmk" />
+    <None Include="Build\make\Gen\Target\mega\Makefile_Target.gmk" />
+    <None Include="Build\make\Gen\Target\win32\Makefile_Target.gmk" />
+    <None Include="Build\make\Makefile.gmk" />
+    <None Include="Build\make\Prj\BlinkSample\Makefile_Prj.gmk" />
+    <None Include="Build\make\Prj\UnitTest\Gen\Dcc\Ut_Packet\Makefile_Prj.gmk" />
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Array\Makefile_Prj.gmk" />
+    <None Include="Src\Gen\Os\FreeRTOS\v202112.00\include\stdint.readme" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Gen\Dcc\Decoder.cpp" />
-    <ClCompile Include="Gen\Runable\Runable.cpp" />
-    <ClCompile Include="Gen\Scheduler\Scheduler.cpp" />
-    <ClCompile Include="Prj\BlinkSample\BlinkSample.cpp" />
-    <ClCompile Include="Prj\DccDecoderTest\DccMain.cpp" />
-    <ClCompile Include="Prj\DccDecoder\DccMain.cpp" />
-    <ClCompile Include="Prj\FireFlicker\FireFlicker.cpp" />
-    <ClCompile Include="Prj\Signal\DiagnoseCommander.cpp" />
-    <ClCompile Include="Prj\Signal\IfcM.cpp" />
-    <ClCompile Include="Prj\Signal\RailwaySignal.cpp" />
-    <ClCompile Include="Prj\Signal\RailwaySignalDO.cpp" />
-    <ClCompile Include="Prj\Signal\Rnbl.cpp" />
+    <ClCompile Include="Src\Gen\Dcc\Decoder.cpp" />
+    <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\croutine.c" />
+    <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\event_groups.c" />
+    <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\list.c" />
+    <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\portable\GCC\ATmega\port.c" />
+    <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\portable\MemMang\heap_4.c" />
+    <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\queue.c" />
+    <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\stream_buffer.c" />
+    <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\tasks.c" />
+    <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\timers.c" />
+    <ClCompile Include="Src\Prj\BlinkSample\BlinkSample.cpp" />
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Dcc\Ut_Packet\test.cpp" />
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Array\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Gen\Dcc\Decoder.h" />
-    <ClInclude Include="Gen\Dcc\Packet.h" />
-    <ClInclude Include="Gen\Dcc\PacketExtractor.h" />
-    <ClInclude Include="Gen\Dcc\BitExtractor.h" />
-    <ClInclude Include="Gen\Runable\Runable.h" />
-    <ClInclude Include="Gen\Scheduler\Scheduler.h" />
-    <ClInclude Include="Gen\Timer\Timer.h" />
-    <ClInclude Include="Gen\Util\Array.h" />
-    <ClInclude Include="Gen\Util\Math.h" />
-    <ClInclude Include="Prj\Signal\DiagnoseCommander.h" />
-    <ClInclude Include="Prj\Signal\IfcDiagnose.h" />
-    <ClInclude Include="Prj\Signal\IfcM.h" />
-    <ClInclude Include="Prj\Signal\IfcSignalCommand.h" />
-    <ClInclude Include="Prj\Signal\IfcClassifier.h" />
-    <ClInclude Include="Prj\Signal\IfcSignalTarget.h" />
-    <ClInclude Include="Prj\Signal\InputButtonClassifier.h" />
-    <ClInclude Include="Prj\Signal\InputClassifier.h" />
-    <ClInclude Include="Prj\Signal\PortMpx.h" />
-    <ClInclude Include="Prj\Signal\RailwaySignal.h" />
-    <ClInclude Include="Prj\Signal\RailwaySignalDO.h" />
+    <ClInclude Include="Src\Gen\Dcc\BitExtractor.h" />
+    <ClInclude Include="Src\Gen\Dcc\Decoder.h" />
+    <ClInclude Include="Src\Gen\Dcc\Packet.h" />
+    <ClInclude Include="Src\Gen\Dcc\PacketExtractor.h" />
+    <ClInclude Include="Src\Gen\Os\Arduino\avr-gcc\OS_Type.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\atomic.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\croutine.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\deprecated_definitions.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\event_groups.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\FreeRTOS.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\list.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\message_buffer.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\mpu_prototypes.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\mpu_wrappers.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\portable.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\projdefs.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\queue.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\semphr.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\StackMacros.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\stack_macros.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\stream_buffer.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\task.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\include\timers.h" />
+    <ClInclude Include="Src\Gen\Os\FreeRTOS\v202112.00\portable\GCC\ATmega\portmacro.h" />
+    <ClInclude Include="Src\Gen\Platform\avr\avrgcc\Compiler.h" />
+    <ClInclude Include="Src\Gen\Platform\avr\avrgcc\Platform_Types.h" />
+    <ClInclude Include="Src\Gen\Platform\Std_Types.h" />
+    <ClInclude Include="Src\Gen\Platform\x86\msvc\Compiler.h" />
+    <ClInclude Include="Src\Gen\Platform\x86\msvc\Platform_Types.h" />
+    <ClInclude Include="Src\Gen\Sys\Runable.h" />
+    <ClInclude Include="Src\Gen\Sys\Scheduler.h" />
+    <ClInclude Include="Src\Gen\Util\Array.h" />
+    <ClInclude Include="Src\Gen\Util\Math.h" />
+    <ClInclude Include="Src\Gen\Util\RingBuffer.h" />
+    <ClInclude Include="Src\Gen\Util\Timer.h" />
+    <ClInclude Include="Src\Gen\Util\Vector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -94,6 +130,11 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Build|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -113,12 +154,27 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Array Build|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Program|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -151,6 +207,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Build|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Signal Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -160,10 +219,19 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Array Build|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Program|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Program|Win32'" Label="PropertySheets">
@@ -180,12 +248,23 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'">
-    <NMakeBuildCommandLine>./Build BlinkSample all</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>./Build BlinkSample clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>./Build BlinkSample rebuild</NMakeReBuildCommandLine>
+    <NMakeBuildCommandLine>./Build/Build BlinkSample mega avrgcc arduino none all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build BlinkSample mega avrgcc arduino none clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build BlinkSample mega avrgcc arduino none rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
+    <OutDir>.\Build\Bin</OutDir>
+    <IntDir>.\Build\Tmp</IntDir>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/.\..\..\Tools\avr8-gnu-toolchain\3.7.0.1796\bin\avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Prj/BlinkSample;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Build|Win32'">
+    <NMakeBuildCommandLine>./Build FreeRTOSDemo all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build FreeRTOSDemo clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build FreeRTOSDemo rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>__AVR_ATmega2560__</NMakePreprocessorDefinitions>
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
+    <IncludePath>$(SolutionDir)Gen/Platform/avr-gcc;$(SolutionDir)Gen/Arduino/avr/cores/arduino;$(SolutionDir)Gen;$(SolutionDir)Gen/Arduino/avr/variants/mega;$(SolutionDir)Prj/FreeRTOSDemo;$(SolutionDir)Gen/Os/FreeRTOS/v202112.00/include;$(SolutionDir)Gen/Os/FreeRTOS/v202112.00/portable/Gcc/ATmega;D:\Projects\Tools\avr8-gnu-toolchain\3.7.0.1796\bin\../lib/gcc/avr/7.3.0/include;D:\Projects\Tools\avr8-gnu-toolchain\3.7.0.1796\bin\../lib/gcc/avr/7.3.0/include-fixed;D:\Projects\Tools\avr8-gnu-toolchain\3.7.0.1796\bin\../lib/gcc/avr/7.3.0/../../../../avr/include</IncludePath>
+    <NMakeIncludeSearchPath>$(SolutionDir)Gen/Platform/avr-gcc;$(SolutionDir)Gen/Arduino/avr/cores/arduino;$(SolutionDir)Gen;$(SolutionDir)Gen/Arduino/avr/variants/mega;$(SolutionDir)Prj/FreeRTOSDemo;$(SolutionDir)Gen/Os/FreeRTOS/v202112.00/include;$(SolutionDir)Gen/Os/FreeRTOS/v202112.00/portable/Gcc/ATmega;D:\Projects\Tools\avr8-gnu-toolchain\3.7.0.1796\bin\../lib/gcc/avr/7.3.0/include;D:\Projects\Tools\avr8-gnu-toolchain\3.7.0.1796\bin\../lib/gcc/avr/7.3.0/include-fixed;D:\Projects\Tools\avr8-gnu-toolchain\3.7.0.1796\bin\../lib/gcc/avr/7.3.0/../../../../avr/include</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Signal Compile|Win32'">
     <NMakeBuildCommandLine>./Build Signal all</NMakeBuildCommandLine>
@@ -194,6 +273,7 @@
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir);$(SolutionDir)\Prj\Signal;Z:\hardware\arduino\avr\variants\mega;Z:\hardware\arduino\avr\cores\arduino</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'">
     <NMakeBuildCommandLine>./Build FireFlicker all</NMakeBuildCommandLine>
@@ -212,7 +292,32 @@
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
-    <NMakeIncludeSearchPath>.\Gen;$(NMakeIncludeSearchPath);Z:/hardware/arduino/avr/cores/arduino</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/OS/Arduino/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</NMakeIncludeSearchPath>
+    <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Array Build|Win32'">
+    <NMakeBuildCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Array win32 msvc none googletest all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Array win32 msvc none googletest clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Array win32 msvc none googletest rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Build\Bin</OutDir>
+    <IntDir>.\Build\Tmp</IntDir>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/Ut_Array;$(SolutionDir)Src/Gen</NMakeIncludeSearchPath>
+    <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
+    <NMakeOutput>./Build/Bin/Ut_Array.exe</NMakeOutput>
+    <SourcePath>$(VC_SourcePath);$(SolutionDir)Src\Prj\Ut_Array;$(SolutionDir)Src</SourcePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet|Win32'">
+    <NMakeBuildCommandLine>./Build/Build UnitTest/Gen/Dcc/Ut_Packet win32 msvc none googletest all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build UnitTest/Gen/Dcc/Ut_Packet win32 msvc none googletest clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build UnitTest/Gen/Dcc/Ut_Packet win32 msvc none googletest rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Build\Bin</OutDir>
+    <IntDir>.\Build\Tmp</IntDir>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/Ut_Array;$(SolutionDir)Src/Gen</NMakeIncludeSearchPath>
+    <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
+    <NMakeOutput>./Build/Bin/Ut_Packet.exe</NMakeOutput>
+    <SourcePath>$(VC_SourcePath);$(SolutionDir)Src</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'">
     <NMakeBuildCommandLine>./Build DccDecoderTest all</NMakeBuildCommandLine>
@@ -226,6 +331,14 @@
     <NMakeBuildCommandLine>./Build BlinkSample program</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>./Build BlinkSample clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>./Build BlinkSample program</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Program|Win32'">
+    <NMakeBuildCommandLine>./Build FreeRTOSDemo program</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build FreeRTOSDemo clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build FreeRTOSDemo program</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>

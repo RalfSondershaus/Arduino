@@ -1,0 +1,129 @@
+# 
+# Makefile for base software configuration
+#
+# Depends on ARG_BUILD_BSW (arduino, none)
+# Depends on ARG_BUILD_BSW_TESTFRAMEWORK (googletest, none)
+
+# ---------------------------------------------------
+# ARG_BUILD_BSW: arduino
+# ---------------------------------------------------
+ifeq ($(ARG_BUILD_BSW),arduino)
+FILES_BSW :=  $(FILES_BSW)                             \
+              $(PATH_SRC_ARDUINO_CORE)/abi             \
+              $(PATH_SRC_ARDUINO_CORE)/CDC             \
+              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial  \
+              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial0 \
+              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial1 \
+              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial2 \
+              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial3 \
+              $(PATH_SRC_ARDUINO_CORE)/hooks           \
+              $(PATH_SRC_ARDUINO_CORE)/IPAddress       \
+              $(PATH_SRC_ARDUINO_CORE)/main            \
+              $(PATH_SRC_ARDUINO_CORE)/new             \
+              $(PATH_SRC_ARDUINO_CORE)/PluggableUSB    \
+              $(PATH_SRC_ARDUINO_CORE)/Print           \
+              $(PATH_SRC_ARDUINO_CORE)/Stream          \
+              $(PATH_SRC_ARDUINO_CORE)/Tone            \
+              $(PATH_SRC_ARDUINO_CORE)/USBCore         \
+              $(PATH_SRC_ARDUINO_CORE)/WInterrupts     \
+              $(PATH_SRC_ARDUINO_CORE)/wiring          \
+              $(PATH_SRC_ARDUINO_CORE)/wiring_analog   \
+              $(PATH_SRC_ARDUINO_CORE)/wiring_digital  \
+              $(PATH_SRC_ARDUINO_CORE)/wiring_pulse    \
+              $(PATH_SRC_ARDUINO_CORE)/wiring_shift    \
+              $(PATH_SRC_ARDUINO_CORE)/WMath           \
+              $(PATH_SRC_ARDUINO_CORE)/WString
+
+C_INCLUDES := $(C_INCLUDES)                         \
+              -I$(PATH_SRC_ARDUINO_CORE)
+
+# old stuff for FreeRTOS
+#             -I$(PATH_SRC_GEN)/OS/Arduino/$(CC)
+
+endif
+
+
+# ---------------------------------------------------
+# ARG_BUILD_BSW_TESTFRAMEWORK: googletest
+# ---------------------------------------------------
+ifeq ($(ARG_BUILD_BSW_TESTFRAMEWORK),googletest)
+FILES_BSW_TEST := $(FILES_BSW_TEST) \
+                  $(PATH_SRC_GOOGLETEST)/src/gtest-all \
+                  $(PATH_SRC_GOOGLETEST)/src/gtest_main
+
+C_INCLUDES := $(C_INCLUDES)                         \
+              -I$(PATH_SRC_GOOGLETEST)              \
+              -I$(PATH_SRC_GOOGLETEST)/include
+
+# ---------------------------------------------------
+# Compiler flags. See also https://learn.microsoft.com/en-us/cpp/build/reference/compiler-options-listed-alphabetically?view=msvc-170
+# /analyze-               Turns on code analysis. Use /analyze- to explicitly turn off analysis. /analyze- is the default behavior.
+# /diagnostics            Use the /diagnostics compiler option to specify the display of error and warning location information.
+# /diagnostics:classic    The /diagnostics:classic option is the default, which reports only the line number where the issue was found.
+# /diagnostics:column     This option also includes the column where the issue was found. This can help you identify the specific language construct or character that is causing the issue.
+# /diagnostics:caret      This option includes the column where the issue was found and places a caret (^) under the location in the line of code where the issue was detected.
+# /EHc                    extern "C" defaults to nothrow.
+# /EHs                    Enable C++ exception handling (no SEH exceptions).
+# /errorReport:prompt     Deprecated. Error reporting is controlled by Windows Error Reporting (WER) settings.
+# /Fa (Listing file)      Creates a listing file containing assembler code.
+# /FC                     Displays the full path of source code files passed to cl.exe in diagnostic text.
+# /Fd (Program Database File Name) Specifies a file name for the program database (PDB) file created by /Z7, /Zi, /ZI (Debug Information Format).
+#                         If you specify a file name that does not include an extension, the compiler uses .pdb as the extension.
+# /fp:precise             "precise" floating-point model; results are predictable.
+# /Fo (Object File Name)  Specifies an object (.obj) file name or directory to be used instead of the default. Defined in Makefile_Rules.gmk. 
+# /Gd                     Uses the __cdecl calling convention. (x86 only). If required, defined in Makefile_Target.gmk.
+# /Gm                     Deprecated. Enables minimal rebuild.
+# /GS                     Checks buffer security.
+# /MDd                    Defines _DEBUG, _MT, and _DLL and causes the application to use the debug multithread-specific and DLL-specific version of the run-time library. It also causes the compiler to place the library name MSVCRTD.lib into the .obj file.
+# /nologo                 Suppresses display of sign-on banner.
+# /Od                     Disables optimization.
+# /Oy-                    /Oy enables frame-pointer omission and /Oy- disables omission. In x64 compilers, /Oy and /Oy- are not available. If required, defined in Makefile_Target.gmk.
+# /RTC1                   Enable fast runtime checks (equivalent to /RTCsu).
+# /W3                     Specifies how the compiler generates warnings for a given compilation. /W3: recommend that you use this option to provide lint-like warnings.
+# /W4                     Specifies how the compiler generates warnings for a given compilation. /W4: For a new project, it may be best to use /W4 in all compilations. This option helps ensure the fewest possible hard-to-find code defects.
+# /WX                     Treat warnings as errors. Use /WX- to not treat warnings as errors.
+# /Zc:forScope            Enforce Standard C++ for scoping rules (on by default).
+# /Zc:inline              Remove unreferenced functions or data if they're COMDAT or have internal linkage only (off by default).
+# /Zc:wchar_t             wchar_t is a native type, not a typedef (on by default).
+# /Zi                     Generates complete debugging information.
+# ---------------------------------------------------
+ifeq ($(ARG_COMPILER),msvc)
+CFLAGS := $(CFLAGS)                       \
+          /analyze-                       \
+          /EHsc                           \
+          /errorReport:prompt             \
+          /Fa$(PATH_TMP)\                 \
+          /FC                             \
+          /Fd$(PATH_BIN)/$(PROJECT_NAME)  \
+          /fp:precise                     \
+          /GS                             \
+          /MDd                            \
+          /nologo                         \
+          /Od                             \
+          /RTC1                           \
+          /W4                             \
+          /WX                             \
+          /Zc:inline                      \
+          /Zc:wchar_t                     \
+          /Zi
+
+C_DEFINES := $(C_DEFINES) \
+          /D "_DEBUG"     \
+          /D "_CONSOLE"   \
+          /D "_UNICODE"   \
+          /D "UNICODE" 
+
+# ---------------------------------------------------
+# Linker flags. See also https://learn.microsoft.com/en-us/cpp/build/reference/linker-options?view=msvc-170
+# /DEBUG    The /DEBUG option creates debugging information for the executable. 
+#           The linker uses the base name of the program and the extension .pdb to name the program database, 
+#           and embeds the path where it was created. 
+#           To override this default, set /PDB and specify a different file name.
+# /PDB:(Use Program Database)   A user-specified name for the program database (PDB) that the linker creates. It replaces the default name.
+LFLAGS := $(LFLAGS)           \
+          /DEBUG              \
+          /SUBSYSTEM:CONSOLE
+
+endif
+
+endif

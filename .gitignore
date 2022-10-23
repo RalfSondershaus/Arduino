@@ -1,5 +1,13 @@
-/build/
 /Doc/
-/Tmp/
-/Bin/
+/Build/Tmp/
+/Build/Bin/
+/Src/Gen/Arduino/avr/bootloaders/
+/Src/Gen/Arduino/avr/firmwares/
+/Src/Gen/Arduino/avr/libraries/
+/Src/Gen/Test/googletest-main.zip
+/Src/Gen/Test/googletest-main/googlemock/
+/Src/Prj/DccDecoder/Alt/
+/Src/Prj/DccDecoder/DccDecoderMicrosoftTest/
+/Src/Prj/_Test/
+*_DEPRECATED*
 /.vs/

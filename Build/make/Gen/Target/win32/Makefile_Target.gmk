@@ -1,0 +1,76 @@
+# 
+# Makefile for Win32 projects
+#
+
+# ---------------------------------------------------
+# Select MCU
+# ---------------------------------------------------
+TARGET_MCU_FAMILY    = X86
+TARGET_MCU_VARIANT   = Intel
+TARGET_MCU_DEVICE    = i5-2
+
+# ---------------------------------------------------
+# Select target file extension
+# ---------------------------------------------------
+TARGET_FILENAME_EXT := exe
+
+# ---------------------------------------------------
+# Select the compiler executable CC
+# ---------------------------------------------------
+# ---------------------------------------------------
+# Microsoft MSVC
+# ---------------------------------------------------
+ifeq ($(ARG_COMPILER),msvc)
+CC := $(CL)
+
+# ---------------------------------------------------
+# Compiler include pathes; typically just required to print compiler include paths for Visual Studio browsing
+# ---------------------------------------------------
+C_INCLUDES_COMPILER =
+
+# ---------------------------------------------------
+# Include pathes for platform dependend header files (platform = MCU + compiler)
+# ---------------------------------------------------
+C_INCLUDES := $(C_INCLUDES)   \
+             -I$(PATH_SRC_GEN)/Platform/$(TARGET_MCU_FAMILY)/$(ARG_COMPILER)
+
+# ---------------------------------------------------
+# Add compiler #defines for the target.
+# ---------------------------------------------------
+C_DEFINES := $(C_DEFINES) \
+             /D "WIN32"
+
+# ---------------------------------------------------
+# Add compiler flags for the target.
+# /Gd   Uses the __cdecl calling convention. (x86 only)
+# /Oy   Omits frame pointer. (x86 only)
+# ---------------------------------------------------
+CFLAGS := $(CFLAGS)    \
+          /Gd          \
+          /Oy-
+
+# ---------------------------------------------------
+# Linker flags
+# See https://learn.microsoft.com/de-de/cpp/build/reference/link-pass-options-to-linker?source=recommendations&view=msvc-170
+# /link (Optionen an Linker übergeben)
+# The /link option and its linker options must appear after any file names and CL options. 
+# A space is required between /link and any linker options.
+# ---------------------------------------------------
+LFLAGS := $(LFLAGS)     \
+          /link         \
+          /NOLOGO       \
+          /MACHINE:X86
+
+
+# ---------------------------------------------------
+# Select target file extension
+# ---------------------------------------------------
+OBJ_FILENAME_EXT := obj
+
+
+else
+
+$(error ------ Invalid build command line parameter ARG_COMPILER for ARG_TARGET. Supported: msvc) ------
+
+endif
+

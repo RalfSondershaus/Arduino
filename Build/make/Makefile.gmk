@@ -1,0 +1,296 @@
+# 
+# Makefile for Arduino projects
+#
+# Cannot handle pathes with blanks, e.g. C:/Program Files/...
+# Mount such directories as network drives:
+# - Right click on "This PC" in Windows explorer
+# - Click "Mount network drive"
+# - Fill in \\localhost\C$\Program Files\...
+#
+# Arguments for make:
+#
+# ARG_PROJECT       name of the project, such as BlinkSample or UnitTest/Gen/Dcc/Ut_Packet
+#                   The path to the project files is ./Prj/$(ARG_PROJECT)
+#
+# ARG_TARGET_ECU    name of the target ECU
+#                   supported: mega, uno, win64, win32
+#
+# ARG_COMPILER      name of the compiler
+#                   supported: avr_gcc, msvc
+#
+# ARG_BUILD_BSW                   base software that is required by the project
+#                                 supported: arduino, none
+#
+# ARG_BUILD_BSW_TESTFRAMEWORK     test framework that is required by the project
+#                                 supported: googletest, none
+
+# TARGET_ECU          such as mega, uno, Win32, Win64
+# TARGET_MCU_FAMILY   such as ARM, AVR, X86, X64
+# TARGET_MCU_VARIANT  such as M4F, M0PLUS, AVtiny, mega (AVmega),
+# TARGET_MCU_DEVICE   such as atmega2560, atmega328p
+
+# target platform: MCU family plus compiler
+
+# ---------------------------------------------------
+# Project name without dirs
+# ---------------------------------------------------
+PROJECT_NAME   = $(notdir $(ARG_PROJECT))
+
+# ---------------------------------------------------
+# Miscellanous
+# ---------------------------------------------------
+DOLLAR  = $$
+EMPTY   =
+SPACE   = $(EMPTY) $(EMPTY)
+
+# ---------------------------------------------------
+# Pathes
+# ---------------------------------------------------
+PATH_BUILD                = .
+PATH_TMP                  = $(PATH_BUILD)/Tmp
+PATH_BIN                  = $(PATH_BUILD)/Bin
+PATH_ERR                  = $(PATH_BUILD)/Tmp
+PATH_TOOLS                = $(PATH_BUILD)/../../Tools
+PATH_SRC                  = $(PATH_BUILD)/../Src
+PATH_SRC_PRJ              = $(PATH_SRC)/Prj
+PATH_SRC_GEN              = $(PATH_SRC)/Gen
+PATH_SRC_ARDUINO_BASE     = $(PATH_SRC)/Gen/Arduino
+PATH_SRC_ARDUINO_CORE     = $(PATH_SRC_ARDUINO_BASE)/avr/cores/arduino
+PATH_SRC_ARDUINO_VARIANTS = $(PATH_SRC_ARDUINO_BASE)/avr/variants
+PATH_SRC_GOOGLETEST       = $(PATH_SRC)/Gen/Test/googletest-main/googletest
+PATH_SRC_PRJ_PROJECT      = $(PATH_SRC_PRJ)/$(ARG_PROJECT)
+PATH_BUILD_MAKE           = $(PATH_BUILD)/make
+PATH_BUILD_GEN            = $(PATH_BUILD_MAKE)/Gen
+PATH_BUILD_TARGET         = $(PATH_BUILD_MAKE)/Gen/Target
+PATH_BUILD_BSW            = $(PATH_BUILD_MAKE)/Gen/Bsw
+PATH_BUILD_RULES          = $(PATH_BUILD_MAKE)/Gen/Rules
+PATH_BUILD_PRJ            = $(PATH_BUILD_MAKE)/Prj
+PATH_AVRGNU               = $(PATH_TOOLS)/avr8-gnu-toolchain/3.7.0.1796
+PATH_AVRDUDE              = $(PATH_TOOLS)/avrdude
+PATH_OBJ                  = $(PATH_TMP)
+# Remark: Arduino core location in Arduino IDE: /hardware/arduino/avr
+# Remark: avr-gcc location in Arduino IDE: /hardware/tools/avr
+
+# ---------------------------------------------------
+# Tools
+# ---------------------------------------------------
+AVRGCC  = $(PATH_AVRGNU)/bin/avr-gcc
+OBJCOPY = $(PATH_AVRGNU)/bin/avr-objcopy
+SIZE    = $(PATH_AVRGNU)/bin/avr-size
+AVRDUDE = $(PATH_AVRDUDE)/bin/avrdude
+CL      = cl
+RM      = del
+RMDIR   = del
+SED     = $(PATH_TOOLS)/GNU/sed
+AWK     = $(PATH_TOOLS)/GNU/awk
+
+AVRGCC  := $(subst /,\,$(AVRGCC))
+OBJCOPY := $(subst /,\,$(OBJCOPY))
+SIZE    := $(subst /,\,$(SIZE))
+RM      := $(subst /,\,$(RM))
+RMDIR   := $(subst /,\,$(RMDIR))
+SED     := $(subst /,\,$(SED))
+AWK     := $(subst /,\,$(AWK))
+
+# ---------------------------------------------------
+# Clear source files and compiler flags.
+#
+# Makefiles that are included afterwards (such as Makefile_Target.gmk, Makefile_Bsw.gmk, and Makefile_Prj.gmk) can set / modify the following variables.
+# ---------------------------------------------------
+FILES_BSW =
+FILES_GEN =
+FILES_BSW_TEST =
+FILES_PRJ =
+TARGET_FILENAME_EXT =
+OBJ_FILENAME_EXT =
+CC =
+C_DEFINES =
+C_INCLUDES =
+C_INCLUDES_GEN =
+C_INCLUDES_PRJ =
+C_INCLUDES_COMPILER =
+CFLAGS =
+LFLAGS =
+
+# ---------------------------------------------------
+# Select target MCU and compiler from target makefile. 
+#
+# Depends on ARG_TARGET_ECU and ARG_COMPILER.
+#
+# Defines TARGET_MCU_FAMILY, supported: AVR, X86, X64
+# Defines TARGET_MCU_VARIANT, supported: mega, default
+# Defines TARGET_MCU_DEVICE, supported: atmega2560, atmega328p, x86, x64
+# Defines CC
+# Defines C_INCLUDES_COMPILER
+# Defines TARGET_FILENAME_EXT
+# Defines OBJ_FILENAME_EXT
+# Modifies LFLAGS
+# Modifies some more variables
+# ---------------------------------------------------
+-include $(PATH_BUILD_TARGET)/$(ARG_TARGET_ECU)/Makefile_Target.gmk
+
+# ---------------------------------------------------
+# Depends on ARG_BUILD_BSW and ARG_BUILD_BSW_TESTFRAMEWORK.
+#
+# Modifies FILES_GEN
+# Modifies FILES_BSW
+# Modifies FILES_BSW_TEST
+# Modifies C_INCLUDES
+# Modifies C_DEFINES
+# Modifies some more variables
+# ---------------------------------------------------
+-include $(PATH_BUILD_BSW)/Makefile_Bsw.gmk
+
+# ---------------------------------------------------
+# include project specific makefile
+#
+# Defines FILES_PRJ
+# Modifies some more variables
+# ---------------------------------------------------
+-include $(PATH_BUILD_PRJ)/$(ARG_PROJECT)/Makefile_Prj.gmk
+
+# ---------------------------------------------------
+# Default: add path to generic files to generic compiler include pathes
+# ---------------------------------------------------
+C_INCLUDES_GEN := $(C_INCLUDES_GEN)\
+                 -I$(PATH_SRC_GEN)
+
+# ---------------------------------------------------
+# Default: add path to project folder to project specific compiler include pathes
+# ---------------------------------------------------
+C_INCLUDES_PRJ := $(C_INCLUDES_PRJ) \
+                 -I$(PATH_SRC_PRJ)/$(ARG_PROJECT)
+
+# ---------------------------------------------------
+# Object files
+# ---------------------------------------------------
+FILES_O = $(addprefix $(PATH_OBJ)/, $(notdir $(addsuffix .$(OBJ_FILENAME_EXT), $(FILES_PRJ) $(FILES_GEN) $(FILES_BSW) $(FILES_BSW_TEST))))
+
+# ---------------------------------------------------
+# Target file without extension (i.e. executable or flash file)
+# ---------------------------------------------------
+TARGET_FILENAME_BASE = $(PATH_BIN)/$(PROJECT_NAME)
+
+# ---------------------------------------------------
+# Finalize compiler include pathes.
+# ---------------------------------------------------
+C_INCLUDES := $(C_INCLUDES)          \
+              $(C_INCLUDES_PRJ)      \
+              $(C_INCLUDES_GEN)      \
+              $(C_INCLUDES_COMPILER)
+
+# ---------------------------------------------------
+# Flags for tools
+# ---------------------------------------------------
+OBJCOPYFLAGS =  -O ihex \
+                -R .eeprom
+
+# -----------------------------------------------------------------------
+# See https://www.nongnu.org/avrdude/user-manual/avrdude_4.html
+# See http://savannah.nongnu.org/projects/avrdude
+# See https://www.avrfreaks.net/forum/cannot-connect-avrdude-mega2560
+
+# -p partno         This is the only mandatory option and it tells AVRDUDE what type of part (MCU) that is connected to the programmer.
+# -b baudrate       Override the RS-232 connection baud rate specified in the respective programmer’s entry of the configuration file. 
+# -B bitclock       Specify the bit clock period for the JTAG interface or the ISP clock (JTAG ICE only).
+# -c programmer-id  Specify the programmer to be used.
+# -C config-file    Use the specified config file for configuration data. This file contains all programmer and part definitions that AVRDUDE knows about.
+# -D                Disable auto erase for flash.
+# -e                Causes a chip erase to be executed. This will reset the contents of the flash ROM and EEPROM to the value ‘0xff’, and clear all lock bits.
+# -E exitspec[,...] By default, AVRDUDE leaves the parallel port in the same state at exit as it has been found at startup.
+#                   This option modifies the state of the ‘/RESET’ and ‘Vcc’ lines the parallel port is left at, according to the exitspec arguments provided.
+# -F                Normally, AVRDUDE tries to verify that the device signature read from the part is reasonable before continuing. 
+#                   Since it can happen from time to time that a device has a broken (erased or overwritten) device signature but is otherwise operating normally, 
+#                   this options is provided to override the check.
+# -i delay          For bitbang-type programmers, delay for approximately delay microseconds between each bit state change.
+# -l logfile        Use logfile rather than stderr for diagnostics output.
+# -n                No-write - disables actually writing data to the MCU (useful for debugging AVRDUDE).
+# -O                Perform a RC oscillator run-time calibration according to Atmel application note AVR053. 
+#                   This is only supported on the STK500v2, AVRISP mkII, and JTAG ICE mkII hardware.
+# -P port           Use port to identify the device to which the programmer is attached.
+# -q                Disable (or quell) output of the progress bar while reading or writing to the device.
+# -u                Disables the default behaviour of reading out the fuses three times before programming, 
+#                   then verifying at the end of programming that the fuses have not changed.
+# -s                Disable safemode prompting.
+# -t                Tells AVRDUDE to enter the interactive “terminal” mode instead of up- or downloading files.
+# -U memtype:op:filename[:format]
+#                   Perform a memory operation. Multiple ‘-U’ options can be specified in order to operate on multiple memories on the same command-line invocation.
+#                   The memtype field specifies the memory type to operate on. Use the ‘-v’ option on the command line or the part command from terminal mode 
+#                   to display all the memory types supported by a particular device. Typically, a device’s memory configuration at least contains the memory 
+#                   types flash and eeprom.
+#                   All memory types currently known are: 
+#                     flash    The flash ROM of the device. 
+#                     ...
+#                   The op field specifies what operation to perform: 
+#                     r    read the specified device memory and write to the specified file
+#                     w    read the specified file and write it to the specified device memory
+#                     v    read the specified device memory and the specified file and perform a verify operation
+#                   The filename field indicates the name of the file to read or write. 
+#                   The format field is optional and contains the format of the file to read or write. Possible values are:
+#                     i    Intel Hex
+#                     s    Motorola S-record
+#                     e    ELF (Executable and Linkable Format), the final output file from the linker; currently only accepted as an input file
+#                     a    auto detect; valid for input only, and only if the input is not provided at stdin.
+#                     ...
+# -v                Enable verbose output. More -v options increase verbosity level.
+# -V                Disable automatic verify check when uploading data.
+# -x extended_param Pass extended_param to the chosen programmer implementation as an extended parameter.
+# -----------------------------------------------------------------------
+AVRDUDE_FLAGS = -C$(PATH_AVRDUDE)/etc/avrdude.conf  \
+                -v                                  \
+                -V                                  \
+                -p m2560                            \
+                -c wiring                           \
+                -P COM3                             \
+                -D
+
+# ------------------------------------------------------------------------------
+# VPATH definition
+#
+# The value of the make variable VPATH specifies a list of directories that make should search.
+# Most often, the directories are expected to contain prerequisite files that are not in the 
+# current directory; however, make uses VPATH as a search list for both prerequisites and 
+# targets of rules. 
+# Thus, if a file that is listed as a target or prerequisite does not exist in the current directory, 
+# make searches the directories listed in VPATH for a file with that name. If a file is found in 
+# one of them, that file may become the prerequisite (see below). Rules may then specify the names 
+# of files in the prerequisite list as if they all existed in the current directory.
+# In the VPATH variable, directory names are separated by colons or blanks. 
+# The order in which directories are listed is the order followed by make in its search.
+# ------------------------------------------------------------------------------
+VPATH = $(sort $(dir $(FILES_PRJ))) $(sort $(dir $(FILES_BSW) $(FILES_BSW_TEST) $(FILES_GEN)))
+
+
+# ------------------------------------------------------------------------------
+# Include dependeny files
+# ------------------------------------------------------------------------------
+ifneq ($(MAKECMDGOALS),rebuild)
+-include $(subst .$(OBJ_FILENAME_EXT),.d,$(FILES_O))
+endif
+
+# ------------------------------------------------------------------------------
+# Rules
+# ------------------------------------------------------------------------------
+
+# Implicit rules are not used, instead pattern rules with %.c are used, see below
+.SUFFIXES:
+
+all: PrintIncludePaths $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
+
+rebuild: clean PrintIncludePaths all
+
+.PHONY: PrintIncludePaths
+PrintIncludePaths:
+	@echo ++++++ include paths ++++++
+	@echo $(C_INCLUDES)
+	@echo $(subst $(SPACE),,$(addsuffix ;,$(subst -I./../,$(DOLLAR)(SolutionDir),$(C_INCLUDES))))
+
+.PHONY: clean
+clean:
+	@-if exist $(PATH_BIN)/*.elf $(RM) $(subst /,\,$(PATH_BIN)/*.elf)
+	@-if exist $(PATH_BIN)/*.hex $(RM) $(subst /,\,$(PATH_BIN)/*.hex)
+	@-if exist $(PATH_BIN)/*.exe $(RM) $(subst /,\,$(PATH_BIN)/*.exe)
+	@-if exist $(PATH_TMP)       $(RM) $(subst /,\,$(PATH_TMP)/*.$(OBJ_FILENAME_EXT))
+	@-if exist $(PATH_TMP)       $(RM) $(subst /,\,$(PATH_TMP)/*.d  )
+
+-include $(PATH_BUILD_RULES)/Makefile_Rules.gmk

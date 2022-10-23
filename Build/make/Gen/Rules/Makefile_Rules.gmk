@@ -1,0 +1,57 @@
+# 
+# Makefile for rules
+#
+
+# ---------------------------------------------------
+# AVR GCC
+# ---------------------------------------------------
+ifeq ($(ARG_COMPILER),avrgcc)
+$(TARGET_FILENAME_BASE).elf: $(FILES_O)
+	@echo +++++ linking $(basename $@).elf +++++
+	@$(CC) $(LFLAGS) $(FILES_O) -o $(basename $@).elf
+
+$(TARGET_FILENAME_BASE).hex: $(TARGET_FILENAME_BASE).elf
+	@echo +++++ converting $(basename $@).elf into $(basename $@).hex +++++
+	@$(OBJCOPY) $(OBJCOPYFLAGS) $(basename $@).elf $(basename $@).hex
+
+$(PATH_OBJ)/%.o: %.c
+	@echo +++++ compile $< to $@
+	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
+	@-$(AWK) -f $(subst /,\,$(PATH_TOOLS/GNU/gccerror.awk)) $(PATH_ERR)/$(basename $(@F)).err
+
+$(PATH_OBJ)/%.o: %.cpp
+	@echo +++++ compile $< to $@
+	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
+	@$(AWK) -f $(PATH_TOOLS)/GNU/gccerror.awk $(PATH_ERR)/$(basename $(@F)).err
+   
+.PHONY: size
+size:
+	@echo +++++ size of $(basename $@).elf +++++
+	$(SIZE) -A $(TARGET).elf
+
+.PHONY: program
+program:
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -Uflash:w:$(TARGET).hex:i
+
+# ---------------------------------------------------
+# MSVC
+# ---------------------------------------------------
+else ifeq ($(ARG_COMPILER),msvc)
+
+$(PATH_OBJ)/%.obj: %.c
+	@echo +++++ compile $< to $@
+	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) /Fo"$@" /c $< 2> $(PATH_ERR)/$(basename $(@F)).err
+
+$(PATH_OBJ)/%.obj: %.cc
+	@echo +++++ compile $< to $@
+	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) /Fo"$@" /c $< 2> $(PATH_ERR)/$(basename $(@F)).err
+
+$(PATH_OBJ)/%.obj: %.cpp
+	@echo +++++ compile $< to $@
+	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) /Fo"$@" /c $< 2> $(PATH_ERR)/$(basename $(@F)).err
+
+$(TARGET_FILENAME_BASE).exe: $(FILES_O)
+	@echo +++++ linking $@ +++++
+	@$(CC) /Fe"$@" $(FILES_O) $(LFLAGS)
+
+endif

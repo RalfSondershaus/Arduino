@@ -1,0 +1,20 @@
+# 
+# Makefile for Win64 projects
+#
+
+# ---------------------------------------------------
+# Select MCU, VARIANT (mainly for AVR-GCC), and CORE
+# ---------------------------------------------------
+PAR_MCU       = x64
+PAR_VARIANT   =
+PAR_CORE      = x64
+
+# ---------------------------------------------------
+# Select the compiler executable CC
+# ---------------------------------------------------
+ifeq ($(ARG_COMPILER),msvc)
+CC = $(CL)
+C_INCLUDES_COMPILER = 
+else
+$(error ------ Invalid build command line parameter ARG_COMPILER $(ARG_COMPILER) for ARG_TARGET $(ARG_TARGET). Supported: msvc) ------
+endif

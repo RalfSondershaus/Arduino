@@ -1,0 +1,31 @@
+# 
+# Makefile for AVR application projects
+#
+
+FILES_CORE := $(FILES_CORE)                            \
+              $(PATH_SRC_ARDUINO_CORE)/abi             \
+              $(PATH_SRC_ARDUINO_CORE)/CDC             \
+              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial  \
+              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial0 \
+              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial1 \
+              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial2 \
+              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial3 \
+              $(PATH_SRC_ARDUINO_CORE)/hooks           \
+              $(PATH_SRC_ARDUINO_CORE)/IPAddress       \
+              $(PATH_SRC_ARDUINO_CORE)/main            \
+              $(PATH_SRC_ARDUINO_CORE)/new             \
+              $(PATH_SRC_ARDUINO_CORE)/PluggableUSB    \
+              $(PATH_SRC_ARDUINO_CORE)/Print           \
+              $(PATH_SRC_ARDUINO_CORE)/Stream          \
+              $(PATH_SRC_ARDUINO_CORE)/Tone            \
+              $(PATH_SRC_ARDUINO_CORE)/USBCore         \
+              $(PATH_SRC_ARDUINO_CORE)/WInterrupts     \
+              $(PATH_SRC_ARDUINO_CORE)/wiring          \
+              $(PATH_SRC_ARDUINO_CORE)/wiring_analog   \
+              $(PATH_SRC_ARDUINO_CORE)/wiring_digital  \
+              $(PATH_SRC_ARDUINO_CORE)/wiring_pulse    \
+              $(PATH_SRC_ARDUINO_CORE)/wiring_shift    \
+              $(PATH_SRC_ARDUINO_CORE)/WMath           \
+              $(PATH_SRC_ARDUINO_CORE)/WString
+
+TARGET_EXT = hex

@@ -1,0 +1,21 @@
+# 
+# Project specific Makefile for FreeRTOSDemo
+#
+
+PATH_OS = $(PATH_GEN)/Os/FreeRTOS/v202112.00
+
+# Files
+FILES_PRJ = $(PATH_PRJ_PROJECT)/FreeRTOSDemo \
+            $(PATH_OS)/list \
+            $(PATH_OS)/queue \
+            $(PATH_OS)/tasks \
+            $(PATH_OS)/croutine \
+            $(PATH_OS)/event_groups \
+            $(PATH_OS)/stream_buffer \
+            $(PATH_OS)/timers \
+            $(PATH_OS)/portable/Gcc/ATmega/port \
+            $(PATH_OS)/portable/MemMang/heap_4
+
+# Includes
+C_INCLUDES_PRJ = -I$(PATH_OS)/include \
+                 -I$(PATH_OS)/portable/Gcc/ATmega

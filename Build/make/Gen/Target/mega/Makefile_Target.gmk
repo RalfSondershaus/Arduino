@@ -1,0 +1,92 @@
+# 
+# Makefile for Arduino Mega2560 projects
+#
+
+# ---------------------------------------------------
+# Select MCU
+# ---------------------------------------------------
+TARGET_MCU_FAMILY    = AVR
+TARGET_MCU_VARIANT   = mega
+TARGET_MCU_DEVICE    = atmega2560
+
+# ---------------------------------------------------
+# Select target file extension
+# ---------------------------------------------------
+TARGET_FILENAME_EXT := hex
+
+# ---------------------------------------------------
+# Select compiler
+# ---------------------------------------------------
+# ---------------------------------------------------
+# AVR_GCC
+# ---------------------------------------------------
+ifeq ($(ARG_COMPILER),avrgcc)
+CC := $(AVRGCC)
+
+# ---------------------------------------------------
+# Compiler include pathes; typically just required to print compiler include paths for Visual Studio browsing
+# ---------------------------------------------------
+C_INCLUDES_COMPILER := -I$(PATH_AVRGNU)/lib/gcc/avr/7.3.0/include       \
+                       -I$(PATH_AVRGNU)/lib/gcc/avr/7.3.0/include-fixed \
+                       -I$(PATH_AVRGNU)/avr/include
+
+# ---------------------------------------------------
+# Include pathes for platform dependend header files (platform = MCU + compiler)
+# ---------------------------------------------------
+C_INCLUDES := $(C_INCLUDES)                                       \
+             -I$(PATH_SRC_GEN)/Platform                           \
+             -I$(PATH_SRC_GEN)/Platform/$(CC)                     \
+             -I$(PATH_SRC_ARDUINO_VARIANTS)/$(TARGET_MCU_VARIANT)
+
+# ---------------------------------------------------
+# Add compiler #defines for the target
+# ---------------------------------------------------
+C_DEFINES := $(C_DEFINES)           \
+            -DF_CPU=16000000L       \
+            -DARDUINO=10608         \
+            -DARDUINO_AVR_MEGA2560  \
+            -DARDUINO_ARCH_AVR
+
+# ---------------------------------------------------
+# Compiler flags.
+# Remark: Use -v flag to make gcc show its configuration including include pathes
+# ---------------------------------------------------
+CFLAGS := $(CFLAGS)               \
+        -c                        \
+        -g                        \
+        -Os                       \
+        -w                        \
+        -std=gnu++11              \
+        -fpermissive              \
+        -fno-exceptions           \
+        -ffunction-sections       \
+        -fdata-sections           \
+        -fno-threadsafe-statics   \
+        -MMD                      \
+        -flto                     \
+        -mmcu=$(TARGET_MCU_DEVICE)
+
+# ---------------------------------------------------
+# Linker flags
+# ---------------------------------------------------
+LFLAGS := $(LFLAGS)                   \
+         -w                           \
+         -Os                          \
+         -g                           \
+         -flto                        \
+         -fuse-linker-plugin          \
+         -mmcu=$(TARGET_MCU_DEVICE)   \
+         -L.                          \
+         -lm
+
+# ---------------------------------------------------
+# Select target file extension
+# ---------------------------------------------------
+OBJ_FILENAME_EXT := o
+
+
+else
+
+$(error ------ Invalid build command line parameter ARG_COMPILER $(ARG_COMPILER) for ARG_TARGET_ECU $(ARG_TARGET_ECU). Supported: avrgcc) ------
+
+endif
