@@ -6,8 +6,8 @@
 /Src/Gen/Arduino/avr/libraries/
 /Src/Gen/Test/googletest-main.zip
 /Src/Gen/Test/googletest-main/googlemock/
-/Src/Prj/App/DccDecoder/Alt/
-/Src/Prj/App/DccDecoder/DccDecoderMicrosoftTest/
+/Src/Prj/App/DccSniffer/Alt/
+/Src/Prj/App/DccSniffer/DccDecoderMicrosoftTest/
 /Src/Prj/_Test/
 *_DEPRECATED*
 /.vs/
