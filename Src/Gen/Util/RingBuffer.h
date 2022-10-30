@@ -119,4 +119,4 @@ namespace Util
 
 } // namespace Util
 
-#endif // UTIL_ARRAY_H
+#endif // UTIL_RINGBUFFER_H

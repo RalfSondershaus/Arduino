@@ -1,10 +1,14 @@
-/// @file Decoder.h
-///
-/// DCC Decoder for Arduino
-///
-/// Declares class Dcc::Decoder with
-/// - setup
-/// - loop
+/**
+  * @file Decoder.h
+  *
+  * @author Ralf Sondershaus
+  *
+  * @brief DCC Decoder for Arduino
+  *
+  * Declares class Dcc::Decoder with
+  * - setup
+  * - loop
+  */
 
 #ifndef DCC_DECODER_H
 #define DCC_DECODER_H
@@ -28,7 +32,7 @@ namespace Dcc
     typedef PacketExtractor<> PacketExtractorType;
     typedef PacketExtractorType::PacketType PacketType;
     typedef BitExtractor<BitExtractorConstantsType, PacketExtractorType> BitExtractorType;
-    /// This handler is called if a new packet is received
+    /// Such a handler is called if a new packet is received
     typedef PacketExtractorType::HandlerIfc HandlerIfc;
 
   protected:

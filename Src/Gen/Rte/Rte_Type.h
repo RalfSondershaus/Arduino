@@ -1,10 +1,11 @@
 /**
- * @file Runable.h
+ * @file Rte_Type.h
  * @author Ralf Sondershaus
  *
  * @brief Interface class Runable
  * 
- * @copyright
+ * @copyright Copyright 2018 - 2022 Ralf Sondershaus
+ *
  * This program is free software: you can redistribute it and/or modify it 
  * under the terms of the GNU General Public License as published by the 
  * Free Software Foundation, either version 3 of the License, or (at your 
@@ -16,29 +17,21 @@
  * for more details.
  *
  * See <https://www.gnu.org/licenses/>.
- *
- * Copyright 2018 - 2022 Ralf Sondershaus
  */
 
-#ifndef RUNABLE_H_
-#define RUNABLE_H_
+#ifndef RTE_TYPE_H_
+#define RTE_TYPE_H_
 
-namespace Sys
+#include <Rte/Rte_Type_Ifc.h>
+#include <Rte/Rte_Type_Runable.h>
+
+#include <Util/Timer.h>
+
+namespace Rte
 {
-  /// Interface class for runables
-  class Runable
-  {
-  public:
-    /// Default constructor
-    Runable() {}
-    /// Default destructor
-    virtual ~Runable() {}
-    /// Initialization at system start
-    virtual void init(void) = 0;
-    /// Main execution function
-    virtual void run(void) = 0;
-  };
+  /// Timer types
+  typedef Util::MicroTimer::time_type   time_type;
+  typedef Util::MicroTimer              timer_type;
+} // namespace Rte
 
-} // namespace Sys
-
-#endif /* RUNABLE_H_ */
+#endif /* RTE_TYPE_H_ */

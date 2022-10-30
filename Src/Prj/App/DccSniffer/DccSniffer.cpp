@@ -1,19 +1,24 @@
-/// main.cpp
-///
-/// DCC Decoder for Arduino
-///
-/// Implements
-/// - setup
-/// - loop
+/**
+  * @file DccSniffer.cpp
+  *
+  * @author Ralf Sondershaus
+  *
+  * @brief DCC Sniffer for Arduino
+  */
 
 #include <Dcc/Decoder.h>
+#include <Util/Array.h>
 #include <Arduino.h>
-#include <limits.h>
 
 using namespace Dcc;
+using namespace Util;
+
+/// The Arduino pin for DCC interrupts
+static constexpr unsigned int unInterruptPin = 2U;
 
 // ---------------------------------------------------
-/// Interface for a handler that is called if a packet is received
+/// Interface for a handler that is called if a packet is received.
+/// Stores received packets and counts how often a packet is received.
 // ---------------------------------------------------
 template<int MaxNrPackets = 60>
 class ArrayHandlerIfc : public Decoder::HandlerIfc
@@ -22,7 +27,7 @@ public:
   /// Array of packets
   typedef Array<PacketType, MaxNrPackets> PacketArray;
   /// received valid packets
-  PacketArray aPackets;
+  PacketArray packets;
 
   /// Default constructor
   ArrayHandlerIfc() = default;
@@ -30,15 +35,15 @@ public:
   virtual ~ArrayHandlerIfc() = default;
 
   /// Store the received packet into the list of packets (if it does not exist already)
-  virtual void packetReceived(const MyPacket& pkt) override
+  virtual void packetReceived(const PacketType& pkt) override
   {
-    auto it = aPackets.find(pkt);
-    if (it == aPackets.end())
+    auto it = packets.find(pkt);
+    if (it == packets.end())
     {
-      if (aPackets.size() < MaxNrPackets)
+      if (packets.size() < MaxNrPackets)
       {
-        aPackets.push_back(pkt);
-        aPackets.back().unNrRcv++;
+        packets.push_back(pkt);
+        packets.back().unNrRcv++;
       }
     }
     else
@@ -51,23 +56,18 @@ public:
   }
 };
 
+// ---------------------------------------------------
+/// Local variables
+// ---------------------------------------------------
 typedef ArrayHandlerIfc<> MyArrayHandlerIfc;
 
-MyArrayHandlerIfc MyHandlerIfc;
-Decoder MyDecoder(MyHandlerIfc);
+static MyArrayHandlerIfc MyHandlerIfc;
+static Decoder MyDecoder(MyHandlerIfc);
+static bool bPrintTime = false;
+static bool bPrintPackets = false;
 
-void setup()
-{
-  unsigned int unInterruptPin = 2u;
-
-  MyDecoder.setup(unInterruptPin);
-
-  Serial.begin(9600);
-}
-
-bool bPrintTime = false;
-bool bPrintPackets = false;
-
+// ---------------------------------------------------
+// ---------------------------------------------------
 void printBin(unsigned char b)
 {
   int i;
@@ -84,6 +84,22 @@ void printBin(unsigned char b)
     b <<= 1u;
   }
 }
+
+// ---------------------------------------------------
+/// Arduino's setup() function.
+/// Setup DCC decoder.
+/// Setup serial connection.
+// ---------------------------------------------------
+void setup()
+{
+  MyDecoder.setup(unInterruptPin);
+
+  Serial.begin(9600);
+}
+
+// ---------------------------------------------------
+/// Arduino's loop() function.
+// ---------------------------------------------------
 void loop()
 {
   MyDecoder.loop();

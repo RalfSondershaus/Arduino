@@ -1,10 +1,10 @@
 /**
- * @file BlinkSample.cpp
+ * @file BlinkSample2.cpp
  * @author Ralf Sondershaus
  *
- * @brief Code sample for a blinking LED with Runable/Scheduler support and gamma correction.
+ * @brief Code sample for a blinking LED with RTE support and gamma correction.
  *
- * @copyright Copyright 2018 - 2022 Ralf Sondershaus
+ * @copyright Copyright 2022 Ralf Sondershaus
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,14 +19,14 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
+#include <Std_Types.h>
+#include <Rte/Rte.h>
 #include <Arduino.h>
-#include <Util/Timer.h>
-#include <Sys/Scheduler.h>
 
 // --------------------------------------------------------------------------------------------
 /// Intensity [0 ... 255] to Arduino PWM [0 ... 255]
 // --------------------------------------------------------------------------------------------
-static const unsigned int aunIntensity2Pwm[256u] =
+static const uint8 aunIntensity2Pwm[256u] =
 {
   /*          0    1    2    3    4    5    6    7    8    9  */
   /*   0 */   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,
@@ -68,7 +68,7 @@ unsigned int int2Pwm(unsigned int unInt)
 // --------------------------------------------------------------------------------------------
 /// Blink the LED on pin 7 (LED on board).
 // --------------------------------------------------------------------------------------------
-class Blinker : public Sys::Runable
+class Blinker
 {
 protected:
   const int nLedPin = 7;
@@ -128,18 +128,38 @@ public:
 // --------------------------------------------------------------------------------------------
 /// Variables
 // --------------------------------------------------------------------------------------------
-/// runable for a blinking LED
-Blinker  rBlinker;
-/// the scheduler
-Sys::Scheduler<10> SchM;
+/// This class manages a blinking LED
+Blinker theBlinker;
+
+// --------------------------------------------------------------------------------------------
+/// RTE configuration
+// --------------------------------------------------------------------------------------------
+
+/// The runables of instance theBlinker
+Rte::TRunable<Blinker> rBlinker_Init(theBlinker, &Blinker::init);
+Rte::TRunable<Blinker> rBlinker_Cyclic(theBlinker, &Blinker::run);
+
+/// One init runable and one cyclic runable
+static constexpr int NCR = 1;
+static constexpr int NIR = 1;
+
+/// The arrays to configure the RTE
+static const Rte::RTE<NIR, NCR>::tCyclicCfgArray rcb_cfg_array = {
+  {
+    { 0U, 10000U, &rBlinker_Cyclic }
+  }
+};
+static const Rte::RTE<NIR, NCR>::tInitArray init_array = { &rBlinker_Init };
+
+/// The RTE
+Rte::RTE<1, 1> rte(init_array, rcb_cfg_array);
 
 // --------------------------------------------------------------------------------------------
 /// Arduino's setup() function
 // --------------------------------------------------------------------------------------------
 void setup()
 {
-  SchM.add(0u, 1u, &rBlinker);
-  SchM.init();
+  rte.start();
 }
 
 // --------------------------------------------------------------------------------------------
@@ -147,5 +167,5 @@ void setup()
 // --------------------------------------------------------------------------------------------
 void loop()
 {
-  SchM.schedule();
+  rte.exec1();
 }

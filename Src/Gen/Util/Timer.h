@@ -100,7 +100,7 @@ namespace Util
     /// Return true if timer is elapsed; false otherwise
     /// millis() >= ulTimer: positive result: highest bit is 0
     /// millis() <  ulTimer: negative result: highest bit is 1
-    boolean timeout(void) const { return ((static_cast<time_type>(getCurrentTime() - ulTimer)) & static_cast<time_type>(0x80000000u)) == static_cast<time_type>(0u); }
+    bool timeout(void) const { return ((static_cast<time_type>(getCurrentTime() - ulTimer)) & static_cast<time_type>(0x80000000u)) == static_cast<time_type>(0u); }
 
     /// Return current time [us]
     static time_type getCurrentTime(void) { return millis(); }

@@ -9,6 +9,10 @@
       <Configuration>BlinkSample Program</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="BlinkSample2 Build|Win32">
+      <Configuration>BlinkSample2 Build</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="DccDecoder Compile|Win32">
       <Configuration>DccDecoder Compile</Configuration>
       <Platform>Win32</Platform>
@@ -53,6 +57,10 @@
       <Configuration>Ut_Gen_Dcc_PacketExtractor Build</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Ut_Gen_Rte_Rte Build|Win32">
+      <Configuration>Ut_Gen_Rte_Rte Build</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Ut_Gen_Util_Array Build|Win32">
       <Configuration>Ut_Gen_Util_Array Build</Configuration>
       <Platform>Win32</Platform>
@@ -69,9 +77,12 @@
     <None Include="Build\make\Gen\Target\mega\Makefile_Target.gmk" />
     <None Include="Build\make\Gen\Target\win32\Makefile_Target.gmk" />
     <None Include="Build\make\Makefile.gmk" />
+    <None Include="Build\make\Prj\App\BlinkSample2\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\App\BlinkSample\Makefile_Prj.gmk" />
+    <None Include="Build\make\Prj\App\DccSniffer\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Gen\Dcc\Ut_PacketExtractor\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Gen\Dcc\Ut_Packet\Makefile_Prj.gmk" />
+    <None Include="Build\make\Prj\UnitTest\Gen\Rte\Ut_Rte\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Array\Makefile_Prj.gmk" />
     <None Include="Src\Gen\Os\FreeRTOS\v202112.00\include\stdint.readme" />
   </ItemGroup>
@@ -86,9 +97,12 @@
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\stream_buffer.c" />
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\tasks.c" />
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\timers.c" />
+    <ClCompile Include="Src\Prj\App\BlinkSample2\BlinkSample2.cpp" />
     <ClCompile Include="Src\Prj\App\BlinkSample\BlinkSample.cpp" />
+    <ClCompile Include="Src\Prj\App\DccSniffer\DccSniffer.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Gen\Dcc\Ut_PacketExtractor\test.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Gen\Dcc\Ut_Packet\test.cpp" />
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Test.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Array\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +135,10 @@
     <ClInclude Include="Src\Gen\Platform\Std_Types.h" />
     <ClInclude Include="Src\Gen\Platform\x86\msvc\Compiler.h" />
     <ClInclude Include="Src\Gen\Platform\x86\msvc\Platform_Types.h" />
+    <ClInclude Include="Src\Gen\Rte\Rte.h" />
+    <ClInclude Include="Src\Gen\Rte\Rte_Type.h" />
+    <ClInclude Include="Src\Gen\Rte\Rte_Type_Ifc.h" />
+    <ClInclude Include="Src\Gen\Rte\Rte_Type_Runable.h" />
     <ClInclude Include="Src\Gen\Sys\Runable.h" />
     <ClInclude Include="Src\Gen\Sys\Scheduler.h" />
     <ClInclude Include="Src\Gen\Util\Array.h" />
@@ -128,6 +146,7 @@
     <ClInclude Include="Src\Gen\Util\RingBuffer.h" />
     <ClInclude Include="Src\Gen\Util\Timer.h" />
     <ClInclude Include="Src\Gen\Util\Vector.h" />
+    <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Arduino.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -136,6 +155,11 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample2 Build|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -161,6 +185,11 @@
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Array Build|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Rte_Rte Build|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -218,6 +247,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample2 Build|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Build|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -231,6 +263,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Array Build|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Rte_Rte Build|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet Build|Win32'" Label="PropertySheets">
@@ -269,6 +304,15 @@
     <OutDir>.\Build\Bin</OutDir>
     <IntDir>.\Build\Tmp</IntDir>
     <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/.\..\..\Tools\avr8-gnu-toolchain\3.7.0.1796\bin\avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Prj/BlinkSample;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample2 Build|Win32'">
+    <NMakeBuildCommandLine>./Build/Build App/BlinkSample2 mega avrgcc arduino none all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build App/BlinkSample2 mega avrgcc arduino none clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build App/BlinkSample2 mega avrgcc arduino none rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Build\Bin</OutDir>
+    <IntDir>.\Build\Tmp</IntDir>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/AVR/avrgcc;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Prj/App/BlinkSample2;$(SolutionDir)Src/Gen;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Build|Win32'">
     <NMakeBuildCommandLine>./Build FreeRTOSDemo all</NMakeBuildCommandLine>
@@ -319,6 +363,18 @@
     <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/Ut_Array;$(SolutionDir)Src/Gen</NMakeIncludeSearchPath>
     <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
     <NMakeOutput>./Build/Bin/Ut_Array.exe</NMakeOutput>
+    <SourcePath>$(VC_SourcePath);$(SolutionDir)Src\Prj\Ut_Array;$(SolutionDir)Src</SourcePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Rte_Rte Build|Win32'">
+    <NMakeBuildCommandLine>./Build/Build UnitTest/Gen/Rte/Ut_Rte win32 msvc none googletest all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build UnitTest/Gen/Rte/Ut_Rte win32 msvc none googletest clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build UnitTest/Gen/Rte/Ut_Rte win32 msvc none googletest rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Build\Bin</OutDir>
+    <IntDir>.\Build\Tmp</IntDir>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/UnitTest/Gen/Rte/Ut_Rte;$(SolutionDir)Src/Gen;</NMakeIncludeSearchPath>
+    <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
+    <NMakeOutput>./Build/Bin/Ut_Rte.exe</NMakeOutput>
     <SourcePath>$(VC_SourcePath);$(SolutionDir)Src\Prj\Ut_Array;$(SolutionDir)Src</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_Packet Build|Win32'">

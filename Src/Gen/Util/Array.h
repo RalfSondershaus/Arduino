@@ -21,9 +21,8 @@ namespace Util
   /// and other functions as known from STL containers
   // ---------------------------------------------------
   template<class T, int N>
-  class Array
+  struct Array
   {
-  public:
     /// MemberClass
     typedef T value_type;
     /// This class
@@ -40,22 +39,16 @@ namespace Util
     typedef T& reference;
     typedef const T& const_reference;
 
-  protected:
-
     /// array of elements
     T elements[N];
     
-  public:
     /// Constructor
-    Array() = default;
-    /// Destructor
-    ~Array() = default;
     /// returns an iterator to the beginning
     iterator begin() { return &elements[0]; }
     const_iterator begin() const { return &elements[0]; }
     /// returns an iterator to the end
     iterator end() { return &elements[N]; }
-    const_iterator end() const { &elements[N]; }
+    const_iterator end() const { return &elements[N]; }
     /// Returns a reference to the element at specified location pos. No bounds checking is performed (contrary to STL)
     reference at(size_type pos) { return elements[pos]; }
     constexpr const_reference at(size_type pos) const { return elements[pos]; }

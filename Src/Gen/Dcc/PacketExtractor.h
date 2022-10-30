@@ -37,7 +37,7 @@ namespace Dcc
     /// size type
     typedef size_t size_type;
 
-    /// Interface for a handler. This handler is called if a new packet is received completely
+    /// Interface for a handler. Such a handler is called if a new packet is received completely
     class HandlerIfc
     {
     public:
