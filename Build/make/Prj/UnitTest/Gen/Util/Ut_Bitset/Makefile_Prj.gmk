@@ -1,0 +1,6 @@
+# 
+# Project specific Makefile for unit test of class util::bitset
+#
+
+# Files
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test

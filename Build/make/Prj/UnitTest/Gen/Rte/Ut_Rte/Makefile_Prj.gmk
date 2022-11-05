@@ -3,4 +3,5 @@
 #
 
 # Files
-FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test \
+            $(PATH_SRC_GEN)/Rte/Rte

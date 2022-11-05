@@ -169,6 +169,24 @@
     <Filter Include="Build\make\Prj\UnitTest\Gen\Rte">
       <UniqueIdentifier>{9c7bb4c7-4cdf-4c2d-9a68-7c54f13a2cf6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Gen\Arduino">
+      <UniqueIdentifier>{7e4556a1-c546-42bc-b65d-d0cb18cc1abf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Gen\Arduino_win32">
+      <UniqueIdentifier>{39757d2f-4fe7-4fc5-b81e-ddd597557677}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Gen\Arduino_win32\cores">
+      <UniqueIdentifier>{5a51c88b-d042-452b-a603-ce13a887ed21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Rte">
+      <UniqueIdentifier>{f45f226a-ce91-4b75-8923-0d2d08bb90ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Gen\Util\Ut_Bitset">
+      <UniqueIdentifier>{94c2d630-7eb4-4f89-a1ff-97998f4f4bd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Bitset">
+      <UniqueIdentifier>{54afec34-4531-49e2-a26a-03762a566fe2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gen\Dcc\Decoder.cpp">
@@ -221,6 +239,15 @@
     </ClCompile>
     <ClCompile Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Test.cpp">
       <Filter>Src\Prj\UnitTest\Gen\Rte\Ut_Rte</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino_win32\cores\main.cpp">
+      <Filter>Src\Gen\Arduino_win32\cores</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Rte\Rte.cpp">
+      <Filter>Src\Gen\Rte</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Bitset\Test.cpp">
+      <Filter>Src\Prj\UnitTest\Gen\Util\Ut_Bitset</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -332,9 +359,6 @@
     <ClInclude Include="Src\Gen\Platform\x86\msvc\Platform_Types.h">
       <Filter>Src\Gen\Platform\x86\msvc</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Gen\Rte\Rte_Type.h">
-      <Filter>Src\Gen\Rte</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Gen\Rte\Rte_Type_Runable.h">
       <Filter>Src\Gen\Rte</Filter>
     </ClInclude>
@@ -346,6 +370,30 @@
     </ClInclude>
     <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Arduino.h">
       <Filter>Src\Prj\UnitTest\Gen\Rte\Ut_Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino_win32\cores\Arduino.h">
+      <Filter>Src\Gen\Arduino_win32\cores</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Rte\Rte_Cfg_Ext.h">
+      <Filter>Src\Gen\Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Rte\Rte_Cfg_Mac.h">
+      <Filter>Src\Gen\Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Rte\Rte_Cfg_Prj.h">
+      <Filter>Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\A.h">
+      <Filter>Src\Prj\UnitTest\Gen\Rte\Ut_Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\B.h">
+      <Filter>Src\Prj\UnitTest\Gen\Rte\Ut_Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Ifc_A.h">
+      <Filter>Src\Prj\UnitTest\Gen\Rte\Ut_Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\bitset.h">
+      <Filter>Src\Gen\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -390,6 +438,9 @@
     </None>
     <None Include="Build\make\Prj\UnitTest\Gen\Rte\Ut_Rte\Makefile_Prj.gmk">
       <Filter>Build\make\Prj\UnitTest\Gen\Rte</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Bitset\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_Bitset</Filter>
     </None>
   </ItemGroup>
 </Project>

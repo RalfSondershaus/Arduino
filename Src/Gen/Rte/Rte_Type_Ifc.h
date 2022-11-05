@@ -3,10 +3,10 @@
  * @author Ralf Sondershaus
  *
  * @descr generic classes for RTE interfaces
- *        - IfcBase
- *        - IfcSR     (Sender Receiver)
- *        - IfcSRCal  (Sender Receiver for calibration data)
- *        - IfcCS     (Client Server)
+ *        - ifc_base
+ *        - ifc_sr      (Sender Receiver)
+ *        - ifc_sr_cal  (Sender Receiver for calibration data)
+ *        - ifc_cs      (Client Server)
  *
  * @copyright Copyright 2020 - 2022 Ralf Sondershaus
  *
@@ -26,17 +26,14 @@
 #ifndef RTE_TYPE_IFC_H__
 #define RTE_TYPE_IFC_H__
 
-namespace Rte
+namespace rte
 {
   // ----------------------------------------------------------
   /// Base class for RTE interfaces
   // ----------------------------------------------------------
-  template<typename T>
-  class IfcBase
+  class ifc_base
   {
   public:
-    typedef T ifc_type;
-    typedef IfcBase<ifc_type> This;
     /// Return type of RTE access functions
     typedef enum
     {
@@ -44,8 +41,8 @@ namespace Rte
       NOK = 1
     } ret_type;
   public:
-    IfcBase() {}
-    virtual ~IfcBase() {}
+    ifc_base() {}
+    virtual ~ifc_base() {}
   };
 
   // ----------------------------------------------------------
@@ -53,43 +50,41 @@ namespace Rte
   /// Owns a copy of data of type T.
   // ----------------------------------------------------------
   template<typename T>
-  class IfcSR : public IfcBase<T>
+  class ifc_sr : public ifc_base
   {
   public:
-    typedef IfcBase<T> Base;
-    typedef IfcSR<T> This;
-    typedef typename Base::ifc_type ifc_type;
+    typedef ifc_base Base;
+    typedef T data_type;
+    typedef ifc_sr<data_type> This;
     typedef typename Base::ret_type ret_type;
 
-    ifc_type mData;
+    data_type mData;
 
   public:
-    IfcSR() {}
-    virtual ~IfcSR() {}
+    ifc_sr() {}
+    virtual ~ifc_sr() {}
     /// Read and write data. Default implementation uses operator=. 
-    virtual ret_type read (      ifc_type& t) const { t = mData; return Base::OK; }
-    virtual ret_type write(const ifc_type& t)       { mData = t; return Base::OK; }
+    virtual ret_type read (      data_type& t) const { t = mData; return Base::OK; }
+    virtual ret_type write(const data_type& t)       { mData = t; return Base::OK; }
     /// get reference to stored data
-    const ifc_type& ref() const noexcept { return mData; }
-    ifc_type& ref() noexcept { return mData; }
+    const data_type& ref() const noexcept { return mData; }
+    data_type& ref() noexcept { return mData; }
   };
 
   // ----------------------------------------------------------
   /// Sender Receiver interface for calibration values
   // ----------------------------------------------------------
   template<typename T>
-  class IfcSRCal : public IfcSR<T>
+  class ifc_sr_cal : public ifc_sr<T>
   {
   public:
-    typedef IfcSRCal<T> This;
-    typedef IfcSR<T> Base;
-    typedef typename Base::ifc_type ifc_type;
-    typedef typename Base::ret_type ret_type;
+    typedef ifc_sr_cal<T> This;
+    typedef ifc_sr<T> Base;
   protected:
     bool mIsValid;
   public:
-    IfcSRCal() : mIsValid(false) {}
-    virtual ~IfcSRCal() {}
+    ifc_sr_cal() : mIsValid(false) {}
+    virtual ~ifc_sr_cal() {}
     /// Return true if calibation data are valid
     constexpr bool isValid() const noexcept { return mIsValid; }
     /// Validate calibration data
@@ -101,20 +96,17 @@ namespace Rte
   // ----------------------------------------------------------
   /// Client Server interface
   // ----------------------------------------------------------
-  template<typename T>
-  class IfcCS : public IfcBase<T>
+  class ifc_cs : public ifc_base
   {
   public:
-    typedef IfcBase<T> Base;
-    typedef IfcCS<T> This;
-    typedef typename Base::ifc_type ifc_type;
+    typedef ifc_base Base;
     typedef typename Base::ret_type ret_type;
 
-    IfcCS() {}
-    virtual ~IfcCS() {}
-    virtual ifc_type call() const = 0;
+    ifc_cs() {}
+    virtual ~ifc_cs() {}
+    virtual ret_type call() const = 0;
   };
 
-} // namespace Rte
+} // namespace rte
 
 #endif // RTE_TYPE_IFC_H__

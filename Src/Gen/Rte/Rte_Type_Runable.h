@@ -1,10 +1,11 @@
 /**
  * @file Rte_Type_Runable.h
+ *
  * @author Ralf Sondershaus
  *
- * @brief The interface Runable can be used to schedule a member function of a class
+ * @brief The Runable class is a proxy class to make a member function a runable.
  * 
- * @copyright Copyright 2018 - 2022 Ralf Sondershaus
+ * @copyright Copyright 2020 - 2022 Ralf Sondershaus
  *
  * This program is free software: you can redistribute it and/or modify it 
  * under the terms of the GNU General Public License as published by the 
@@ -22,7 +23,7 @@
 #ifndef RTE_TYPE_RUNABLE_H_
 #define RTE_TYPE_RUNABLE_H_
 
-namespace Rte
+namespace rte
 {
   // ----------------------------------------------
   /// Interface class for runables.
@@ -66,6 +67,6 @@ namespace Rte
     /// Main execution function
     virtual void run(void) override { CALL_MEMBER_FUNC(obj, func)(); }
   };
-} // namespace Rte
+} // namespace rte
 
 #endif /* RTE_TYPE_RUNABLE_H_ */

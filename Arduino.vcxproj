@@ -69,6 +69,10 @@
       <Configuration>Ut_Gen_Dcc_Packet Build</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Ut_Gen_Util_Bitset|Win32">
+      <Configuration>Ut_Gen_Util_Bitset</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
     <None Include="Build\Build.bat" />
@@ -84,9 +88,11 @@
     <None Include="Build\make\Prj\UnitTest\Gen\Dcc\Ut_Packet\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Gen\Rte\Ut_Rte\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Array\Makefile_Prj.gmk" />
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Bitset\Makefile_Prj.gmk" />
     <None Include="Src\Gen\Os\FreeRTOS\v202112.00\include\stdint.readme" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Gen\Arduino_win32\cores\main.cpp" />
     <ClCompile Include="Src\Gen\Dcc\Decoder.cpp" />
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\croutine.c" />
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\event_groups.c" />
@@ -97,6 +103,7 @@
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\stream_buffer.c" />
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\tasks.c" />
     <ClCompile Include="Src\Gen\Os\FreeRTOS\v202112.00\timers.c" />
+    <ClCompile Include="Src\Gen\Rte\Rte.cpp" />
     <ClCompile Include="Src\Prj\App\BlinkSample2\BlinkSample2.cpp" />
     <ClCompile Include="Src\Prj\App\BlinkSample\BlinkSample.cpp" />
     <ClCompile Include="Src\Prj\App\DccSniffer\DccSniffer.cpp" />
@@ -104,8 +111,10 @@
     <ClCompile Include="Src\Prj\UnitTest\Gen\Dcc\Ut_Packet\test.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Test.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Array\Test.cpp" />
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Bitset\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Gen\Arduino_win32\cores\Arduino.h" />
     <ClInclude Include="Src\Gen\Dcc\BitExtractor.h" />
     <ClInclude Include="Src\Gen\Dcc\Decoder.h" />
     <ClInclude Include="Src\Gen\Dcc\Packet.h" />
@@ -136,17 +145,23 @@
     <ClInclude Include="Src\Gen\Platform\x86\msvc\Compiler.h" />
     <ClInclude Include="Src\Gen\Platform\x86\msvc\Platform_Types.h" />
     <ClInclude Include="Src\Gen\Rte\Rte.h" />
-    <ClInclude Include="Src\Gen\Rte\Rte_Type.h" />
+    <ClInclude Include="Src\Gen\Rte\Rte_Cfg_Ext.h" />
+    <ClInclude Include="Src\Gen\Rte\Rte_Cfg_Mac.h" />
     <ClInclude Include="Src\Gen\Rte\Rte_Type_Ifc.h" />
     <ClInclude Include="Src\Gen\Rte\Rte_Type_Runable.h" />
     <ClInclude Include="Src\Gen\Sys\Runable.h" />
     <ClInclude Include="Src\Gen\Sys\Scheduler.h" />
     <ClInclude Include="Src\Gen\Util\Array.h" />
+    <ClInclude Include="Src\Gen\Util\bitset.h" />
     <ClInclude Include="Src\Gen\Util\Math.h" />
     <ClInclude Include="Src\Gen\Util\RingBuffer.h" />
     <ClInclude Include="Src\Gen\Util\Timer.h" />
     <ClInclude Include="Src\Gen\Util\Vector.h" />
+    <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\A.h" />
     <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Arduino.h" />
+    <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\B.h" />
+    <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Ifc_A.h" />
+    <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Rte\Rte_Cfg_Prj.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -185,6 +200,11 @@
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Array Build|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Bitset|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -263,6 +283,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Array Build|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Bitset|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Rte_Rte Build|Win32'" Label="PropertySheets">
@@ -365,6 +388,18 @@
     <NMakeOutput>./Build/Bin/Ut_Array.exe</NMakeOutput>
     <SourcePath>$(VC_SourcePath);$(SolutionDir)Src\Prj\Ut_Array;$(SolutionDir)Src</SourcePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Bitset|Win32'">
+    <NMakeBuildCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Bitset win32 msvc none googletest all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Bitset win32 msvc none googletest clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Bitset win32 msvc none googletest rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Build\Bin</OutDir>
+    <IntDir>.\Build\Tmp</IntDir>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/Ut_Array;$(SolutionDir)Src/Gen</NMakeIncludeSearchPath>
+    <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
+    <NMakeOutput>./Build/Bin/Ut_Bitset.exe</NMakeOutput>
+    <SourcePath>$(VC_SourcePath);$(SolutionDir)Src\Prj\Ut_Array;$(SolutionDir)Src</SourcePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Rte_Rte Build|Win32'">
     <NMakeBuildCommandLine>./Build/Build UnitTest/Gen/Rte/Ut_Rte win32 msvc none googletest all</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>./Build/Build UnitTest/Gen/Rte/Ut_Rte win32 msvc none googletest clean</NMakeCleanCommandLine>
@@ -372,7 +407,7 @@
     <NMakePreprocessorDefinitions />
     <OutDir>.\Build\Bin</OutDir>
     <IntDir>.\Build\Tmp</IntDir>
-    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/UnitTest/Gen/Rte/Ut_Rte;$(SolutionDir)Src/Gen;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/UnitTest/Gen/Rte/Ut_Rte;$(SolutionDir)Src/Gen</NMakeIncludeSearchPath>
     <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
     <NMakeOutput>./Build/Bin/Ut_Rte.exe</NMakeOutput>
     <SourcePath>$(VC_SourcePath);$(SolutionDir)Src\Prj\Ut_Array;$(SolutionDir)Src</SourcePath>

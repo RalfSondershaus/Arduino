@@ -1,10 +1,10 @@
 /**
- * @file Rte.h
+ * @file Rte_Cfg_Ext.h
  *
  * @author Ralf Sondershaus
  *
- * @brief External interface of RTE. Provides start(), stop(), exec(), and setEvent().
- *        Provides project specific interfaces (ports) via include header files and objects.
+ * @brief Helper file to define external interface of RTE. Provides project specific interfaces (ports)
+ *        and objects.
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -21,26 +21,17 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef RTE_H_
-#define RTE_H_
+#ifndef RTE_CFG_EXT_H_
+#define RTE_CFG_EXT_H_
 
-#include <Std_Types.h>
+#define RTE_DEF_MODE_OBJ_EXT
+#include <Rte/Rte_Cfg_Mac.h>
+#include <Rte/Rte_Cfg_Prj.h>
+#undef RTE_DEF_MODE_OBJ_EXT
 
-namespace rte
-{
-  typedef uint32 tEvntId;
+#define RTE_DEF_MODE_INTERFACES_EXT
+#include <Rte/Rte_Cfg_Mac.h>
+#include <Rte/Rte_Cfg_Prj.h>
+#undef RTE_DEF_MODE_INTERFACES_EXT
 
-  constexpr tEvntId kInvalidEventId = static_cast<tEvntId>(0xFFFFFFFFU);
-}
-
-#include <Rte/Rte_Cfg_Ext.h>
-
-namespace rte
-{
-  void start();
-  void stop();
-  void exec();
-  void setEvent(uint32 ulEventId);
-} // namespace rte
-
-#endif // RTE_H_
+#endif // RTE_CFG_EXT_H_

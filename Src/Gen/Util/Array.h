@@ -3,7 +3,21 @@
   *
   * @author Ralf Sondershaus
   *
-  * An Array class
+  * @brief An array class.
+  *
+  * @copyright Copyright 2018 - 2022 Ralf Sondershaus
+  *
+  * This program is free software: you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the
+  * Free Software Foundation, either version 3 of the License, or (at your
+  * option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful, but
+  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+  * for more details.
+  *
+  * See <https://www.gnu.org/licenses/>.
   */
 
 #ifndef UTIL_ARRAY_H
@@ -11,7 +25,7 @@
 
 #include <Std_Types.h>
 
-namespace Util
+namespace util
 {
   // ---------------------------------------------------
   /// A simple container class which supports
@@ -21,12 +35,12 @@ namespace Util
   /// and other functions as known from STL containers
   // ---------------------------------------------------
   template<class T, int N>
-  struct Array
+  struct array
   {
     /// MemberClass
     typedef T value_type;
     /// This class
-    typedef Array<T, N> This;
+    typedef array<T, N> This;
     /// iterators
     typedef T *       iterator;
     typedef const T * const_iterator;
@@ -78,6 +92,6 @@ namespace Util
     }
   };
 
-} // namespace Util
+} // namespace util
 
 #endif // UTIL_ARRAY_H
