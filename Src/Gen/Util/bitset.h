@@ -91,7 +91,7 @@ namespace util
 
     constexpr tWord& ref_word(size_t pos) noexcept { return aWords[which_word(pos)]; }
     constexpr tWord  get_word(size_t pos) const noexcept { return aWords[which_word(pos)]; }
-    constexpr tWord& hiword() noexcept { return aWords[NWORDS - 1]; }
+              tWord& hiword() noexcept { return aWords[NWORDS - 1]; }
     constexpr tWord  hiword() const noexcept { return aWords[NWORDS - 1]; }
 
     template<size_t NBITS>
@@ -201,6 +201,46 @@ namespace util
   };
 
   // --------------------------------------------------------------------
+  /// partial specialization of base class for important use case NWORDS = 0
+  // --------------------------------------------------------------------
+  template<typename W>
+  struct bitset_base<W, 0U>
+  {
+    typedef W tWord;
+
+    tWord word;
+
+    constexpr bitset_base() noexcept : word() {}
+    constexpr bitset_base(tWord v) noexcept : word{ v } {}
+
+    static constexpr size_t bits_per_char() noexcept { return 8U; }
+    static constexpr size_t bits_per_word() noexcept { return bits_per_char() * sizeof(tWord); }
+    static constexpr size_t which_bit(size_t pos) noexcept { return pos; }
+    template<size_t NBITS>
+    static constexpr tWord hiword_nr_bits() noexcept { return static_cast<tWord>(0); }
+
+    constexpr tWord& ref_word(size_t pos) noexcept { (void)pos; return word; }
+    constexpr tWord  get_word(size_t pos) const noexcept { (void)pos; return static_cast<tWord>(0); }
+    tWord& hiword() noexcept { return word; }
+    constexpr tWord  hiword() const noexcept { return static_cast<tWord>(0); }
+
+    template<size_t NBITS>
+    bool all() const noexcept { return true; }
+    bool any() const noexcept { return false; }
+    bool none() const noexcept { return false; }
+
+    template<size_t NBITS>
+    void set() noexcept {}
+    void set(size_t pos, bool value = true) noexcept { (void)pos; (void)value; }
+
+    void reset() noexcept {}
+    void reset(size_t pos) noexcept { (void)pos; }
+
+    size_t find_first(size_t notfound) const { return notfound; }
+    size_t find_next(size_t prevpos, size_t notfound) const { return notfound; }
+  };
+
+  // --------------------------------------------------------------------
   /// partial specialization of base class for important use case NWORDS = 1
   // --------------------------------------------------------------------
   template<typename W>
@@ -221,7 +261,7 @@ namespace util
 
     constexpr tWord& ref_word(size_t pos) noexcept { (void)pos; return word; }
     constexpr tWord  get_word(size_t pos) const noexcept { (void)pos; return word; }
-    constexpr tWord& hiword() noexcept { return word; }
+              tWord& hiword() noexcept { return word; }
     constexpr tWord  hiword() const noexcept { return word; }
 
     template<size_t NBITS>
@@ -282,7 +322,7 @@ namespace util
   {
     typedef bitset_base<W, bits::nr_words<W>(NBITS)> Base;
   public:
-    typedef Base::tWord tWord;
+    typedef typename Base::tWord tWord;
     typedef bitset<W, NBITS> This;
   public:
     /// Default constructor. Constructs a bitset with all bits set to zero.
@@ -297,14 +337,22 @@ namespace util
     bool test(size_t pos) const { return this->operator[](pos); }
 
     /// Checks if all bits are set to true
+#ifdef _MSC_VER
     bool all() const noexcept { return Base::all<NBITS>(); }
+#else
+    bool all() const noexcept { return Base::all(); }
+#endif
     /// Checks if any bits are set to true
     bool any() const noexcept { return Base::any(); }
     /// Checks if none of the bits are set to true
     bool none() const noexcept { return Base::none(); }
 
     /// Sets all bits to true or sets one bit to specified value
+#ifdef _MSC_VER
     This& set() noexcept { Base::set<NBITS>(); return *this; }
+#else
+    This& set() noexcept { Base::set(); return *this; }
+#endif
     This& set(size_t pos, bool value = true) { Base::set(pos, value); return *this; }
 
     /// Sets bits to false

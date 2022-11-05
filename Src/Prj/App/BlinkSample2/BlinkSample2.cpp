@@ -1,5 +1,6 @@
 /**
  * @file BlinkSample2.cpp
+ *
  * @author Ralf Sondershaus
  *
  * @brief Code sample for a blinking LED with RTE support and gamma correction.
@@ -19,7 +20,6 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#include <Std_Types.h>
 #include <Rte/Rte.h>
 #include <Arduino.h>
 
@@ -65,101 +65,60 @@ unsigned int int2Pwm(unsigned int unInt)
   return aunIntensity2Pwm[unInt];
 }
 
-// --------------------------------------------------------------------------------------------
-/// Blink the LED on pin 7 (LED on board).
-// --------------------------------------------------------------------------------------------
-class Blinker
+// Initialization
+void Blinker::init(void)
 {
-protected:
-  const int nLedPin = 7;
-  unsigned int unIntensity;   ///< [0...255] intensity value
-  bool bUp;                   ///< upwards counting (true) or downwards counting (false)
+  // Most Arduinos have an on-board LED you can control. On Mega, it is attached to digital pin 13.
+  pinMode(nLedPin, OUTPUT);
+}
 
-public:
-  /// default constructor
-  Blinker() : unIntensity(0), bUp(true)
+/// Main execution function
+void Blinker::run(void)
+{
+  analogWrite(nLedPin, int2Pwm(unIntensity));
+
+  //Serial.print("Alive ");
+  //Serial.print(int2Pwm(unIntensity));
+  //Serial.println();
+
+  if (bUp)
   {
-  }
-
-  /// Initialization
-  virtual void init(void)
-  {
-    // Most Arduinos have an on-board LED you can control. On Mega, it is attached to digital pin 13.
-    pinMode(nLedPin, OUTPUT);
-  }
-
-  /// Main execution function
-  virtual void run(void)
-  {
-    analogWrite(nLedPin, int2Pwm(unIntensity));
-
-    if (bUp)
+    if (unIntensity >= 255u)
     {
-      if (unIntensity >= 255u)
-      {
-        bUp = false;
-      }
-    }
-    else
-    {
-      if (unIntensity == 0)
-      {
-        bUp = true;
-      }
-    }
-
-    if (bUp)
-    {
-      if (unIntensity < 255u)
-      {
-        unIntensity++;
-      }
-    }
-    else
-    {
-      if (unIntensity > 0u)
-      {
-        unIntensity--;
-      }
+      bUp = false;
     }
   }
-};
-
-// --------------------------------------------------------------------------------------------
-/// Variables
-// --------------------------------------------------------------------------------------------
-/// This class manages a blinking LED
-Blinker theBlinker;
-
-// --------------------------------------------------------------------------------------------
-/// RTE configuration
-// --------------------------------------------------------------------------------------------
-
-/// The runables of instance theBlinker
-Rte::TRunable<Blinker> rBlinker_Init(theBlinker, &Blinker::init);
-Rte::TRunable<Blinker> rBlinker_Cyclic(theBlinker, &Blinker::run);
-
-/// One init runable and one cyclic runable
-static constexpr int NCR = 1;
-static constexpr int NIR = 1;
-
-/// The arrays to configure the RTE
-static const Rte::RTE<NIR, NCR>::tCyclicCfgArray rcb_cfg_array = {
+  else
   {
-    { 0U, 10000U, &rBlinker_Cyclic }
+    if (unIntensity == 0)
+    {
+      bUp = true;
+    }
   }
-};
-static const Rte::RTE<NIR, NCR>::tInitArray init_array = { &rBlinker_Init };
 
-/// The RTE
-Rte::RTE<1, 1> rte(init_array, rcb_cfg_array);
+  if (bUp)
+  {
+    if (unIntensity < 255u)
+    {
+      unIntensity++;
+    }
+  }
+  else
+  {
+    if (unIntensity > 0u)
+    {
+      unIntensity--;
+    }
+  }
+}
 
 // --------------------------------------------------------------------------------------------
 /// Arduino's setup() function
 // --------------------------------------------------------------------------------------------
 void setup()
 {
-  rte.start();
+  //Serial.begin(9600);
+  rte::start();
 }
 
 // --------------------------------------------------------------------------------------------
@@ -167,5 +126,5 @@ void setup()
 // --------------------------------------------------------------------------------------------
 void loop()
 {
-  rte.exec1();
+  rte::exec();
 }

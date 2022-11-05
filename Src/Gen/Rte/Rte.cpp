@@ -49,6 +49,21 @@ namespace rte
 #include <Rte/Rte_Cfg_Prj.h>
 #undef RTE_DEF_MODE_OBJ
 
+#define RTE_DEF_MODE_INIT_RUNABLES
+#include <Rte/Rte_Cfg_Mac.h>
+#include <Rte/Rte_Cfg_Prj.h>
+#undef RTE_DEF_MODE_INIT_RUNABLES
+
+#define RTE_DEF_MODE_INIT_RUNABLE_ENUM
+#include <Rte/Rte_Cfg_Mac.h>
+#include <Rte/Rte_Cfg_Prj.h>
+#undef RTE_DEF_MODE_INIT_RUNABLE_ENUM
+
+#define RTE_DEF_MODE_INIT_RUNABLE_ARRAY
+#include <Rte/Rte_Cfg_Mac.h>
+#include <Rte/Rte_Cfg_Prj.h>
+#undef RTE_DEF_MODE_INIT_RUNABLE_ARRAY
+
 #define RTE_DEF_MODE_CYCLIC_RUNABLES
 #include <Rte/Rte_Cfg_Mac.h>
 #include <Rte/Rte_Cfg_Prj.h>
@@ -98,6 +113,7 @@ namespace rte
   // 32 events
   typedef util::bitset<uint32, 32> event_array;
 
+
   /// The RCBs
   rcb_array aRcb;
   /// Events
@@ -107,6 +123,7 @@ namespace rte
 
   void start()
   {
+    // load timers
     auto it_rcb = aRcb.begin();
     auto it_rcb_cfg = aCyclicRunables.begin();
 
@@ -117,8 +134,18 @@ namespace rte
       it_rcb_cfg++;
     }
 
+    // clear events
     aEvents.reset();
 
+    // call init runables
+    auto it_init_cfg = aInitRunables.begin();
+    while (it_init_cfg != aInitRunables.end())
+    {
+      (*it_init_cfg)->run();
+      it_init_cfg++;
+    }
+
+    // restart round robin scheduling
     //it_rcb_cur = aRcb.begin();
   }
 

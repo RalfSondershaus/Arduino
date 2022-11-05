@@ -24,15 +24,6 @@ $(PATH_OBJ)/%.o: %.cpp
 	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
 	@$(AWK) -f $(PATH_TOOLS)/GNU/gccerror.awk $(PATH_ERR)/$(basename $(@F)).err
    
-.PHONY: size
-size:
-	@echo +++++ size of $(basename $@).elf +++++
-	$(SIZE) -A $(TARGET).elf
-
-.PHONY: program
-program:
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -Uflash:w:$(TARGET).hex:i
-
 # ---------------------------------------------------
 # MSVC
 # ---------------------------------------------------

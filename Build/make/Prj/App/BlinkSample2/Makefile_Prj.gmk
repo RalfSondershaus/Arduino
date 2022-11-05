@@ -3,4 +3,5 @@
 #
 
 # Files
-FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/BlinkSample2
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/BlinkSample2 \
+            $(PATH_SRC_GEN)/Rte/Rte

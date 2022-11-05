@@ -39,6 +39,15 @@
 #ifdef RTE_DEF_OBJ_END
 #undef RTE_DEF_OBJ_END
 #endif
+#ifdef RTE_DEF_INIT_RUNABLE
+#undef RTE_DEF_INIT_RUNABLE
+#endif
+#ifdef RTE_DEF_INIT_RUNABLE_START
+#undef RTE_DEF_INIT_RUNABLE_START
+#endif
+#ifdef RTE_DEF_INIT_RUNABLE_END
+#undef RTE_DEF_INIT_RUNABLE_END
+#endif
 #ifdef RTE_DEF_CYCLIC_RUNABLE
 #undef RTE_DEF_CYCLIC_RUNABLE
 #endif
@@ -74,6 +83,9 @@
 #define RTE_DEF_OBJ_START
 #define RTE_DEF_OBJ_END
 #define RTE_DEF_OBJ(cls, obj)                                       cls obj;
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
 #define RTE_DEF_CYCLIC_RUNABLE_START
 #define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
 #define RTE_DEF_CYCLIC_RUNABLE_END
@@ -89,6 +101,66 @@
 #define RTE_DEF_OBJ_START
 #define RTE_DEF_OBJ_END
 #define RTE_DEF_OBJ(cls, obj)                                       extern cls obj;
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
+#define RTE_DEF_CYCLIC_RUNABLE_START
+#define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
+#define RTE_DEF_CYCLIC_RUNABLE_END
+#define RTE_DEF_EVENT_RUNABLE_START
+#define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
+#define RTE_DEF_EVENT_RUNABLE_END
+#define RTE_DEF_INTERFACE(cls,obj)
+#define RTE_DEF_INTERFACE_START
+#define RTE_DEF_INTERFACE_END
+#endif
+
+// ----------------------------------------------------------------------
+/// Init runables
+// ----------------------------------------------------------------------
+#ifdef RTE_DEF_MODE_INIT_RUNABLES
+#define RTE_DEF_OBJ_START
+#define RTE_DEF_OBJ_END
+#define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)                        TRunable<cls> ri_##obj##func(obj, &cls::func);
+#define RTE_DEF_INIT_RUNABLE_END
+#define RTE_DEF_CYCLIC_RUNABLE_START
+#define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
+#define RTE_DEF_CYCLIC_RUNABLE_END
+#define RTE_DEF_EVENT_RUNABLE_START
+#define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
+#define RTE_DEF_EVENT_RUNABLE_END
+#define RTE_DEF_INTERFACE(cls,obj)
+#define RTE_DEF_INTERFACE_START
+#define RTE_DEF_INTERFACE_END
+#endif
+
+#ifdef RTE_DEF_MODE_INIT_RUNABLE_ENUM
+#define RTE_DEF_OBJ_START
+#define RTE_DEF_OBJ_END
+#define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START                                    enum {
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)                          kRI_##obj##func,
+#define RTE_DEF_INIT_RUNABLE_END                                      kRI_Max };
+#define RTE_DEF_CYCLIC_RUNABLE_START                                  
+#define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
+#define RTE_DEF_CYCLIC_RUNABLE_END
+#define RTE_DEF_EVENT_RUNABLE_START
+#define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
+#define RTE_DEF_EVENT_RUNABLE_END
+#define RTE_DEF_INTERFACE(cls,obj)
+#define RTE_DEF_INTERFACE_START
+#define RTE_DEF_INTERFACE_END
+#endif
+
+#ifdef RTE_DEF_MODE_INIT_RUNABLE_ARRAY
+#define RTE_DEF_OBJ_START
+#define RTE_DEF_OBJ_END
+#define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START                                  util::array<runable_const_pointer, kRI_Max> aInitRunables = {
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)                        &ri_##obj##func,
+#define RTE_DEF_INIT_RUNABLE_END                                    };
 #define RTE_DEF_CYCLIC_RUNABLE_START
 #define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
 #define RTE_DEF_CYCLIC_RUNABLE_END
@@ -107,6 +179,9 @@
 #define RTE_DEF_OBJ_START
 #define RTE_DEF_OBJ_END
 #define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
 #define RTE_DEF_CYCLIC_RUNABLE_START
 #define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc) TRunable<cls> rc_##obj##func(obj, &cls::func);
 #define RTE_DEF_CYCLIC_RUNABLE_END
@@ -122,6 +197,9 @@
 #define RTE_DEF_OBJ_START
 #define RTE_DEF_OBJ_END
 #define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
 #define RTE_DEF_CYCLIC_RUNABLE_START                                  enum {
 #define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)    kRC_##obj##func,
 #define RTE_DEF_CYCLIC_RUNABLE_END                                    kRC_Max };
@@ -137,6 +215,9 @@
 #define RTE_DEF_OBJ_START
 #define RTE_DEF_OBJ_END
 #define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
 #define RTE_DEF_CYCLIC_RUNABLE_START                                  util::array<rcb_cfg_type, kRC_Max> aCyclicRunables = { {
 #define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)    { time_off, time_cyc, &rc_##obj##func },
 #define RTE_DEF_CYCLIC_RUNABLE_END                                    } };
@@ -155,6 +236,9 @@
 #define RTE_DEF_OBJ_START
 #define RTE_DEF_OBJ_END
 #define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
 #define RTE_DEF_CYCLIC_RUNABLE_START
 #define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
 #define RTE_DEF_CYCLIC_RUNABLE_END
@@ -170,6 +254,9 @@
 #define RTE_DEF_OBJ_START
 #define RTE_DEF_OBJ_END
 #define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
 #define RTE_DEF_CYCLIC_RUNABLE_START
 #define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
 #define RTE_DEF_CYCLIC_RUNABLE_END
@@ -185,6 +272,9 @@
 #define RTE_DEF_OBJ_START
 #define RTE_DEF_OBJ_END
 #define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
 #define RTE_DEF_CYCLIC_RUNABLE_START             
 #define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
 #define RTE_DEF_CYCLIC_RUNABLE_END
@@ -203,6 +293,9 @@
 #define RTE_DEF_OBJ_START
 #define RTE_DEF_OBJ_END
 #define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
 #define RTE_DEF_CYCLIC_RUNABLE_START
 #define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
 #define RTE_DEF_CYCLIC_RUNABLE_END
@@ -218,6 +311,9 @@
 #define RTE_DEF_OBJ_START
 #define RTE_DEF_OBJ_END
 #define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
 #define RTE_DEF_CYCLIC_RUNABLE_START
 #define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
 #define RTE_DEF_CYCLIC_RUNABLE_END

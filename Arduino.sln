@@ -15,6 +15,8 @@ Global
 		BlinkSample Program|x86 = BlinkSample Program|x86
 		BlinkSample2 Build|x64 = BlinkSample2 Build|x64
 		BlinkSample2 Build|x86 = BlinkSample2 Build|x86
+		BlinkSample2 Program|x64 = BlinkSample2 Program|x64
+		BlinkSample2 Program|x86 = BlinkSample2 Program|x86
 		DccDecoder Build|x64 = DccDecoder Build|x64
 		DccDecoder Build|x86 = DccDecoder Build|x86
 		DccDecoder Program|x64 = DccDecoder Program|x64
@@ -61,6 +63,9 @@ Global
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample2 Build|x64.ActiveCfg = BlinkSample2 Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample2 Build|x86.ActiveCfg = BlinkSample2 Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample2 Build|x86.Build.0 = BlinkSample2 Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample2 Program|x64.ActiveCfg = BlinkSample2 Program|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample2 Program|x64.Build.0 = BlinkSample2 Program|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample2 Program|x86.ActiveCfg = BlinkSample2 Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Build|x64.ActiveCfg = Ut_Gen_Util_Array Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Build|x64.Build.0 = Ut_Gen_Util_Array Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Build|x86.ActiveCfg = DccDecoder Compile|Win32
@@ -127,6 +132,9 @@ Global
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample2 Build|x64.ActiveCfg = BlinkSample2 Build|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample2 Build|x64.Build.0 = BlinkSample2 Build|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample2 Build|x86.ActiveCfg = BlinkSample2 Build|Win32
+		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample2 Program|x64.ActiveCfg = BlinkSample2 Program|x64
+		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample2 Program|x86.ActiveCfg = BlinkSample2 Program|Win32
+		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample2 Program|x86.Build.0 = BlinkSample2 Program|Win32
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.DccDecoder Build|x64.ActiveCfg = Debug|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.DccDecoder Build|x64.Build.0 = Debug|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.DccDecoder Build|x86.ActiveCfg = Debug|Win32

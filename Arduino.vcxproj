@@ -13,6 +13,10 @@
       <Configuration>BlinkSample2 Build</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="BlinkSample2 Program|Win32">
+      <Configuration>BlinkSample2 Program</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="DccDecoder Compile|Win32">
       <Configuration>DccDecoder Compile</Configuration>
       <Platform>Win32</Platform>
@@ -157,6 +161,8 @@
     <ClInclude Include="Src\Gen\Util\RingBuffer.h" />
     <ClInclude Include="Src\Gen\Util\Timer.h" />
     <ClInclude Include="Src\Gen\Util\Vector.h" />
+    <ClInclude Include="Src\Prj\App\BlinkSample2\Blinker.h" />
+    <ClInclude Include="Src\Prj\App\BlinkSample2\Rte\Rte_Cfg_Prj.h" />
     <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\A.h" />
     <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Arduino.h" />
     <ClInclude Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\B.h" />
@@ -234,6 +240,11 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample2 Program|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Program|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -303,6 +314,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample2 Program|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Program|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -336,6 +350,7 @@
     <OutDir>.\Build\Bin</OutDir>
     <IntDir>.\Build\Tmp</IntDir>
     <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/AVR/avrgcc;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Prj/App/BlinkSample2;$(SolutionDir)Src/Gen;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</NMakeIncludeSearchPath>
+    <NMakeOutput>./Build/Bin/BlinkSample2.elf</NMakeOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FreeRTOSDemo Build|Win32'">
     <NMakeBuildCommandLine>./Build FreeRTOSDemo all</NMakeBuildCommandLine>
@@ -448,6 +463,14 @@
     <NMakeBuildCommandLine>./Build BlinkSample program</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>./Build BlinkSample clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>./Build BlinkSample program</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Bin</OutDir>
+    <IntDir>.\Tmp</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample2 Program|Win32'">
+    <NMakeBuildCommandLine>./Build/Build App/BlinkSample2 mega avrgcc arduino none program</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build App/BlinkSample2 mega avrgcc arduino none clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build App/BlinkSample2 mega avrgcc arduino none program</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
