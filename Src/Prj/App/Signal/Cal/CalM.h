@@ -1,10 +1,9 @@
 /**
- * @file Rte.h
+ * @file CalM.h
  *
  * @author Ralf Sondershaus
  *
- * @brief External interface of RTE. Provides start(), stop(), exec(), and setEvent().
- *        Provides project specific interfaces (ports) via include header files and objects.
+ * @brief Access to calibration parameters
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -21,27 +20,30 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef RTE_H_
-#define RTE_H_
+#ifndef CAL_H_
+#define CAL_H_
 
 #include <Std_Types.h>
-#include <Rte/Rte_Type.h>
+#include <Cal/CalM_Type.h>
 
-namespace rte
+namespace cal
 {
-  typedef uint32 tEvntId;
 
-  constexpr tEvntId kInvalidEventId = static_cast<tEvntId>(0xFFFFFFFFU);
-}
+  class CalM
+  {
+  public:
+    /// coding data for signals
+    signal_array signals;
 
-#include <Rte/Rte_Cfg_Ext.h>
+    /// Init runable
+    void init();
+    /// Runable 100 ms
+    void cycle100();
 
-namespace rte
-{
-  void start();
-  void stop();
-  void exec();
-  void setEvent(uint32 ulEventId);
-} // namespace rte
+    /// Obsolete: reference to coding parameters
+    const signal_array& ref_signal_array() const { return signals; }
+  };
 
-#endif // RTE_H_
+} // namespace cal
+
+#endif // CAL_H_

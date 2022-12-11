@@ -1,10 +1,7 @@
 /**
- * @file Rte.h
+ * @file Prj/Signal/Nvm_Type_Prj.h
  *
- * @author Ralf Sondershaus
- *
- * @brief External interface of RTE. Provides start(), stop(), exec(), and setEvent().
- *        Provides project specific interfaces (ports) via include header files and objects.
+ * @brief Defines project specific NVM types for project Signal.
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -21,27 +18,14 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef RTE_H_
-#define RTE_H_
+#ifndef NVM_TYPE_PRJ_H_
+#define NVM_TYPE_PRJ_H_
 
-#include <Std_Types.h>
-#include <Rte/Rte_Type.h>
+#include <Cfg_Prj.h>
 
-namespace rte
+namespace nvm
 {
-  typedef uint32 tEvntId;
 
-  constexpr tEvntId kInvalidEventId = static_cast<tEvntId>(0xFFFFFFFFU);
-}
+} // namespace nvm
 
-#include <Rte/Rte_Cfg_Ext.h>
-
-namespace rte
-{
-  void start();
-  void stop();
-  void exec();
-  void setEvent(uint32 ulEventId);
-} // namespace rte
-
-#endif // RTE_H_
+#endif // NVM_TYPE_PRJ_H_

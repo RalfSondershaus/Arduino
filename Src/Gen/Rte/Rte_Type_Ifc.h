@@ -1,6 +1,5 @@
 /**
  * @file Rte_Type_Ifc.h
- * @author Ralf Sondershaus
  *
  * @descr generic classes for RTE interfaces
  *        - ifc_base
@@ -40,9 +39,6 @@ namespace rte
       OK = 0,
       NOK = 1
     } ret_type;
-  public:
-    ifc_base() {}
-    virtual ~ifc_base() {}
   };
 
   // ----------------------------------------------------------
@@ -61,50 +57,110 @@ namespace rte
     data_type mData;
 
   public:
-    ifc_sr() {}
-    virtual ~ifc_sr() {}
     /// Read and write data. Default implementation uses operator=. 
-    virtual ret_type read (      data_type& t) const { t = mData; return Base::OK; }
-    virtual ret_type write(const data_type& t)       { mData = t; return Base::OK; }
+    ret_type read (      data_type& t) const { t = mData; return Base::OK; }
+    ret_type write(const data_type& t)       { mData = t; return Base::OK; }
     /// get reference to stored data
     const data_type& ref() const noexcept { return mData; }
     data_type& ref() noexcept { return mData; }
   };
 
   // ----------------------------------------------------------
-  /// Sender Receiver interface for calibration values
+  /// Sender Receiver interface for array types.
+  /// Owns a copy of array type T.
+  /// @tparam T An array type such as util::array<int>
   // ----------------------------------------------------------
   template<typename T>
-  class ifc_sr_cal : public ifc_sr<T>
-  {
-  public:
-    typedef ifc_sr_cal<T> This;
-    typedef ifc_sr<T> Base;
-  protected:
-    bool mIsValid;
-  public:
-    ifc_sr_cal() : mIsValid(false) {}
-    virtual ~ifc_sr_cal() {}
-    /// Return true if calibation data are valid
-    constexpr bool isValid() const noexcept { return mIsValid; }
-    /// Validate calibration data
-    constexpr void SetValid() noexcept { mIsValid = true; }
-    /// Invalidate calibration data
-    constexpr void SetInvalid() noexcept { mIsValid = false; }
-  };
-
-  // ----------------------------------------------------------
-  /// Client Server interface
-  // ----------------------------------------------------------
-  class ifc_cs : public ifc_base
+  class ifc_sr_array : public ifc_base
   {
   public:
     typedef ifc_base Base;
-    typedef typename Base::ret_type ret_type;
+    typedef T array_type;
+    typedef ifc_sr<array_type> This;
+    using value_type = typename array_type::value_type;
+    using size_type = typename array_type::size_type;
+    using ret_type = typename Base::ret_type;
 
-    ifc_cs() {}
-    virtual ~ifc_cs() {}
-    virtual ret_type call() const = 0;
+    array_type mData;
+
+  public:
+    /// Read and write array. Default implementation uses operator=. 
+    ret_type read(array_type& t) const { t = mData; return Base::OK; }
+    ret_type write(const array_type& t) { mData = t; return Base::OK; }
+    /// Read and write a single element
+    ret_type readElement(size_type pos, value_type& v) const { v = mData.at(pos); return Base::OK; }
+    ret_type writeElement(size_type pos, const value_type& v) { mData.at(pos) = v; return Base::OK; }
+    /// get reference to stored data
+    const array_type& ref() const noexcept { return mData; }
+    array_type& ref() noexcept { return mData; }
+  };
+
+  // ----------------------------------------------------------
+  /// Client Server interface.
+  /// @tparam Ret Return type of the member function to be called
+  /// @tparam Cls class type of the object to be called
+  /// @tparam Args Parameter types (arguments) of the member function to be called
+  // ----------------------------------------------------------
+  template<typename Ret, typename Cls, typename ... Args>
+  class ifc_cs : public ifc_base
+  {
+  public:
+    /// Base class
+    typedef ifc_base Base;
+    /// The server object is of this type
+    typedef Cls class_type;
+    /// Reference to the server object
+    typedef class_type& class_type_reference;
+    /// The server function has this return type
+    typedef Ret ret_type;
+    /// Type of a pointer to a member function of class class_type
+    typedef ret_type (class_type::*member_func_type)(Args...);
+
+  protected:
+    /// The server object
+    class_type_reference obj;
+    /// The pointer to a member function
+    member_func_type func;
+
+  public:
+    /// Constructor
+    ifc_cs(class_type_reference o, member_func_type f) : obj(o), func(f) {}
+    /// Server function
+    ret_type call(Args... args) { return CALL_MEMBER_FUNC(obj, func)(args...); }
+  };
+
+  // ----------------------------------------------------------
+  /// Client Server interface. Partial specialization for the important use case of a
+  /// member function without parameters.
+  /// @tparam Ret Return type of the member function to be called
+  /// @tparam Cls class type of the object to be called
+  // ----------------------------------------------------------
+  template<typename Ret, typename Cls>
+  class ifc_cs<Ret, Cls, void> : public ifc_base
+  {
+  public:
+    /// Base class
+    typedef ifc_base Base;
+    /// The server object is of this type
+    typedef Cls class_type;
+    /// Reference to the server object
+    typedef class_type& class_type_reference;
+    /// The server function has this return type
+    typedef Ret ret_type;
+    /// Type of a pointer to a member function of class class_type
+    typedef ret_type(class_type::*member_func_type)(void);
+
+  protected:
+    /// The server object
+    class_type_reference obj;
+    /// The pointer to a member function
+    member_func_type func;
+
+  public:
+    /// Constructor
+    ifc_cs(class_type_reference o, member_func_type f) : obj(o), func(f) {}
+    /// Server function
+    ret_type call() { return CALL_MEMBER_FUNC(obj, func)(); }
   };
 
 } // namespace rte

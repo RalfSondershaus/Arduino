@@ -1,9 +1,9 @@
 /**
- * @file Signal/InputClassifier.h
+ * @file Signal/InputCommand.h
  *
  * @author Ralf Sondershaus
  *
- * @brief The classifier interface.
+ * @brief Implements server runable to get a command.
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -20,43 +20,24 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SIGNAL_INPUT_CLASSIFIER_H_
-#define SIGNAL_INPUT_CLASSIFIER_H_
+#ifndef SIGNAL_INPUT_COMMAND_H_
+#define SIGNAL_INPUT_COMMAND_H_
 
-#include "Cfg_Prj.h"
 #include <Rte/Rte_Type.h>
 #include <Cal/CalM_Type.h>
-#include <Util/Array.h>
-#include <Util/Classifier.h>
 
 namespace signal
 {
   // -----------------------------------------------------------------------------------
   /// Read AD values, classify and write classified values onto the RTE.
   // -----------------------------------------------------------------------------------
-  class InputClassifier
+  class InputCommand
   {
   public:
-    typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> input_classifier_type;
-    using classified_values_array_type = input_classifier_type::classified_values_array_type;
+    using cmd_type = rte::cmd_type;
 
-  protected:
-    input_classifier_type classifiers;
-
-    /// Pointer to calibration data
-    const cal::input_classifier_cfg_type * pCal;
-
-  public:
-    /// Construct
-    InputClassifier() : pCal(nullptr) {}
-
-    /// Runables
-    void init();
-    void cycle10();
-
-    /// Server runable: set calibration values
-    void set_cal(const cal::input_classifier_cfg_type * p);
+    cmd_type getCmd(cal::input_type in);
   };
 } // namespace signal
 
-#endif // SIGNAL_INPUT_CLASSIFIER_H_
+#endif // SIGNAL_INPUT_COMMAND_H_

@@ -53,6 +53,9 @@ namespace util
     typedef T& reference;
     typedef const T& const_reference;
 
+    /// Integral template parameters
+    static constexpr int kNrElements = N;
+
     /// array of elements
     T elements[N];
     
@@ -82,6 +85,8 @@ namespace util
     constexpr size_type max_size() const noexcept { return N; }
     /// Returns the number of elements
     constexpr size_type size() const noexcept { return N; }
+    /// Return true if the index is valid (within boundaries)
+    constexpr bool check_boundary(size_type pos) { return (pos >= static_cast<size_type>(0)) && (pos < size()); }
     /// Assigns the given value value to all elements in the container.
     void fill(const T& value) 
     {

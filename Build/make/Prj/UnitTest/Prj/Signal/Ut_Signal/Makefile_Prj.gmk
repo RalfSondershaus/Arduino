@@ -1,0 +1,6 @@
+# 
+# Project specific Makefile for unit test of class signal::SignalInputClassifier
+#
+
+# Files
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test

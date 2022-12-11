@@ -66,14 +66,23 @@
 #ifdef RTE_DEF_EVENT_RUNABLE_END
 #undef RTE_DEF_EVENT_RUNABLE_END
 #endif
-#ifdef RTE_DEF_INTERFACE
-#undef RTE_DEF_INTERFACE
+#ifdef RTE_DEF_INTERFACE_SR
+#undef RTE_DEF_INTERFACE_SR
 #endif
-#ifdef RTE_DEF_INTERFACE_START
-#undef RTE_DEF_INTERFACE_START
+#ifdef RTE_DEF_INTERFACE_SR_START
+#undef RTE_DEF_INTERFACE_SR_START
 #endif
-#ifdef RTE_DEF_INTERFACE_END
-#undef RTE_DEF_INTERFACE_END
+#ifdef RTE_DEF_INTERFACE_CS_END
+#undef RTE_DEF_INTERFACE_CS_END
+#endif
+#ifdef RTE_DEF_INTERFACE_CS
+#undef RTE_DEF_INTERFACE_CS
+#endif
+#ifdef RTE_DEF_INTERFACE_CS_START
+#undef RTE_DEF_INTERFACE_CS_START
+#endif
+#ifdef RTE_DEF_INTERFACE_CS_END
+#undef RTE_DEF_INTERFACE_CS_END
 #endif
 
 // ----------------------------------------------------------------------
@@ -92,9 +101,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 #ifdef RTE_DEF_MODE_OBJ_EXT
@@ -110,9 +122,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 // ----------------------------------------------------------------------
@@ -131,9 +146,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 #ifdef RTE_DEF_MODE_INIT_RUNABLE_ENUM
@@ -149,9 +167,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 #ifdef RTE_DEF_MODE_INIT_RUNABLE_ARRAY
@@ -167,9 +188,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 // ----------------------------------------------------------------------
@@ -188,9 +212,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 #ifdef RTE_DEF_MODE_CYCLIC_RUNABLE_ENUM
@@ -206,9 +233,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 #ifdef RTE_DEF_MODE_CYCLIC_RUNABLE_ARRAY
@@ -224,9 +254,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 // ----------------------------------------------------------------------
@@ -245,9 +278,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func) TRunable<cls> re_##obj##func(obj, &cls::func);
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 #ifdef RTE_DEF_MODE_EVENT_RUNABLE_ENUM
@@ -263,9 +299,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START                       enum {
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)  kEvent_##eventname,
 #define RTE_DEF_EVENT_RUNABLE_END                         kEvent_Max };
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 #ifdef RTE_DEF_MODE_EVENT_RUNABLE_ARRAY
@@ -281,9 +320,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START                       util::array<Runable * const, kEvent_Max> aEventRunables = {
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)  &re_##obj##func,
 #define RTE_DEF_EVENT_RUNABLE_END                         };
-#define RTE_DEF_INTERFACE(cls,obj)
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 // ----------------------------------------------------------------------
@@ -302,9 +344,12 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)                        cls obj;
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)                        cls obj;
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)            cls obj(srvobj,func);
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif
 
 #ifdef RTE_DEF_MODE_INTERFACES_EXT
@@ -320,7 +365,10 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_INTERFACE(cls,obj)                        extern cls obj;
-#define RTE_DEF_INTERFACE_START
-#define RTE_DEF_INTERFACE_END
+#define RTE_DEF_INTERFACE_SR(cls,obj)                        extern cls obj;
+#define RTE_DEF_INTERFACE_SR_START
+#define RTE_DEF_INTERFACE_SR_END
+#define RTE_DEF_INTERFACE_CS(cls,obj,srvobj,func)            extern cls obj;
+#define RTE_DEF_INTERFACE_CS_START
+#define RTE_DEF_INTERFACE_CS_END
 #endif

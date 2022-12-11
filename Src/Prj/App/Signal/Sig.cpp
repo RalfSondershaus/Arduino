@@ -1,10 +1,7 @@
 /**
- * @file Rte.h
+ * @file Signal/main.cpp
  *
- * @author Ralf Sondershaus
- *
- * @brief External interface of RTE. Provides start(), stop(), exec(), and setEvent().
- *        Provides project specific interfaces (ports) via include header files and objects.
+ * @brief Defines loop and setup.
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -21,27 +18,20 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef RTE_H_
-#define RTE_H_
+#include <Rte/Rte.h>
 
-#include <Std_Types.h>
-#include <Rte/Rte_Type.h>
-
-namespace rte
+// --------------------------------------------------------------------------------------------
+/// Arduino's setup() function
+// --------------------------------------------------------------------------------------------
+void setup()
 {
-  typedef uint32 tEvntId;
-
-  constexpr tEvntId kInvalidEventId = static_cast<tEvntId>(0xFFFFFFFFU);
+  rte::start();
 }
 
-#include <Rte/Rte_Cfg_Ext.h>
-
-namespace rte
+// --------------------------------------------------------------------------------------------
+/// Arduino's loop() function
+// --------------------------------------------------------------------------------------------
+void loop()
 {
-  void start();
-  void stop();
-  void exec();
-  void setEvent(uint32 ulEventId);
-} // namespace rte
-
-#endif // RTE_H_
+  rte::exec();
+}

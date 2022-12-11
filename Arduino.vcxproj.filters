@@ -190,6 +190,48 @@
     <Filter Include="Src\Prj\App\BlinkSample2\Rte">
       <UniqueIdentifier>{7ba8432c-5a21-4a8d-872b-cfed0b506202}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Prj\App\Signal">
+      <UniqueIdentifier>{3a3355fc-72a5-47df-a561-dcbf56268b86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\App\Signal">
+      <UniqueIdentifier>{8ff5bcc0-e309-43ad-8cfe-f4611c1e543e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\App\Signal\Rte">
+      <UniqueIdentifier>{e544fd6a-c83a-48d4-8397-28b4ecce70f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Gen\Util\Ut_InputClassifier">
+      <UniqueIdentifier>{96253d21-8fed-418f-a590-40f9940c441b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Gen\Util\Ut_InputClassifier">
+      <UniqueIdentifier>{85147d6c-5a03-47a9-b8ef-966933c0eeb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Prj">
+      <UniqueIdentifier>{ba69d52b-2567-4704-ab60-9cb050dfd23d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Prj\Signal">
+      <UniqueIdentifier>{d14eb117-fad6-40a0-9cef-e5793fa00cab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Prj">
+      <UniqueIdentifier>{d21d9690-00ac-4ad4-aa41-7cd68945f1a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\App\Signal\Nvm">
+      <UniqueIdentifier>{393e0977-3a25-4f2a-9feb-6443ef8478ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Gen\Nvm">
+      <UniqueIdentifier>{0efbdc9d-117f-4658-9d0a-e7e183c6f418}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Gen\Arduino\avr">
+      <UniqueIdentifier>{908d66a7-35d9-4fb2-9fd1-df702e4a6a9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Gen\Arduino\avr\cores">
+      <UniqueIdentifier>{0ce84d32-bd96-4d50-a754-e03b929d1afe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Gen\Arduino\avr\cores\arduino">
+      <UniqueIdentifier>{461680be-583e-4673-9a19-e89ad09a2eb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\App\Signal\Cal">
+      <UniqueIdentifier>{f753aa4c-aba2-4071-9d1f-972a791a6bc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gen\Dcc\Decoder.cpp">
@@ -251,6 +293,102 @@
     </ClCompile>
     <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Bitset\Test.cpp">
       <Filter>Src\Prj\UnitTest\Gen\Util\Ut_Bitset</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_InputClassifier\Test.cpp">
+      <Filter>Src\Prj\UnitTest\Gen\Util\Ut_InputClassifier</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Prj\Ut_Signal\Test.cpp">
+      <Filter>Src\Prj\UnitTest\Prj</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\App\Signal\InputClassifier.cpp">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\App\Signal\Signal.cpp">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\abi.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\CDC.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial0.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial1.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial2.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial3.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\hooks.c">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\IPAddress.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\main.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\new.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\PluggableUSB.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\Print.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\Stream.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\Tone.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\USBCore.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\WInterrupts.c">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\wiring.c">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\wiring_analog.c">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\wiring_digital.c">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\wiring_pulse.c">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\wiring_shift.c">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\WMath.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\WString.cpp">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\App\Signal\Cal\CalM.cpp">
+      <Filter>Src\Prj\App\Signal\Cal</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\App\Signal\LedRouter.cpp">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\App\Signal\InputCommand.cpp">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\App\Signal\Sig.cpp">
+      <Filter>Src\Prj\App\Signal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -404,6 +542,141 @@
     <ClInclude Include="Src\Prj\App\BlinkSample2\Blinker.h">
       <Filter>Src\Prj\App\BlinkSample2</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Rte\Rte_Cfg_Prj.h">
+      <Filter>Src\Prj\App\Signal\Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Platform\x86\msvc\Platform_Limits.h">
+      <Filter>Src\Gen\Platform\x86\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Platform\avr\avrgcc\Platform_Limits.h">
+      <Filter>Src\Gen\Platform\avr\avrgcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\InputClassifier.h">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Rte\Rte_Type.h">
+      <Filter>Src\Gen\Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Rte\Rte_Type_Gen.h">
+      <Filter>Src\Gen\Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Rte\Rte_Type_Prj.h">
+      <Filter>Src\Gen\Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Rte\Rte_Type_Prj.h">
+      <Filter>Src\Prj\App\Signal\Rte</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Algorithm.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Signal.h">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Nvm\Nvm_Cfg_Prj.h">
+      <Filter>Src\Prj\App\Signal\Nvm</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Nvm\Nvm_Type_Prj.h">
+      <Filter>Src\Prj\App\Signal\Nvm</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Nvm\Nvm.h">
+      <Filter>Src\Gen\Nvm</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Nvm\Nvm_Type.h">
+      <Filter>Src\Gen\Nvm</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Nvm\Nvm_Type_Gen.h">
+      <Filter>Src\Gen\Nvm</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Nvm\Nvm_Type_Prj.h">
+      <Filter>Src\Gen\Nvm</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Nvm\Nvm_Cfg_Ext.h">
+      <Filter>Src\Gen\Nvm</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Nvm\Nvm_Cfg_Mac.h">
+      <Filter>Src\Gen\Nvm</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Arduino.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\binary.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Client.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial_private.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\IPAddress.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\new.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\PluggableUSB.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Print.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Printable.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Server.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Stream.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Udp.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\USBAPI.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\USBCore.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\USBDesc.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\WCharacter.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\wiring_private.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\WString.h">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Cfg_Prj.h">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Cal\CalM.h">
+      <Filter>Src\Prj\App\Signal\Cal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Cal\CalM_Type.h">
+      <Filter>Src\Prj\App\Signal\Cal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Cal\CalM_Type_Prj.h">
+      <Filter>Src\Prj\App\Signal\Cal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\LedRouter.h">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\LedIntensitySetter.h">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\InputCommand.h">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Classifier.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Src\Gen\Os\FreeRTOS\v202112.00\include\stdint.readme">
@@ -450,6 +723,18 @@
     </None>
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Bitset\Makefile_Prj.gmk">
       <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_Bitset</Filter>
+    </None>
+    <None Include="Build\make\Prj\App\Signal\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\App\Signal</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_InputClassifier\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_InputClassifier</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Prj\Signal\Ut_Signal\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Prj\Signal</Filter>
+    </None>
+    <None Include="Src\Gen\Arduino\avr\cores\arduino\wiring_pulse.S">
+      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
     </None>
   </ItemGroup>
 </Project>

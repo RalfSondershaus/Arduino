@@ -1,10 +1,9 @@
 /**
- * @file Rte.h
+ * @file Signal/InputCommand.cpp
  *
  * @author Ralf Sondershaus
  *
- * @brief External interface of RTE. Provides start(), stop(), exec(), and setEvent().
- *        Provides project specific interfaces (ports) via include header files and objects.
+ * @brief Implements server runable to get a command.
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -21,27 +20,24 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef RTE_H_
-#define RTE_H_
+#include <Rte/Rte.h>
+#include "InputCommand.h"
 
-#include <Std_Types.h>
-#include <Rte/Rte_Type.h>
-
-namespace rte
+namespace signal
 {
-  typedef uint32 tEvntId;
+  InputCommand::cmd_type InputCommand::getCmd(cal::input_type in)
+  {
+    cmd_type cmd = rte::kInvalidCmd;
 
-  constexpr tEvntId kInvalidEventId = static_cast<tEvntId>(0xFFFFFFFFU);
-}
+    if (in.type == cal::input_type::kClassified)
+    {
+      if (rte::ifc_classified_values.ref().check_boundary(static_cast<rte::classified_values_array::size_type>(in.idx)))
+      {
+        rte::ifc_classified_values.readElement(static_cast<rte::classified_values_array::size_type>(in.idx), cmd);
+      }
+    }
 
-#include <Rte/Rte_Cfg_Ext.h>
+    return cmd;
+  }
 
-namespace rte
-{
-  void start();
-  void stop();
-  void exec();
-  void setEvent(uint32 ulEventId);
-} // namespace rte
-
-#endif // RTE_H_
+} // namespace signal

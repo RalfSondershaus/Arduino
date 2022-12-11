@@ -30,8 +30,8 @@
 namespace rte
 {
   /// Timer types
-  typedef Util::MicroTimer::time_type   time_type;
-  typedef Util::MicroTimer              timer_type;
+  typedef util::MicroTimer::time_type   time_type;
+  typedef util::MicroTimer              timer_type;
 
   typedef rte::Runable * const          runable_const_pointer;
 
@@ -170,9 +170,9 @@ namespace rte
 
   void setEvent(uint32 ulEventId)
   {
-    if (ulEventId < kEvent_Max)
-    { 
-      aEvents.set(ulEventId, true);
-    }
+    //if (ulEventId < kEvent_Max)
+    //{ 
+    //  aEvents.set(ulEventId, true);
+    //}
   }
 } // namespace rte

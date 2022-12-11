@@ -1,10 +1,7 @@
 /**
- * @file Rte.h
+ * @file Gen/Rte/Rte_Type_Gen.h
  *
- * @author Ralf Sondershaus
- *
- * @brief External interface of RTE. Provides start(), stop(), exec(), and setEvent().
- *        Provides project specific interfaces (ports) via include header files and objects.
+ * @brief Defines generic types for RTE
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -21,27 +18,19 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef RTE_H_
-#define RTE_H_
+#ifndef RTE_TYPE_GEN_H_
+#define RTE_TYPE_GEN_H_
 
 #include <Std_Types.h>
-#include <Rte/Rte_Type.h>
 
 namespace rte
 {
-  typedef uint32 tEvntId;
+  /// Intensities
+  typedef uint16 intensity16_t; ///< 16 bit, 0 = 0%, 65535 = 100%
+  typedef uint8  intensity8_t;  ///< 8 bit, 0 = 0%, 255 = 100%
 
-  constexpr tEvntId kInvalidEventId = static_cast<tEvntId>(0xFFFFFFFFU);
-}
-
-#include <Rte/Rte_Cfg_Ext.h>
-
-namespace rte
-{
-  void start();
-  void stop();
-  void exec();
-  void setEvent(uint32 ulEventId);
+  /// Times
+  typedef uint8  dimtime8_10ms_t;  ///< 8 bit, [10 ms] 0 = 0 ms, 255 = 2550 ms = 2.55 sec
 } // namespace rte
 
-#endif // RTE_H_
+#endif // RTE_TYPE_GEN_H_

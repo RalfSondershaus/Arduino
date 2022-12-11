@@ -9,7 +9,7 @@
 
 #include <Arduino.h>
 
-namespace Util
+namespace util
 {
   // --------------------------------------------------------------------------------------------
   /// Start a timer, get time since a timer start and check a timeout.

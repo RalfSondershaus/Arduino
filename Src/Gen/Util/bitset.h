@@ -208,10 +208,10 @@ namespace util
   {
     typedef W tWord;
 
-    tWord word;
+    tWord w;
 
-    constexpr bitset_base() noexcept : word() {}
-    constexpr bitset_base(tWord v) noexcept : word{ v } {}
+    constexpr bitset_base() noexcept : w() {}
+    constexpr bitset_base(tWord v) noexcept : w{ v } {}
 
     static constexpr size_t bits_per_char() noexcept { return 8U; }
     static constexpr size_t bits_per_word() noexcept { return bits_per_char() * sizeof(tWord); }
@@ -219,9 +219,9 @@ namespace util
     template<size_t NBITS>
     static constexpr tWord hiword_nr_bits() noexcept { return static_cast<tWord>(0); }
 
-    constexpr tWord& ref_word(size_t pos) noexcept { (void)pos; return word; }
+    constexpr tWord& ref_word(size_t pos) noexcept { (void)pos; return w; }
     constexpr tWord  get_word(size_t pos) const noexcept { (void)pos; return static_cast<tWord>(0); }
-    tWord& hiword() noexcept { return word; }
+    tWord& hiword() noexcept { return w; }
     constexpr tWord  hiword() const noexcept { return static_cast<tWord>(0); }
 
     template<size_t NBITS>
@@ -248,10 +248,10 @@ namespace util
   {
     typedef W tWord;
 
-    tWord word;
+    tWord w;
 
-    constexpr bitset_base() noexcept : word() {}
-    constexpr bitset_base(tWord v) noexcept : word{ v } {}
+    constexpr bitset_base() noexcept : w() {}
+    constexpr bitset_base(tWord v) noexcept : w{ v } {}
 
     static constexpr size_t bits_per_char() noexcept { return 8U; }
     static constexpr size_t bits_per_word() noexcept { return bits_per_char() * sizeof(tWord); }
@@ -259,43 +259,43 @@ namespace util
     template<size_t NBITS>
     static constexpr tWord hiword_nr_bits() noexcept { return static_cast<tWord>(bits_per_word() - NBITS); }
 
-    constexpr tWord& ref_word(size_t pos) noexcept { (void)pos; return word; }
-    constexpr tWord  get_word(size_t pos) const noexcept { (void)pos; return word; }
-              tWord& hiword() noexcept { return word; }
-    constexpr tWord  hiword() const noexcept { return word; }
+    constexpr tWord& ref_word(size_t pos) noexcept { (void)pos; return w; }
+    constexpr tWord  get_word(size_t pos) const noexcept { (void)pos; return w; }
+              tWord& hiword() noexcept { return w; }
+    constexpr tWord  hiword() const noexcept { return w; }
 
     template<size_t NBITS>
-    bool all() const noexcept { return word == (bits::all_one<tWord>() >> hiword_nr_bits<NBITS>()); }
-    bool any() const noexcept { return word != bits::all_zero<tWord>(); }
+    bool all() const noexcept { return w == (bits::all_one<tWord>() >> hiword_nr_bits<NBITS>()); }
+    bool any() const noexcept { return w != bits::all_zero<tWord>(); }
     bool none() const noexcept { return !any(); }
 
     template<size_t NBITS>
-    void set() noexcept { word = bits::all_one<tWord>() >> hiword_nr_bits<NBITS>(); }
+    void set() noexcept { w = bits::all_one<tWord>() >> hiword_nr_bits<NBITS>(); }
     void set(size_t pos, bool value = true) noexcept 
     { 
       if (pos < bits_per_word())
       {
         if (value)
         {
-          word |= bits::bit_mask<tWord>(which_bit(pos));
+          w |= bits::bit_mask<tWord>(which_bit(pos));
         }
         else
         {
-          word &= ~bits::bit_mask<tWord>(which_bit(pos));
+          w &= ~bits::bit_mask<tWord>(which_bit(pos));
         }
       }
     }
 
-    void reset() noexcept { word = bits::all_zero<tWord>(); }
+    void reset() noexcept { w = bits::all_zero<tWord>(); }
     void reset(size_t pos) noexcept
     {
       if (pos < bits_per_word())
       {
-        word &= ~bits::bit_mask<tWord>(which_bit(pos));
+        w &= ~bits::bit_mask<tWord>(which_bit(pos));
       }
     }
 
-    size_t find_first(size_t notfound) const { return bits::first(word, notfound); }
+    size_t find_first(size_t notfound) const { return bits::first(w, notfound); }
     size_t find_next(size_t prevpos, size_t notfound) const 
     {
       size_t pos;
@@ -308,7 +308,7 @@ namespace util
       }
       else
       {
-        pos = bits::first(word >> which_bit(prevpos), notfound);
+        pos = bits::first(w >> which_bit(prevpos), notfound);
       }
       return pos;
     }
@@ -359,6 +359,6 @@ namespace util
     This& reset() noexcept { Base::reset(); return *this; }
     This& reset(size_t pos) { Base::reset(pos); return *this; }
   };
-} // namepsace util
+} // namespace util
 
 #endif // BITSET_H_

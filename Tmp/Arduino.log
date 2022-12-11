@@ -1,0 +1,6 @@
+﻿  ++++++ include paths ++++++
+   -I./../Src/Gen/Platform -I./../Src/Gen/Platform/AVR/avrgcc -I./../Src/Gen/Arduino/avr/variants/mega -I./../Src/Gen/Arduino/avr/cores/arduino  -I./../Src/Prj/App/Signal  -I./../Src/Gen -I./../../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include -I./../../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed -I./../../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include
+  $(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/AVR/avrgcc;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Prj/App/Signal;$(SolutionDir)Src/Gen;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;
+  +++++ compile ./../Src/Prj/App/Signal/Cal/CalM.cpp to Tmp/CalM.o
+  +++++ linking Bin/Signal.elf +++++
+  +++++ converting Bin/Signal.elf into Bin/Signal.hex +++++

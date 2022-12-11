@@ -51,12 +51,16 @@ Global
 		Ut_Gen_Util_Array Build|x86 = Ut_Gen_Util_Array Build|x86
 		Ut_Gen_Util_Bitset|x64 = Ut_Gen_Util_Bitset|x64
 		Ut_Gen_Util_Bitset|x86 = Ut_Gen_Util_Bitset|x86
+		Ut_Gen_Util_InputClassifier|x64 = Ut_Gen_Util_InputClassifier|x64
+		Ut_Gen_Util_InputClassifier|x86 = Ut_Gen_Util_InputClassifier|x86
+		Ut_Prj_Signal|x64 = Ut_Prj_Signal|x64
+		Ut_Prj_Signal|x86 = Ut_Prj_Signal|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Build|x64.ActiveCfg = Ut_Gen_Util_Array Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Build|x64.Build.0 = Ut_Gen_Util_Array Build|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Build|x86.ActiveCfg = BlinkSample Compile|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Build|x86.Build.0 = BlinkSample Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Build|x86.ActiveCfg = BlinkSample Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Build|x86.Build.0 = BlinkSample Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Program|x64.ActiveCfg = BlinkSample Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Program|x86.ActiveCfg = BlinkSample Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample Program|x86.Build.0 = BlinkSample Program|Win32
@@ -68,8 +72,8 @@ Global
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.BlinkSample2 Program|x86.ActiveCfg = BlinkSample2 Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Build|x64.ActiveCfg = Ut_Gen_Util_Array Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Build|x64.Build.0 = Ut_Gen_Util_Array Build|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Build|x86.ActiveCfg = DccDecoder Compile|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Build|x86.Build.0 = DccDecoder Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Build|x86.ActiveCfg = DccDecoder Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Build|x86.Build.0 = DccDecoder Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Program|x64.ActiveCfg = DccDecoder Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Program|x86.ActiveCfg = DccDecoder Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.DccDecoder Program|x86.Build.0 = DccDecoder Program|Win32
@@ -98,10 +102,10 @@ Global
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Release|x64.Build.0 = Ut_Gen_Util_Array Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Release|x86.ActiveCfg = Signal Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Release|x86.Build.0 = Signal Program|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Build|x64.ActiveCfg = Ut_Gen_Util_Array Build|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Build|x64.Build.0 = Ut_Gen_Util_Array Build|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Build|x86.ActiveCfg = Signal Compile|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Build|x86.Build.0 = Signal Compile|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Build|x64.ActiveCfg = Signal Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Build|x64.Build.0 = Signal Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Build|x86.ActiveCfg = Signal Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Build|x86.Build.0 = Signal Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Program|x64.ActiveCfg = Signal Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Program|x86.ActiveCfg = Signal Program|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Signal Program|x86.Build.0 = Signal Program|Win32
@@ -118,9 +122,18 @@ Global
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Array Build|x64.ActiveCfg = Ut_Gen_Util_Array Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Array Build|x86.ActiveCfg = Ut_Gen_Util_Array Build|Win32
 		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Array Build|x86.Build.0 = Ut_Gen_Util_Array Build|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Bitset|x64.ActiveCfg = Ut_Gen_Util_Bitset|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Bitset|x64.Build.0 = Ut_Gen_Util_Bitset|Win32
-		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Bitset|x86.ActiveCfg = Ut_Gen_Util_Bitset|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Bitset|x64.ActiveCfg = Ut_Prj_Signal Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Bitset|x64.Build.0 = Ut_Prj_Signal Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Bitset|x86.ActiveCfg = Ut_Gen_Util_Bitset Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_Bitset|x86.Build.0 = Ut_Gen_Util_Bitset Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_InputClassifier|x64.ActiveCfg = Ut_Prj_Signal Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_InputClassifier|x64.Build.0 = Ut_Prj_Signal Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_InputClassifier|x86.ActiveCfg = Ut_Gen_Util_InputClassifier Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Gen_Util_InputClassifier|x86.Build.0 = Ut_Gen_Util_InputClassifier Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Prj_Signal|x64.ActiveCfg = Ut_Prj_Signal Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Prj_Signal|x64.Build.0 = Ut_Prj_Signal Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Prj_Signal|x86.ActiveCfg = Ut_Prj_Signal Build|Win32
+		{F1EA4A64-8F93-415E-9A1A-796AEA204A71}.Ut_Prj_Signal|x86.Build.0 = Ut_Prj_Signal Build|Win32
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample Build|x64.ActiveCfg = Signal Compile|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample Build|x64.Build.0 = Signal Compile|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.BlinkSample Build|x86.ActiveCfg = Release|Win32
@@ -174,9 +187,7 @@ Global
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Release|x86.ActiveCfg = Release|Win32
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Release|x86.Build.0 = Release|Win32
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Signal Build|x64.ActiveCfg = Signal Compile|x64
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Signal Build|x64.Build.0 = Signal Compile|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Signal Build|x86.ActiveCfg = Release|Win32
-		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Signal Build|x86.Build.0 = Release|Win32
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Signal Program|x64.ActiveCfg = Signal Compile|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Signal Program|x64.Build.0 = Signal Compile|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Signal Program|x86.ActiveCfg = Release|Win32
@@ -194,6 +205,10 @@ Global
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Util_Bitset|x64.ActiveCfg = Ut_Gen_Util_Bitset|x64
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Util_Bitset|x86.ActiveCfg = Ut_Gen_Util_Bitset|Win32
 		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Util_Bitset|x86.Build.0 = Ut_Gen_Util_Bitset|Win32
+		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Util_InputClassifier|x64.ActiveCfg = Ut_Gen_Util_InputClassifier|x64
+		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Gen_Util_InputClassifier|x86.ActiveCfg = Ut_Gen_Util_InputClassifier|Win32
+		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Prj_Signal|x64.ActiveCfg = Ut_Prj_Signal|x64
+		{CF5BC1EE-4693-47E8-9DB9-9824DC72ED35}.Ut_Prj_Signal|x86.ActiveCfg = Ut_Prj_Signal|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

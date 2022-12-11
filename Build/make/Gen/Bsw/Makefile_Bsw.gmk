@@ -42,6 +42,59 @@ C_INCLUDES := $(C_INCLUDES)                         \
 
 endif
 
+# ---------------------------------------------------
+# ARG_BUILD_BSW: arduino_win32
+# ---------------------------------------------------
+ifeq ($(ARG_BUILD_BSW),arduino_win32)
+FILES_BSW :=  $(FILES_BSW)                             \
+              $(PATH_SRC_ARDUINO_WIN32_CORE)/main
+
+C_INCLUDES := $(C_INCLUDES)                         \
+              -I$(PATH_SRC_ARDUINO_WIN32_CORE)
+
+ifeq ($(ARG_COMPILER),msvc)
+CFLAGS := $(CFLAGS)                       \
+          /analyze-                       \
+          /diagnostics:classic            \
+          /EHsc                           \
+          /errorReport:prompt             \
+          /Fa$(PATH_TMP)\                 \
+          /FC                             \
+          /Fd$(PATH_BIN)/$(PROJECT_NAME)  \
+          /fp:precise                     \
+          /Gd                             \
+          /GS                             \
+          /MDd                            \
+          /nologo                         \
+          /Od                             \
+          /RTC1                           \
+          /W4                             \
+          /WX                             \
+          /Zc:inline                      \
+          /Zc:wchar_t                     \
+          /Zi
+
+C_DEFINES := $(C_DEFINES) \
+          /D "WIN32"      \
+          /D "_DEBUG"     \
+          /D "_CONSOLE"   \
+          /D "_UNICODE"   \
+          /D "UNICODE" 
+
+# ---------------------------------------------------
+# Linker flags. See also https://learn.microsoft.com/en-us/cpp/build/reference/linker-options?view=msvc-170
+# /DEBUG    The /DEBUG option creates debugging information for the executable. 
+#           The linker uses the base name of the program and the extension .pdb to name the program database, 
+#           and embeds the path where it was created. 
+#           To override this default, set /PDB and specify a different file name.
+# /PDB:(Use Program Database)   A user-specified name for the program database (PDB) that the linker creates. It replaces the default name.
+LFLAGS := $(LFLAGS)           \
+          /DEBUG              \
+          /SUBSYSTEM:CONSOLE
+endif
+
+endif
+
 
 # ---------------------------------------------------
 # ARG_BUILD_BSW_TESTFRAMEWORK: googletest
@@ -74,11 +127,14 @@ C_INCLUDES := $(C_INCLUDES)                         \
 # /Gd                     Uses the __cdecl calling convention. (x86 only). If required, defined in Makefile_Target.gmk.
 # /Gm                     Deprecated. Enables minimal rebuild.
 # /GS                     Checks buffer security.
+# /JMC 	                  Supports native C++ Just My Code debugging
 # /MDd                    Defines _DEBUG, _MT, and _DLL and causes the application to use the debug multithread-specific and DLL-specific version of the run-time library. It also causes the compiler to place the library name MSVCRTD.lib into the .obj file.
 # /nologo                 Suppresses display of sign-on banner.
 # /Od                     Disables optimization.
 # /Oy-                    /Oy enables frame-pointer omission and /Oy- disables omission. In x64 compilers, /Oy and /Oy- are not available. If required, defined in Makefile_Target.gmk.
+# /permissive-            Specify standards conformance mode to the compiler. Use this option to help you identify and fix conformance issues in your code, to make it both more correct and more portable.
 # /RTC1                   Enable fast runtime checks (equivalent to /RTCsu).
+# /sdl 	                  Enable more security features and warnings.
 # /W3                     Specifies how the compiler generates warnings for a given compilation. /W3: recommend that you use this option to provide lint-like warnings.
 # /W4                     Specifies how the compiler generates warnings for a given compilation. /W4: For a new project, it may be best to use /W4 in all compilations. This option helps ensure the fewest possible hard-to-find code defects.
 # /WX                     Treat warnings as errors. Use /WX- to not treat warnings as errors.
@@ -86,6 +142,7 @@ C_INCLUDES := $(C_INCLUDES)                         \
 # /Zc:inline              Remove unreferenced functions or data if they're COMDAT or have internal linkage only (off by default).
 # /Zc:wchar_t             wchar_t is a native type, not a typedef (on by default).
 # /Zi                     Generates complete debugging information.
+# /ZI 	                  Includes debug information in a program database compatible with Edit and Continue. (x86 only)
 # ---------------------------------------------------
 ifeq ($(ARG_COMPILER),msvc)
 CFLAGS := $(CFLAGS)                       \

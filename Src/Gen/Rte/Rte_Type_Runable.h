@@ -39,10 +39,6 @@ namespace rte
     virtual void run(void) = 0;
   };
   
-  /// Call a member function of an object (instance of a class).
-  /// We use this macro because AVR GCC doesn't seem to support std::invoke.
-  #define CALL_MEMBER_FUNC(obj,ptrToMemberFunc)  ((obj).*(ptrToMemberFunc))
-
   // ----------------------------------------------
   /// Make a Runable for a member function of a class
   // ----------------------------------------------

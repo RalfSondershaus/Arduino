@@ -1,9 +1,0 @@
-# 
-# Project specific Makefile for BlinkSample
-#
-
-# Files
-FILES_PRJ = $(PATH_PRJ_PROJECT)/Rnbl              \
-            $(PATH_PRJ_PROJECT)/RailwaySignalDO   \
-            $(PATH_PRJ_PROJECT)/DiagnoseCommander \
-            $(PATH_PRJ_PROJECT)/IfcM
