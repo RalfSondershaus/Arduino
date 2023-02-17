@@ -25,7 +25,6 @@
 #include <Util/Algorithm.h>
 #include <Util/Array.h>
 #include <Cal/CalM_Type.h>
-#include <LedIntensitySetter.h>
 #include <Signal.h>
 
 namespace signal
@@ -33,51 +32,60 @@ namespace signal
   // -----------------------------------------------------------------------------------
   /// 
   // -----------------------------------------------------------------------------------
-  class LedRouter : public LedIntensitySetter
+  class LedRouter
   {
   public:
+    using intensity8_type = rte::intensity8_t;
+    using intensity16_type = rte::intensity16_t;
+    using dimtime8_10ms_type = rte::dimtime8_10ms_t;
     using classified_values_array = rte::classified_values_array;
     using classified_value_type = classified_values_array::value_type;
     using classified_values_size_type = rte::classified_values_array::size_type;
     using cmd_type = rte::cmd_type;
-    typedef util::ramp<uint16> ramp_type;
+    using size_type = rte::Ifc_SignalTargetIntensities::size_type;
+    using target_type = cal::target_type;
+
+    typedef util::ramp<intensity16_type> ramp_type;
     typedef util::array<ramp_type, cfg::kNrOnboardTargets> ramp_onboard_array_type;
     typedef util::array<ramp_type, cfg::kNrExternalTargets> ramp_external_array_type;
-    typedef util::array<dimtime8_10ms_t, cfg::kNrOnboardTargets> dimtime_onboard_array_type;
-    typedef util::array<dimtime8_10ms_t, cfg::kNrExternalTargets> dimtime_external_array_type;
-    typedef util::array<Signal, cfg::kNrSignals> signal_array_type;
+    typedef util::array<dimtime8_10ms_type, cfg::kNrOnboardTargets> dimtime_onboard_array_type;
+    typedef util::array<dimtime8_10ms_type, cfg::kNrExternalTargets> dimtime_external_array_type;
+    //typedef util::array<Signal, cfg::kNrSignals> signal_array_type;
+    //typedef const cal::signal_cal_type * cal_const_pointer;
+
 
   protected:
 
     ramp_onboard_array_type ramps_onboard;
-    dimtime_onboard_array_type dimtimes_onboard;
     ramp_external_array_type ramps_external;
+    dimtime_onboard_array_type dimtimes_onboard;
     dimtime_external_array_type dimtimes_external;
-    signal_array_type signals;
 
-    const cal::signal_array * pCal;
+    /// Access calibration data
+    static bool cal_signal_valid(const cal::signal_cal_type * pCal) noexcept { return pCal != nullptr; }
 
-    /// Calculate new target intensities
-    void handleSignals();
+    /// Scaling
+    static intensity16_type scale_8_16(const intensity8_type intensity) noexcept { return static_cast<intensity16_type>(256U * intensity); }
+    static intensity8_type scale_16_8(const intensity16_type intensity) noexcept { return static_cast<intensity8_type>(intensity / 256U); }
+    static uint16 scale_10ms_1ms(const dimtime8_10ms_type time) noexcept { return static_cast<uint16>(10U * time); }
+
+    static constexpr uint8 kCycleTime = 10U;
 
     /// Caclulate ramps
     void doRamps();
+    void mapSignals();
+    void mapSignal(size_type pos, const cal::signal_type * pCal);
 
-    /// Access calibration data
-    bool cal_valid() const noexcept { return pCal != nullptr; }
+    /// Initialize ramp for tgt with given intensity and time if intensity and time differ from current tamp target values.
+    void setIntensitySpeed(const target_type tgt, const intensity8_type intensity, const dimtime8_10ms_type time);
 
   public:
-    LedRouter() : pCal(nullptr) {}
+    LedRouter() {}
 
     /// Runables
     void init();
-    void cycle10();
+    void cycle();
 
-    /// Server runable: set calibration values
-    void set_cal(const cal::signal_array * p);
-
-    /// Interface LedIntensitySetter
-    virtual void setIntensitySpeed(target_type tgt, intensity8_t intensity, dimtime8_10ms_t time) override;
   };
 } // namespace signal
 

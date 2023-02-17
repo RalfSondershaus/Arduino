@@ -170,6 +170,7 @@ namespace rte
 
   void setEvent(uint32 ulEventId)
   {
+    (void)ulEventId;
     //if (ulEventId < kEvent_Max)
     //{ 
     //  aEvents.set(ulEventId, true);

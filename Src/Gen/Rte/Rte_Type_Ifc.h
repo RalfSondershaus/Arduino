@@ -83,13 +83,44 @@ namespace rte
 
     array_type mData;
 
+    /// Helper class: non const iterator
+    class iterator
+    {
+    public:
+      This& arr;
+      size_type pos;
+    public:
+      iterator(This& a, size_type p) : arr(a), pos(p) {}
+      void operator++() { pos++; }
+      value_type& operator*() { return arr.mData.at(pos); }
+      bool operator!=(const iterator& it) { return pos != it.pos; }
+      bool operator==(const iterator& it) { return pos == it.pos; }
+    };
+    /// Helper class: const iterator
+    class const_iterator
+    {
+    public:
+      const This& arr;
+      size_type pos;
+    public:
+      const_iterator(const This& a, size_type p) : arr(a), pos(p) {}
+      void operator++() { pos++; }
+      const value_type& operator*() const { return arr.mData.at(pos); }
+      bool operator!=(const iterator& it) { return pos != it.pos; }
+      bool operator==(const iterator& it) { return pos == it.pos; }
+    };
   public:
+    /// array
+    iterator begin() { return iterator(*this, static_cast<size_type>(0U)); }
+    iterator end() { return iterator(*this, size()); }
     /// Read and write array. Default implementation uses operator=. 
     ret_type read(array_type& t) const { t = mData; return Base::OK; }
     ret_type write(const array_type& t) { mData = t; return Base::OK; }
     /// Read and write a single element
     ret_type readElement(size_type pos, value_type& v) const { v = mData.at(pos); return Base::OK; }
     ret_type writeElement(size_type pos, const value_type& v) { mData.at(pos) = v; return Base::OK; }
+    /// size
+    size_type size() const { return mData.size(); }
     /// get reference to stored data
     const array_type& ref() const noexcept { return mData; }
     array_type& ref() noexcept { return mData; }

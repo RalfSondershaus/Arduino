@@ -1,0 +1,16 @@
+# 
+# Project specific Makefile for unit test of project Signal
+#
+
+# Files
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test \
+            $(PATH_SRC_PRJ_PROJECT)/CalM \
+            $(PATH_SRC_PRJ)/App/Signal/InputClassifier \
+            $(PATH_SRC_PRJ)/App/Signal/InputCommand \
+            $(PATH_SRC_PRJ)/App/Signal/LedRouter \
+            $(PATH_SRC_PRJ)/App/Signal/Signal \
+            $(PATH_SRC_GEN)/Rte/Rte
+
+# Includes
+C_INCLUDES_PRJ := $(C_INCLUDES_PRJ) \
+                  -I$(PATH_SRC_PRJ)/App/Signal

@@ -21,9 +21,10 @@
 #ifndef SIGNAL_H_
 #define SIGNAL_H_
 
+#include <Std_Types.h>
 #include <Rte/Rte_Type.h>
 #include <Cal/CalM_Type.h>
-#include <LedIntensitySetter.h>
+#include <Util/Timer.h>
 
 namespace signal
 {
@@ -33,29 +34,81 @@ namespace signal
   // -----------------------------------------------------------------------------------
   class Signal
   {
-  protected:
+  public:
     using cmd_type = rte::cmd_type;
+
     using aspect_type = cal::aspect_type;
     using size_type = util::array<aspect_type, cfg::kNrSignalAspects>::size_type;
 
-    const cal::signal_type * pCal;
-
     /// Access calibration data
-    bool cal_valid() const { return pCal != nullptr; }
-    cal::input_type cal_getInput() const { return pCal->input; }
-    cal::aspect_type cal_getAspect(cmd_type cmd) const { return pCal->aspects[static_cast<size_type>(cmd)]; }
-    cal::target_type cal_getTarget(size_type idx) const { return pCal->targets[idx]; }
-    uint8 cal_getChangeOverTime() const { return pCal->changeOverTime; }
+    static bool cal_valid(const cal::signal_type * pCal) { return pCal != nullptr; }
+    static cal::input_type cal_getInput(const cal::signal_type * pCal) { return pCal->input; }
+    static cal::aspect_type cal_getAspect(const cal::signal_type * pCal, cmd_type cmd) { return pCal->aspects[static_cast<size_type>(cmd)]; }
+    static cal::target_type cal_getTarget(const cal::signal_type * pCal, size_type idx) { return pCal->targets[idx]; }
+    static uint8 cal_getChangeOverTime(const cal::signal_type * pCal) { return pCal->changeOverTime; }
+
+  protected:
+    /// Returns true if the cmd is valid
     bool isValid(cmd_type cmd) const noexcept { return cmd < cfg::kNrSignalAspects; }
+
+    /// Current target aspect (can be 0 during transition, or final target aspect)
+    aspect_type aspect_cur;
+    /// Target aspect (final)
+    aspect_type aspect_tgt;
+    /// Change over time between transitions (time is used twice: for dim down and for dim up)
+    util::MilliTimer changeOverTimer;
+    /// transform unit [10 ms] to unit [1 ms]
+    static uint16 scale_10ms_1ms(const rte::dimtime8_10ms_t time) noexcept { return static_cast<uint16>(10U * time); }
+
   public:
 
-    Signal() : pCal(nullptr)
+    Signal() : aspect_cur{ 0U, 0U }, aspect_tgt{ 0U, 0U }
     {}
 
-    void exec(LedIntensitySetter& lis);
-    void set_cal(const cal::signal_type * p);
+    /// Returns the current aspect
+    aspect_type getCurAspect() const noexcept { return aspect_cur; }
+
+    /// Initialization
+    void init();
+    /// Check cmd and turn on current and target aspect if required
+    void exec(const cal::signal_type * pCal, const cmd_type cmd);
   };
 
+  // -----------------------------------------------------------------------------------
+  /// Controls a list of cfg::kNrSignals signals. 
+  /// Reads input commands from RTE, applies commands and writes aspects to RTE.
+  // -----------------------------------------------------------------------------------
+  class SignalHandler
+  {
+  public:
+    using classified_values_array = rte::classified_values_array;
+    using classified_value_type = classified_values_array::value_type;
+    using classified_values_size_type = rte::classified_values_array::size_type;
+    using cmd_type = rte::cmd_type;
+    using signal_array_type = util::array<Signal, cfg::kNrSignals>;
+    
+  protected:
+    /// the list of cfg::kNrSignals signals
+    signal_array_type signals;
+
+    enum
+    {
+      kUninitialized = 0,
+      kInitialized = 1
+    };
+    uint8_t bootstate; // kUninitialized or kInitialized
+
+    bool cal_valid(const cal::signal_cal_type * pCal) const { return pCal != nullptr; }
+
+  public:
+
+    SignalHandler() : bootstate{ kUninitialized }
+    {}
+
+    /// RTE runables
+    void init();
+    void cycle();
+  };
 } // namespace signal
 
 #endif // SIGNAL_H_

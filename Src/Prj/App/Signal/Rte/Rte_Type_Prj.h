@@ -23,15 +23,17 @@
 
 #include <Std_Types.h>
 #include <Cfg_Prj.h>
-#include <Util/Array.h>
 #include <Platform_Limits.h>
 #include <Cal/CalM_Type.h>
+#include <Util/Array.h>
 
 // forward declaration for servers
+namespace cal
+{
+  class CalM;
+}
 namespace signal
 {
-  class LedRouter;
-  class InputClassifier;
   class InputCommand;
 }
 
@@ -45,6 +47,16 @@ namespace rte
   /// The AD classified values are written into an array of this type
   typedef util::array<cmd_type, cfg::kNrClassifiers> classified_values_array;
 
+  /// Target intensities for a signal
+  typedef struct
+  {
+    util::array<intensity8_t, cfg::kNrSignalTargets> intensities;
+    uint8 changeOverTime; ///< [10 ms] dim time if aspect changes
+  } signal_intensity_type;
+
+  /// Target intensities for each signal
+  typedef util::array<signal_intensity_type, cfg::kNrSignals> signal_intensity_array_type;
+
   /// The target intensities are written into an array of this type
   typedef util::array<intensity8_t, cfg::kNrOnboardTargets> onboard_intensity_array;
   typedef util::array<intensity8_t, cfg::kNrExternalTargets> external_intensity_array;
@@ -55,6 +67,11 @@ namespace rte
   typedef rte::ifc_sr_array<classified_values_array> Ifc_ClassifiedValues;
 
   // -----------------------------------------------------------------------------------
+  /// SR interface for signal target intensities
+  // -----------------------------------------------------------------------------------
+  typedef rte::ifc_sr_array< signal_intensity_array_type> Ifc_SignalTargetIntensities;
+
+  // -----------------------------------------------------------------------------------
   /// SR interface for target intensities
   // -----------------------------------------------------------------------------------
   typedef rte::ifc_sr_array<onboard_intensity_array> Ifc_OnboardTargetIntensities;
@@ -63,8 +80,8 @@ namespace rte
   // -----------------------------------------------------------------------------------
   /// CS interface for calibration values
   // -----------------------------------------------------------------------------------
-  typedef rte::ifc_cs<void, signal::LedRouter, const cal::signal_array *> Ifc_Cal_LedR;
-  typedef rte::ifc_cs<void, signal::InputClassifier, const cal::input_classifier_cfg_type *> Ifc_Cal_InputClassifier;
+  typedef rte::ifc_cs<const cal::signal_cal_type *          , cal::CalM> Ifc_Cal_Signal;
+  typedef rte::ifc_cs<const cal::input_classifier_cal_type *, cal::CalM> Ifc_Cal_InputClassifier;
 
   // -----------------------------------------------------------------------------------
   /// CS interface for commands

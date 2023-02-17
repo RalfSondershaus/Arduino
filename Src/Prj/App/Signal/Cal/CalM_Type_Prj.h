@@ -70,12 +70,12 @@ namespace cal
     uint8 blinkChangeOverTime; ///< [10 ms] dim time for blinking effects
   } signal_type;
 
-  /// Coding data for each signal
-  typedef util::array<signal_type, cfg::kNrSignals> signal_array;
+  /// Calibration data type for each signal
+  typedef util::array<signal_type, cfg::kNrSignals> signal_cal_type;
 
   /// Calibration data for input classifiers is taken over from util::input_classifier
   typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> input_classifier_type;
-  using input_classifier_cfg_type = input_classifier_type::input_classifier_cfg_type;
+  using input_classifier_cal_type = input_classifier_type::input_classifier_cal_type;
 
 } // namespace cal
 

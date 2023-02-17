@@ -18,49 +18,117 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#include <Signal.h>
 #include <Rte/Rte.h>
 #include <Util/bitset.h>
+#include <Signal.h>
 
 namespace signal
 {
 
   // -----------------------------------------------------------------------------------
-  /// 
+  /// Initializes output if calibration data are available (set_cal needs to be called
+  /// before).
   // -----------------------------------------------------------------------------------
-  void Signal::set_cal(const cal::signal_type * p)
+  void Signal::init()
   {
-    pCal = p;
   }
 
   // -----------------------------------------------------------------------------------
-  /// 
+  /// Calculates target values and dim ramps for command cmd.
+  /// Precondition: valid calibration data (pCal is valid).
   // -----------------------------------------------------------------------------------
-  void Signal::exec(LedIntensitySetter& lis)
+  void Signal::exec(const cal::signal_type * pCal, const cmd_type cmd)
+  {
+    cal::aspect_type aspect_tmp;
+    rte::dimtime8_10ms_t dimtime = static_cast<rte::dimtime8_10ms_t>(cal_getChangeOverTime(pCal));
+
+    if (isValid(cmd))
+    {
+      const cal::aspect_type asp = cal_getAspect(pCal, cmd);
+      if (aspect_tgt.aspect != asp.aspect)
+      {
+        // apply change over time only if current target aspect is not initial state
+        if (aspect_tgt.aspect != static_cast<uint8_t>(0U))
+        {
+          changeOverTimer.start(scale_10ms_1ms(dimtime));
+        }
+        aspect_tgt = asp;
+      }
+    }
+
+    if (!changeOverTimer.timeout())
+    {
+      aspect_tmp.aspect = 0U;
+    }
+    else
+    {
+      aspect_tmp = aspect_tgt;
+    }
+
+    if (aspect_cur.aspect != aspect_tmp.aspect)
+    {
+      aspect_cur = aspect_tmp;
+    }
+  }
+
+  // -----------------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------------
+  void SignalHandler::init()
+  {
+    bootstate = kUninitialized;
+  }
+
+  // -----------------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------------
+  void SignalHandler::cycle()
   {
     size_t pos;
+    rte::signal_intensity_type intensities_tgt;
     rte::intensity8_t intensity;
-    rte::dimtime8_10ms_t dimtime = static_cast<rte::dimtime8_10ms_t>(cal_getChangeOverTime());
 
-    if (cal_valid())
+    const cal::signal_cal_type * pCal = rte::ifc_cal_signal.call();
+
+    if (cal_valid(pCal))
     {
-      const cmd_type cmd = rte::ifc_rte_get_cmd.call(cal_getInput());
-      if (isValid(cmd))
+      auto calit = pCal->begin();
+      for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
       {
-        const cal::aspect_type aspect = cal_getAspect(cmd);
-        for (pos = 0; pos < static_cast<size_t>(cfg::kNrSignalTargets); pos++)
+        cmd_type cmd = rte::ifc_rte_get_cmd.call(calit->input);
+
+        // switch on RED if this is called for the first time and no valid command is available
+        if ((cmd == rte::kInvalidCmd) && (bootstate == kUninitialized))
         {
-          if (util::bits::test<uint8>(aspect.aspect, pos))
+          cmd = 0; // 0 means RED by default
+        }
+
+        sigit->exec(calit, cmd);
+
+        for (pos = static_cast<size_t>(0U); pos < static_cast<size_t>(cfg::kNrSignalTargets); pos++)
+        {
+          if (util::bits::test<uint8>(sigit->getCurAspect().aspect, pos))
           {
-            intensity = static_cast<rte::intensity8_t>(100U);
+            intensity = static_cast<rte::intensity8_t>(rte::kIntensity8_100);
           }
           else
           {
-            intensity = static_cast<rte::intensity8_t>(0U);
+            intensity = static_cast<rte::intensity8_t>(rte::kIntensity8_0);
           }
-          lis.setIntensitySpeed(cal_getTarget(pos), intensity, dimtime);
+          // MSB of aspect is index 0 in target intensiry array
+          // LSB of aspect is index cfg::kNrSignalTargets-1 in target intensity array
+          intensities_tgt.intensities[static_cast<size_t>((cfg::kNrSignalTargets - 1U) - pos)] = intensity;
+          intensities_tgt.changeOverTime = Signal::cal_getChangeOverTime(calit);
+          //lis.setIntensitySpeed(cal_getTarget(static_cast<size_t>((cfg::kNrSignalTargets - 1U) - pos)), intensity, dimtime);
         }
+
+        rte::ifc_signal_target_intensities.writeElement(sigit - signals.begin(), intensities_tgt);
+
+        calit++;
       }
     }
+
+    // Initialization is performed after the first call to this function
+    bootstate = kInitialized;
   }
+
+
 } // namespace signal

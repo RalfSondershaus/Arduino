@@ -208,9 +208,6 @@
     <Filter Include="Build\make\Prj\UnitTest\Prj">
       <UniqueIdentifier>{ba69d52b-2567-4704-ab60-9cb050dfd23d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Build\make\Prj\UnitTest\Prj\Signal">
-      <UniqueIdentifier>{d14eb117-fad6-40a0-9cef-e5793fa00cab}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Prj\UnitTest\Prj">
       <UniqueIdentifier>{d21d9690-00ac-4ad4-aa41-7cd68945f1a8}</UniqueIdentifier>
     </Filter>
@@ -231,6 +228,12 @@
     </Filter>
     <Filter Include="Src\Prj\App\Signal\Cal">
       <UniqueIdentifier>{f753aa4c-aba2-4071-9d1f-972a791a6bc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Prj\Ut_Signal">
+      <UniqueIdentifier>{745665ae-c13b-4878-a05b-45b227da0043}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Prj\Ut_Signal">
+      <UniqueIdentifier>{d14eb117-fad6-40a0-9cef-e5793fa00cab}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -296,9 +299,6 @@
     </ClCompile>
     <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_InputClassifier\Test.cpp">
       <Filter>Src\Prj\UnitTest\Gen\Util\Ut_InputClassifier</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Prj\UnitTest\Prj\Ut_Signal\Test.cpp">
-      <Filter>Src\Prj\UnitTest\Prj</Filter>
     </ClCompile>
     <ClCompile Include="Src\Prj\App\Signal\InputClassifier.cpp">
       <Filter>Src\Prj\App\Signal</Filter>
@@ -389,6 +389,12 @@
     </ClCompile>
     <ClCompile Include="Src\Prj\App\Signal\Sig.cpp">
       <Filter>Src\Prj\App\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Prj\Ut_Signal\Test.cpp">
+      <Filter>Src\Prj\UnitTest\Prj\Ut_Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Prj\Ut_Signal\CalM.cpp">
+      <Filter>Src\Prj\UnitTest\Prj\Ut_Signal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -668,14 +674,20 @@
     <ClInclude Include="Src\Prj\App\Signal\LedRouter.h">
       <Filter>Src\Prj\App\Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Prj\App\Signal\LedIntensitySetter.h">
-      <Filter>Src\Prj\App\Signal</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Prj\App\Signal\InputCommand.h">
       <Filter>Src\Prj\App\Signal</Filter>
     </ClInclude>
     <ClInclude Include="Src\Gen\Util\Classifier.h">
       <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\UnitTest\Prj\Ut_Signal\Arduino.h">
+      <Filter>Src\Prj\UnitTest\Prj\Ut_Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\UnitTest\Prj\Ut_Signal\CalM_config.h">
+      <Filter>Src\Prj\UnitTest\Prj\Ut_Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Cal\CalM_config.h">
+      <Filter>Src\Prj\App\Signal\Cal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -730,11 +742,11 @@
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_InputClassifier\Makefile_Prj.gmk">
       <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_InputClassifier</Filter>
     </None>
-    <None Include="Build\make\Prj\UnitTest\Prj\Signal\Ut_Signal\Makefile_Prj.gmk">
-      <Filter>Build\make\Prj\UnitTest\Prj\Signal</Filter>
-    </None>
     <None Include="Src\Gen\Arduino\avr\cores\arduino\wiring_pulse.S">
       <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Prj\Ut_Signal\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Prj\Ut_Signal</Filter>
     </None>
   </ItemGroup>
 </Project>

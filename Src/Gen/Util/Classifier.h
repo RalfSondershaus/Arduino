@@ -45,16 +45,16 @@ namespace util
     };
 
     template<int NrClasses>
-    struct input_classifier_single_cfg
+    struct input_classifier_single
     {
       uint8 ucPin; ///< Pin of AD channel (such as A0)
       classifier_limits<NrClasses> limits; ///< debounce and limits
     };
 
     template<int NrClassifiers, int NrClasses>
-    struct input_classifier_cfg
+    struct input_classifier_cal
     {
-      util::array<input_classifier_single_cfg<NrClasses>, NrClassifiers> classifiers; ///< pin, debounce and limits
+      util::array<input_classifier_single<NrClasses>, NrClassifiers> classifiers; ///< pin, debounce and limits
     };
   } // namespace cal
 
@@ -83,8 +83,8 @@ namespace util
     typedef classifier<NrClasses> This;
 
     /// Configuration data
-    typedef cal::classifier_limits<NrClasses> classifier_limits_type;
-    typedef const classifier_limits_type * cal_const_pointer;
+    typedef cal::classifier_limits<NrClasses> classifier_limits_cal_type;
+    typedef const classifier_limits_cal_type * cal_const_pointer;
 
     /// The invalid index
     static constexpr class_type kInvalidIndex = platform::numeric_limits<class_type>::max_();
@@ -144,7 +144,7 @@ namespace util
     /// @param val Value to be classified (with debouncing)
     ///
     /// @return class index
-    class_type classify_debounce(limit_type val)
+    class_type classify_debounce(input_type val)
     {
       class_type idx = classify(val);
       if (idx != currentClass)
@@ -189,24 +189,22 @@ namespace util
   class input_classifier
   {
   public:
-    /// 16 bit are sufficient for conversion of 10 bit AD values
-    typedef uint16 input_type;
-    /// 8 bit are ok to store limits
-    typedef uint8 limit_type;
-    /// 8 bit are sufficient for class identifiers
-    typedef uint8 class_type;
-
     /// type of this class
     typedef input_classifier<NrClassifiers, NrClasses> This;
 
-    /// Configuration type for this class including N classifiers with N = NrClassifiers
-    typedef cal::input_classifier_cfg<NrClassifiers, NrClasses> input_classifier_cfg_type;
-    typedef const input_classifier_cfg_type * cal_const_pointer;
+    /// Calibration data type for this class including N classifiers with N = NrClassifiers
+    typedef cal::input_classifier_cal<NrClassifiers, NrClasses> input_classifier_cal_type;
+    typedef const input_classifier_cal_type * cal_const_pointer;
 
     /// A classifier
     typedef classifier<NrClasses> classifier_type;
     /// The classifiers are arranged in an util::array
     typedef util::array<classifier_type, NrClassifiers> classifier_array_type;
+
+    /// Take over classifier_type's types. These types define bit resolution of input signals and limits
+    using input_type = typename classifier_type::input_type;
+    using limit_type = typename classifier_type::limit_type;
+    using class_type = typename classifier_type::class_type;
 
     /// The classified values are arranged in an util::array
     typedef util::array<uint8, NrClassifiers> classified_values_array_type;
@@ -282,7 +280,7 @@ namespace util
         for (auto it = classifiers.begin(); it != classifiers.end(); it++)
         {
           nAdc = get_ADC((it_cfg++)->ucPin);
-          nClass = it->classify_debounce(static_cast<limit_type>(nAdc));
+          nClass = it->classify_debounce(static_cast<input_type>(nAdc));
           (*it_cls++) = static_cast<uint8>(nClass);
         }
       }

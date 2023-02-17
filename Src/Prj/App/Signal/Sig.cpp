@@ -1,5 +1,5 @@
 /**
- * @file Signal/main.cpp
+ * @file Signal/Sig.cpp
  *
  * @brief Defines loop and setup.
  *

@@ -96,6 +96,10 @@ namespace util
       init(ystart, yend, dt, timestep);
     }
 
+    /// Return target values and current value
+    base_type get_tgt() const noexcept { return tgt; }
+    base_type get_cur() const noexcept { return cur; }
+
     /// Initialize: ramp starts at ystart and reaches yend after time dt with step size defined by timestep
     void init(base_type ystart, base_type yend, base_type dt, base_type timestep)
     {

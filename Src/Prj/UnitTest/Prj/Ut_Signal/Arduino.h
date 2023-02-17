@@ -1,9 +1,8 @@
 /**
- * @file CalM.h
- *
+ * @file Arduino.h
  * @author Ralf Sondershaus
  *
- * @brief Access to calibration parameters
+ * @descr Stub file for Google Test for Gen/Rte/Rte.h
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -20,34 +19,17 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CAL_H_
-#define CAL_H_
+#ifndef ARDUINO_H__
+#define ARDUINO_H__
 
 #include <Std_Types.h>
-#include <Cal/CalM_Type.h>
 
-namespace cal
-{
+/// Return current time [us]
+unsigned long micros(); 
+/// Return current time [ms]
+unsigned long millis();
 
-  class CalM
-  {
-  public:
-    /// coding data for signals
-    signal_cal_type signals;
-    input_classifier_cal_type input_classifiers;
+/// Return analogue value
+int analogRead(uint8);
 
-    CalM();
-
-    /// Init runable
-    void init();
-    /// Runable 100 ms
-    void cycle100();
-
-    /// references to coding parameters
-    const signal_cal_type *           get_signal()             { return &signals; }
-    const input_classifier_cal_type * get_input_classifiers()  { return &input_classifiers; }
-  };
-
-} // namespace cal
-
-#endif // CAL_H_
+#endif // ARDUINO_H__

@@ -1,9 +1,9 @@
 /**
- * @file CalM.h
+ * @file Nvm.h
  *
  * @author Ralf Sondershaus
  *
- * @brief Access to calibration parameters
+ * @brief Access to NVM data structures
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -20,34 +20,11 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CAL_H_
-#define CAL_H_
+#ifndef NVM_H_
+#define NVM_H_
 
 #include <Std_Types.h>
-#include <Cal/CalM_Type.h>
+#include <Nvm/Nvm_Type.h>
+#include <Nvm/Nvm_Cfg_Ext.h>
 
-namespace cal
-{
-
-  class CalM
-  {
-  public:
-    /// coding data for signals
-    signal_cal_type signals;
-    input_classifier_cal_type input_classifiers;
-
-    CalM();
-
-    /// Init runable
-    void init();
-    /// Runable 100 ms
-    void cycle100();
-
-    /// references to coding parameters
-    const signal_cal_type *           get_signal()             { return &signals; }
-    const input_classifier_cal_type * get_input_classifiers()  { return &input_classifiers; }
-  };
-
-} // namespace cal
-
-#endif // CAL_H_
+#endif // NVM_H_

@@ -32,6 +32,7 @@ C_INCLUDES_COMPILER =
 # Include pathes for platform dependend header files (platform = MCU + compiler)
 # ---------------------------------------------------
 C_INCLUDES := $(C_INCLUDES)   \
+             -I$(PATH_SRC_GEN)/Platform                                         \
              -I$(PATH_SRC_GEN)/Platform/$(TARGET_MCU_FAMILY)/$(ARG_COMPILER)
 
 # ---------------------------------------------------

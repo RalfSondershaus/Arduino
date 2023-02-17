@@ -1,5 +1,5 @@
 /**
- * @file Signal/Cal/CalM.cpp
+ * @file Ut_Signal/CalM.cpp
  *
  * @author Ralf Sondershaus
  *
@@ -28,11 +28,10 @@
 
 namespace cal
 {
-
   // -----------------------------------------------
   /// Constructor
   // -----------------------------------------------
-  CalM::CalM()
+  CalM::CalM() 
     : signals{ CAL_SIGNAL_ARRAY }
     , input_classifiers{ CAL_INPUT_CLASSIFIER_CFG }
   {}
@@ -45,7 +44,7 @@ namespace cal
   }
 
   // -----------------------------------------------
-  /// Cyclic runable
+  /// Runable 10 ms
   // -----------------------------------------------
   void CalM::cycle100()
   {

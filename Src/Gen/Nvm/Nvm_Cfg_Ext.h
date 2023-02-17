@@ -1,7 +1,9 @@
 /**
- * @file Gen/Rte/Rte_Type_Gen.h
+ * @file Nvm_Cfg_Ext.h
  *
- * @brief Defines generic types for RTE
+ * @author Ralf Sondershaus
+ *
+ * @brief Helper file to define external NVM interface.
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -18,22 +20,12 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef RTE_TYPE_GEN_H_
-#define RTE_TYPE_GEN_H_
+#ifndef NVM_CFG_EXT_H_
+#define NVM_CFG_EXT_H_
 
-#include <Std_Types.h>
+#define NVM_DEF_MODE_TYPE
+#include <Nvm/Nvm_Cfg_Mac.h>
+#include <Nvm/Nvm_Cfg_Prj.h>
+#undef NVM_DEF_MODE_TYPE
 
-namespace rte
-{
-  /// Intensities
-  typedef uint16 intensity16_t; ///< 16 bit, 0 = 0%, 65535 = 100%
-  typedef uint8  intensity8_t;  ///< 8 bit, 0 = 0%, 255 = 100%
-
-  constexpr uint8 kIntensity8_100 = 255;
-  constexpr uint8 kIntensity8_0 = 0;
-
-  /// Times
-  typedef uint8  dimtime8_10ms_t;  ///< 8 bit, [10 ms] 0 = 0 ms, 255 = 2550 ms = 2.55 sec
-} // namespace rte
-
-#endif // RTE_TYPE_GEN_H_
+#endif // NVM_CFG_EXT_H_

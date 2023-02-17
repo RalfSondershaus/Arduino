@@ -38,24 +38,19 @@ namespace signal
   {
   public:
     typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> input_classifier_type;
+    typedef const cal::input_classifier_cal_type * cal_const_pointer;
     using classified_values_array_type = input_classifier_type::classified_values_array_type;
-
+    
   protected:
     input_classifier_type classifiers;
 
-    /// Pointer to calibration data
-    const cal::input_classifier_cfg_type * pCal;
-
   public:
     /// Construct
-    InputClassifier() : pCal(nullptr) {}
+    InputClassifier() {}
 
     /// Runables
     void init();
-    void cycle10();
-
-    /// Server runable: set calibration values
-    void set_cal(const cal::input_classifier_cfg_type * p);
+    void cycle();
   };
 } // namespace signal
 

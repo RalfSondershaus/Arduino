@@ -21,7 +21,8 @@ unsigned long millis() { return Arduino_Stub_MillisReturnValue; }
 int analogRead(int pin) { return Arduino_Stub_AnalogReadReturnValue[pin]; }
 
 // ------------------------------------------------------------------------------
-///
+/// Test a configuration with 1 classifier with 5 classes.
+/// Use mid values, and min and max values per class.
 // ------------------------------------------------------------------------------
 TEST(Ut_InputClassifier, Test_1_Classifier_5_Classes)
 {
@@ -29,7 +30,7 @@ TEST(Ut_InputClassifier, Test_1_Classifier_5_Classes)
   constexpr int kNrClasses = 5;
 
   typedef util::input_classifier<kNrClassifiers, kNrClasses> input_classifier_type;
-  using cal_type        = input_classifier_type::input_classifier_cfg_type;
+  using cal_type        = input_classifier_type::input_classifier_cal_type;
   using classifier_type = input_classifier_type::classifier_type;
   using time_type       = input_classifier_type::classifier_type::time_type;
 
@@ -49,22 +50,61 @@ TEST(Ut_InputClassifier, Test_1_Classifier_5_Classes)
   {
       pin
     , debounce
-    , V2P(  0), V2P(101), V2P(201), V2P(301), V2P(401) // Lower limit for class x [0, 255]
-    , V2P(100), V2P(200), V2P(300), V2P(400), V2P(500) // Upper limit for class x [0, 255]
+    , V2P(  0), V2P(104), V2P(204), V2P(304), V2P(404)  // Lower limit for class x [0, 255]
+    , V2P(100), V2P(200), V2P(300), V2P(400), V2P(1023) // Upper limit for class x [0, 255]
   };
 #undef V2P
 
   const step_type aSteps[] =
   {
-      {   0,   0, input_classifier_type::kInvalidIndex }
-    , {  50,  10, input_classifier_type::kInvalidIndex }
-    , { 100,   5, 0 }
-    , { 150, 150, input_classifier_type::kInvalidIndex }
-    , { 200, 140, input_classifier_type::kInvalidIndex }
-    , { 250, 140, 1 }
-    , { 300, 240, input_classifier_type::kInvalidIndex }
-    , { 350, 230, input_classifier_type::kInvalidIndex }
-    , { 400, 230, 2 }
+    /* mid values */
+      { 0 * 50,  50, input_classifier_type::kInvalidIndex }
+    , { 1 * 50,  50, input_classifier_type::kInvalidIndex }
+    , { 2 * 50,  50, 0 }
+    , { 3 * 50, 150, input_classifier_type::kInvalidIndex }
+    , { 4 * 50, 150, input_classifier_type::kInvalidIndex }
+    , { 5 * 50, 150, 1 }
+    , { 6 * 50, 250, input_classifier_type::kInvalidIndex }
+    , { 7 * 50, 250, input_classifier_type::kInvalidIndex }
+    , { 8 * 50, 250, 2 }
+    , { 9 * 50, 350, input_classifier_type::kInvalidIndex }
+    , {10 * 50, 350, input_classifier_type::kInvalidIndex }
+    , {11 * 50, 350, 3 }
+    , {12 * 50, 700, input_classifier_type::kInvalidIndex }
+    , {13 * 50, 700, input_classifier_type::kInvalidIndex }
+    , {14 * 50, 700, 4 }
+    /* min values */
+    , {16 * 50,   0, input_classifier_type::kInvalidIndex }
+    , {17 * 50,   0, input_classifier_type::kInvalidIndex }
+    , {18 * 50,   0, 0 }
+    , {19 * 50, 104, input_classifier_type::kInvalidIndex }
+    , {20 * 50, 104, input_classifier_type::kInvalidIndex }
+    , {21 * 50, 104, 1 }
+    , {22 * 50, 204, input_classifier_type::kInvalidIndex }
+    , {23 * 50, 204, input_classifier_type::kInvalidIndex }
+    , {24 * 50, 204, 2 }
+    , {25 * 50, 304, input_classifier_type::kInvalidIndex }
+    , {26 * 50, 304, input_classifier_type::kInvalidIndex }
+    , {27 * 50, 304, 3 }
+    , {28 * 50, 404, input_classifier_type::kInvalidIndex }
+    , {29 * 50, 404, input_classifier_type::kInvalidIndex }
+    , {30 * 50, 404, 4 }
+    /* max values */
+    , {31 * 50, 100, input_classifier_type::kInvalidIndex }
+    , {32 * 50, 100, input_classifier_type::kInvalidIndex }
+    , {33 * 50, 100, 0 }
+    , {34 * 50, 200, input_classifier_type::kInvalidIndex }
+    , {35 * 50, 200, input_classifier_type::kInvalidIndex }
+    , {36 * 50, 200, 1 }
+    , {37 * 50, 300, input_classifier_type::kInvalidIndex }
+    , {38 * 50, 300, input_classifier_type::kInvalidIndex }
+    , {39 * 50, 300, 2 }
+    , {40 * 50, 400, input_classifier_type::kInvalidIndex }
+    , {41 * 50, 400, input_classifier_type::kInvalidIndex }
+    , {42 * 50, 400, 3 }
+    , {43 * 50,1023, input_classifier_type::kInvalidIndex }
+    , {44 * 50,1023, input_classifier_type::kInvalidIndex }
+    , {45 * 50,1023, 4 }
   };
   int nStep;
   
@@ -88,7 +128,7 @@ TEST(Ut_InputClassifier, Test_3_Classifiers_5_Classes)
   constexpr int kNrClasses = 5;
 
   typedef util::input_classifier<kNrClassifiers, kNrClasses> input_classifier_type;
-  using cal_type        = input_classifier_type::input_classifier_cfg_type;
+  using cal_type        = input_classifier_type::input_classifier_cal_type;
   using classifier_type = input_classifier_type::classifier_type;
   using time_type       = input_classifier_type::classifier_type::time_type;
 

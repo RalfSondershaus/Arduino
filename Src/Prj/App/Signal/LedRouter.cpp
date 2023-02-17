@@ -20,25 +20,15 @@
 
 #include <Rte/Rte.h>
 #include <Util/Algorithm.h>
+#include <LedRouter.h>
 
 namespace signal
 {
- 
-  // -----------------------------------------------------------------------------------
-  /// 
-  // -----------------------------------------------------------------------------------
-  void LedRouter::handleSignals()
-  {
-    for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
-    {
-      sigit->exec(*this);
-    }
-  }
 
   // -----------------------------------------------------------------------------------
-  /// 
+  /// Initialize ramp for tgt with given intensity and time if intensity and time differ from current tamp target values.
   // -----------------------------------------------------------------------------------
-  void LedRouter::setIntensitySpeed(target_type tgt, intensity8_t intensity, dimtime8_10ms_t time)
+  void LedRouter::setIntensitySpeed(const target_type tgt, const intensity8_type intensity, const dimtime8_10ms_type time)
   {
     switch (tgt.type)
     {
@@ -46,10 +36,10 @@ namespace signal
     {
       if (dimtimes_onboard.check_boundary(tgt.idx))
       {
-        if (dimtimes_onboard.at(tgt.idx) != time)
+        if ((dimtimes_onboard[tgt.idx] != time) || (ramps_onboard[tgt.idx].get_tgt() != scale_8_16(intensity)))
         {
-          ramps_onboard.at(tgt.idx).init(255U*intensity, 10U * time, 10U);
-          dimtimes_onboard.at(tgt.idx) = time;
+          ramps_onboard[tgt.idx].init(scale_8_16(intensity), scale_10ms_1ms(time), kCycleTime);
+          dimtimes_onboard[tgt.idx] = time;
         }
       }
     }
@@ -68,9 +58,9 @@ namespace signal
   {
     rte::Ifc_OnboardTargetIntensities::size_type pos = static_cast<rte::Ifc_OnboardTargetIntensities::size_type>(0);
 
-    for (auto it = ramps_onboard.begin(); it = ramps_onboard.end(); it++)
+    for (auto it = ramps_onboard.begin(); it != ramps_onboard.end(); it++)
     {
-      rte::ifc_onboard_target_intensities.writeElement(pos, it->step() / 255U);
+      rte::ifc_onboard_target_intensities.writeElement(pos, scale_16_8(it->step()));
       pos++;
     }
   }
@@ -78,24 +68,62 @@ namespace signal
   // -----------------------------------------------------------------------------------
   /// Sets calibration data
   // -----------------------------------------------------------------------------------
-  void LedRouter::set_cal(const cal::signal_array * p)
-  {
-    pCal = p;
+  //void LedRouter::set_cal(cal_const_pointer p)
+  //{
+  //  pCal = p;
 
-    if (p != nullptr)
+  //  if (p != nullptr)
+  //  {
+  //    auto calit = p->begin();
+  //    for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
+  //    {
+  //      sigit->set_cal(calit);
+  //      calit++;
+  //    }
+  //  }
+  //  else
+  //  {
+  //    for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
+  //    {
+  //      sigit->set_cal(nullptr);
+  //    }
+  //  }
+  //}
+
+  // -----------------------------------------------------------------------------------
+  /// For the pos-th signal, map intensities and speed from RTE signal values to internal onboard or external values.
+  /// @param pos [0 ... cfg::kNrSignals-1] signal id
+  /// @param pCal pointer to calibration data of pos-th signal, must not be nullptr
+  // -----------------------------------------------------------------------------------
+  void LedRouter::mapSignal(size_type pos, const cal::signal_type * pCal)
+  {
+    rte::signal_intensity_type sigintensity;
+
+    rte::readElement(rte::ifc_signal_target_intensities, pos, sigintensity);
+
+    auto calit = pCal->targets.begin();
+    for (auto sigit = sigintensity.intensities.begin(); sigit != sigintensity.intensities.end(); sigit++)
     {
-      auto calit = p->begin();
-      for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
-      {
-        sigit->set_cal(calit);
-        calit++;
-      }
+      setIntensitySpeed(*calit, *sigit, sigintensity.changeOverTime);
+      calit++;
     }
-    else
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// For each signal, map intensities and speed from RTE signal values to internal onboard or external values.
+  // -----------------------------------------------------------------------------------
+  void LedRouter::mapSignals()
+  {
+    const cal::signal_cal_type * pCal = rte::call_void(rte::ifc_cal_signal);
+    size_type pos;
+
+    if (cal_signal_valid(pCal))
     {
-      for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
+      auto calit = pCal->begin();
+      for (pos = static_cast<size_type>(0U); pos < rte::ifc_signal_target_intensities.size(); pos++)
       {
-        sigit->set_cal(nullptr);
+        mapSignal(pos, calit);
+        calit++;
       }
     }
   }
@@ -110,9 +138,9 @@ namespace signal
   // -----------------------------------------------------------------------------------
   /// 
   // -----------------------------------------------------------------------------------
-  void LedRouter::cycle10()
+  void LedRouter::cycle()
   {
-    handleSignals();
+    mapSignals();
     doRamps();
   }
 } // namespace signal
