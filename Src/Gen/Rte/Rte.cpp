@@ -94,10 +94,10 @@ namespace rte
 #include <Rte/Rte_Cfg_Prj.h>
 #undef RTE_DEF_MODE_EVENT_RUNABLE_ARRAY
 
-#define RTE_DEF_MODE_INTERFACES
+#define RTE_DEF_MODE_PORT
 #include <Rte/Rte_Cfg_Mac.h>
 #include <Rte/Rte_Cfg_Prj.h>
-#undef RTE_DEF_MODE_INTERFACES
+#undef RTE_DEF_MODE_PORT
 
 namespace rte
 {

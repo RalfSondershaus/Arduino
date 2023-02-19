@@ -31,9 +31,10 @@ namespace signal
 
     if (in.type == cal::input_type::kClassified)
     {
-      if (rte::ifc_classified_values.ref().check_boundary(static_cast<rte::classified_values_array::size_type>(in.idx)))
+      const rte::classified_values_array::size_type pos = static_cast<rte::classified_values_array::size_type>(in.idx);
+      if (rte::ifc_classified_values::boundaryCheck(pos))
       {
-        rte::ifc_classified_values.readElement(static_cast<rte::classified_values_array::size_type>(in.idx), cmd);
+        rte::ifc_classified_values::readElement(pos, cmd);
       }
     }
 

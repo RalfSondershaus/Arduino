@@ -7,10 +7,10 @@
 class B
 {
 public:
-  uint32 ulCalls;
+  uint32 ulCallsCyc;
   uint32 ulCallsEvent;
-  B() : ulCalls{ 0 } {}
+  B() : ulCallsCyc{ 0 }, ulCallsEvent{ 0 } {}
   virtual ~B() {}
-  void func(void) { ulCalls++; }
+  void func(void) { ulCallsCyc++; }
   void evnt(void) { ulCallsEvent++; }
 };

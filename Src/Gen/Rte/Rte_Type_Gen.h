@@ -25,6 +25,8 @@
 
 namespace rte
 {
+  using ret_type = ifc_base::ret_type;
+
   /// Intensities
   typedef uint16 intensity16_t; ///< 16 bit, 0 = 0%, 65535 = 100%
   typedef uint8  intensity8_t;  ///< 8 bit, 0 = 0%, 255 = 100%

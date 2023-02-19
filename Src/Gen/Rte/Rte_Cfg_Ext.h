@@ -29,9 +29,9 @@
 #include <Rte/Rte_Cfg_Prj.h>
 #undef RTE_DEF_MODE_OBJ_EXT
 
-#define RTE_DEF_MODE_INTERFACES_EXT
+#define RTE_DEF_MODE_PORT_EXT
 #include <Rte/Rte_Cfg_Mac.h>
 #include <Rte/Rte_Cfg_Prj.h>
-#undef RTE_DEF_MODE_INTERFACES_EXT
+#undef RTE_DEF_MODE_PORT_EXT
 
 #endif // RTE_CFG_EXT_H_

@@ -60,7 +60,7 @@ namespace signal
 
     for (auto it = ramps_onboard.begin(); it != ramps_onboard.end(); it++)
     {
-      rte::ifc_onboard_target_intensities.writeElement(pos, scale_16_8(it->step()));
+      rte::ifc_onboard_target_intensities::writeElement(pos, scale_16_8(it->step()));
       pos++;
     }
   }
@@ -99,8 +99,7 @@ namespace signal
   {
     rte::signal_intensity_type sigintensity;
 
-    rte::readElement(rte::ifc_signal_target_intensities, pos, sigintensity);
-
+    rte::ifc_signal_target_intensities::readElement(pos, sigintensity);
     auto calit = pCal->targets.begin();
     for (auto sigit = sigintensity.intensities.begin(); sigit != sigintensity.intensities.end(); sigit++)
     {
@@ -114,13 +113,14 @@ namespace signal
   // -----------------------------------------------------------------------------------
   void LedRouter::mapSignals()
   {
-    const cal::signal_cal_type * pCal = rte::call_void(rte::ifc_cal_signal);
+    const cal::signal_cal_type * pCal = rte::ifc_cal_signal::call();
+    //const cal::signal_cal_type * pCal = rte::Ifc_Cal_Signal::call();
     size_type pos;
 
     if (cal_signal_valid(pCal))
     {
       auto calit = pCal->begin();
-      for (pos = static_cast<size_type>(0U); pos < rte::ifc_signal_target_intensities.size(); pos++)
+      for (pos = static_cast<size_type>(0U); pos < rte::ifc_signal_target_intensities::size(); pos++)
       {
         mapSignal(pos, calit);
         calit++;

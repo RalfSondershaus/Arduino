@@ -6,8 +6,11 @@
 class A
 {
 public:
-  uint32 ulCalls;
-  A() : ulCalls{ 0 } {}
+  uint32 ulCallsCyc;
+  uint32 ulCallsInit;
+  A() : ulCallsCyc{ 0 }, ulCallsInit{ 0 }
+  {}
   virtual ~A() {}
-  void func(void) { ulCalls++; }
+  void init(void) { ulCallsInit++; }
+  void func(void) { ulCallsCyc++; }
 };

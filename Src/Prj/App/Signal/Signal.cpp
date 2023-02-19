@@ -86,14 +86,14 @@ namespace signal
     rte::signal_intensity_type intensities_tgt;
     rte::intensity8_t intensity;
 
-    const cal::signal_cal_type * pCal = rte::ifc_cal_signal.call();
+    const cal::signal_cal_type * pCal = rte::ifc_cal_signal::call();
 
     if (cal_valid(pCal))
     {
       auto calit = pCal->begin();
       for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
       {
-        cmd_type cmd = rte::ifc_rte_get_cmd.call(calit->input);
+        cmd_type cmd = rte::ifc_rte_get_cmd::call(calit->input);
 
         // switch on RED if this is called for the first time and no valid command is available
         if ((cmd == rte::kInvalidCmd) && (bootstate == kUninitialized))
@@ -120,7 +120,7 @@ namespace signal
           //lis.setIntensitySpeed(cal_getTarget(static_cast<size_t>((cfg::kNrSignalTargets - 1U) - pos)), intensity, dimtime);
         }
 
-        rte::ifc_signal_target_intensities.writeElement(sigit - signals.begin(), intensities_tgt);
+        rte::ifc_signal_target_intensities::writeElement(sigit - signals.begin(), intensities_tgt);
 
         calit++;
       }

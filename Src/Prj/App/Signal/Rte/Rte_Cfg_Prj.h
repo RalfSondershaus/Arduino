@@ -51,17 +51,17 @@ RTE_DEF_CYCLIC_RUNABLE(signal::LedRouter, led_router, cycle, 100, 1000)
 RTE_DEF_CYCLIC_RUNABLE(cal::CalM, calib_mgr, cycle100, 500, 10000)
 RTE_DEF_CYCLIC_RUNABLE_END
 
-RTE_DEF_INTERFACE_SR_START
-RTE_DEF_INTERFACE_SR(rte::Ifc_ClassifiedValues, ifc_classified_values)
-RTE_DEF_INTERFACE_SR(rte::Ifc_SignalTargetIntensities, ifc_signal_target_intensities)
-RTE_DEF_INTERFACE_SR(rte::Ifc_OnboardTargetIntensities, ifc_onboard_target_intensities)
-RTE_DEF_INTERFACE_SR(rte::Ifc_ExternalTargetIntensities, ifc_external_target_intensities)
-RTE_DEF_INTERFACE_SR_END
+RTE_DEF_PORT_SR_START
+RTE_DEF_PORT_SR_CONTAINER(rte::Ifc_ClassifiedValues, ifc_classified_values)
+RTE_DEF_PORT_SR_CONTAINER(rte::Ifc_SignalTargetIntensities, ifc_signal_target_intensities)
+RTE_DEF_PORT_SR_CONTAINER(rte::Ifc_OnboardTargetIntensities, ifc_onboard_target_intensities)
+RTE_DEF_PORT_SR_CONTAINER(rte::Ifc_ExternalTargetIntensities, ifc_external_target_intensities)
+RTE_DEF_PORT_SR_END
 
-RTE_DEF_INTERFACE_CS_START
-RTE_DEF_INTERFACE_CS(Ifc_Cal_Signal         , ifc_cal_signal          , calib_mgr, &cal::CalM::get_signal)
-RTE_DEF_INTERFACE_CS(Ifc_Cal_InputClassifier, ifc_cal_input_classifier, calib_mgr, &cal::CalM::get_input_classifiers)
-RTE_DEF_INTERFACE_CS(Ifc_Rte_GetCommand, ifc_rte_get_cmd, input_command, &signal::InputCommand::getCmd)
-RTE_DEF_INTERFACE_CS_END
+RTE_DEF_PORT_CS_START
+RTE_DEF_PORT_CS(Ifc_Cal_Signal         , ifc_cal_signal          , calib_mgr, &cal::CalM::get_signal)
+RTE_DEF_PORT_CS(Ifc_Cal_InputClassifier, ifc_cal_input_classifier, calib_mgr, &cal::CalM::get_input_classifiers)
+RTE_DEF_PORT_CS(Ifc_Rte_GetCommand, ifc_rte_get_cmd, input_command, &signal::InputCommand::getCmd)
+RTE_DEF_PORT_CS_END
 
 RTE_DEF_END

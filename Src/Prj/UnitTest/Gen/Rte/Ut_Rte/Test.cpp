@@ -37,26 +37,45 @@ TEST(Ut_Rte, init_and_run_1)
 {
   Arduino_Stub_MicrosReturnValue = 0;
   rte::start();
-  EXPECT_EQ(rte::a1.ulCalls, static_cast<uint32>(0));
-  EXPECT_EQ(rte::b1.ulCalls, static_cast<uint32>(0));
+  EXPECT_EQ(rte::a1.ulCallsInit, static_cast<uint32>(1));
+  EXPECT_EQ(rte::a1.ulCallsCyc, static_cast<uint32>(0));
+  EXPECT_EQ(rte::b1.ulCallsCyc, static_cast<uint32>(0));
   rte::exec();
-  EXPECT_EQ(rte::a1.ulCalls, static_cast<uint32>(1));
-  EXPECT_EQ(rte::b1.ulCalls, static_cast<uint32>(0));
+  EXPECT_EQ(rte::a1.ulCallsCyc, static_cast<uint32>(1));
+  EXPECT_EQ(rte::b1.ulCallsCyc, static_cast<uint32>(0));
   Arduino_Stub_MicrosReturnValue = 1000U;
   rte::exec();
-  EXPECT_EQ(rte::a1.ulCalls, static_cast<uint32>(1));
-  EXPECT_EQ(rte::b1.ulCalls, static_cast<uint32>(1));
+  EXPECT_EQ(rte::a1.ulCallsCyc, static_cast<uint32>(1));
+  EXPECT_EQ(rte::b1.ulCallsCyc, static_cast<uint32>(1));
   Arduino_Stub_MicrosReturnValue = 10000U;
   rte::exec();
-  EXPECT_EQ(rte::a1.ulCalls, static_cast<uint32>(2));
-  EXPECT_EQ(rte::b1.ulCalls, static_cast<uint32>(1));
+  EXPECT_EQ(rte::a1.ulCallsCyc, static_cast<uint32>(2));
+  EXPECT_EQ(rte::b1.ulCallsCyc, static_cast<uint32>(1));
   Arduino_Stub_MicrosReturnValue = 20000U;
   rte::exec();
-  EXPECT_EQ(rte::a1.ulCalls, static_cast<uint32>(3));
-  EXPECT_EQ(rte::b1.ulCalls, static_cast<uint32>(1));
+  EXPECT_EQ(rte::a1.ulCallsCyc, static_cast<uint32>(3));
+  EXPECT_EQ(rte::b1.ulCallsCyc, static_cast<uint32>(1));
   Arduino_Stub_MicrosReturnValue = 21000U;
   rte::exec();
-  EXPECT_EQ(rte::a1.ulCalls, static_cast<uint32>(3));
-  EXPECT_EQ(rte::b1.ulCalls, static_cast<uint32>(2));
+  EXPECT_EQ(rte::a1.ulCallsCyc, static_cast<uint32>(3));
+  EXPECT_EQ(rte::b1.ulCallsCyc, static_cast<uint32>(2));
 }
 
+// --------------------------------------------------------------------------------------------
+/// Test case for SR interface
+/// - write to a SR port
+/// - read from a SR port
+// --------------------------------------------------------------------------------------------
+TEST(Ut_Rte, interface_sr_1)
+{
+  uint32_t ulVal;
+
+  Arduino_Stub_MicrosReturnValue = 0;
+  rte::start();
+  EXPECT_EQ(rte::ifca::write(1U), rte::ret_type::OK);
+  EXPECT_EQ(rte::ifca::read(ulVal), rte::ret_type::OK);
+  EXPECT_EQ(ulVal, 1U);
+  EXPECT_EQ(rte::ifca::write(1000U), rte::ret_type::OK);
+  EXPECT_EQ(rte::ifca::read(ulVal), rte::ret_type::OK);
+  EXPECT_EQ(ulVal, 1000U);
+}

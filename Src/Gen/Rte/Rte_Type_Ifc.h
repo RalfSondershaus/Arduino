@@ -3,9 +3,9 @@
  *
  * @descr generic classes for RTE interfaces
  *        - ifc_base
- *        - ifc_sr      (Sender Receiver)
- *        - ifc_sr_cal  (Sender Receiver for calibration data)
- *        - ifc_cs      (Client Server)
+ *        - ifc_sr        (Sender Receiver)
+ *        - ifc_sr_array  (Sender Receiver for container types)
+ *        - ifc_cs        (Client Server)
  *
  * @copyright Copyright 2020 - 2022 Ralf Sondershaus
  *
@@ -52,17 +52,15 @@ namespace rte
     typedef ifc_base Base;
     typedef T data_type;
     typedef ifc_sr<data_type> This;
-    typedef typename Base::ret_type ret_type;
-
+    using ret_type = typename Base::ret_type ;
+  
+  protected:
     data_type mData;
 
   public:
     /// Read and write data. Default implementation uses operator=. 
     ret_type read (      data_type& t) const { t = mData; return Base::OK; }
     ret_type write(const data_type& t)       { mData = t; return Base::OK; }
-    /// get reference to stored data
-    const data_type& ref() const noexcept { return mData; }
-    data_type& ref() noexcept { return mData; }
   };
 
   // ----------------------------------------------------------
@@ -81,8 +79,10 @@ namespace rte
     using size_type = typename array_type::size_type;
     using ret_type = typename Base::ret_type;
 
+  protected:
     array_type mData;
 
+  public:
     /// Helper class: non const iterator
     class iterator
     {
@@ -121,9 +121,8 @@ namespace rte
     ret_type writeElement(size_type pos, const value_type& v) { mData.at(pos) = v; return Base::OK; }
     /// size
     size_type size() const { return mData.size(); }
-    /// get reference to stored data
-    const array_type& ref() const noexcept { return mData; }
-    array_type& ref() noexcept { return mData; }
+    /// Returns true if pos is a valid index (is within boundaries)
+    bool boundaryCheck(size_type pos) const { return pos < size(); }
   };
 
   // ----------------------------------------------------------
@@ -159,7 +158,7 @@ namespace rte
     /// Server function
     ret_type call(Args... args) { return CALL_MEMBER_FUNC(obj, func)(args...); }
   };
-
+#if 0
   // ----------------------------------------------------------
   /// Client Server interface. Partial specialization for the important use case of a
   /// member function without parameters.
@@ -193,6 +192,7 @@ namespace rte
     /// Server function
     ret_type call() { return CALL_MEMBER_FUNC(obj, func)(); }
   };
+#endif
 
 } // namespace rte
 

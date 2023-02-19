@@ -31,7 +31,8 @@ namespace signal
   // -----------------------------------------------------------------------------------
   void InputClassifier::init()
   {
-    const cal::input_classifier_cal_type * pCal = rte::ifc_cal_input_classifier.call();
+    const cal::input_classifier_cal_type * pCal = rte::ifc_cal_input_classifier::call();
+    //const cal::input_classifier_cal_type * pCal = rte::Ifc_Cal_InputClassifier::call();
     classifiers.set_config(pCal);
   }
 
@@ -42,6 +43,6 @@ namespace signal
   {
     classifiers.run();
 
-    (void)rte::write(rte::ifc_classified_values, classifiers.classified_values());
+    rte::ifc_classified_values::write(classifiers.classified_values());
   }
 }
