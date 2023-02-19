@@ -63,6 +63,7 @@ static void PreTest()
 
 // ------------------------------------------------------------------------------------------------
 /// Test if aspects and dim ramps are ok for
+/// - Commands from classifiers
 /// - Start with default (init) aspect
 /// - Switch to green
 /// - Switch to red
@@ -82,7 +83,7 @@ TEST(Ut_Signal, Default_Green_Red)
     int nPin;      // input pin for AD value
     int nAdc;     // current AD value for pin
     cmd_type cmd; // expected value: command on RTE
-    signal_target_array curs; // expected value: target onboard intensities
+    signal_target_array au8Curs; // expected value: target onboard intensities
   } step_type;
 
   const step_type aSteps[] =
@@ -162,15 +163,16 @@ TEST(Ut_Signal, Default_Green_Red)
     Arduino_Stub_MillisReturnValue = aSteps[nStep].ms;
     Arduino_Stub_MicrosReturnValue = 1000U * Arduino_Stub_MillisReturnValue;
     rte::exec();
-    rte::cmd_type cmd = rte::ifc_rte_get_cmd.call(in);
+    rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
-    for (size_type i = 0U; i < aSteps[nStep].curs.size(); i++)
+    for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
-      const int nIdx = rte::calib_mgr.signals[kSignalId].targets[i].idx;
-      auto OnboardIntensities = rte::ifc_onboard_target_intensities.ref();
-      log << std::setw(3) << (int)OnboardIntensities.at(nIdx) << ", ";
-      EXPECT_EQ(OnboardIntensities.at(nIdx), aSteps[nStep].curs[i]);
+      rte::intensity8_t u8Intensity;
+      rte::Ifc_OnboardTargetIntensities::size_type pos = static_cast<rte::Ifc_OnboardTargetIntensities::size_type>(rte::calib_mgr.signals[kSignalId].targets[i].idx);
+      EXPECT_EQ(rte::ifc_onboard_target_intensities::readElement(pos, u8Intensity), rte::ret_type::OK);
+      log << std::setw(3) << (int)u8Intensity << ", ";
+      EXPECT_EQ(u8Intensity, aSteps[nStep].au8Curs[i]);
     }
     log << std::endl;
   }
