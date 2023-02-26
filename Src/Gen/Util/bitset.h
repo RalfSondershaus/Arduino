@@ -89,10 +89,11 @@ namespace util
     template<size_t NBITS>
     static constexpr tWord hiword_nr_bits() noexcept { return static_cast<tWord>(NWORDS * bits_per_word() - NBITS); }
 
-    constexpr tWord& ref_word(size_t pos) noexcept { return aWords[which_word(pos)]; }
-    constexpr tWord  get_word(size_t pos) const noexcept { return aWords[which_word(pos)]; }
-              tWord& hiword() noexcept { return aWords[NWORDS - 1]; }
-    constexpr tWord  hiword() const noexcept { return aWords[NWORDS - 1]; }
+          tWord& ref_word(size_t pos) noexcept { return aWords[which_word(pos)]; }
+    const tWord& ref_word(size_t pos) const noexcept { return aWords[which_word(pos)]; }
+          tWord  get_word(size_t pos) const noexcept { return aWords[which_word(pos)]; }
+          tWord& hiword() noexcept { return aWords[NWORDS - 1]; }
+    const tWord& hiword() const noexcept { return aWords[NWORDS - 1]; }
 
     template<size_t NBITS>
     bool all() const noexcept

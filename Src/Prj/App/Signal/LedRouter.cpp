@@ -66,31 +66,6 @@ namespace signal
   }
 
   // -----------------------------------------------------------------------------------
-  /// Sets calibration data
-  // -----------------------------------------------------------------------------------
-  //void LedRouter::set_cal(cal_const_pointer p)
-  //{
-  //  pCal = p;
-
-  //  if (p != nullptr)
-  //  {
-  //    auto calit = p->begin();
-  //    for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
-  //    {
-  //      sigit->set_cal(calit);
-  //      calit++;
-  //    }
-  //  }
-  //  else
-  //  {
-  //    for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
-  //    {
-  //      sigit->set_cal(nullptr);
-  //    }
-  //  }
-  //}
-
-  // -----------------------------------------------------------------------------------
   /// For the pos-th signal, map intensities and speed from RTE signal values to internal onboard or external values.
   /// @param pos [0 ... cfg::kNrSignals-1] signal id
   /// @param pCal pointer to calibration data of pos-th signal, must not be nullptr
@@ -114,7 +89,6 @@ namespace signal
   void LedRouter::mapSignals()
   {
     const cal::signal_cal_type * pCal = rte::ifc_cal_signal::call();
-    //const cal::signal_cal_type * pCal = rte::Ifc_Cal_Signal::call();
     size_type pos;
 
     if (cal_signal_valid(pCal))

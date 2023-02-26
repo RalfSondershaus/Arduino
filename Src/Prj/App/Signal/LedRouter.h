@@ -50,9 +50,6 @@ namespace signal
     typedef util::array<ramp_type, cfg::kNrExternalTargets> ramp_external_array_type;
     typedef util::array<dimtime8_10ms_type, cfg::kNrOnboardTargets> dimtime_onboard_array_type;
     typedef util::array<dimtime8_10ms_type, cfg::kNrExternalTargets> dimtime_external_array_type;
-    //typedef util::array<Signal, cfg::kNrSignals> signal_array_type;
-    //typedef const cal::signal_cal_type * cal_const_pointer;
-
 
   protected:
 
@@ -76,7 +73,7 @@ namespace signal
     void mapSignals();
     void mapSignal(size_type pos, const cal::signal_type * pCal);
 
-    /// Initialize ramp for tgt with given intensity and time if intensity and time differ from current tamp target values.
+    /// Initialize ramp for tgt with given intensity and time if intensity and time differ from current ramp target values.
     void setIntensitySpeed(const target_type tgt, const intensity8_type intensity, const dimtime8_10ms_type time);
 
   public:

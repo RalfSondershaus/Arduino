@@ -82,6 +82,7 @@ namespace rte
   // -----------------------------------------------------------------------------------
   typedef rte::ifc_cs<const cal::signal_cal_type *          , cal::CalM> Ifc_Cal_Signal;
   typedef rte::ifc_cs<const cal::input_classifier_cal_type *, cal::CalM> Ifc_Cal_InputClassifier;
+  typedef rte::ifc_cs<const cal::led_cal_type *             , cal::CalM> Ifc_Cal_Led;
 
   // -----------------------------------------------------------------------------------
   /// CS interface for commands

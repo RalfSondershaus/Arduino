@@ -1,7 +1,7 @@
 /**
- * @file Signal/InputClassifier.cpp
+ * @file Signal/CddLed.h
  *
- * @brief Read AD values, classify and write classified value onto RTE
+ * @brief Driver for LEDs
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -18,30 +18,33 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#include "InputClassifier.h"
-#include "Cfg_Prj.h"
-#include <Rte/Rte.h>
-#include <Arduino.h>
+#ifndef CDD_LED_H_
+#define CDD_LED_H_
 
-namespace signal
+#include <Rte/Rte_Type.h>
+
+namespace cdd
 {
-  
   // -----------------------------------------------------------------------------------
-  /// Init at system start
+  /// 
   // -----------------------------------------------------------------------------------
-  void InputClassifier::init()
+  class CddLed
   {
-    const cal::input_classifier_cal_type * pCal = rte::ifc_cal_input_classifier::call();
-    classifiers.set_config(pCal);
-  }
+  public:
+    using intensity8_type = rte::intensity8_t;
+    using intensity16_type = rte::intensity16_t;
 
-  // -----------------------------------------------------------------------------------
-  /// Read AD values, classify and write classified values onto the RTE.
-  // -----------------------------------------------------------------------------------
-  void InputClassifier::cycle()
-  {
-    classifiers.run();
+  protected:
+    void writeOutputs();
 
-    rte::ifc_classified_values::write(classifiers.classified_values());
-  }
-}
+  public:
+    CddLed() = default;
+
+    /// Runables
+    void init();
+    void cycle();
+
+  };
+} // namespace cdd
+
+#endif // CDD_LED_H_

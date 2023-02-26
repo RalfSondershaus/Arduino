@@ -35,7 +35,12 @@ namespace cal
     /// coding data for signals
     signal_cal_type signals;
     input_classifier_cal_type input_classifiers;
+    led_cal_type leds;
 
+  protected:
+    void calcLeds();
+
+  public:
     CalM();
 
     /// Init runable
@@ -46,6 +51,7 @@ namespace cal
     /// references to coding parameters
     const signal_cal_type *           get_signal()             { return &signals; }
     const input_classifier_cal_type * get_input_classifiers()  { return &input_classifiers; }
+    const led_cal_type *              get_leds()               { return &leds; }
   };
 
 } // namespace cal

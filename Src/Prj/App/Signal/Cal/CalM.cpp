@@ -24,7 +24,7 @@
 #include <Rte/Rte.h>
 #include <Arduino.h>
 
-#include "CalM_config.h"
+#include <Cal/CalM_config.h>
 
 namespace cal
 {
@@ -40,8 +40,33 @@ namespace cal
   // -----------------------------------------------
   /// Init runable
   // -----------------------------------------------
+  void CalM::calcLeds()
+  {
+    const signal_cal_type * pSignals = get_signal();
+    if (pSignals != nullptr)
+    {
+      // set all bits to zero
+      leds.reset();
+      for (auto it = pSignals->begin(); it != pSignals->end(); it++)
+      {
+        for (auto tgtit = it->targets.begin(); tgtit != it->targets.end(); tgtit++)
+        {
+          if (tgtit->type == target_type::kOnboard)
+          {
+            // set idx-th bit to one
+            leds.set(tgtit->idx);
+          }
+        }
+      }
+    }
+  }
+
+  // -----------------------------------------------
+  /// Init runable
+  // -----------------------------------------------
   void CalM::init()
   {
+    calcLeds();
   }
 
   // -----------------------------------------------

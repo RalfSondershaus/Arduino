@@ -11,3 +11,4 @@
 /Src/Prj/_Test/
 *_DEPRECATED*
 /.vs/
+Tmp/Arduino.log

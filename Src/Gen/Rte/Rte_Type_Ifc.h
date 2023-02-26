@@ -84,7 +84,7 @@ namespace rte
 
   public:
     /// Helper class: non const iterator
-    class iterator
+/*    class iterator
     {
     public:
       This& arr;
@@ -95,24 +95,27 @@ namespace rte
       value_type& operator*() { return arr.mData.at(pos); }
       bool operator!=(const iterator& it) { return pos != it.pos; }
       bool operator==(const iterator& it) { return pos == it.pos; }
-    };
+    };*/
     /// Helper class: const iterator
-    class const_iterator
+    /*class const_iterator
     {
     public:
+      using array_const_iterator = typename array_type::const_iterator;
+
       const This& arr;
-      size_type pos;
+      array_const_iterator cit;
+
     public:
-      const_iterator(const This& a, size_type p) : arr(a), pos(p) {}
-      void operator++() { pos++; }
-      const value_type& operator*() const { return arr.mData.at(pos); }
-      bool operator!=(const iterator& it) { return pos != it.pos; }
-      bool operator==(const iterator& it) { return pos == it.pos; }
-    };
+      const_iterator (const This& a, array_const_iterator it) : arr(a), cit(it) {}
+      void operator++() { cit++; }
+      const value_type& operator*() const { return *cit; }
+      bool operator!=(const const_iterator& it) { return it->cit != cit; }
+      bool operator==(const const_iterator& it) { return it->cit == cit; }
+    };*/
   public:
     /// array
-    iterator begin() { return iterator(*this, static_cast<size_type>(0U)); }
-    iterator end() { return iterator(*this, size()); }
+    //const_iterator begin() const noexcept { return const_iterator(*this, mData.begin()); }
+    //const_iterator end() const noexcept { return const_iterator(*this, mData.end()); }
     /// Read and write array. Default implementation uses operator=. 
     ret_type read(array_type& t) const { t = mData; return Base::OK; }
     ret_type write(const array_type& t) { mData = t; return Base::OK; }

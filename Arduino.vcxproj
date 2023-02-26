@@ -148,6 +148,7 @@
     <ClCompile Include="Src\Prj\App\BlinkSample\BlinkSample.cpp" />
     <ClCompile Include="Src\Prj\App\DccSniffer\DccSniffer.cpp" />
     <ClCompile Include="Src\Prj\App\Signal\Cal\CalM.cpp" />
+    <ClCompile Include="Src\Prj\App\Signal\CddLed.cpp" />
     <ClCompile Include="Src\Prj\App\Signal\InputClassifier.cpp" />
     <ClCompile Include="Src\Prj\App\Signal\InputCommand.cpp" />
     <ClCompile Include="Src\Prj\App\Signal\Sig.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="Src\Prj\App\Signal\Cal\CalM_config.h" />
     <ClInclude Include="Src\Prj\App\Signal\Cal\CalM_Type.h" />
     <ClInclude Include="Src\Prj\App\Signal\Cal\CalM_Type_Prj.h" />
+    <ClInclude Include="Src\Prj\App\Signal\CddLed.h" />
     <ClInclude Include="Src\Prj\App\Signal\Cfg_Prj.h" />
     <ClInclude Include="Src\Prj\App\Signal\InputClassifier.h" />
     <ClInclude Include="Src\Prj\App\Signal\InputCommand.h" />

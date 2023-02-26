@@ -1,4 +1,4 @@
-/**
+ /**
  * @file Rte_Cfg_Mac.h
  *
  * @author Ralf Sondershaus
@@ -407,6 +407,8 @@
     inline ifc_base::ret_type read(cls::array_type& param) { return obj.read(param); } \
     inline ifc_base::ret_type writeElement(cls::size_type pos, const cls::value_type& param) { return obj.writeElement(pos, param); } \
     inline ifc_base::ret_type readElement(cls::size_type pos, cls::value_type& param) { return obj.readElement(pos, param); } \
+    /*inline cls::const_iterator begin() { return obj.begin(); }*/ \
+    /*inline cls::const_iterator end() { return obj.end(); }*/ \
     inline bool boundaryCheck(cls::size_type pos) { return obj.boundaryCheck(pos); } \
     inline cls::size_type size() { return obj.size(); } \
   }

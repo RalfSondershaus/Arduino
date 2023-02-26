@@ -25,6 +25,7 @@
 #include <InputClassifier.h>
 #include <InputCommand.h>
 #include <LedRouter.h>
+#include <CddLed.h>
 #include <Signal.h>
 #include <Cal/CalM.h>
 
@@ -36,6 +37,7 @@ RTE_DEF_OBJ(signal::InputClassifier, input_classifier)
 RTE_DEF_OBJ(signal::LedRouter, led_router)
 RTE_DEF_OBJ(signal::SignalHandler, signal_handler)
 RTE_DEF_OBJ(signal::InputCommand, input_command)
+RTE_DEF_OBJ(cdd::CddLed, cddled)
 RTE_DEF_OBJ_END
 
 RTE_DEF_INIT_RUNABLE_START
@@ -61,6 +63,7 @@ RTE_DEF_PORT_SR_END
 RTE_DEF_PORT_CS_START
 RTE_DEF_PORT_CS(Ifc_Cal_Signal         , ifc_cal_signal          , calib_mgr, &cal::CalM::get_signal)
 RTE_DEF_PORT_CS(Ifc_Cal_InputClassifier, ifc_cal_input_classifier, calib_mgr, &cal::CalM::get_input_classifiers)
+RTE_DEF_PORT_CS(Ifc_Cal_Led,             ifc_cal_leds            , calib_mgr, &cal::CalM::get_leds)
 RTE_DEF_PORT_CS(Ifc_Rte_GetCommand, ifc_rte_get_cmd, input_command, &signal::InputCommand::getCmd)
 RTE_DEF_PORT_CS_END
 
