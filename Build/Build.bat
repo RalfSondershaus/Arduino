@@ -27,6 +27,10 @@ if "%3" == "msvc" (
   )
 )
 
+:: make -k (or --keep-going)
+::   Continue as much as possible after an error. While the target that failed, 
+::   and those that depend on it, cannot be remade, the other prerequisites of 
+::   these targets can be processed all the same.
 :: MS Visual Studio: current directory is project directory (Arduino.vcproj)
 cd Build
-make -s -f ./make/Makefile.gmk ARG_PROJECT=%1 ARG_TARGET_ECU=%2 ARG_COMPILER=%3 ARG_BUILD_BSW=%4 ARG_BUILD_BSW_TESTFRAMEWORK=%5 %6
+make -s -k -f ./make/Makefile.gmk ARG_PROJECT=%1 ARG_TARGET_ECU=%2 ARG_COMPILER=%3 ARG_BUILD_BSW=%4 ARG_BUILD_BSW_TESTFRAMEWORK=%5 %6

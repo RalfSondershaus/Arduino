@@ -113,7 +113,7 @@ namespace signal
           {
             intensity = static_cast<rte::intensity8_t>(rte::kIntensity8_0);
           }
-          // MSB of aspect is index 0 in target intensiry array
+          // MSB of aspect is index 0 in target intensity array
           // LSB of aspect is index cfg::kNrSignalTargets-1 in target intensity array
           intensities_tgt.intensities[static_cast<size_t>((cfg::kNrSignalTargets - 1U) - pos)] = intensity;
           intensities_tgt.changeOverTime = Signal::cal_getChangeOverTime(calit);
@@ -126,9 +126,8 @@ namespace signal
       }
     }
 
-    // Initialization is performed after the first call to this function
+    // Initialization is performed when this function is called for the first time
     bootstate = kInitialized;
   }
-
 
 } // namespace signal

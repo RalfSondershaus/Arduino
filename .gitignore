@@ -12,3 +12,8 @@
 *_DEPRECATED*
 /.vs/
 Tmp/Arduino.log
+Build/link.bat
+Install.txt
+Tmp/Arduino.log
+Tmp/Arduino.vcxprojAssemblyReference.cache
+Tmp/Arduino.log

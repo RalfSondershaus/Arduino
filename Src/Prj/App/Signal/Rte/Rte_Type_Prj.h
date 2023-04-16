@@ -47,19 +47,19 @@ namespace rte
   /// The AD classified values are written into an array of this type
   typedef util::array<cmd_type, cfg::kNrClassifiers> classified_values_array;
 
-  /// Target intensities for a signal
+  /// Target intensities for one signal
   typedef struct
   {
     util::array<intensity8_t, cfg::kNrSignalTargets> intensities;
     uint8 changeOverTime; ///< [10 ms] dim time if aspect changes
   } signal_intensity_type;
 
-  /// Target intensities for each signal
+  /// Target intensities for all signals
   typedef util::array<signal_intensity_type, cfg::kNrSignals> signal_intensity_array_type;
 
   /// The target intensities are written into an array of this type
-  typedef util::array<intensity8_t, cfg::kNrOnboardTargets> onboard_intensity_array;
-  typedef util::array<intensity8_t, cfg::kNrExternalTargets> external_intensity_array;
+  typedef util::array<intensity8_t, cfg::kNrOnboardTargets> onboard_target_array;
+  typedef util::array<intensity8_t, cfg::kNrExternalTargets> external_target_array;
 
   // -----------------------------------------------------------------------------------
   /// SR interface for classified values
@@ -72,10 +72,10 @@ namespace rte
   typedef rte::ifc_sr_array< signal_intensity_array_type> Ifc_SignalTargetIntensities;
 
   // -----------------------------------------------------------------------------------
-  /// SR interface for target intensities
+  /// SR interface for onboard and external target intensities
   // -----------------------------------------------------------------------------------
-  typedef rte::ifc_sr_array<onboard_intensity_array> Ifc_OnboardTargetIntensities;
-  typedef rte::ifc_sr_array<external_intensity_array> Ifc_ExternalTargetIntensities;
+  typedef rte::ifc_sr_array<onboard_target_array> Ifc_OnboardTargetIntensities;
+  typedef rte::ifc_sr_array<external_target_array> Ifc_ExternalTargetIntensities;
 
   // -----------------------------------------------------------------------------------
   /// CS interface for calibration values

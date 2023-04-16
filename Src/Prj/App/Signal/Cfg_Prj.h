@@ -37,6 +37,14 @@ namespace cfg
   constexpr int kNrOnboardTargets = 54; ///< We support up to 54 onboard LED targets (some of them with PWM))
   constexpr int kNrExternalTargets = 32; ///< We support up to 32 external outputs (such as 4 shift registers with 8 bit each)
   constexpr int kNrTargets = kNrOnboardTargets + kNrExternalTargets;
+  /// Number of bits that are required to store numbers from 0 ... max(kNrOnboardTargets, kNrExternalTargets)
+  /// and the corresponding power of two.
+  /// TODO: Can be replaced by a macro
+  /// If kCalTgtNrBits > 6, you need to modify the base type of cal::target_type (which is currently uint8)
+  /// because 2 bits are required beside kCalTgtNrBits.
+  constexpr uint8 kCalTgtNrBits = 6U;
+  constexpr uint8 kCalTgtNrBitsPinsPow2 = 64U;
+
 } // namespace cfg
 
 #endif // CFG_PRJ_H_

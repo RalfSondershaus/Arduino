@@ -26,6 +26,50 @@
 #
 # Command           such as all, clean, program
 #
+# GnuWin32: make 3.81
+# https://sourceforge.net/projects/getgnuwin32/
+#
+# MinGW
+# gcc, via msys 1.0: awk, sed, make 3.81, several shells
+# https://sourceforge.net/projects/mingw/
+# A native Windows port of the GNU Compiler Collection (GCC), with freely distributable import 
+# libraries and header files for building native Windows applications; includes extensions to the 
+# MSVC runtime to support C99 functionality. All of MinGW's software will execute on the 64bit 
+# Windows platforms
+# CI support: 
+#   Github actions (https://github.com/marketplace/actions/install-mingw) (uses: egor-tensin/setup-mingw@v2)
+#
+# CMake
+# https://sourceforge.net/projects/cmake.mirror/
+#
+# MSYS2
+# gcc, avr-gcc, ..., make 4.4, sed, awk, several shells, version depends on package
+# https://www.msys2.org/
+# MSYS2 is a collection of tools and libraries providing you with an easy-to-use environment 
+# for building, installing and running native Windows software.
+# You need to install packages in a MSYS2 shell.
+# CI support: 
+#   Gihhub actions (https://www.msys2.org/docs/ci/) (uses: msys2/setup-msys2@v2)
+#   Others
+# Examples:
+#   $ pacman -S make
+#   $ pacman -S mingw-w64-ucrt-x86_64-gcc
+#   $ pacman -S mingw-w64-clang-x86_64-avr-gcc
+# Search for packages:
+#   $ pacman -Ss <search string>
+#   $ pacman -Ss AVR
+# W:\tools\msys2\usr\bin
+# 
+# Bazel
+# https://sourceforge.net/projects/bazel.mirror/
+#
+# WinAVR
+# gcc 4.33, make 3.81, sed
+# https://winavr.sourceforge.net/
+# https://sourceforge.net/projects/winavr/
+# Latest update: 2010 - not updated anymore?
+# WinAVR (tm) is a suite of executable, open source software development tools for the Atmel AVR 
+# series of RISC microprocessors hosted on the Windows platform. Includes the GNU GCC compiler for C and C++.
 
 # TARGET_ECU          such as mega, uno, Win32, Win64
 # TARGET_MCU_FAMILY   such as ARM, AVR, X86, X64
@@ -53,7 +97,7 @@ PATH_BUILD                  = .
 PATH_TMP                    = $(PATH_BUILD)/Tmp
 PATH_BIN                    = $(PATH_BUILD)/Bin
 PATH_ERR                    = $(PATH_BUILD)/Tmp
-PATH_TOOLS                  = $(PATH_BUILD)/../../Tools
+PATH_TOOLS                  = $(PATH_BUILD)/../../../Tools
 PATH_SRC                    = $(PATH_BUILD)/../Src
 PATH_SRC_PRJ                = $(PATH_SRC)/Prj
 PATH_SRC_GEN                = $(PATH_SRC)/Gen
@@ -71,6 +115,7 @@ PATH_BUILD_BSW              = $(PATH_BUILD_MAKE)/Gen/Bsw
 PATH_BUILD_RULES            = $(PATH_BUILD_MAKE)/Gen/Rules
 PATH_BUILD_PRJ              = $(PATH_BUILD_MAKE)/Prj
 PATH_AVRGNU                 = $(PATH_TOOLS)/avr8-gnu-toolchain/3.7.0.1796
+#PATH_AVRGNU                 = $(PATH_TOOLS)/msys2/clang64
 PATH_AVRDUDE                = $(PATH_TOOLS)/avrdude
 PATH_OBJ                    = $(PATH_TMP)
 # Remark: Arduino core location in Arduino IDE: /hardware/arduino/avr
@@ -79,23 +124,16 @@ PATH_OBJ                    = $(PATH_TMP)
 # ---------------------------------------------------
 # Tools
 # ---------------------------------------------------
-AVRGCC  = $(PATH_AVRGNU)/bin/avr-gcc
+AVRGCC  = avr-gcc
 OBJCOPY = $(PATH_AVRGNU)/bin/avr-objcopy
 SIZE    = $(PATH_AVRGNU)/bin/avr-size
 AVRDUDE = $(PATH_AVRDUDE)/bin/avrdude
+CAT		= cat
 CL      = cl
-RM      = del
+RM      = rm
 RMDIR   = del
-SED     = $(PATH_TOOLS)/GNU/sed
-AWK     = $(PATH_TOOLS)/GNU/awk
-
-AVRGCC  := $(subst /,\,$(AVRGCC))
-OBJCOPY := $(subst /,\,$(OBJCOPY))
-SIZE    := $(subst /,\,$(SIZE))
-RM      := $(subst /,\,$(RM))
-RMDIR   := $(subst /,\,$(RMDIR))
-SED     := $(subst /,\,$(SED))
-AWK     := $(subst /,\,$(AWK))
+SED     = sed
+AWK     = awk
 
 # ---------------------------------------------------
 # Clear source files and compiler flags.
@@ -181,8 +219,8 @@ TARGET_FILENAME_BASE = $(PATH_BIN)/$(PROJECT_NAME)
 # ---------------------------------------------------
 C_INCLUDES := $(C_INCLUDES)          \
               $(C_INCLUDES_PRJ)      \
-              $(C_INCLUDES_GEN)      \
-              $(C_INCLUDES_COMPILER)
+              $(C_INCLUDES_GEN)
+#              $(C_INCLUDES_COMPILER)
 
 # ---------------------------------------------------
 # Flags for tools
@@ -280,23 +318,52 @@ endif
 # Implicit rules are not used, instead pattern rules with %.c are used, see below
 .SUFFIXES:
 
-all: PrintIncludePaths $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
+all: PrintCompiler PrintIncludePaths $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
 
 rebuild: clean PrintIncludePaths all
 
+# sed is used instead of subst because some make implementations cannot replace $(SolutionDir).
+# Comments on sed: 
+#   The s Command: 
+#     The syntax of the s command is ‘s/regexp/replacement/flags'
+#     The / characters may be uniformly replaced by any other single character within any given s command.
+#     g: Apply the replacement to all matches to the regexp, not just the first.
 .PHONY: PrintIncludePaths
 PrintIncludePaths:
 	@echo ++++++ include paths ++++++
 	@echo $(C_INCLUDES)
-	@echo $(subst $(SPACE),,$(addsuffix ;,$(subst -I./../,$(DOLLAR)(SolutionDir),$(C_INCLUDES))))
+	@echo ++++++ include paths for Visual Studio browsing ++++++
+	@echo $(C_INCLUDES) | $(SED) s:-I./../:\$(DOLLAR)\(SolutionDir\)\:g | $(SED) s:' ':\;:g
+
+.PHONY: PrintCompiler
+PrintCompiler:
+	@echo ++++++ compiler information ++++++
+	@echo $(CC)
+	$(CC) $(CFLAGS) $(LFLAGS) -v
 
 .PHONY: clean
 clean:
-	@-if exist $(PATH_BIN)/*.elf $(RM) $(subst /,\,$(PATH_BIN)/*.elf)
-	@-if exist $(PATH_BIN)/*.hex $(RM) $(subst /,\,$(PATH_BIN)/*.hex)
-	@-if exist $(PATH_BIN)/*.exe $(RM) $(subst /,\,$(PATH_BIN)/*.exe)
-	@-if exist $(PATH_TMP)       $(RM) $(subst /,\,$(PATH_TMP)/*.$(OBJ_FILENAME_EXT))
-	@-if exist $(PATH_TMP)       $(RM) $(subst /,\,$(PATH_TMP)/*.d  )
+	@echo ++++++ cleaning ++++++
+ifneq ($(wildcard $(PATH_BIN)/*.elf),)
+	@echo remove $(PATH_BIN)/*.elf
+	@$(RM) $(PATH_BIN)/*.elf
+endif
+ifneq ($(wildcard $(PATH_BIN)/*.hex),)
+	@echo remove $(PATH_BIN)/*.hex
+	$(RM) $(PATH_BIN)/*.hex
+endif
+ifneq ($(wildcard $(PATH_BIN)/*.exe),)
+	@echo remove $(PATH_BIN)/*.exe
+	@$(RM) $(PATH_BIN)/*.exe
+endif
+ifneq ($(wildcard $(PATH_TMP)/*.$(OBJ_FILENAME_EXT)),)
+	@echo remove $(PATH_TMP)/*.$(OBJ_FILENAME_EXT)
+	@$(RM) $(PATH_TMP)/*.$(OBJ_FILENAME_EXT)
+endif
+ifneq ($(wildcard $(PATH_TMP)/*.d),)
+	@echo remove $(PATH_TMP)/*.d
+	@$(RM) $(PATH_TMP)/*.d
+endif
 
 .PHONY: size
 size:

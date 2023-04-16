@@ -477,9 +477,9 @@
     <NMakeCleanCommandLine>./Build/Build App/Signal mega avrgcc arduino none clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>./Build/Build App/Signal mega avrgcc arduino none rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
-    <OutDir>.\Bin</OutDir>
-    <IntDir>.\Tmp</IntDir>
-    <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/AVR/avrgcc;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Prj/App/Signal;$(SolutionDir)Src/Gen;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
+    <OutDir>.\Build\Bin</OutDir>
+    <IntDir>.\Build\Tmp</IntDir>
+    <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/AVR/avrgcc;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Prj/App/Signal;$(SolutionDir)Src/Gen;$(SolutionDir)../../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)../../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)../../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include</IncludePath>
     <NMakeOutput>./Build/Bin/Signal.elf</NMakeOutput>
     <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/AVR/avrgcc;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Prj/App/Signal;$(SolutionDir)Src/Gen;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include</NMakeIncludeSearchPath>
   </PropertyGroup>

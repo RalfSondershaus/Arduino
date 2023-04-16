@@ -26,6 +26,20 @@ namespace signal
 {
 
   // -----------------------------------------------------------------------------------
+  /// Calculate dim ramps
+  // -----------------------------------------------------------------------------------
+  void LedRouter::doRamps()
+  {
+    rte::Ifc_OnboardTargetIntensities::size_type pos = static_cast<rte::Ifc_OnboardTargetIntensities::size_type>(0);
+
+    for (auto it = ramps_onboard.begin(); it != ramps_onboard.end(); it++)
+    {
+      rte::ifc_onboard_target_intensities::writeElement(pos, scale_16_8(it->step()));
+      pos++;
+    }
+  }
+
+  // -----------------------------------------------------------------------------------
   /// Initialize ramp for tgt with given intensity and time if intensity and time differ from current tamp target values.
   // -----------------------------------------------------------------------------------
   void LedRouter::setIntensitySpeed(const target_type tgt, const intensity8_type intensity, const dimtime8_10ms_type time)
@@ -48,20 +62,6 @@ namespace signal
       break;
     default:
       break;
-    }
-  }
-
-  // -----------------------------------------------------------------------------------
-  /// Calculate dim ramps
-  // -----------------------------------------------------------------------------------
-  void LedRouter::doRamps()
-  {
-    rte::Ifc_OnboardTargetIntensities::size_type pos = static_cast<rte::Ifc_OnboardTargetIntensities::size_type>(0);
-
-    for (auto it = ramps_onboard.begin(); it != ramps_onboard.end(); it++)
-    {
-      rte::ifc_onboard_target_intensities::writeElement(pos, scale_16_8(it->step()));
-      pos++;
     }
   }
 

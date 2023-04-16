@@ -28,11 +28,6 @@
 
 namespace cal
 {
-  /// Number of bits that are used as pin index and the corresponding number of bits
-  /// if each pin index has a bit in a bit field
-  constexpr uint8_t kCalNrBitsPins = 6U;
-  constexpr uint8_t kCalNrBitsPinsPow2 = 64U;
-
   /// Define inputs: classified AD values, commands received via busses (such as DCC), etc
   typedef struct
   {
@@ -55,8 +50,8 @@ namespace cal
       kExternal = 2
     };
 
-    uint8 type : (8U - kCalNrBitsPins); ///< type of target such as kNone, kOnboard, kExternal
-    uint8 idx  : (kCalNrBitsPins);      ///< output pin number
+    uint8 type : (8U - cfg::kCalTgtNrBits); ///< type of target such as kNone, kOnboard, kExternal
+    uint8 idx  : (cfg::kCalTgtNrBits);      ///< output pin number
   } target_type;
 
   /// Define signal target intensities
@@ -85,7 +80,7 @@ namespace cal
 
   /// Calibration data type for LED complex device drivers
   /// A bit for each pin: 1 = is output, 0 = is not output
-  typedef util::bitset<uint32_t, kCalNrBitsPinsPow2> led_output_rw_type;
+  typedef util::bitset<uint32_t, cfg::kCalTgtNrBits> led_output_rw_type;
   using led_cal_type = led_output_rw_type;
 
 } // namespace cal

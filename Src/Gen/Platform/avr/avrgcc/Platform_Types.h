@@ -18,7 +18,7 @@
 #ifndef PLATFORM_TYPES_H
 #define PLATFORM_TYPES_H
 
-// AVR GCC doesn't seem to have C++ standard headers, so we use C standard headers instead.
+// Atmel's AVR GCC version doesn't have C++ standard headers, so we use C standard headers instead.
 #include <stdint.h>
 #include <stddef.h> // size_t
 

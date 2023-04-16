@@ -1,6 +1,14 @@
 # 
 # Makefile for rules
 #
+# batch operator > redirects standard output to a file
+# batch operator 2> redirects standard output and error output to a file
+#
+# To ignore errors in a recipe line, write a ‘-’ at the beginning of the line’s text 
+# (after the initial tab). The ‘-’ is discarded before the line is passed to the shell for execution
+#
+# Remove source file prefixes ./../ in order to make VS find the source files:
+# $(SED) s:./../::
 
 # ---------------------------------------------------
 # AVR GCC
@@ -17,13 +25,15 @@ $(TARGET_FILENAME_BASE).hex: $(TARGET_FILENAME_BASE).elf
 $(PATH_OBJ)/%.o: %.c
 	@echo +++++ compile $< to $@
 	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
-	@-$(AWK) -f $(subst /,\,$(PATH_TOOLS/GNU/gccerror.awk)) $(PATH_ERR)/$(basename $(@F)).err
+	@-$(CAT) $(PATH_ERR)/$(basename $(@F)).err | $(SED) s:./../::
+	# @-$(AWK) -f $(subst /,\,$(PATH_BUILD_MAKE)/gccerror.awk) $(PATH_ERR)/$(basename $(@F)).err
 
 $(PATH_OBJ)/%.o: %.cpp
 	@echo +++++ compile $< to $@
 	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
-	@$(AWK) -f $(PATH_TOOLS)/GNU/gccerror.awk $(PATH_ERR)/$(basename $(@F)).err
-   
+	@-$(CAT) $(PATH_ERR)/$(basename $(@F)).err | $(SED) s:./../::
+	# @-$(AWK) -f $(PATH_BUILD_MAKE)/gccerror.awk $(PATH_ERR)/$(basename $(@F)).err
+
 # ---------------------------------------------------
 # MSVC
 # ---------------------------------------------------
