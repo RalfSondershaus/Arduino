@@ -1,7 +1,7 @@
 # 
 # Makefile for Arduino projects
 #
-# Cannot handle pathes with blanks, e.g. C:/Program Files/...
+# Cannot handle pathes with spaces such as C:/Program Files/...
 # Mount such directories as network drives:
 # - Right click on "This PC" in Windows explorer
 # - Click "Mount network drive"
@@ -9,7 +9,7 @@
 #
 # Arguments for make:
 #
-# ARG_PROJECT       name of the project, such as BlinkSample or UnitTest/Gen/Dcc/Ut_Packet
+# ARG_PROJECT       name of the project, such as App/BlinkSample or UnitTest/Gen/Dcc/Ut_Packet
 #                   The path to the project files is ./Prj/$(ARG_PROJECT)
 #
 # ARG_TARGET_ECU    name of the target ECU
@@ -18,11 +18,11 @@
 # ARG_COMPILER      name of the compiler
 #                   supported: avr_gcc, msvc
 #
-# ARG_BUILD_BSW                   base software that is required by the project
-#                                 supported: arduino, arduino_win32, none
+# ARG_BSW               base software that is required by the project
+#                       supported: arduino, arduino_win32, none
 #
-# ARG_BUILD_BSW_TESTFRAMEWORK     test framework that is required by the project
-#                                 supported: googletest, none
+# ARG_TESTFRAMEWORK     test framework that is required by the project
+#                       supported: googletest, none
 #
 # Command           such as all, clean, program
 #
@@ -70,11 +70,20 @@
 # Latest update: 2010 - not updated anymore?
 # WinAVR (tm) is a suite of executable, open source software development tools for the Atmel AVR 
 # series of RISC microprocessors hosted on the Windows platform. Includes the GNU GCC compiler for C and C++.
+#
+# Using the Visual Studio Test-Explorert for unit test browsing
+# - Install the Google test adapter
+# - Run the unit test program once
+# - If the test-explorer does not show the unit tests, select another build configuration,
+#   compile it, select the unit test build configuration again and compile and run it again.
+#
 
 # TARGET_ECU          such as mega, uno, Win32, Win64
 # TARGET_MCU_FAMILY   such as ARM, AVR, X86, X64
 # TARGET_MCU_VARIANT  such as M4F, M0PLUS, AVtiny, mega (AVmega),
 # TARGET_MCU_DEVICE   such as atmega2560, atmega328p
+
+SHELL = /bin/bash
 
 # target platform: MCU family plus compiler
 
@@ -93,12 +102,13 @@ SPACE   = $(EMPTY) $(EMPTY)
 # ---------------------------------------------------
 # Pathes
 # ---------------------------------------------------
-PATH_BUILD                  = .
+PATH_ROOT					= .
+PATH_BUILD                  = $(PATH_ROOT)/Build
 PATH_TMP                    = $(PATH_BUILD)/Tmp
 PATH_BIN                    = $(PATH_BUILD)/Bin
 PATH_ERR                    = $(PATH_BUILD)/Tmp
-PATH_TOOLS                  = $(PATH_BUILD)/../../../Tools
-PATH_SRC                    = $(PATH_BUILD)/../Src
+PATH_TOOLS                  = $(PATH_ROOT)/../../Tools
+PATH_SRC                    = $(PATH_ROOT)/Src
 PATH_SRC_PRJ                = $(PATH_SRC)/Prj
 PATH_SRC_GEN                = $(PATH_SRC)/Gen
 PATH_SRC_ARDUINO_BASE       = $(PATH_SRC)/Gen/Arduino
@@ -110,13 +120,13 @@ PATH_SRC_GOOGLETEST         = $(PATH_SRC)/Gen/Test/googletest-main/googletest
 PATH_SRC_PRJ_PROJECT        = $(PATH_SRC_PRJ)/$(ARG_PROJECT)
 PATH_BUILD_MAKE             = $(PATH_BUILD)/make
 PATH_BUILD_GEN              = $(PATH_BUILD_MAKE)/Gen
-PATH_BUILD_TARGET           = $(PATH_BUILD_MAKE)/Gen/Target
+PATH_BUILD_PLATFORM         = $(PATH_BUILD_MAKE)/Gen/Platform
 PATH_BUILD_BSW              = $(PATH_BUILD_MAKE)/Gen/Bsw
 PATH_BUILD_RULES            = $(PATH_BUILD_MAKE)/Gen/Rules
 PATH_BUILD_PRJ              = $(PATH_BUILD_MAKE)/Prj
 PATH_AVRGNU                 = $(PATH_TOOLS)/avr8-gnu-toolchain/3.7.0.1796
-#PATH_AVRGNU                 = $(PATH_TOOLS)/msys2/clang64
-PATH_AVRDUDE                = $(PATH_TOOLS)/avrdude
+#PATH_AVRGNU                = $(PATH_TOOLS)/msys2/clang64
+PATH_AVRDUDE                = $(PATH_TOOLS)/avrdude/7.1
 PATH_OBJ                    = $(PATH_TMP)
 # Remark: Arduino core location in Arduino IDE: /hardware/arduino/avr
 # Remark: avr-gcc location in Arduino IDE: /hardware/tools/avr
@@ -127,7 +137,7 @@ PATH_OBJ                    = $(PATH_TMP)
 AVRGCC  = avr-gcc
 OBJCOPY = $(PATH_AVRGNU)/bin/avr-objcopy
 SIZE    = $(PATH_AVRGNU)/bin/avr-size
-AVRDUDE = $(PATH_AVRDUDE)/bin/avrdude
+AVRDUDE = $(PATH_AVRDUDE)/avrdude
 CAT		= cat
 CL      = cl
 RM      = rm
@@ -156,24 +166,26 @@ CFLAGS =
 LFLAGS =
 
 # ---------------------------------------------------
-# Select target MCU and compiler from target makefile. 
+# Select target MCU and compiler with compiler options from platform makefile. 
 #
 # Depends on ARG_TARGET_ECU and ARG_COMPILER.
 #
-# Defines TARGET_MCU_FAMILY, supported: AVR, X86, X64
-# Defines TARGET_MCU_VARIANT, supported: mega, default
-# Defines TARGET_MCU_DEVICE, supported: atmega2560, atmega328p, x86, x64
-# Defines CC
-# Defines C_INCLUDES_COMPILER
-# Defines TARGET_FILENAME_EXT
-# Defines OBJ_FILENAME_EXT
+# Defines  TARGET_MCU_FAMILY, supported: AVR, X86
+# Defines  TARGET_MCU_VARIANT, supported: mega, default
+# Defines  TARGET_MCU_DEVICE, supported: atmega2560, atmega328p, x86
+# Defines  CC
+# Modifies C_FLAGS
+# Modifies C_INCLUDES
+# Modifies C_INCLUDES_COMPILER
+# Modifies TARGET_FILENAME_EXT
+# Defines  OBJ_FILENAME_EXT
 # Modifies LFLAGS
 # Modifies some more variables
 # ---------------------------------------------------
--include $(PATH_BUILD_TARGET)/$(ARG_TARGET_ECU)/Makefile_Target.gmk
+-include $(PATH_BUILD_PLATFORM)/Makefile_Platform.gmk
 
 # ---------------------------------------------------
-# Depends on ARG_BUILD_BSW and ARG_BUILD_BSW_TESTFRAMEWORK.
+# Depends on ARG_BSW and ARG_TESTFRAMEWORK.
 #
 # Modifies FILES_GEN
 # Modifies FILES_BSW
@@ -222,71 +234,6 @@ C_INCLUDES := $(C_INCLUDES)          \
               $(C_INCLUDES_GEN)
 #              $(C_INCLUDES_COMPILER)
 
-# ---------------------------------------------------
-# Flags for tools
-# ---------------------------------------------------
-OBJCOPYFLAGS =  -O ihex \
-                -R .eeprom
-
-# -----------------------------------------------------------------------
-# See https://www.nongnu.org/avrdude/user-manual/avrdude_4.html
-# See http://savannah.nongnu.org/projects/avrdude
-# See https://www.avrfreaks.net/forum/cannot-connect-avrdude-mega2560
-
-# -p partno         This is the only mandatory option and it tells AVRDUDE what type of part (MCU) that is connected to the programmer.
-# -b baudrate       Override the RS-232 connection baud rate specified in the respective programmer’s entry of the configuration file. 
-# -B bitclock       Specify the bit clock period for the JTAG interface or the ISP clock (JTAG ICE only).
-# -c programmer-id  Specify the programmer to be used.
-# -C config-file    Use the specified config file for configuration data. This file contains all programmer and part definitions that AVRDUDE knows about.
-# -D                Disable auto erase for flash.
-# -e                Causes a chip erase to be executed. This will reset the contents of the flash ROM and EEPROM to the value ‘0xff’, and clear all lock bits.
-# -E exitspec[,...] By default, AVRDUDE leaves the parallel port in the same state at exit as it has been found at startup.
-#                   This option modifies the state of the ‘/RESET’ and ‘Vcc’ lines the parallel port is left at, according to the exitspec arguments provided.
-# -F                Normally, AVRDUDE tries to verify that the device signature read from the part is reasonable before continuing. 
-#                   Since it can happen from time to time that a device has a broken (erased or overwritten) device signature but is otherwise operating normally, 
-#                   this options is provided to override the check.
-# -i delay          For bitbang-type programmers, delay for approximately delay microseconds between each bit state change.
-# -l logfile        Use logfile rather than stderr for diagnostics output.
-# -n                No-write - disables actually writing data to the MCU (useful for debugging AVRDUDE).
-# -O                Perform a RC oscillator run-time calibration according to Atmel application note AVR053. 
-#                   This is only supported on the STK500v2, AVRISP mkII, and JTAG ICE mkII hardware.
-# -P port           Use port to identify the device to which the programmer is attached.
-# -q                Disable (or quell) output of the progress bar while reading or writing to the device.
-# -u                Disables the default behaviour of reading out the fuses three times before programming, 
-#                   then verifying at the end of programming that the fuses have not changed.
-# -s                Disable safemode prompting.
-# -t                Tells AVRDUDE to enter the interactive “terminal” mode instead of up- or downloading files.
-# -U memtype:op:filename[:format]
-#                   Perform a memory operation. Multiple ‘-U’ options can be specified in order to operate on multiple memories on the same command-line invocation.
-#                   The memtype field specifies the memory type to operate on. Use the ‘-v’ option on the command line or the part command from terminal mode 
-#                   to display all the memory types supported by a particular device. Typically, a device’s memory configuration at least contains the memory 
-#                   types flash and eeprom.
-#                   All memory types currently known are: 
-#                     flash    The flash ROM of the device. 
-#                     ...
-#                   The op field specifies what operation to perform: 
-#                     r    read the specified device memory and write to the specified file
-#                     w    read the specified file and write it to the specified device memory
-#                     v    read the specified device memory and the specified file and perform a verify operation
-#                   The filename field indicates the name of the file to read or write. 
-#                   The format field is optional and contains the format of the file to read or write. Possible values are:
-#                     i    Intel Hex
-#                     s    Motorola S-record
-#                     e    ELF (Executable and Linkable Format), the final output file from the linker; currently only accepted as an input file
-#                     a    auto detect; valid for input only, and only if the input is not provided at stdin.
-#                     ...
-# -v                Enable verbose output. More -v options increase verbosity level.
-# -V                Disable automatic verify check when uploading data.
-# -x extended_param Pass extended_param to the chosen programmer implementation as an extended parameter.
-# -----------------------------------------------------------------------
-AVRDUDE_FLAGS = -C$(PATH_AVRDUDE)/etc/avrdude.conf  \
-                -v                                  \
-                -V                                  \
-                -p m2560                            \
-                -c wiring                           \
-                -P COM3                             \
-                -D
-
 # ------------------------------------------------------------------------------
 # VPATH definition
 #
@@ -303,7 +250,6 @@ AVRDUDE_FLAGS = -C$(PATH_AVRDUDE)/etc/avrdude.conf  \
 # ------------------------------------------------------------------------------
 VPATH = $(sort $(dir $(FILES_PRJ))) $(sort $(dir $(FILES_BSW) $(FILES_BSW_TEST) $(FILES_GEN)))
 
-
 # ------------------------------------------------------------------------------
 # Include dependeny files
 # ------------------------------------------------------------------------------
@@ -318,7 +264,7 @@ endif
 # Implicit rules are not used, instead pattern rules with %.c are used, see below
 .SUFFIXES:
 
-all: PrintCompiler PrintIncludePaths $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
+all: PrintIncludePaths $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
 
 rebuild: clean PrintIncludePaths all
 
@@ -338,8 +284,12 @@ PrintIncludePaths:
 .PHONY: PrintCompiler
 PrintCompiler:
 	@echo ++++++ compiler information ++++++
-	@echo $(CC)
-	$(CC) $(CFLAGS) $(LFLAGS) -v
+	@echo +++ CFLAGS
+	@echo $(CFLAGS)
+	@echo +++ LFLAGS
+	@echo $(LFLAGS)
+	@echo +++ version
+	@-$(CC) $(CCVERSIONFLAGS)
 
 .PHONY: clean
 clean:
@@ -370,8 +320,9 @@ size:
 	@echo +++++ size of $(basename $@).elf +++++
 	$(SIZE) -A $(TARGET_FILENAME_BASE).elf
 
-.PHONY: program
-program:
+.PHONY: download
+download:
+	@echo +++++ Download $(TARGET_FILENAME_BASE).hex +++++
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -Uflash:w:$(TARGET_FILENAME_BASE).hex:i
 
 -include $(PATH_BUILD_RULES)/Makefile_Rules.gmk

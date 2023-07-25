@@ -1,13 +1,13 @@
 # 
 # Makefile for base software configuration
 #
-# Depends on ARG_BUILD_BSW (arduino, none)
-# Depends on ARG_BUILD_BSW_TESTFRAMEWORK (googletest, none)
+# Depends on ARG_BSW (arduino, none)
+# Depends on ARG_TESTFRAMEWORK (googletest, none)
 
 # ---------------------------------------------------
-# ARG_BUILD_BSW: arduino
+# ARG_BSW: arduino
 # ---------------------------------------------------
-ifeq ($(ARG_BUILD_BSW),arduino)
+ifeq ($(ARG_BSW),arduino)
 FILES_BSW :=  $(FILES_BSW)                             \
               $(PATH_SRC_ARDUINO_CORE)/abi             \
               $(PATH_SRC_ARDUINO_CORE)/CDC             \
@@ -35,7 +35,8 @@ FILES_BSW :=  $(FILES_BSW)                             \
               $(PATH_SRC_ARDUINO_CORE)/WString
 
 C_INCLUDES := $(C_INCLUDES)                         \
-              -I$(PATH_SRC_ARDUINO_CORE)
+              -I$(PATH_SRC_ARDUINO_CORE)            \
+              -I$(PATH_SRC_GEN)/Os/Arduino/$(ARG_COMPILER)
 
 # old stuff for FreeRTOS
 #             -I$(PATH_SRC_GEN)/OS/Arduino/$(CC)
@@ -43,43 +44,14 @@ C_INCLUDES := $(C_INCLUDES)                         \
 endif
 
 # ---------------------------------------------------
-# ARG_BUILD_BSW: arduino_win32
+# ARG_BSW: arduino_win32
 # ---------------------------------------------------
-ifeq ($(ARG_BUILD_BSW),arduino_win32)
-FILES_BSW :=  $(FILES_BSW)                             \
+ifeq ($(ARG_BSW),arduino_win32)
+FILES_BSW :=  $(FILES_BSW)                          \
               $(PATH_SRC_ARDUINO_WIN32_CORE)/main
 
 C_INCLUDES := $(C_INCLUDES)                         \
               -I$(PATH_SRC_ARDUINO_WIN32_CORE)
-
-ifeq ($(ARG_COMPILER),msvc)
-CFLAGS := $(CFLAGS)                       \
-          /analyze-                       \
-          /diagnostics:classic            \
-          /EHsc                           \
-          /errorReport:prompt             \
-          /Fa$(PATH_TMP)\                 \
-          /FC                             \
-          /Fd$(PATH_BIN)/$(PROJECT_NAME)  \
-          /fp:precise                     \
-          /Gd                             \
-          /GS                             \
-          /MDd                            \
-          /nologo                         \
-          /Od                             \
-          /RTC1                           \
-          /W4                             \
-          /WX                             \
-          /Zc:inline                      \
-          /Zc:wchar_t                     \
-          /Zi
-
-C_DEFINES := $(C_DEFINES) \
-          /D "WIN32"      \
-          /D "_DEBUG"     \
-          /D "_CONSOLE"   \
-          /D "_UNICODE"   \
-          /D "UNICODE" 
 
 # ---------------------------------------------------
 # Linker flags. See also https://learn.microsoft.com/en-us/cpp/build/reference/linker-options?view=msvc-170
@@ -89,17 +61,14 @@ C_DEFINES := $(C_DEFINES) \
 #           To override this default, set /PDB and specify a different file name.
 # /PDB:(Use Program Database)   A user-specified name for the program database (PDB) that the linker creates. It replaces the default name.
 LFLAGS := $(LFLAGS)           \
-          /DEBUG              \
-          /SUBSYSTEM:CONSOLE
+          -DEBUG              \
+          -SUBSYSTEM:CONSOLE
 endif
 
-endif
-
-
 # ---------------------------------------------------
-# ARG_BUILD_BSW_TESTFRAMEWORK: googletest
+# ARG_TESTFRAMEWORK: googletest
 # ---------------------------------------------------
-ifeq ($(ARG_BUILD_BSW_TESTFRAMEWORK),googletest)
+ifeq ($(ARG_TESTFRAMEWORK),googletest)
 FILES_BSW_TEST := $(FILES_BSW_TEST) \
                   $(PATH_SRC_GOOGLETEST)/src/gtest-all \
                   $(PATH_SRC_GOOGLETEST)/src/gtest_main
@@ -107,80 +76,5 @@ FILES_BSW_TEST := $(FILES_BSW_TEST) \
 C_INCLUDES := $(C_INCLUDES)                         \
               -I$(PATH_SRC_GOOGLETEST)              \
               -I$(PATH_SRC_GOOGLETEST)/include
-
-# ---------------------------------------------------
-# Compiler flags. See also https://learn.microsoft.com/en-us/cpp/build/reference/compiler-options-listed-alphabetically?view=msvc-170
-# /analyze-               Turns on code analysis. Use /analyze- to explicitly turn off analysis. /analyze- is the default behavior.
-# /diagnostics            Use the /diagnostics compiler option to specify the display of error and warning location information.
-# /diagnostics:classic    The /diagnostics:classic option is the default, which reports only the line number where the issue was found.
-# /diagnostics:column     This option also includes the column where the issue was found. This can help you identify the specific language construct or character that is causing the issue.
-# /diagnostics:caret      This option includes the column where the issue was found and places a caret (^) under the location in the line of code where the issue was detected.
-# /EHc                    extern "C" defaults to nothrow.
-# /EHs                    Enable C++ exception handling (no SEH exceptions).
-# /errorReport:prompt     Deprecated. Error reporting is controlled by Windows Error Reporting (WER) settings.
-# /Fa (Listing file)      Creates a listing file containing assembler code.
-# /FC                     Displays the full path of source code files passed to cl.exe in diagnostic text.
-# /Fd (Program Database File Name) Specifies a file name for the program database (PDB) file created by /Z7, /Zi, /ZI (Debug Information Format).
-#                         If you specify a file name that does not include an extension, the compiler uses .pdb as the extension.
-# /fp:precise             "precise" floating-point model; results are predictable.
-# /Fo (Object File Name)  Specifies an object (.obj) file name or directory to be used instead of the default. Defined in Makefile_Rules.gmk. 
-# /Gd                     Uses the __cdecl calling convention. (x86 only). If required, defined in Makefile_Target.gmk.
-# /Gm                     Deprecated. Enables minimal rebuild.
-# /GS                     Checks buffer security.
-# /JMC 	                  Supports native C++ Just My Code debugging
-# /MDd                    Defines _DEBUG, _MT, and _DLL and causes the application to use the debug multithread-specific and DLL-specific version of the run-time library. It also causes the compiler to place the library name MSVCRTD.lib into the .obj file.
-# /nologo                 Suppresses display of sign-on banner.
-# /Od                     Disables optimization.
-# /Oy-                    /Oy enables frame-pointer omission and /Oy- disables omission. In x64 compilers, /Oy and /Oy- are not available. If required, defined in Makefile_Target.gmk.
-# /permissive-            Specify standards conformance mode to the compiler. Use this option to help you identify and fix conformance issues in your code, to make it both more correct and more portable.
-# /RTC1                   Enable fast runtime checks (equivalent to /RTCsu).
-# /sdl 	                  Enable more security features and warnings.
-# /W3                     Specifies how the compiler generates warnings for a given compilation. /W3: recommend that you use this option to provide lint-like warnings.
-# /W4                     Specifies how the compiler generates warnings for a given compilation. /W4: For a new project, it may be best to use /W4 in all compilations. This option helps ensure the fewest possible hard-to-find code defects.
-# /WX                     Treat warnings as errors. Use /WX- to not treat warnings as errors.
-# /Zc:forScope            Enforce Standard C++ for scoping rules (on by default).
-# /Zc:inline              Remove unreferenced functions or data if they're COMDAT or have internal linkage only (off by default).
-# /Zc:wchar_t             wchar_t is a native type, not a typedef (on by default).
-# /Zi                     Generates complete debugging information.
-# /ZI 	                  Includes debug information in a program database compatible with Edit and Continue. (x86 only)
-# ---------------------------------------------------
-ifeq ($(ARG_COMPILER),msvc)
-CFLAGS := $(CFLAGS)                       \
-          /analyze-                       \
-          /EHsc                           \
-          /errorReport:prompt             \
-          /Fa$(PATH_TMP)\                 \
-          /FC                             \
-          /Fd$(PATH_BIN)/$(PROJECT_NAME)  \
-          /fp:precise                     \
-          /GS                             \
-          /MDd                            \
-          /nologo                         \
-          /Od                             \
-          /RTC1                           \
-          /W4                             \
-          /WX                             \
-          /Zc:inline                      \
-          /Zc:wchar_t                     \
-          /Zi
-
-C_DEFINES := $(C_DEFINES) \
-          /D "_DEBUG"     \
-          /D "_CONSOLE"   \
-          /D "_UNICODE"   \
-          /D "UNICODE" 
-
-# ---------------------------------------------------
-# Linker flags. See also https://learn.microsoft.com/en-us/cpp/build/reference/linker-options?view=msvc-170
-# /DEBUG    The /DEBUG option creates debugging information for the executable. 
-#           The linker uses the base name of the program and the extension .pdb to name the program database, 
-#           and embeds the path where it was created. 
-#           To override this default, set /PDB and specify a different file name.
-# /PDB:(Use Program Database)   A user-specified name for the program database (PDB) that the linker creates. It replaces the default name.
-LFLAGS := $(LFLAGS)           \
-          /DEBUG              \
-          /SUBSYSTEM:CONSOLE
-
-endif
 
 endif

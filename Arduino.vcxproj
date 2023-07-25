@@ -17,20 +17,12 @@
       <Configuration>BlinkSample2 Program</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="DccDecoder Build|Win32">
-      <Configuration>DccDecoder Build</Configuration>
+    <ProjectConfiguration Include="DccSniffer Build|Win32">
+      <Configuration>DccSniffer Build</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="DccDecoder Program|Win32">
-      <Configuration>DccDecoder Program</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="DccDecoderTest Compile|Win32">
-      <Configuration>DccDecoderTest Compile</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="DccDecoderTest Program|Win32">
-      <Configuration>DccDecoderTest Program</Configuration>
+    <ProjectConfiguration Include="DccSniffer Download|Win32">
+      <Configuration>DccSniffer Download</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="FireFlicker Compile|Win32">
@@ -77,6 +69,14 @@
       <Configuration>Ut_Gen_Util_Bitset Build</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Ut_Gen_Util_Fix_Deque_Build|Win32">
+      <Configuration>Ut_Gen_Util_Fix_Deque_Build</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Ut_Gen_Util_Fix_Queue_Build|Win32">
+      <Configuration>Ut_Gen_Util_Fix_Queue_Build</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Ut_Gen_Util_InputClassifier Build|Win32">
       <Configuration>Ut_Gen_Util_InputClassifier Build</Configuration>
       <Platform>Win32</Platform>
@@ -89,9 +89,8 @@
   <ItemGroup>
     <None Include="Build\Build.bat" />
     <None Include="Build\make\Gen\Bsw\Makefile_Bsw.gmk" />
+    <None Include="Build\make\Gen\Platform\Makefile_Platform.gmk" />
     <None Include="Build\make\Gen\Rules\Makefile_Rules.gmk" />
-    <None Include="Build\make\Gen\Target\mega\Makefile_Target.gmk" />
-    <None Include="Build\make\Gen\Target\win32\Makefile_Target.gmk" />
     <None Include="Build\make\Makefile.gmk" />
     <None Include="Build\make\Prj\App\BlinkSample2\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\App\BlinkSample\Makefile_Prj.gmk" />
@@ -102,6 +101,8 @@
     <None Include="Build\make\Prj\UnitTest\Gen\Rte\Ut_Rte\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Array\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Bitset\Makefile_Prj.gmk" />
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Fix_Deque\Makefile_Prj.gmk" />
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Fix_Queue\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_InputClassifier\Makefile_Prj.gmk" />
     <None Include="Build\make\Prj\UnitTest\Prj\Ut_Signal\Makefile_Prj.gmk" />
     <None Include="Src\Gen\Arduino\avr\cores\arduino\wiring_pulse.S" />
@@ -159,6 +160,8 @@
     <ClCompile Include="Src\Prj\UnitTest\Gen\Rte\Ut_Rte\Test.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Array\Test.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Bitset\Test.cpp" />
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Fix_Deque\Test.cpp" />
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Fix_Queue\Test.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_InputClassifier\Test.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Prj\Ut_Signal\CalM.cpp" />
     <ClCompile Include="Src\Prj\UnitTest\Prj\Ut_Signal\Test.cpp" />
@@ -235,6 +238,8 @@
     <ClInclude Include="Src\Gen\Util\Array.h" />
     <ClInclude Include="Src\Gen\Util\bitset.h" />
     <ClInclude Include="Src\Gen\Util\Classifier.h" />
+    <ClInclude Include="Src\Gen\Util\Fix_Deque.h" />
+    <ClInclude Include="Src\Gen\Util\Fix_Queue.h" />
     <ClInclude Include="Src\Gen\Util\Math.h" />
     <ClInclude Include="Src\Gen\Util\RingBuffer.h" />
     <ClInclude Include="Src\Gen\Util\Timer.h" />
@@ -294,12 +299,22 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Build|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccSniffer Build|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Array Build|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Fix_Deque_Build|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Fix_Queue_Build|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -334,11 +349,6 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'" Label="Configuration">
-    <ConfigurationType>Makefile</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -364,12 +374,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Program|Win32'" Label="Configuration">
-    <ConfigurationType>Makefile</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Program|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccSniffer Download|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -394,10 +399,16 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FireFlicker Compile|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Build|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccSniffer Build|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Array Build|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Fix_Deque_Build|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Fix_Queue_Build|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Bitset Build|Win32'" Label="PropertySheets">
@@ -418,9 +429,6 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Dcc_PacketExtractor Build|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -436,10 +444,7 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Signal Program|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Program|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Program|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DccSniffer Download|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -493,10 +498,10 @@
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <NMakeIncludeSearchPath>.\Gen;$(NMakeIncludeSearchPath);Z:/hardware/arduino/avr/cores/arduino</NMakeIncludeSearchPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Build|Win32'">
-    <NMakeBuildCommandLine>./Build DccDecoder all</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>./Build DccDecoder clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>./Build DccDecoder rebuild</NMakeReBuildCommandLine>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccSniffer Build|Win32'">
+    <NMakeBuildCommandLine>./Build/Build App/DccSniffer mega avrgcc arduino none all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build App/DccSniffer mega avrgcc arduino none clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build App/DccSniffer mega avrgcc arduino none rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
@@ -514,6 +519,30 @@
     <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
     <NMakeOutput>./Build/Bin/Ut_Array.exe</NMakeOutput>
     <SourcePath>$(VC_SourcePath);$(SolutionDir)Src\Prj\Ut_Array;$(SolutionDir)Src</SourcePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Fix_Deque_Build|Win32'">
+    <NMakeBuildCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Fix_Deque win32 msvc none googletest all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Fix_Deque win32 msvc none googletest clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Fix_Deque win32 msvc none googletest rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Build\Bin</OutDir>
+    <IntDir>.\Build\Tmp</IntDir>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/Ut_Fix_Deque;$(SolutionDir)Src/Gen</NMakeIncludeSearchPath>
+    <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
+    <NMakeOutput>./Build/Bin/Ut_Fix_Deque.exe</NMakeOutput>
+    <SourcePath>$(VC_SourcePath);$(SolutionDir)Src\Prj\Ut_Fix_Deque;$(SolutionDir)Src</SourcePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Fix_Queue_Build|Win32'">
+    <NMakeBuildCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Fix_Queue win32 msvc none googletest all</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Fix_Queue win32 msvc none googletest clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Fix_Queue win32 msvc none googletest rebuild</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions />
+    <OutDir>.\Build\Bin</OutDir>
+    <IntDir>.\Build\Tmp</IntDir>
+    <NMakeIncludeSearchPath>$(SolutionDir)Src/Gen/Platform/X86/msvc;$(SolutionDir)Src/Gen/Test/googletest-main/googletest/include;$(SolutionDir)Src/Prj/Ut_Fix_Queue;$(SolutionDir)Src/Gen</NMakeIncludeSearchPath>
+    <IncludePath>$(SolutionDir)Src/Gen/Platform;$(SolutionDir)Src/Gen/Platform/avr-gcc;$(SolutionDir)Src/Gen/Arduino/avr/cores/arduino;$(SolutionDir)Src/Gen/Arduino/avr/variants/mega;$(SolutionDir)Src/Gen;$(SolutionDir)Src/Prj/DccDecoder;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/lib/gcc/avr/7.3.0/include-fixed;$(SolutionDir)/../Tools/avr8-gnu-toolchain/3.7.0.1796/avr/include;</IncludePath>
+    <NMakeOutput>./Build/Bin/Ut_Fix_Queue.exe</NMakeOutput>
+    <SourcePath>$(VC_SourcePath);$(SolutionDir)Src\Prj\Ut_Fix_Deque;$(SolutionDir)Src</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Ut_Gen_Util_Bitset Build|Win32'">
     <NMakeBuildCommandLine>./Build/Build UnitTest/Gen/Util/Ut_Bitset win32 msvc none googletest all</NMakeBuildCommandLine>
@@ -587,14 +616,6 @@
     <NMakeOutput>./Build/Bin/Ut_PacketExtractor.exe</NMakeOutput>
     <SourcePath>$(VC_SourcePath);$(SolutionDir)Src</SourcePath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Compile|Win32'">
-    <NMakeBuildCommandLine>./Build DccDecoderTest all</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>./Build DccDecoderTest clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>./Build DccDecoderTest rebuild</NMakeReBuildCommandLine>
-    <NMakePreprocessorDefinitions />
-    <OutDir>.\Bin</OutDir>
-    <IntDir>.\Tmp</IntDir>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BlinkSample Program|Win32'">
     <NMakeBuildCommandLine>./Build BlinkSample program</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>./Build BlinkSample clean</NMakeCleanCommandLine>
@@ -635,18 +656,10 @@
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoder Program|Win32'">
-    <NMakeBuildCommandLine>./Build DccDecoder program</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>./Build DccDecoder clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>./Build DccDecoder program</NMakeReBuildCommandLine>
-    <NMakePreprocessorDefinitions />
-    <OutDir>.\Bin</OutDir>
-    <IntDir>.\Tmp</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccDecoderTest Program|Win32'">
-    <NMakeBuildCommandLine>./Build DccDecoderTest program</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>./Build DccDecoderTest clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>./Build DccDecoderTest program</NMakeReBuildCommandLine>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DccSniffer Download|Win32'">
+    <NMakeBuildCommandLine>./Build/Build App/DccSniffer mega avrgcc arduino none download</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>./Build/Build App/DccSniffer mega avrgcc arduino none clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>./Build/Build App/DccSniffer mega avrgcc arduino none download</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions />
     <OutDir>.\Bin</OutDir>
     <IntDir>.\Tmp</IntDir>

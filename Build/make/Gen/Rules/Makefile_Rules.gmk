@@ -41,18 +41,18 @@ else ifeq ($(ARG_COMPILER),msvc)
 
 $(PATH_OBJ)/%.obj: %.c
 	@echo +++++ compile $< to $@
-	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) /Fo"$@" /c $< 2> $(PATH_ERR)/$(basename $(@F)).err
+	$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -Fo"$@" -c $< 2> $(PATH_ERR)/$(basename $(@F)).err
 
 $(PATH_OBJ)/%.obj: %.cc
 	@echo +++++ compile $< to $@
-	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) /Fo"$@" /c $< 2> $(PATH_ERR)/$(basename $(@F)).err
+	$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -Fo"$@" -c $< 2> $(PATH_ERR)/$(basename $(@F)).err
 
 $(PATH_OBJ)/%.obj: %.cpp
 	@echo +++++ compile $< to $@
-	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) /Fo"$@" /c $< 2> $(PATH_ERR)/$(basename $(@F)).err
+	$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -Fo"$@" -c $< 2> $(PATH_ERR)/$(basename $(@F)).err
 
 $(TARGET_FILENAME_BASE).exe: $(FILES_O)
 	@echo +++++ linking $@ +++++
-	@$(CC) /Fe"$@" $(FILES_O) $(LFLAGS)
+	$(CC) -Fe"$@" $(FILES_O) $(LFLAGS)
 
 endif

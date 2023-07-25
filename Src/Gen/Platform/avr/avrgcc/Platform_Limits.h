@@ -25,6 +25,13 @@ namespace platform
     static constexpr uint8 min_() noexcept { return static_cast<uint8>(0); }
     static constexpr uint8 max_() noexcept { return UINT8_MAX; }
   };
+
+  template<> class numeric_limits<uint16>
+  {
+  public:
+    static constexpr uint8 min_() noexcept { return static_cast<uint16>(0); }
+    static constexpr uint8 max_() noexcept { return UINT16_MAX; }
+  };
 } // namespace util
 
 #endif // PLATFORM_LIMITS_H_

@@ -19,11 +19,10 @@
 :: Use if /I "%3" == "msvc" if case insensitive comparison is required.
 if "%3" == "msvc" (
   if "%2" == "win32" (
-    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+    call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
   )
   if "%2" == "win64" (
-    echo vcvars64.bat
-    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+    call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
   )
 )
 
@@ -32,5 +31,4 @@ if "%3" == "msvc" (
 ::   and those that depend on it, cannot be remade, the other prerequisites of 
 ::   these targets can be processed all the same.
 :: MS Visual Studio: current directory is project directory (Arduino.vcproj)
-cd Build
-make -s -k -f ./make/Makefile.gmk ARG_PROJECT=%1 ARG_TARGET_ECU=%2 ARG_COMPILER=%3 ARG_BUILD_BSW=%4 ARG_BUILD_BSW_TESTFRAMEWORK=%5 %6
+make -s -f ./Build/make/Makefile.gmk ARG_PROJECT=%1 ARG_TARGET_ECU=%2 ARG_COMPILER=%3 ARG_BSW=%4 ARG_TESTFRAMEWORK=%5 %6

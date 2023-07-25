@@ -8,7 +8,7 @@
 #include <Std_Types.h>
 #include <Dcc/Packet.h>
 
-namespace Dcc
+namespace dcc
 {
   // ---------------------------------------------------
   /// Extract a packet from a stream of bits.<BR>
@@ -196,6 +196,6 @@ namespace Dcc
     }
   }
 
-} // namespace Dcc
+} // namespace dcc
 
 #endif // DCC_PACKETEXTRACTOR_H

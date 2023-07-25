@@ -24,6 +24,7 @@
 #define ALGORITHM_H_
 
 #include <Std_Types.h>
+#include <Platform_Limits.h>
 #include <Util/Math.h>
 
 namespace util
@@ -37,6 +38,41 @@ namespace util
     return ((v >= lowerlimit) && (v < upperlimit));
   }
 
+  // ------------------------------------------------------------------------------
+  /// Returns an interator to the element that equals v.
+  /// Returns last if the element is not found.
+  /// Performs a linear search.
+  // ------------------------------------------------------------------------------
+  template<class InputIt, class T>
+  InputIt find(InputIt first, InputIt last, const T& v)
+  {
+    while (first != last)
+    {
+      if (*first == v)
+      {
+        break;
+      }
+      first++;
+    }
+    return first;
+  }
+
+  // ------------------------------------------------------------------------------
+  /// Returns s1 + s2 and limits the sum to max value of T
+  // ------------------------------------------------------------------------------
+  template<typename T>
+  T add_no_overflow(T s1, T s2)
+  {
+    T ret = s1 + s2;
+
+    if (ret < s1)
+    {
+      // overflow
+      ret = platform::numeric_limits<T>::max_();
+    }
+
+    return ret;
+  }
   // ------------------------------------------------------------------------------
   /// Discretizes a ramp from ystart to yend over time dt with given timesteps.
   ///

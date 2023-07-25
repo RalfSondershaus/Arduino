@@ -64,20 +64,11 @@
     <Filter Include="Build\make\Gen\Bsw">
       <UniqueIdentifier>{dab7e2e1-acd8-4f63-b751-2e74ce10254f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Build\make\Gen\Target">
-      <UniqueIdentifier>{ced87fd2-380a-4f47-8ad9-d13e83a2b03f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Build\make\Gen\Rules">
       <UniqueIdentifier>{83f86399-ebd2-441e-ab8d-c97921aa57f3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Build\make\Gen\Target\mega">
-      <UniqueIdentifier>{209f1faa-2722-4b85-9495-2e75187df058}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Prj">
       <UniqueIdentifier>{07beb564-2433-40e4-9a98-8e0f1a00e6e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Build\make\Gen\Target\win32">
-      <UniqueIdentifier>{eda1da46-9736-4187-9b8f-c88558a832e7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Build\make\Prj\UnitTest">
       <UniqueIdentifier>{96721d41-6e57-4fa0-91cb-550f8177a646}</UniqueIdentifier>
@@ -234,6 +225,21 @@
     </Filter>
     <Filter Include="Build\make\Prj\UnitTest\Prj\Ut_Signal">
       <UniqueIdentifier>{d14eb117-fad6-40a0-9cef-e5793fa00cab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Gen\Platform">
+      <UniqueIdentifier>{9323eae8-2daa-43de-8ef0-71b9a71bc777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Fix_Deque">
+      <UniqueIdentifier>{457f0d57-af4f-4419-b185-cf5eec5ce2cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Gen\Util\Ut_Fix_Deque">
+      <UniqueIdentifier>{aaf21274-8c57-4d94-bc82-22bb5d0a4ed6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Fix_Queue">
+      <UniqueIdentifier>{75263eb2-7a1f-4b5d-935b-79d6b15fc3af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Gen\Util\Ut_Fix_Queue">
+      <UniqueIdentifier>{efd459d4-87f9-47ce-bcd6-20728b336990}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -398,6 +404,12 @@
     </ClCompile>
     <ClCompile Include="Src\Prj\App\Signal\CddLed.cpp">
       <Filter>Src\Prj\App\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Fix_Deque\Test.cpp">
+      <Filter>Src\Prj\UnitTest\Gen\Util\Ut_Fix_Deque</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Fix_Queue\Test.cpp">
+      <Filter>Src\Prj\UnitTest\Gen\Util\Ut_Fix_Queue</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -695,6 +707,12 @@
     <ClInclude Include="Src\Prj\App\Signal\CddLed.h">
       <Filter>Src\Prj\App\Signal</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Fix_Deque.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Fix_Queue.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Src\Gen\Os\FreeRTOS\v202112.00\include\stdint.readme">
@@ -711,12 +729,6 @@
     </None>
     <None Include="Build\make\Gen\Rules\Makefile_Rules.gmk">
       <Filter>Build\make\Gen\Rules</Filter>
-    </None>
-    <None Include="Build\make\Gen\Target\mega\Makefile_Target.gmk">
-      <Filter>Build\make\Gen\Target\mega</Filter>
-    </None>
-    <None Include="Build\make\Gen\Target\win32\Makefile_Target.gmk">
-      <Filter>Build\make\Gen\Target\win32</Filter>
     </None>
     <None Include="Build\make\Prj\UnitTest\Gen\Dcc\Ut_Packet\Makefile_Prj.gmk">
       <Filter>Build\make\Prj\UnitTest\Gen\Dcc\Ut_Packet</Filter>
@@ -753,6 +765,15 @@
     </None>
     <None Include="Build\make\Prj\UnitTest\Prj\Ut_Signal\Makefile_Prj.gmk">
       <Filter>Build\make\Prj\UnitTest\Prj\Ut_Signal</Filter>
+    </None>
+    <None Include="Build\make\Gen\Platform\Makefile_Platform.gmk">
+      <Filter>Build\make\Gen\Platform</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Fix_Deque\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_Fix_Deque</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Fix_Queue\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_Fix_Queue</Filter>
     </None>
   </ItemGroup>
 </Project>

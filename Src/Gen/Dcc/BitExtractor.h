@@ -3,7 +3,7 @@
   *
   * @author Ralf Sondershaus
   *
-  * @brief Defines class BitExtractor in namespace Dcc
+  * @brief Defines class BitExtractor in namespace dcc
   */
 
 #ifndef DCC_BITEXTRACTOR_H
@@ -13,7 +13,7 @@
 #include <Dcc/PacketExtractor.h>
 #include <Util/Array.h> // for debugging
 
-namespace Dcc
+namespace dcc
 {
   // ---------------------------------------------------
   /// a helper class to define all constant values in a single class
@@ -81,7 +81,7 @@ namespace Dcc
     } eHalfBit;
 
     /// For debugging: number of received interrupts per state (half bits)
-    typedef Util::Array<uint32_t, STATE_MAX_COUNT> TickArray;
+    typedef util::array<uint32_t, STATE_MAX_COUNT> TickArray;
 
     /// Current state
     eState state;
@@ -220,6 +220,6 @@ namespace Dcc
     return unRet;
   }
 
-} // namespace Dcc
+} // namespace dcc
 
 #endif // DCC_BITEXTRACTOR_H

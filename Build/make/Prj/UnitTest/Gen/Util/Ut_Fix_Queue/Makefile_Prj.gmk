@@ -1,0 +1,10 @@
+# 
+# Project specific Makefile for unit test of class Util::Fix_Queue
+#
+
+# Files
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test
+
+# Dependencies
+$(PATH_OBJ)/Test.obj: $(PATH_SRC_GEN)/Util/Fix_Queue.h \
+                      $(PATH_SRC_GEN)/Util/Fix_Deque.h

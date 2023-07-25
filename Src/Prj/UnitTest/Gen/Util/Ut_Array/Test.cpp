@@ -9,13 +9,11 @@
 #include <Util/Array.h>
 #include <gtest/gtest.h>
 
-using namespace Util;
-
-typedef typename Array<int, 5>::size_type size_type;
+typedef typename util::array<int, 5>::size_type size_type;
 
 TEST(Ut_Array, array_uninit_begin_end)
 {
-  Array<int, 5> arr;
+  util::array<int, 5> arr;
 
   auto it = arr.begin();
   int n;
@@ -33,7 +31,7 @@ TEST(Ut_Array, array_uninit_begin_end)
 
 TEST(Ut_Array, array_operator)
 {
-  Array<int, 5> arr;
+  util::array<int, 5> arr;
   int i;
   auto it = arr.begin();
 
@@ -54,7 +52,7 @@ TEST(Ut_Array, array_operator)
 
 TEST(Ut_Array, array_at)
 {
-  Array<int, 5> arr;
+  util::array<int, 5> arr;
   int i;
   auto it = arr.begin();
 
@@ -74,7 +72,7 @@ TEST(Ut_Array, array_at)
 
 TEST(Ut_Array, array_front)
 {
-  Array<int, 5> arr;
+  util::array<int, 5> arr;
 
   arr.front() = 5;
 
@@ -83,7 +81,7 @@ TEST(Ut_Array, array_front)
 
 TEST(Ut_Array, array_back)
 {
-  Array<int, 5> arr;
+  util::array<int, 5> arr;
 
   arr.back() = 5;
 
@@ -92,7 +90,7 @@ TEST(Ut_Array, array_back)
 
 TEST(Ut_Array, array_fill)
 {
-  Array<int, 5> arr;
+  util::array<int, 5> arr;
 
   arr.fill(10);
 
@@ -104,7 +102,7 @@ TEST(Ut_Array, array_fill)
 
 TEST(Ut_Array, array_copy_constructor)
 {
-  Array<int, 5> arr;
+  util::array<int, 5> arr;
 
   arr.fill(10);
 
@@ -124,8 +122,8 @@ TEST(Ut_Array, array_copy_constructor)
 
 TEST(Ut_Array, array_copy_assignment)
 {
-  Array<int, 5> arr;
-  Array<int, 5> arr_copy;
+  util::array<int, 5> arr;
+  util::array<int, 5> arr_copy;
 
   arr.fill(10);
   arr_copy.fill(20);

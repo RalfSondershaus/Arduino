@@ -51,6 +51,11 @@ CFLAGS := $(CFLAGS)    \
           /Oy-
 
 # ---------------------------------------------------
+# Print compiler version flags
+# ---------------------------------------------------
+CCVERSIONFLAGS :=
+
+# ---------------------------------------------------
 # Linker flags
 # See https://learn.microsoft.com/de-de/cpp/build/reference/link-pass-options-to-linker?source=recommendations&view=msvc-170
 # /link (Optionen an Linker übergeben)

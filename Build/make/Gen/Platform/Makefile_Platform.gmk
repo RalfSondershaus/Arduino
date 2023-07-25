@@ -1,0 +1,351 @@
+# 
+# Makefile for Platform specific settings
+#
+# A platform is defined by a target device and a compiler
+#
+
+# ---------------------------------------------------
+# Select target MCU
+# ---------------------------------------------------
+ifeq ($(ARG_TARGET_ECU),mega)
+TARGET_MCU_FAMILY    = AVR
+TARGET_MCU_VARIANT   = mega
+TARGET_MCU_DEVICE    = atmega2560
+endif
+
+ifeq ($(ARG_TARGET_ECU),uno)
+TARGET_MCU_FAMILY    = AVR
+TARGET_MCU_VARIANT   = uno
+TARGET_MCU_DEVICE    = atmega328p
+endif
+
+ifeq ($(ARG_TARGET_ECU),win32)
+TARGET_MCU_FAMILY    = X86
+TARGET_MCU_VARIANT   = X86
+TARGET_MCU_DEVICE    = X86
+endif
+
+ifeq ($(ARG_TARGET_ECU),win64)
+TARGET_MCU_FAMILY    = X64
+TARGET_MCU_VARIANT   = X64
+TARGET_MCU_DEVICE    = X64
+endif
+
+# ---------------------------------------------------
+# Select target file extension
+# ---------------------------------------------------
+ifeq ($(TARGET_MCU_FAMILY),AVR)
+TARGET_FILENAME_EXT := hex
+endif
+
+ifeq ($(TARGET_MCU_FAMILY),X86)
+TARGET_FILENAME_EXT := exe
+endif
+
+ifeq ($(TARGET_MCU_FAMILY),X64)
+TARGET_FILENAME_EXT := exe
+endif
+
+# ---------------------------------------------------
+# Select compiler
+# ---------------------------------------------------
+
+# ---------------------------------------------------
+# ---------------------------------------------------
+# ---------------------------------------------------
+# AVR_GCC
+# ---------------------------------------------------
+ifeq ($(ARG_COMPILER),avrgcc)
+CC := $(AVRGCC)
+
+# ---------------------------------------------------
+# Compiler include pathes; typically just required to print compiler include paths for Visual Studio browsing
+# ---------------------------------------------------
+C_INCLUDES_COMPILER := -I$(PATH_AVRGNU)/lib/gcc/avr/7.3.0/include       \
+                       -I$(PATH_AVRGNU)/lib/gcc/avr/7.3.0/include-fixed \
+                       -I$(PATH_AVRGNU)/avr/include
+
+# ---------------------------------------------------
+# Include pathes for platform dependend header files (platform = MCU + compiler)
+# ---------------------------------------------------
+C_INCLUDES := $(C_INCLUDES)                                                     \
+             -I$(PATH_SRC_GEN)/Platform                                         \
+             -I$(PATH_SRC_GEN)/Platform/$(TARGET_MCU_FAMILY)/$(ARG_COMPILER)    \
+             -I$(PATH_SRC_ARDUINO_VARIANTS)/$(TARGET_MCU_VARIANT)
+
+# ---------------------------------------------------
+# Add compiler #defines for the target
+# ---------------------------------------------------
+ifeq ($(TARGET_MCU_VARIANT),mega)
+C_DEFINES := $(C_DEFINES)           \
+            -DF_CPU=16000000L       \
+            -DARDUINO=10608         \
+            -DARDUINO_AVR_MEGA2560  \
+            -DARDUINO_ARCH_AVR
+
+else
+$(error ------ Invalid build command line parameter ARG_TARGET_ECU $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: mega) ------
+endif
+
+# ---------------------------------------------------
+# Compiler flags.
+# Remark: Use -v flag to make gcc show its configuration including include pathes
+# ---------------------------------------------------
+CFLAGS := $(CFLAGS)               \
+        -c                        \
+        -g                        \
+        -Os                       \
+        -w                        \
+        -std=gnu++11              \
+        -fpermissive              \
+        -fno-exceptions           \
+        -ffunction-sections       \
+        -fdata-sections           \
+        -fno-threadsafe-statics   \
+        -MMD                      \
+        -flto                     \
+        -mmcu=$(TARGET_MCU_DEVICE)
+
+# ---------------------------------------------------
+# Print compiler version flags
+# ---------------------------------------------------
+CCVERSIONFLAGS := --version
+
+# ---------------------------------------------------
+# Linker flags
+# ---------------------------------------------------
+LFLAGS := $(LFLAGS)                   \
+         -w                           \
+         -Os                          \
+         -g                           \
+         -flto                        \
+         -fuse-linker-plugin          \
+         -mmcu=$(TARGET_MCU_DEVICE)   \
+         -L.                          \
+         -lm
+
+# ---------------------------------------------------
+# Select target file extension
+# ---------------------------------------------------
+OBJ_FILENAME_EXT := o
+
+# ---------------------------------------------------
+# Flags for tools
+# ---------------------------------------------------
+OBJCOPYFLAGS =  -O ihex \
+                -R .eeprom
+
+# -----------------------------------------------------------------------
+# See https://www.nongnu.org/avrdude/user-manual/avrdude_4.html
+# See http://savannah.nongnu.org/projects/avrdude
+# See https://www.avrfreaks.net/forum/cannot-connect-avrdude-mega2560
+
+# -p partno         This is the only mandatory option and it tells AVRDUDE what type of part (MCU) that is connected to the programmer.
+# -b baudrate       Override the RS-232 connection baud rate specified in the respective programmer’s entry of the configuration file. 
+# -B bitclock       Specify the bit clock period for the JTAG interface or the ISP clock (JTAG ICE only).
+# -c programmer-id  Specify the programmer to be used.
+# -C config-file    Use the specified config file for configuration data. This file contains all programmer and part definitions that AVRDUDE knows about.
+# -D                Disable auto erase for flash.
+# -e                Causes a chip erase to be executed. This will reset the contents of the flash ROM and EEPROM to the value ‘0xff’, and clear all lock bits.
+# -E exitspec[,...] By default, AVRDUDE leaves the parallel port in the same state at exit as it has been found at startup.
+#                   This option modifies the state of the ‘/RESET’ and ‘Vcc’ lines the parallel port is left at, according to the exitspec arguments provided.
+# -F                Normally, AVRDUDE tries to verify that the device signature read from the part is reasonable before continuing. 
+#                   Since it can happen from time to time that a device has a broken (erased or overwritten) device signature but is otherwise operating normally, 
+#                   this options is provided to override the check.
+# -i delay          For bitbang-type programmers, delay for approximately delay microseconds between each bit state change.
+# -l logfile        Use logfile rather than stderr for diagnostics output.
+# -n                No-write - disables actually writing data to the MCU (useful for debugging AVRDUDE).
+# -O                Perform a RC oscillator run-time calibration according to Atmel application note AVR053. 
+#                   This is only supported on the STK500v2, AVRISP mkII, and JTAG ICE mkII hardware.
+# -P port           Use port to identify the device to which the programmer is attached.
+# -q                Disable (or quell) output of the progress bar while reading or writing to the device.
+# -u                Disables the default behaviour of reading out the fuses three times before programming, 
+#                   then verifying at the end of programming that the fuses have not changed.
+# -s                Disable safemode prompting.
+# -t                Tells AVRDUDE to enter the interactive “terminal” mode instead of up- or downloading files.
+# -U memtype:op:filename[:format]
+#                   Perform a memory operation. Multiple ‘-U’ options can be specified in order to operate on multiple memories on the same command-line invocation.
+#                   The memtype field specifies the memory type to operate on. Use the ‘-v’ option on the command line or the part command from terminal mode 
+#                   to display all the memory types supported by a particular device. Typically, a device’s memory configuration at least contains the memory 
+#                   types flash and eeprom.
+#                   All memory types currently known are: 
+#                     flash    The flash ROM of the device. 
+#                     ...
+#                   The op field specifies what operation to perform: 
+#                     r    read the specified device memory and write to the specified file
+#                     w    read the specified file and write it to the specified device memory
+#                     v    read the specified device memory and the specified file and perform a verify operation
+#                   The filename field indicates the name of the file to read or write. 
+#                   The format field is optional and contains the format of the file to read or write. Possible values are:
+#                     i    Intel Hex
+#                     s    Motorola S-record
+#                     e    ELF (Executable and Linkable Format), the final output file from the linker; currently only accepted as an input file
+#                     a    auto detect; valid for input only, and only if the input is not provided at stdin.
+#                     ...
+# -v                Enable verbose output. More -v options increase verbosity level.
+# -V                Disable automatic verify check when uploading data.
+# -x extended_param Pass extended_param to the chosen programmer implementation as an extended parameter.
+# -----------------------------------------------------------------------
+AVRDUDE_FLAGS = -C$(PATH_AVRDUDE)/avrdude.conf      \
+                -v                                  \
+                -V                                  \
+                -p m2560                            \
+                -c wiring                           \
+                -P COM3                             \
+                -D
+
+
+# ---------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------
+
+# ---------------------------------------------------
+# MSVC (Microsoft)
+# ---------------------------------------------------
+# Supported platforms with MSVC (Microsoft):
+#   X86 and msvc
+#   X64 and msvc
+# ---------------------------------------------------
+else ifeq ($(ARG_COMPILER),msvc)
+CC := $(CL)
+
+# ---------------------------------------------------
+# Compiler include pathes; typically just required to print compiler include paths for Visual Studio browsing
+# ---------------------------------------------------
+C_INCLUDES_COMPILER =
+
+# ---------------------------------------------------
+# Include pathes for platform dependend header files
+# ---------------------------------------------------
+C_INCLUDES := $(C_INCLUDES)   \
+             -I$(PATH_SRC_GEN)/Platform                                         \
+             -I$(PATH_SRC_GEN)/Platform/$(TARGET_MCU_FAMILY)/$(ARG_COMPILER)
+
+# ---------------------------------------------------
+# Add compiler #defines for the target.
+# ---------------------------------------------------
+ifeq ($(TARGET_MCU_FAMILY),X86)
+C_DEFINES := $(C_DEFINES) \
+             -D "WIN32"
+
+else
+$(error ------ Invalid build command line parameter TARGET_MCU_FAMILY $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: X86) ------
+endif
+
+# ---------------------------------------------------
+# Compiler flags. See also https://learn.microsoft.com/en-us/cpp/build/reference/compiler-options-listed-alphabetically?view=msvc-170
+#
+# Use -<Option> instead of /<Option>: The /bin/sh shell only supports -<Option> instead of /<Option>.
+#
+# /analyze-               Turns on code analysis. Use /analyze- to explicitly turn off analysis. /analyze- is the default behavior.
+# /diagnostics            Use the /diagnostics compiler option to specify the display of error and warning location information.
+# /diagnostics:classic    The /diagnostics:classic option is the default, which reports only the line number where the issue was found.
+# /diagnostics:column     This option also includes the column where the issue was found. This can help you identify the specific language construct or character that is causing the issue.
+# /diagnostics:caret      This option includes the column where the issue was found and places a caret (^) under the location in the line of code where the issue was detected.
+# /EHc                    extern "C" defaults to nothrow.
+# /EHs                    Enable C++ exception handling (no SEH exceptions).
+# /errorReport:prompt     Deprecated. Error reporting is controlled by Windows Error Reporting (WER) settings.
+# /Fa (Listing file)      Creates a listing file containing assembler code.
+# /FC                     Displays the full path of source code files passed to cl.exe in diagnostic text.
+# /Fd (Program Database File Name) Specifies a file name for the program database (PDB) file created by /Z7, /Zi, /ZI (Debug Information Format).
+#                         If you specify a file name that does not include an extension, the compiler uses .pdb as the extension.
+# /fp:precise             "precise" floating-point model; results are predictable.
+# /Fo (Object File Name)  Specifies an object (.obj) file name or directory to be used instead of the default. Defined in Makefile_Rules.gmk. 
+# /Gd                     Uses the __cdecl calling convention. (x86 only). If required, defined in Makefile_Target.gmk.
+# /Gm                     Deprecated. Enables minimal rebuild.
+# /GS                     Checks buffer security.
+# /JMC 	                  Supports native C++ Just My Code debugging
+# /MD                     Compiles to create a multithreaded DLL, by using MSVCRT.lib.
+# /MDd                    Defines _DEBUG, _MT, and _DLL and causes the application to use the debug multithread-specific and DLL-specific version of the run-time library. It also causes the compiler to place the library name MSVCRTD.lib into the .obj file.
+# /nologo                 Suppresses display of sign-on banner.
+# /Od                     Disables optimization.
+# /O1	                  Creates small code.
+# /O2	                  Creates fast code.
+# /Ob0	                  The default value under /Od. Disables inline expansions
+# /Ob1	                  Allows expansion only of functions marked inline, __inline, or __forceinline, or in a C++ member function defined in a class declaration.
+# /Ob2	                  The default value under /O1 and /O2. Allows the compiler to expand any function not explicitly marked for no inlining
+# /Ob3	                  This option specifies more aggressive inlining than /Ob2, but has the same restrictions. The /Ob3 option is available starting in Visual Studio 2019.
+# /Oy-                    /Oy enables frame-pointer omission and /Oy- disables omission. In x64 compilers, /Oy and /Oy- are not available. If required, defined in Makefile_Target.gmk.
+# /permissive-            Specify standards conformance mode to the compiler. Use this option to help you identify and fix conformance issues in your code, to make it both more correct and more portable.
+# /RTC1                   Enable fast runtime checks (equivalent to /RTCsu).
+# /scanDependencies       This compiler option generates a JSON file that lists module and header-unit dependencies according to C++ Standard proposal P1689R5 Format for describing dependencies of source files.
+# /sdl 	                  Enable more security features and warnings.
+# /W3                     Specifies how the compiler generates warnings for a given compilation. /W3: recommend that you use this option to provide lint-like warnings.
+# /W4                     Specifies how the compiler generates warnings for a given compilation. /W4: For a new project, it may be best to use /W4 in all compilations. This option helps ensure the fewest possible hard-to-find code defects.
+# /WX                     Treat warnings as errors. Use /WX- to not treat warnings as errors.
+# /Zc:forScope            Enforce Standard C++ for scoping rules (on by default).
+# /Zc:inline              Remove unreferenced functions or data if they're COMDAT or have internal linkage only (off by default).
+# /Zc:wchar_t             wchar_t is a native type, not a typedef (on by default).
+# /Zi                     Generates complete debugging information.
+# /ZI 	                  Includes debug information in a program database compatible with Edit and Continue. (x86 only)
+# ---------------------------------------------------
+CFLAGS := $(CFLAGS)                       \
+          -analyze-                       \
+          -EHsc                           \
+          -errorReport:prompt             \
+          -Fa$(PATH_TMP)/                 \
+          -FC                             \
+          -Fd$(PATH_BIN)/$(PROJECT_NAME)  \
+          -fp:precise                     \
+          -Gd                             \
+          -GS                             \
+          -MDd                            \
+          -nologo                         \
+          -Od                             \
+          -Oy-                            \
+          -RTC1                           \
+          -W4                             \
+          -WX                             \
+          -Zc:inline                      \
+          -Zc:wchar_t                     \
+          -Zi
+
+#           -scanDependencies $(PATH_TMP)/
+
+C_DEFINES := $(C_DEFINES) \
+          -D "_DEBUG"     \
+          -D "_CONSOLE"   \
+          -D "_UNICODE"   \
+          -D "UNICODE" 
+
+# ---------------------------------------------------
+# How to print compiler version flags
+# ---------------------------------------------------
+CCVERSIONFLAGS :=
+
+# ---------------------------------------------------
+# Linker flags
+# See https://learn.microsoft.com/de-de/cpp/build/reference/link-pass-options-to-linker?source=recommendations&view=msvc-170
+# See https://learn.microsoft.com/en-us/cpp/build/reference/linker-options?view=msvc-170
+# /link (Optionen an Linker übergeben)
+# The /link option and its linker options must appear after any file names and CL options. 
+# A space is required between /link and any linker options.
+# /DEBUG    The /DEBUG option creates debugging information for the executable. 
+#           The linker uses the base name of the program and the extension .pdb to name the program database, 
+#           and embeds the path where it was created. 
+#           To override this default, set /PDB and specify a different file name.
+# /PDB:(Use Program Database)   A user-specified name for the program database (PDB) that the linker creates. It replaces the default name.
+# ---------------------------------------------------
+ifeq ($(TARGET_MCU_FAMILY),X86)
+LFLAGS := $(LFLAGS)          \
+          -link              \
+          -NOLOGO            \
+          -MACHINE:X86       \
+          -DEBUG             \
+          -SUBSYSTEM:CONSOLE
+else
+$(error ------ Invalid build command line parameter TARGET_MCU_FAMILY $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: X86) ------
+endif
+
+# ---------------------------------------------------
+# Select target file extension
+# ---------------------------------------------------
+OBJ_FILENAME_EXT := obj
+
+
+# ---------------------------------------------------
+# ---------------------------------------------------
+else
+
+$(error ------ Invalid build command line parameter ARG_COMPILER $(ARG_COMPILER) for ARG_TARGET_ECU $(ARG_TARGET_ECU). Supported: avrgcc,msvc) ------
+
+endif

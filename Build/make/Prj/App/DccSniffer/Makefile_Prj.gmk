@@ -3,4 +3,5 @@
 #
 
 # Files
-FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/DccSniffer
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/DccSniffer \
+            $(PATH_SRC_GEN)/Dcc/Decoder
