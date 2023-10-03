@@ -58,6 +58,21 @@ namespace util
   }
 
   // ------------------------------------------------------------------------------
+  /// Copies the elements in the range, defined by [first, last), to another range 
+  /// beginning at d_first (copy destination range).
+  // ------------------------------------------------------------------------------
+  template< class InputIt, class OutputIt >
+  OutputIt copy(InputIt first, InputIt last, OutputIt d_first)
+  {
+    while (first != last)
+    {
+      *d_first++ = *first++;
+    }
+
+    return d_first;
+  }
+
+  // ------------------------------------------------------------------------------
   /// Returns s1 + s2 and limits the sum to max value of T
   // ------------------------------------------------------------------------------
   template<typename T>
