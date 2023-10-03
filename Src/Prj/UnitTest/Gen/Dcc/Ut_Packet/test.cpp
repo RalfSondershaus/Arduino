@@ -1,10 +1,25 @@
-/**
+ /**
  * @file test.cpp
- *
- * @author Ralf Sondershaus
- *
+   *
+   * @author Ralf Sondershaus
+   *
  * Google Test for Gen/Dcc/Packet.h
- */
+   *
+   * @copyright Copyright 2018 - 2023 Ralf Sondershaus
+   *
+   * This program is free software: you can redistribute it and/or modify it
+   * under the terms of the GNU General Public License as published by the
+   * Free Software Foundation, either version 3 of the License, or (at your
+   * option) any later version.
+   *
+   * This program is distributed in the hope that it will be useful, but
+   * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+   * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+   * for more details.
+   *
+   * You should have received a copy of the GNU General Public License
+   * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   */
 
 #include <Dcc/Packet.h>
 #include <gtest/gtest.h>
@@ -12,7 +27,7 @@
 
 TEST(Ut_Packet, packet_empty)
 {
-  Dcc::Packet<6> packet;
+  dcc::Packet<6> packet;
   int i;
 
   for (i = 0; i < 6; i++)
@@ -24,7 +39,7 @@ TEST(Ut_Packet, packet_empty)
 
 TEST(Ut_Packet, packet_add_2_bits)
 {
-  Dcc::Packet<6> packet;
+  dcc::Packet<6> packet;
 
   packet.addBit(1);
   EXPECT_EQ(packet.refByte(0), 1);
@@ -35,7 +50,7 @@ TEST(Ut_Packet, packet_add_2_bits)
 
 TEST(Ut_Packet, packet_add_16_bits)
 {
-  Dcc::Packet<6> packet;
+  dcc::Packet<6> packet;
   std::array<uint8_t, 8> byte0 = { 1, 0, 1, 1,  0, 1, 1, 0 };
   std::array<uint8_t, 8> byte1 = { 0, 1, 1, 0,  0, 0, 0, 1 };
   uint8_t byte;
@@ -61,7 +76,7 @@ TEST(Ut_Packet, packet_add_16_bits)
 
 TEST(Ut_Packet, packet_copy_constructor)
 {
-  Dcc::Packet<6> packet;
+  dcc::Packet<6> packet;
   std::array<uint8_t, 8> byte0 = { 1, 0, 1, 1,  0, 1, 1, 0 };
   std::array<uint8_t, 8> byte1 = { 0, 1, 1, 0,  0, 0, 0, 1 };
 
@@ -83,8 +98,8 @@ TEST(Ut_Packet, packet_copy_constructor)
 
 TEST(Ut_Packet, packet_copy_assignment)
 {
-  Dcc::Packet<6> packet;
-  Dcc::Packet<6> packet_copy;
+  dcc::Packet<6> packet;
+  dcc::Packet<6> packet_copy;
   std::array<uint8_t, 8> byte0 = { 1, 0, 1, 1,  0, 1, 1, 0 };
   std::array<uint8_t, 8> byte1 = { 0, 1, 1, 0,  0, 0, 0, 1 };
 
@@ -106,8 +121,8 @@ TEST(Ut_Packet, packet_copy_assignment)
 
 TEST(Ut_Packet, packet_operator_equal)
 {
-  Dcc::Packet<6> packet;
-  Dcc::Packet<6> packet_copy;
+  dcc::Packet<6> packet;
+  dcc::Packet<6> packet_copy;
   std::array<uint8_t, 8> byte0 = { 1, 0, 1, 1,  0, 1, 1, 0 };
   std::array<uint8_t, 8> byte1 = { 0, 1, 1, 0,  0, 0, 0, 1 };
 

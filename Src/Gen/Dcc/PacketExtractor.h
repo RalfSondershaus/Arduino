@@ -11,7 +11,7 @@
 namespace dcc
 {
   // ---------------------------------------------------
-  /// Extract a packet from a stream of bits.<BR>
+  /// Extract a packet from a bit stream.<BR>
   /// Minimum time for a packet (preamble + 2 bytes of data):<BR>
   /// <CODE>
   /// Preamble: 10x "1" + 1x "0"<BR>
@@ -37,13 +37,16 @@ namespace dcc
     /// size type
     typedef size_t size_type;
 
-    /// Interface for a handler. Such a handler is called if a new packet is received completely
+    /// Interface for a handler. Such a handler is called if a new packet is available
     class HandlerIfc
     {
     public:
+      /// The packets
       typedef This::PacketType PacketType;
+      /// Construct and destruct
       HandlerIfc() {}
       virtual ~HandlerIfc() {}
+      /// If a new packet is available, this function is called
       virtual void packetReceived(const PacketType& pkt) = 0;
     };
 
@@ -81,12 +84,12 @@ namespace dcc
     eState executeData(eBit bitRcv);
 
     /// Number of "1" received
-    uint16_t unNrOnePreamble;
+    uint8_least ucNrOnePreamble;
     /// Count received data bits for current packet per byte: first 8 bits are stored in a packet, 9th bit defines "packet finished" (1 bit) or "more bytes" (0 bit)
     /// Counts from 0 (nothing received yet) up to 9 (trailing 0 bit)
-    uint16_t unNrBitsData;
+    uint8_least ucNrBitsData;
 
-    /// Reference for HandlerIfc interface. This interface is called as soon as a new packet is received completely.
+    /// Reference for HandlerIfc interface. This interface is called as soon as a new packet is available.
     HandlerIfc& mHandlerIfc;
 
     /// Packet that is processed (received) currently
@@ -96,7 +99,7 @@ namespace dcc
     /// constructor
     PacketExtractor(HandlerIfc& hifc)
       : state(STATE_PREAMBLE)
-      , unNrBitsData(0u)
+      , ucNrBitsData(0u)
       , mHandlerIfc(hifc)
     {
       invalid();
@@ -112,8 +115,8 @@ namespace dcc
     void invalid()
     {
       state = STATE_PREAMBLE;
-      unNrOnePreamble = 0u;
-      unNrBitsData = 0u;
+      ucNrOnePreamble = 0u;
+      ucNrBitsData = 0u;
       CurrentPacket.clear();
     }
   };
@@ -130,21 +133,21 @@ namespace dcc
     if (bitRcv == BIT_ONE)
     {
       // prevent overflow
-      if (unNrOnePreamble < static_cast<uint16_t>(255))
+      if (ucNrOnePreamble < static_cast<uint16>(255))
       {
-        unNrOnePreamble++;
+        ucNrOnePreamble++;
       }
     }
     else // BIT_ZERO
     {
-      if (isPreambleValid(unNrOnePreamble))
+      if (isPreambleValid(ucNrOnePreamble))
       {
         nextState = STATE_DATA;
       }
       // reset counter because
       // - min number of "1" not reached, invalid or waiting for first "1"
       // - or valid preamble detected, switch to STATE_DATA but prepare next switch to STATE_PREAMBLE
-      unNrOnePreamble = 0;
+      ucNrOnePreamble = 0;
     }
 
     return nextState;
@@ -158,20 +161,22 @@ namespace dcc
   {
     eState nextState = state;
 
-    if (unNrBitsData < 8u)
+    if (ucNrBitsData < 8u)
     {
-      CurrentPacket.addBit(static_cast<uint8_t>(bitRcv));
-      unNrBitsData++;
+      CurrentPacket.addBit(static_cast<uint8>(bitRcv));
+      ucNrBitsData++;
     }
     else
     {
-      unNrBitsData = 0u;
+      ucNrBitsData = 0u;
 
       // Bit 0 is expected at the end of a data / address byte
       // If a 1 bit is received instead of a 0 bit, the packet is finished and the next packet is to be received
       if (bitRcv == BIT_ONE)
       {
         nextState = STATE_PREAMBLE;
+        // store number of preamble "1" in the packet; can be optimized (use CurrentPacket.ucNrOnePreamble instead of ucNrOnePreamble)
+        CurrentPacket.ucNrOnePreamble = ucNrOnePreamble;
         // notify handler about new packet
         mHandlerIfc.packetReceived(CurrentPacket);
         // prepare next reception

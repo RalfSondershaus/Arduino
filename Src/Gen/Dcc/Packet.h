@@ -43,43 +43,52 @@ namespace dcc
     typedef util::array<uint8, kMaxBytes> ByteArray;
 
     /// number of bits received
-    uint16 un_nr_bits;
+    uint8_least ucNrNbits;
     /// byte array
     ByteArray bytes;
 
     /// Return current byte index (index into array of bytes)
-    uint16 byteIdx() const noexcept { return static_cast<uint16>(un_nr_bits / 8u); }
+    uint16 byteIdx() const noexcept { return static_cast<uint16>(ucNrNbits / 8u); }
     /// Return current bit index (in current byte byteIdx())
-    uint16 bitIdx() const noexcept { return static_cast<uint16>(un_nr_bits % 8u); }
+    uint16 bitIdx() const noexcept { return static_cast<uint16>(ucNrNbits % 8u); }
 
   public:
     typedef size_t size_type;
 
+    using iterator = typename ByteArray::iterator;
+    using const_iterator = typename ByteArray::const_iterator;
+
+    /// Maximal number of bytes (template parameter)
+    static constexpr int kMaxNrBytes = kMaxBytes;
+
+    /// number of "1" in the preamble (for debugging)
+    uint8 ucNrOnePreamble;
+
     /// Constructor
-    Packet() : un_nr_bits(0) { clear(); }
+    Packet() : ucNrNbits(0) { clear(); }
     /// clear all data
     void clear()
     {
-      un_nr_bits = 0;
+      ucNrNbits = 0;
       bytes.fill(0);
     }
     /// add a bit (0 or 1)
     void addBit(uint8 uc_bit)
     {
       refByte(byteIdx()) = static_cast<uint8>((refByte(byteIdx()) << 1u) | uc_bit);
-      un_nr_bits++;
+      ucNrNbits++;
     }
     /// get a single byte
     uint8& refByte(size_type idx) { return bytes[idx]; }
     const uint8& refByte(size_type idx) const { return bytes[idx]; }
     /// get the number of used bytes
-    size_type getNrBytes() const noexcept { return util::math::ceilt(un_nr_bits, static_cast<uint16>(8u)); }
+    size_type getNrBytes() const noexcept { return util::math::ceilt(ucNrNbits, static_cast<uint8_least>(8u)); }
     /// equality
     bool operator==(const Packet& p) const
     {
       uint16_t i;
 
-      bool b_ret = (p.un_nr_bits == un_nr_bits);
+      bool b_ret = (p.ucNrNbits == ucNrNbits);
 
       for (i = 0; i < byteIdx(); i++)
       {
@@ -88,6 +97,14 @@ namespace dcc
 
       return b_ret;
     }
+
+    /// returns an iterator to the beginning
+    iterator begin() { return bytes.begin(); }
+    const_iterator begin() const { return bytes.begin(); }
+
+    /// returns an iterator to the end
+    iterator end() { return bytes.end(); }
+    const_iterator end() const { return bytes.end(); }
   };
   
 } // namespace dcc

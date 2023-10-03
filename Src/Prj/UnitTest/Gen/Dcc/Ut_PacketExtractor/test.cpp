@@ -1,16 +1,31 @@
 /**
- * @file test.cpp
- *
- * @author Ralf Sondershaus
- *
- * Google Test for Gen/Dcc/BitExtractor.h and Gen/Dcc/PacketExtractor.h
- */
+  * @file test.cpp
+  *
+  * @author Ralf Sondershaus
+  *
+  * Google Test for Gen/Dcc/BitExtractor.h and Gen/Dcc/PacketExtractor.h
+  *
+  * @copyright Copyright 2018 - 2023 Ralf Sondershaus
+  *
+  * This program is free software: you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the
+  * Free Software Foundation, either version 3 of the License, or (at your
+  * option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful, but
+  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+  * for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program. If not, see <https://www.gnu.org/licenses/>.
+  */
 
 #include <Dcc/PacketExtractor.h>
 #include <gtest/gtest.h>
 #include <array>
 
-typedef Dcc::PacketExtractor<> PacketExtractorType;
+typedef dcc::PacketExtractor<> PacketExtractorType;
 
 // -----------------------------------------------------------------------
 /// A handler class for new packets.
@@ -86,7 +101,7 @@ TEST(Ut_PacketExtractor, packetextractor_preamble_valid_10_bit)
   };
   PacketExtractorHandlerClass packethandler;
   PacketExtractorType packetextractor(packethandler);
-  Dcc::Packet<> packet;
+  dcc::Packet<> packet;
 
   packet.refByte(0) = 0b10101010;
   packet.refByte(1) = 0b11101010;

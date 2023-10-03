@@ -124,6 +124,7 @@ namespace util
     typedef fix_deque_iterator_base<FixDeque> Base;
 
     using reference = typename FixDeque::reference;
+    using size_type = typename Base::size_type;
 
   protected:
     FixDeque& myDeque;
@@ -134,7 +135,7 @@ namespace util
 
     /// @name Element access
     /// @{
-    reference operator*() noexcept { return myDeque.at(myPos); }
+    reference operator*() noexcept { return myDeque.at(Base::myPos); }
     /// @}
 
     /// @name Increment / decrement
@@ -156,6 +157,7 @@ namespace util
     typedef fix_deque_iterator_base<FixDeque> Base;
 
     using const_reference = typename FixDeque::const_reference;
+    using size_type = typename Base::size_type;
 
   protected:
     FixDeque& myDeque; // "FixDeque" is of type "const fix_deque<T,N>"
@@ -166,7 +168,7 @@ namespace util
 
     /// @name Element access
     /// @{
-    const_reference operator*() const noexcept { return myDeque.at(myPos); }
+    const_reference operator*() const noexcept { return myDeque.at(Base::myPos); }
     /// @}
 
     /// @name Increment / decrement
