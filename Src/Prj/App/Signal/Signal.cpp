@@ -41,7 +41,7 @@ namespace signal
   // -----------------------------------------------------------------------------------
   rte::signal_intensity_type Signal::exec(const cal::signal_type * pCal)
   {
-    cal::aspect_type aspect_tmp;
+    cal::aspect_type aspect_cur;
     size_t pos;
     rte::signal_intensity_type intensities_tgt;
     constexpr size_t kNrSignalTargetsMaxIdx = cfg::kNrSignalTargets - 1U;
@@ -75,17 +75,12 @@ namespace signal
     if (!changeOverTimer.timeout())
     {
       // aspect is changing, phase 1: dim down to zero intensity
-      aspect_tmp.aspect = 0U;
+      aspect_cur.aspect = 0U;
     }
     else
     {
       // aspect is active or changing, phase 2: dim up to target intensities
-      aspect_tmp = aspect_tgt;
-    }
-
-    if (aspect_cur.aspect != aspect_tmp.aspect)
-    {
-      aspect_cur = aspect_tmp;
+      aspect_cur = aspect_tgt;
     }
 
     // MSB of aspect is index 0 in target intensity array

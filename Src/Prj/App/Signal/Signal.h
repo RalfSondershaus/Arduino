@@ -55,8 +55,6 @@ namespace signal
     /// Returns true if the cmd is valid
     bool isValid(cmd_type cmd) const noexcept { return cmd < cfg::kNrSignalAspects; }
 
-    /// Current target aspect (can be 0 during transition, or final target aspect)
-    aspect_type aspect_cur;
     /// Target aspect (final)
     aspect_type aspect_tgt;
     /// Change over time between transitions (time is used twice: for dim down and for dim up)
@@ -66,11 +64,8 @@ namespace signal
 
   public:
 
-    Signal() : aspect_cur{ 0U, 0U }, aspect_tgt{ 0U, 0U }
+    Signal() : aspect_tgt{ 0U, 0U }
     {}
-
-    /// Returns the current aspect
-    aspect_type getCurAspect() const noexcept { return aspect_cur; }
 
     /// Initialization
     void init();
