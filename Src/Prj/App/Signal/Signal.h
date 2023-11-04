@@ -47,6 +47,10 @@ namespace signal
     static cal::target_type cal_getTarget(const cal::signal_type * pCal, size_type idx) { return pCal->targets[idx]; }
     static uint8 cal_getChangeOverTime(const cal::signal_type * pCal) { return pCal->changeOverTime; }
 
+    /// Returns true if the aspect is in its initial state (after startup). 
+    /// Returns false otherwise (aspect has been used once at least).
+    static bool isInitialState(aspect_type aspect) { return aspect.aspect == static_cast<uint8_t>(0U); }
+
   protected:
     /// Returns true if the cmd is valid
     bool isValid(cmd_type cmd) const noexcept { return cmd < cfg::kNrSignalAspects; }
@@ -71,7 +75,7 @@ namespace signal
     /// Initialization
     void init();
     /// Check cmd and turn on current and target aspect if required
-    void exec(const cal::signal_type * pCal, const cmd_type cmd);
+    rte::signal_intensity_type exec(const cal::signal_type * pCal);
   };
 
   // -----------------------------------------------------------------------------------
@@ -91,18 +95,11 @@ namespace signal
     /// the list of cfg::kNrSignals signals
     signal_array_type signals;
 
-    enum
-    {
-      kUninitialized = 0,
-      kInitialized = 1
-    };
-    uint8_t bootstate; // kUninitialized or kInitialized
-
     bool cal_valid(const cal::signal_cal_type * pCal) const { return pCal != nullptr; }
 
   public:
 
-    SignalHandler() : bootstate{ kUninitialized }
+    SignalHandler()
     {}
 
     /// RTE runables

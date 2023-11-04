@@ -31,8 +31,8 @@ namespace rte
   typedef uint16 intensity16_t; ///< 16 bit, 0 = 0%, 65535 = 100%
   typedef uint8  intensity8_t;  ///< 8 bit, 0 = 0%, 255 = 100%
 
-  constexpr uint8 kIntensity8_100 = 255;
-  constexpr uint8 kIntensity8_0 = 0;
+  constexpr intensity8_t kIntensity8_100 = 255;
+  constexpr intensity8_t kIntensity8_0 = 0;
 
   /// Times
   typedef uint8  dimtime8_10ms_t;  ///< 8 bit, [10 ms] 0 = 0 ms, 255 = 2550 ms = 2.55 sec

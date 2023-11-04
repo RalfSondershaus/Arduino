@@ -32,7 +32,7 @@ namespace cfg
 
   constexpr uint8 kNrSignals = 6; ///< Maximal number of signals
   constexpr uint8 kNrSignalAspects = 5; ///< Maximal number of signal aspects
-  constexpr uint8 kNrSignalTargets = 5; ///< Maximal number of signal LED strings
+  constexpr uint8 kNrSignalTargets = 5; ///< Maximal number of LED strings of a signal
 
   constexpr int kNrOnboardTargets = 54; ///< We support up to 54 onboard LED targets (some of them with PWM))
   constexpr int kNrExternalTargets = 32; ///< We support up to 32 external outputs (such as 4 shift registers with 8 bit each)

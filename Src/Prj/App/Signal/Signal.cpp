@@ -34,21 +34,37 @@ namespace signal
   }
 
   // -----------------------------------------------------------------------------------
-  /// Calculates target values and dim ramps for command cmd.
+  /// - Gets command for given cal data
+  /// - Calculates and returns target intensities and dim ramp for the command
+  /// 
   /// Precondition: valid calibration data (pCal is valid).
   // -----------------------------------------------------------------------------------
-  void Signal::exec(const cal::signal_type * pCal, const cmd_type cmd)
+  rte::signal_intensity_type Signal::exec(const cal::signal_type * pCal)
   {
     cal::aspect_type aspect_tmp;
+    size_t pos;
+    rte::signal_intensity_type intensities_tgt;
+    constexpr size_t kNrSignalTargetsMaxIdx = cfg::kNrSignalTargets - 1U;
+
     rte::dimtime8_10ms_t dimtime = static_cast<rte::dimtime8_10ms_t>(cal_getChangeOverTime(pCal));
 
+    cmd_type cmd = rte::ifc_rte_get_cmd::call(cal_getInput(pCal));
+
+    // switch on RED if there hasn't been received a valid command since system start.
+    if ((cmd == rte::kInvalidCmd) && (isInitialState(aspect_tgt)))
+    {
+      cmd = 0; // 0 means RED by default
+    }
+
+    // The target intensity is changed if the command is a valid command.
+    // If the command is an invalid command, the (last) target intensity remains.
     if (isValid(cmd))
     {
       const cal::aspect_type asp = cal_getAspect(pCal, cmd);
       if (aspect_tgt.aspect != asp.aspect)
       {
         // apply change over time only if current target aspect is not initial state
-        if (aspect_tgt.aspect != static_cast<uint8_t>(0U))
+        if (!isInitialState(aspect_tgt))
         {
           changeOverTimer.start(scale_10ms_1ms(dimtime));
         }
@@ -58,10 +74,12 @@ namespace signal
 
     if (!changeOverTimer.timeout())
     {
+      // aspect is changing, phase 1: dim down to zero intensity
       aspect_tmp.aspect = 0U;
     }
     else
     {
+      // aspect is active or changing, phase 2: dim up to target intensities
       aspect_tmp = aspect_tgt;
     }
 
@@ -69,22 +87,36 @@ namespace signal
     {
       aspect_cur = aspect_tmp;
     }
+
+    // MSB of aspect is index 0 in target intensity array
+    // LSB of aspect is index cfg::kNrSignalTargets-1 in target intensity array
+    for (pos = 0U; pos < static_cast<size_t>(cfg::kNrSignalTargets); pos++)
+    {
+      if (util::bits::test<uint8>(aspect_cur.aspect, pos))
+      {
+        intensities_tgt.intensities[kNrSignalTargetsMaxIdx - pos] = rte::kIntensity8_100;
+      }
+      else
+      {
+        intensities_tgt.intensities[kNrSignalTargetsMaxIdx - pos] = rte::kIntensity8_0;
+      }
+      intensities_tgt.changeOverTime = dimtime;
+    }
+
+    return intensities_tgt;
   }
 
   // -----------------------------------------------------------------------------------
   // -----------------------------------------------------------------------------------
   void SignalHandler::init()
   {
-    bootstate = kUninitialized;
   }
 
   // -----------------------------------------------------------------------------------
   // -----------------------------------------------------------------------------------
   void SignalHandler::cycle()
   {
-    size_t pos;
     rte::signal_intensity_type intensities_tgt;
-    rte::intensity8_t intensity;
 
     const cal::signal_cal_type * pCal = rte::ifc_cal_signal::call();
 
@@ -93,41 +125,13 @@ namespace signal
       auto calit = pCal->begin();
       for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
       {
-        cmd_type cmd = rte::ifc_rte_get_cmd::call(calit->input);
-
-        // switch on RED if this is called for the first time and no valid command is available
-        if ((cmd == rte::kInvalidCmd) && (bootstate == kUninitialized))
-        {
-          cmd = 0; // 0 means RED by default
-        }
-
-        sigit->exec(calit, cmd);
-
-        for (pos = static_cast<size_t>(0U); pos < static_cast<size_t>(cfg::kNrSignalTargets); pos++)
-        {
-          if (util::bits::test<uint8>(sigit->getCurAspect().aspect, pos))
-          {
-            intensity = static_cast<rte::intensity8_t>(rte::kIntensity8_100);
-          }
-          else
-          {
-            intensity = static_cast<rte::intensity8_t>(rte::kIntensity8_0);
-          }
-          // MSB of aspect is index 0 in target intensity array
-          // LSB of aspect is index cfg::kNrSignalTargets-1 in target intensity array
-          intensities_tgt.intensities[static_cast<size_t>((cfg::kNrSignalTargets - 1U) - pos)] = intensity;
-          intensities_tgt.changeOverTime = Signal::cal_getChangeOverTime(calit);
-          //lis.setIntensitySpeed(cal_getTarget(static_cast<size_t>((cfg::kNrSignalTargets - 1U) - pos)), intensity, dimtime);
-        }
+        intensities_tgt = sigit->exec(calit);
 
         rte::ifc_signal_target_intensities::writeElement(sigit - signals.begin(), intensities_tgt);
 
         calit++;
       }
     }
-
-    // Initialization is performed when this function is called for the first time
-    bootstate = kInitialized;
   }
 
 } // namespace signal
