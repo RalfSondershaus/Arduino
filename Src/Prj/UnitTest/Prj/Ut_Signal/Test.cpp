@@ -83,63 +83,63 @@ TEST(Ut_Signal, Default_Green_Red)
     int nPin;      // input pin for AD value
     int nAdc;     // current AD value for pin
     cmd_type cmd; // expected value: command on RTE
-    signal_target_array au8Curs; // expected value: target onboard intensities
+    signal_target_array au8Curs; // expected value: target onboard duty cycles
   } step_type;
 
   const step_type aSteps[] =
   {
       {   0,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
-    , {  10,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 25,  25,   0,   0,   0 } }
-    , {  20,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 51,  51,   0,   0,   0 } }
-    , {  30,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 76,  76,   0,   0,   0 } }
-    , {  40,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {102, 102,   0,   0,   0 } }
-    , {  50,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {127, 127,   0,   0,   0 } }
-    , {  60,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {153, 153,   0,   0,   0 } }
-    , {  70,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {178, 178,   0,   0,   0 } }
-    , {  80,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {204, 204,   0,   0,   0 } }
-    , {  90,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {229, 229,   0,   0,   0 } }
+    , {  10,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
+    , {  20,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
+    , {  30,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
+    , {  40,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
+    , {  50,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 16,  16,   0,   0,   0 } }
+    , {  60,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 28,  28,   0,   0,   0 } }
+    , {  70,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 48,  48,   0,   0,   0 } }
+    , {  80,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 84,  84,   0,   0,   0 } }
+    , {  90,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {145, 145,   0,   0,   0 } }
     , { 100,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {255, 255,   0,   0,   0 } }
     , { 510,  CLASSIFIER_PIN0, kGreenLo, rte::kInvalidCmd, {255, 255,   0,   0,   0 }}
-    , { 560,  CLASSIFIER_PIN0, kGreenLo,                1, {230, 230,   0,   0,   0 }}
-    , { 570,  CLASSIFIER_PIN0, kGreenLo,                1, {204, 204,   0,   0,   0 }}
-    , { 580,  CLASSIFIER_PIN0, kGreenLo,                1, {179, 179,   0,   0,   0 }}
-    , { 590,  CLASSIFIER_PIN0, kGreenLo,                1, {153, 153,   0,   0,   0 }}
-    , { 600,  CLASSIFIER_PIN0, kGreenLo,                1, {128, 128,   0,   0,   0 }}
-    , { 610,  CLASSIFIER_PIN0, kGreenLo,                1, {102, 102,   0,   0,   0 }}
-    , { 620,  CLASSIFIER_PIN0, kGreenLo,                1, { 77,  77,   0,   0,   0 }}
-    , { 630,  CLASSIFIER_PIN0, kGreenLo,                1, { 51,  51,   0,   0,   0 }}
-    , { 640,  CLASSIFIER_PIN0, kGreenLo,                1, { 26,  26,   0,   0,   0 }}
+    , { 560,  CLASSIFIER_PIN0, kGreenLo,                1, {148, 148,   0,   0,   0 }}
+    , { 570,  CLASSIFIER_PIN0, kGreenLo,                1, { 84,  84,   0,   0,   0 }}
+    , { 580,  CLASSIFIER_PIN0, kGreenLo,                1, { 49,  49,   0,   0,   0 }}
+    , { 590,  CLASSIFIER_PIN0, kGreenLo,                1, { 28,  28,   0,   0,   0 }}
+    , { 600,  CLASSIFIER_PIN0, kGreenLo,                1, { 16,  16,   0,   0,   0 }}
+    , { 610,  CLASSIFIER_PIN0, kGreenLo,                1, {  9,   9,   0,   0,   0 }}
+    , { 620,  CLASSIFIER_PIN0, kGreenLo,                1, {  5,   5,   0,   0,   0 }}
+    , { 630,  CLASSIFIER_PIN0, kGreenLo,                1, {  3,   3,   0,   0,   0 }}
+    , { 640,  CLASSIFIER_PIN0, kGreenLo,                1, {  2,   2,   0,   0,   0 }}
     , { 650,  CLASSIFIER_PIN0, kGreenLo,                1, {  0,   0,   0,   0,   0 }}
-    , { 660,  CLASSIFIER_PIN0, kGreenLo,                1, {  0,   0,  25,   0,   0 }}
-    , { 670,  CLASSIFIER_PIN0, kGreenLo,                1, {  0,   0,  51,   0,   0 }}
-    , { 680,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  76,   0,   0 } }
-    , { 690,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 102,   0,   0 } }
-    , { 700,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 127,   0,   0 } }
-    , { 710,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 153,   0,   0 } }
-    , { 720,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 178,   0,   0 } }
-    , { 730,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 204,   0,   0 } }
-    , { 740,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 229,   0,   0 } }
+    , { 660,  CLASSIFIER_PIN0, kGreenLo,                1, {  0,   0,   2,   0,   0 }}
+    , { 670,  CLASSIFIER_PIN0, kGreenLo,                1, {  0,   0,   3,   0,   0 }}
+    , { 680,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   5,   0,   0 } }
+    , { 690,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   9,   0,   0 } }
+    , { 700,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  16,   0,   0 } }
+    , { 710,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  28,   0,   0 } }
+    , { 720,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  48,   0,   0 } }
+    , { 730,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  84,   0,   0 } }
+    , { 740,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 145,   0,   0 } }
     , { 750,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 255,   0,   0 } }
     , { 760,  CLASSIFIER_PIN0,   kRedLo, rte::kInvalidCmd, {  0,   0, 255,   0,   0 } }
-    , { 810,  CLASSIFIER_PIN0,   kRedLo,                0, {  0,   0, 230,   0,   0 } }
-    , { 820,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 204,   0,   0 } }
-    , { 830,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 179,   0,   0 } }
-    , { 840,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 153,   0,   0 } }
-    , { 850,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 128,   0,   0 } }
-    , { 860,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 102,   0,   0 } }
-    , { 870,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  77,   0,   0 } }
-    , { 880,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  51,   0,   0 } }
-    , { 890,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  26,   0,   0 } }
+    , { 810,  CLASSIFIER_PIN0,   kRedLo,                0, {  0,   0, 148,   0,   0 } }
+    , { 820,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  84,   0,   0 } }
+    , { 830,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  49,   0,   0 } }
+    , { 840,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  28,   0,   0 } }
+    , { 850,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  16,   0,   0 } }
+    , { 860,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   9,   0,   0 } }
+    , { 870,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   5,   0,   0 } }
+    , { 880,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   3,   0,   0 } }
+    , { 890,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   2,   0,   0 } }
     , { 900,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
-    , { 910,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 25,  25,   0,   0,   0 } }
-    , { 920,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 51,  51,   0,   0,   0 } }
-    , { 930,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 76,  76,   0,   0,   0 } }
-    , { 940,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {102, 102,   0,   0,   0 } }
-    , { 950,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {127, 127,   0,   0,   0 } }
-    , { 960,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {153, 153,   0,   0,   0 } }
-    , { 970,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {178, 178,   0,   0,   0 } }
-    , { 980,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {204, 204,   0,   0,   0 } }
-    , { 990,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {229, 229,   0,   0,   0 } }
+    , { 910,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
+    , { 920,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
+    , { 930,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
+    , { 940,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
+    , { 950,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 16,  16,   0,   0,   0 } }
+    , { 960,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 28,  28,   0,   0,   0 } }
+    , { 970,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 48,  48,   0,   0,   0 } }
+    , { 980,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 84,  84,   0,   0,   0 } }
+    , { 990,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {145, 145,   0,   0,   0 } }
     , {1000,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {255, 255,   0,   0,   0 } }
   };
 
@@ -168,11 +168,11 @@ TEST(Ut_Signal, Default_Green_Red)
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
-      rte::intensity8_t u8Intensity;
-      rte::Ifc_OnboardTargetIntensities::size_type pos = static_cast<rte::Ifc_OnboardTargetIntensities::size_type>(rte::calib_mgr.signals[kSignalId].targets[i].idx);
-      EXPECT_EQ(rte::ifc_onboard_target_intensities::readElement(pos, u8Intensity), rte::ret_type::OK);
-      log << std::setw(3) << (int)u8Intensity << ", ";
-      EXPECT_EQ(u8Intensity, aSteps[nStep].au8Curs[i]);
+      rte::intensity8_t u8DutyCycle;
+      rte::Ifc_OnboardTargetDutyCycles::size_type pos = static_cast<rte::Ifc_OnboardTargetDutyCycles::size_type>(rte::calib_mgr.signals[kSignalId].targets[i].idx);
+      EXPECT_EQ(rte::ifc_onboard_target_duty_cycles::readElement(pos, u8DutyCycle), rte::ret_type::OK);
+      log << std::setw(3) << (int)u8DutyCycle << ", ";
+      EXPECT_EQ(u8DutyCycle, aSteps[nStep].au8Curs[i]);
     }
     log << std::endl;
   }

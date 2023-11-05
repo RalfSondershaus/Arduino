@@ -73,10 +73,10 @@ namespace rte
   typedef rte::ifc_sr_array< signal_intensity_array_type> Ifc_SignalTargetIntensities;
 
   // -----------------------------------------------------------------------------------
-  /// SR interface for onboard and external target intensities
+  /// SR interface for onboard and external target duty cycles
   // -----------------------------------------------------------------------------------
-  typedef rte::ifc_sr_array<onboard_target_array> Ifc_OnboardTargetIntensities;
-  typedef rte::ifc_sr_array<external_target_array> Ifc_ExternalTargetIntensities;
+  typedef rte::ifc_sr_array<onboard_target_array> Ifc_OnboardTargetDutyCycles;
+  typedef rte::ifc_sr_array<external_target_array> Ifc_ExternalTargetDutyCycles;
 
   // -----------------------------------------------------------------------------------
   /// CS interface for calibration values
