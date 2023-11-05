@@ -39,18 +39,17 @@ namespace signal
   /// 
   /// Precondition: valid calibration data (pCal is valid).
   // -----------------------------------------------------------------------------------
-  rte::signal_intensity_type Signal::exec(const cal::signal_type * pCal)
+  void Signal::exec(const cal::signal_type * pCal)
   {
     cal::aspect_type aspect_cur;
     size_t pos;
-    rte::signal_intensity_type intensities_tgt;
-    constexpr size_t kNrSignalTargetsMaxIdx = cfg::kNrSignalTargets - 1U;
+    intensity16_type intensity;
 
     rte::dimtime8_10ms_t dimtime = static_cast<rte::dimtime8_10ms_t>(cal_getChangeOverTime(pCal));
 
     cmd_type cmd = rte::ifc_rte_get_cmd::call(cal_getInput(pCal));
 
-    // switch on RED if there hasn't been received a valid command since system start.
+    // switch on RED if a valid command hasn't been received since system start.
     if ((cmd == rte::kInvalidCmd) && (isInitialState(aspect_tgt)))
     {
       cmd = 0; // 0 means RED by default
@@ -83,22 +82,38 @@ namespace signal
       aspect_cur = aspect_tgt;
     }
 
-    // MSB of aspect is index 0 in target intensity array
-    // LSB of aspect is index cfg::kNrSignalTargets-1 in target intensity array
-    for (pos = 0U; pos < static_cast<size_t>(cfg::kNrSignalTargets); pos++)
+    // write intensity and speed to RTE
+    constexpr size_t kSignalTargetIndexMax = static_cast<size_t>(cfg::kNrSignalTargets) - 1U;
+    for (pos = 0U; pos <= kSignalTargetIndexMax; pos++)
     {
-      if (util::bits::test<uint8>(aspect_cur.aspect, pos))
+      // MSB of aspect is index 0 in target intensity array
+      // LSB of aspect is index cfg::kNrSignalTargets-1 in target intensity array
+      if (util::bits::test<uint8>(aspect_cur.aspect, kSignalTargetIndexMax - pos))
       {
-        intensities_tgt.intensities[kNrSignalTargetsMaxIdx - pos] = rte::kIntensity8_100;
+        intensity = rte::kIntensity16_100;
       }
       else
       {
-        intensities_tgt.intensities[kNrSignalTargetsMaxIdx - pos] = rte::kIntensity8_0;
+        intensity = rte::kIntensity16_0;
       }
-      intensities_tgt.changeOverTime = dimtime;
+
+      // update speed only if dim time has changed in order to minimize calculation time
+      if (dimtime != last_dim_time)
+      {
+        // dimtime [10 ms]
+        // speed [(0x0000 ... 0x8000) / ms]
+        // calculate speed for ramp from 0x0000 (0%) to 0x8000 (100%) within dimtime
+        const speed16_ms_type speed = rte::kIntensity16_100 / scale_10ms_1ms(dimtime);
+
+        rte::ifc_rte_set_intensity_and_speed::call(cal_getTarget(pCal, pos), intensity, speed);
+      }
+      else
+      {
+        rte::ifc_rte_set_intensity::call(cal_getTarget(pCal, pos), intensity);
+      }
     }
 
-    return intensities_tgt;
+    last_dim_time = dimtime;
   }
 
   // -----------------------------------------------------------------------------------
@@ -111,8 +126,6 @@ namespace signal
   // -----------------------------------------------------------------------------------
   void SignalHandler::cycle()
   {
-    rte::signal_intensity_type intensities_tgt;
-
     const cal::signal_cal_type * pCal = rte::ifc_cal_signal::call();
 
     if (cal_valid(pCal))
@@ -120,10 +133,7 @@ namespace signal
       auto calit = pCal->begin();
       for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
       {
-        intensities_tgt = sigit->exec(calit);
-
-        rte::ifc_signal_target_intensities::writeElement(sigit - signals.begin(), intensities_tgt);
-
+        sigit->exec(calit);
         calit++;
       }
     }

@@ -35,6 +35,7 @@ namespace cal
 namespace signal
 {
   class InputCommand;
+  class LedRouter;
 }
 
 namespace rte
@@ -88,6 +89,21 @@ namespace rte
   /// CS interface for commands
   // -----------------------------------------------------------------------------------
   typedef rte::ifc_cs<cmd_type, signal::InputCommand, cal::input_type> Ifc_Rte_GetCommand;
+
+  // -----------------------------------------------------------------------------------
+  /// CS interface for LED intensity target values and speed target values
+  // -----------------------------------------------------------------------------------
+  typedef rte::ifc_cs<ret_type, signal::LedRouter, const cal::target_type, const rte::intensity16_t, const rte::speed16_ms_t> Ifc_Rte_LedSetIntensityAndSpeed;
+
+  // -----------------------------------------------------------------------------------
+  /// CS interface type for LED intensity target values
+  // -----------------------------------------------------------------------------------
+  typedef rte::ifc_cs<ret_type, signal::LedRouter, const cal::target_type, const rte::intensity16_t> Ifc_Rte_LedSetIntensity;
+
+  // -----------------------------------------------------------------------------------
+  /// CS interface type for LED speed target values
+  // -----------------------------------------------------------------------------------
+  typedef rte::ifc_cs<ret_type, signal::LedRouter, const cal::target_type, const rte::speed16_ms_t> Ifc_Rte_LedSetSpeed;
 
 } // namespace rte
 

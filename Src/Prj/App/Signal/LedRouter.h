@@ -25,7 +25,6 @@
 #include <Util/Algorithm.h>
 #include <Util/Array.h>
 #include <Cal/CalM_Type.h>
-#include <Signal.h>
 
 namespace signal
 {
@@ -37,10 +36,8 @@ namespace signal
   public:
     using intensity8_type = rte::intensity8_t;
     using intensity16_type = rte::intensity16_t;
-    using dimtime8_10ms_type = rte::dimtime8_10ms_t;
-    using classified_values_array = rte::classified_values_array;
-    using classified_value_type = classified_values_array::value_type;
-    using classified_values_size_type = rte::classified_values_array::size_type;
+    using speed16_ms_type = rte::speed16_ms_t;
+    using ret_type = rte::ret_type;
     using cmd_type = rte::cmd_type;
     using size_type = rte::Ifc_SignalTargetIntensities::size_type;
     using target_type = cal::target_type;
@@ -48,33 +45,22 @@ namespace signal
     typedef util::ramp<intensity16_type> ramp_type;
     typedef util::array<ramp_type, cfg::kNrOnboardTargets> ramp_onboard_array_type;
     typedef util::array<ramp_type, cfg::kNrExternalTargets> ramp_external_array_type;
-    typedef util::array<dimtime8_10ms_type, cfg::kNrOnboardTargets> dimtime_onboard_array_type;
-    typedef util::array<dimtime8_10ms_type, cfg::kNrExternalTargets> dimtime_external_array_type;
 
   protected:
 
     ramp_onboard_array_type ramps_onboard;
     ramp_external_array_type ramps_external;
-    dimtime_onboard_array_type dimtimes_onboard;
-    dimtime_external_array_type dimtimes_external;
 
-    /// Access calibration data
-    static bool cal_signal_valid(const cal::signal_cal_type * pCal) noexcept { return pCal != nullptr; }
+    /// Maximal intensity value (0x8000 = 100%) which uses 16 bits. Values less than kIntensity16Max use 15 bits only.
+    static constexpr intensity16_type kIntensity16Max = 0x8000U;
 
-    /// Scaling
-    static intensity16_type scale_8_16(const intensity8_type intensity) noexcept { return static_cast<intensity16_type>(256U * intensity); }
-    static intensity8_type scale_16_8(const intensity16_type intensity) noexcept { return static_cast<intensity8_type>(intensity / 256U); }
-    static uint16 scale_10ms_1ms(const dimtime8_10ms_type time) noexcept { return static_cast<uint16>(10U * time); }
+    /// Scale from [0x0000, 0x8000] to [0, 255]
+    static intensity8_type scale_16_8(const intensity16_type intensity) noexcept { return (intensity >= kIntensity16Max) ? (255) : (static_cast<intensity8_type>(intensity / 128U)); }
 
     static constexpr uint8 kCycleTime = 10U;
 
     /// Caclulate ramps
     void doRamps();
-    void mapSignals();
-    void mapSignal(size_type pos, const cal::signal_type * pCal);
-
-    /// Initialize ramp for tgt with given intensity and time if intensity and time differ from current ramp target values.
-    void setIntensitySpeed(const target_type tgt, const intensity8_type intensity, const dimtime8_10ms_type time);
 
   public:
     LedRouter() {}
@@ -82,6 +68,15 @@ namespace signal
     /// Runables
     void init();
     void cycle();
+
+    /// Server function: Initialize ramp for tgt with given intensity and slope / speed. Dim ramp is re-started.
+    ret_type setIntensityAndSpeed(const target_type tgt, const intensity16_type intensity, const speed16_ms_type slope);
+    /// Server function: Set the slope / speed to reach the target intensity but do not change the target intensity.
+    /// @param tgt Output port
+    /// @param slope [%/ms] Slope / speed
+    ret_type setSpeed(const target_type tgt, const speed16_ms_type slope);
+    /// Server function: Set the target intensity but do not change the current speed.
+    ret_type setIntensity(const target_type tgt, const intensity16_type intensity);
 
   };
 } // namespace signal

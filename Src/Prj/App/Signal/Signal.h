@@ -39,6 +39,9 @@ namespace signal
 
     using aspect_type = cal::aspect_type;
     using size_type = util::array<aspect_type, cfg::kNrSignalAspects>::size_type;
+    using dimtime8_10ms_type = rte::dimtime8_10ms_t;
+    using intensity16_type = rte::intensity16_t;
+    using speed16_ms_type = rte::speed16_ms_t;
 
     /// Access calibration data
     static bool cal_valid(const cal::signal_type * pCal) { return pCal != nullptr; }
@@ -57,20 +60,23 @@ namespace signal
 
     /// Target aspect (final)
     aspect_type aspect_tgt;
+    /// last valid dim time (from coding data)
+    dimtime8_10ms_type last_dim_time;
     /// Change over time between transitions (time is used twice: for dim down and for dim up)
     util::MilliTimer changeOverTimer;
+
     /// transform unit [10 ms] to unit [1 ms]
     static uint16 scale_10ms_1ms(const rte::dimtime8_10ms_t time) noexcept { return static_cast<uint16>(10U * time); }
 
   public:
 
-    Signal() : aspect_tgt{ 0U, 0U }
+    Signal() : aspect_tgt{ 0U, 0U }, last_dim_time(0U)
     {}
 
     /// Initialization
     void init();
     /// Check cmd and turn on current and target aspect if required
-    rte::signal_intensity_type exec(const cal::signal_type * pCal);
+    void exec(const cal::signal_type * pCal);
   };
 
   // -----------------------------------------------------------------------------------

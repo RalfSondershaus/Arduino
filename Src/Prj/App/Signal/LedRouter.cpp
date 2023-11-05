@@ -40,21 +40,23 @@ namespace signal
   }
 
   // -----------------------------------------------------------------------------------
-  /// Initialize ramp for tgt with given intensity and time if intensity and time differ from current tamp target values.
+  /// Server function: 
+  /// - Initialize ramp for an output port with given intensity and slope / speed.
+  /// - Step size of dim ramp is re-calculated.
+  /// 
+  /// @param tgt Output port
+  /// @param intensity [0x0000 - 0x8000] Target intensity with 0x0000 = 0%, 0x8000 = 100%
+  /// @param slope [(0x0000 - 0x8000)/ms] Slope / speed
   // -----------------------------------------------------------------------------------
-  void LedRouter::setIntensitySpeed(const target_type tgt, const intensity8_type intensity, const dimtime8_10ms_type time)
+  LedRouter::ret_type LedRouter::setIntensityAndSpeed(const target_type tgt, const intensity16_type intensity, const speed16_ms_type slope)
   {
     switch (tgt.type)
     {
     case cal::target_type::kOnboard:
     {
-      if (dimtimes_onboard.check_boundary(tgt.idx))
+      if (ramps_onboard.check_boundary(tgt.idx))
       {
-        if ((dimtimes_onboard[tgt.idx] != time) || (ramps_onboard[tgt.idx].get_tgt() != scale_8_16(intensity)))
-        {
-          ramps_onboard[tgt.idx].init(scale_8_16(intensity), scale_10ms_1ms(time), kCycleTime);
-          dimtimes_onboard[tgt.idx] = time;
-        }
+        ramps_onboard[tgt.idx].init_from_slope(intensity, slope, kCycleTime);
       }
     }
     break;
@@ -63,43 +65,60 @@ namespace signal
     default:
       break;
     }
+
+    return rte::ifc_base::OK;
   }
 
   // -----------------------------------------------------------------------------------
-  /// For the pos-th signal, map intensities and speed from RTE signal values to internal onboard or external values.
-  /// @param pos [0 ... cfg::kNrSignals-1] signal id
-  /// @param pCal pointer to calibration data of pos-th signal, must not be nullptr
+  /// Server function: Set the slope / speed to reach the target intensity but do not change the target intensity.
+  /// 
+  /// @param tgt Output port
+  /// @param slope [(0x0000 - 0x8000)/ms] Slope / speed
   // -----------------------------------------------------------------------------------
-  void LedRouter::mapSignal(size_type pos, const cal::signal_type * pCal)
+  LedRouter::ret_type LedRouter::setSpeed(const target_type tgt, const speed16_ms_type slope)
   {
-    rte::signal_intensity_type sigintensity;
-
-    rte::ifc_signal_target_intensities::readElement(pos, sigintensity);
-    auto calit = pCal->targets.begin();
-    for (auto sigit = sigintensity.intensities.begin(); sigit != sigintensity.intensities.end(); sigit++)
+    switch (tgt.type)
     {
-      setIntensitySpeed(*calit, *sigit, sigintensity.changeOverTime);
-      calit++;
-    }
-  }
-
-  // -----------------------------------------------------------------------------------
-  /// For each signal, map intensities and speed from RTE signal values to internal onboard or external values.
-  // -----------------------------------------------------------------------------------
-  void LedRouter::mapSignals()
-  {
-    const cal::signal_cal_type * pCal = rte::ifc_cal_signal::call();
-    size_type pos;
-
-    if (cal_signal_valid(pCal))
+    case cal::target_type::kOnboard:
     {
-      auto calit = pCal->begin();
-      for (pos = static_cast<size_type>(0U); pos < rte::ifc_signal_target_intensities::size(); pos++)
+      if (ramps_onboard.check_boundary(tgt.idx))
       {
-        mapSignal(pos, calit);
-        calit++;
+        ramps_onboard[tgt.idx].set_slope(slope, kCycleTime);
       }
     }
+    break;
+    case cal::target_type::kExternal:
+      break;
+    default:
+      break;
+    }
+    return rte::ifc_base::OK;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// Server function: Set the target intensity but do not change the current speed.
+  /// 
+  /// @param tgt Output port
+  /// @param intensity [0x0000 - 0x8000] Target intensity with 0x0000 = 0%, 0x8000 = 100%
+  // -----------------------------------------------------------------------------------
+  LedRouter::ret_type LedRouter::setIntensity(const target_type tgt, const intensity16_type intensity)
+  {
+    switch (tgt.type)
+    {
+    case cal::target_type::kOnboard:
+    {
+      if (ramps_onboard.check_boundary(tgt.idx))
+      {
+        ramps_onboard[tgt.idx].set_tgt(intensity);
+      }
+    }
+    break;
+    case cal::target_type::kExternal:
+      break;
+    default:
+      break;
+    }
+    return rte::ifc_base::OK; 
   }
 
   // -----------------------------------------------------------------------------------
@@ -114,7 +133,6 @@ namespace signal
   // -----------------------------------------------------------------------------------
   void LedRouter::cycle()
   {
-    mapSignals();
     doRamps();
   }
 } // namespace signal

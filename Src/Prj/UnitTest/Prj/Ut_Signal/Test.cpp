@@ -100,15 +100,15 @@ TEST(Ut_Signal, Default_Green_Red)
     , {  90,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {229, 229,   0,   0,   0 } }
     , { 100,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {255, 255,   0,   0,   0 } }
     , { 510,  CLASSIFIER_PIN0, kGreenLo, rte::kInvalidCmd, {255, 255,   0,   0,   0 }}
-    , { 560,  CLASSIFIER_PIN0, kGreenLo,                1, {229, 229,   0,   0,   0 }}
+    , { 560,  CLASSIFIER_PIN0, kGreenLo,                1, {230, 230,   0,   0,   0 }}
     , { 570,  CLASSIFIER_PIN0, kGreenLo,                1, {204, 204,   0,   0,   0 }}
-    , { 580,  CLASSIFIER_PIN0, kGreenLo,                1, {178, 178,   0,   0,   0 }}
+    , { 580,  CLASSIFIER_PIN0, kGreenLo,                1, {179, 179,   0,   0,   0 }}
     , { 590,  CLASSIFIER_PIN0, kGreenLo,                1, {153, 153,   0,   0,   0 }}
-    , { 600,  CLASSIFIER_PIN0, kGreenLo,                1, {127, 127,   0,   0,   0 }}
+    , { 600,  CLASSIFIER_PIN0, kGreenLo,                1, {128, 128,   0,   0,   0 }}
     , { 610,  CLASSIFIER_PIN0, kGreenLo,                1, {102, 102,   0,   0,   0 }}
-    , { 620,  CLASSIFIER_PIN0, kGreenLo,                1, { 76,  76,   0,   0,   0 }}
+    , { 620,  CLASSIFIER_PIN0, kGreenLo,                1, { 77,  77,   0,   0,   0 }}
     , { 630,  CLASSIFIER_PIN0, kGreenLo,                1, { 51,  51,   0,   0,   0 }}
-    , { 640,  CLASSIFIER_PIN0, kGreenLo,                1, { 25,  25,   0,   0,   0 }}
+    , { 640,  CLASSIFIER_PIN0, kGreenLo,                1, { 26,  26,   0,   0,   0 }}
     , { 650,  CLASSIFIER_PIN0, kGreenLo,                1, {  0,   0,   0,   0,   0 }}
     , { 660,  CLASSIFIER_PIN0, kGreenLo,                1, {  0,   0,  25,   0,   0 }}
     , { 670,  CLASSIFIER_PIN0, kGreenLo,                1, {  0,   0,  51,   0,   0 }}
@@ -121,15 +121,15 @@ TEST(Ut_Signal, Default_Green_Red)
     , { 740,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 229,   0,   0 } }
     , { 750,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 255,   0,   0 } }
     , { 760,  CLASSIFIER_PIN0,   kRedLo, rte::kInvalidCmd, {  0,   0, 255,   0,   0 } }
-    , { 810,  CLASSIFIER_PIN0,   kRedLo,                0, {  0,   0, 229,   0,   0 } }
+    , { 810,  CLASSIFIER_PIN0,   kRedLo,                0, {  0,   0, 230,   0,   0 } }
     , { 820,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 204,   0,   0 } }
-    , { 830,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 178,   0,   0 } }
+    , { 830,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 179,   0,   0 } }
     , { 840,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 153,   0,   0 } }
-    , { 850,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 127,   0,   0 } }
+    , { 850,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 128,   0,   0 } }
     , { 860,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 102,   0,   0 } }
-    , { 870,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  76,   0,   0 } }
+    , { 870,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  77,   0,   0 } }
     , { 880,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  51,   0,   0 } }
-    , { 890,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  25,   0,   0 } }
+    , { 890,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  26,   0,   0 } }
     , { 900,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
     , { 910,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 25,  25,   0,   0,   0 } }
     , { 920,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 51,  51,   0,   0,   0 } }
