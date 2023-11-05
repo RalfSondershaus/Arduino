@@ -42,15 +42,6 @@ namespace rte
   void stop();
   void exec();
   void setEvent(uint32 ulEventId);
-
-  //template<typename Ifc, typename Data> ret_type write(Ifc& the_interface, const Data& param) { return the_interface.write(param); }
-  //template<typename Ifc, typename Data> ret_type read(Ifc& the_interface, Data& param) { return the_interface.read(param); }
-  //template<typename Ifc, typename SizeType, typename Data> ret_type writeElement(Ifc& the_interface, SizeType pos, const Data& param) { return the_interface.writeElement(pos, param); }
-  //template<typename Ifc, typename SizeType, typename Data> ret_type readElement(Ifc& the_interface, SizeType pos, Data& param) { return the_interface.readElement(pos, param); }
-
-  //template<typename Ifc, typename ... Args> typename Ifc::ret_type call(Ifc& the_interface, Args... args) { return the_interface.call(args...); }
-  //template<typename Ifc> typename Ifc::ret_type call_void(Ifc& the_interface) { return the_interface.call(); }
-
 } // namespace rte
 
 #endif // RTE_H_
