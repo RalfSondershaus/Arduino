@@ -31,7 +31,7 @@ namespace cdd
   // -----------------------------------------------------------------------------------
   void CddLed::writeOutputs()
   {
-    using size_type = rte::Ifc_OnboardTargetIntensities::size_type;
+    using size_type = rte::Ifc_OnboardTargetDutyCycles::size_type;
 
     size_type pos;
     rte::intensity8_t u8Int;
@@ -40,12 +40,12 @@ namespace cdd
     if (pCalLeds != nullptr)
     {
       //for (auto it = rte::ifc_onboard_target_intensities::begin(); it != rte::ifc_onboard_target_intensities::end(); it++)
-      for (pos = 0U; pos < rte::ifc_onboard_target_intensities::size(); pos++)
+      for (pos = 0U; pos < rte::ifc_onboard_target_duty_cycles::size(); pos++)
       {
         // if the output pin is used by a LED
         if (pCalLeds->test(pos))
         {
-          (void)rte::ifc_onboard_target_intensities::readElement(pos, u8Int);
+          (void)rte::ifc_onboard_target_duty_cycles::readElement(pos, u8Int);
           pinMode(pos, OUTPUT);
           if (digitalPinHasPWM(pos))
           {
