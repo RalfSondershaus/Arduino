@@ -3,7 +3,7 @@
   *
   * @author Ralf Sondershaus
   *
-  * @brief Defines a simple string class
+  * @brief Defines string classes such as char_traits and basic_string.
   *
   * @copyright Copyright 2023 Ralf Sondershaus
   *
@@ -30,6 +30,7 @@
 #include <stdio.h>  // EOF
 #include <errno.h>  // errno
 #include <Util/Algorithm.h>
+#include <Util/Ios_Type.h> // streamoff
 
 namespace util
 {
@@ -52,36 +53,37 @@ namespace util
   class char_traits<char>
   {
   public:
-    typedef char char_type;
-    typedef int int_type;
+    using char_type = char;
+    using int_type = int;
+    using off_type = streamoff;
+    using pos_type = streampos;
+    //using state_type = util::mbstate_t;
 
     static void assign(char_type& c1, const char_type& c2) noexcept { c1 = c2; }
     static constexpr bool eq(char_type a, char_type b) noexcept { return static_cast<unsigned char>(a) == static_cast<unsigned char>(b); }
     static constexpr bool lt(char_type a, char_type b) noexcept { return static_cast<unsigned char>(a) < static_cast<unsigned char>(b); }
 
-    /// Copies count characters from the character string pointed to by src to the character string pointed to by dest.
+    /// Copies count characters from src to dest.
     /// Performs correctly even if the ranges[src, src + count) and [dest, dest + count) overlap
-    static char_type* move(char_type* dest, const char_type* src, util::size_t count) { memmove(dest, src, count); }
+    static char_type* move(char_type* dest, const char_type* src, size_t count) { memmove(dest, src, count * sizeof(char_type)); }
 
     /// copies a character sequence
-    static char_type* copy(char_type* dest, const char_type* src, util::size_t count) { memcpy(dest, src, count); }
+    static char_type* copy(char_type* dest, const char_type* src, size_t count) { memcpy(dest, src, count * sizeof(char_type)); }
 
     /// Compares the first count characters of the character strings s1 and s2. The comparison is done lexicographically.
     /// If count is zero, strings are considered equal.
-    static int compare(const char_type* s1, const char_type* s2, util::size_t count) { return strncmp(s1, s2, count); }
+    static int compare(const char_type* s1, const char_type* s2, size_t count) { return strncmp(s1, s2, count); }
 
     /// returns the length of a character sequence
-    static util::size_t length(const char_type* s) { return strlen(s); }
+    static size_t length(const char_type* s) { return strlen(s); }
 
     /// finds a character in a character sequence
-    static const char_type* find(const char_type* ptr, util::size_t count, const char_type& ch) { reinterpret_cast<const char_type*>(memchr(ptr, ch, count)); }
+    static const char_type* find(const char_type* ptr, size_t count, const char_type& ch) { reinterpret_cast<const char_type*>(memchr(ptr, ch, count)); }
 
-    /// converts int_type to equivalent char_type.
-    /// Converts c to char_type. If there is no equivalent char_type value (such as when c is a 
-    /// copy of the eof() value), the result is unspecified. We implement: to_char_type(eof()) -> 0xFF.
+    /// Converts int_type to equivalent char_type.
     static constexpr char_type to_char_type(int_type c) noexcept { return static_cast<char_type>(c); }
 
-    /// Converts c to int_type.
+    /// Converts char_type to int_type.
     static constexpr int_type to_int_type(char_type c) noexcept { return static_cast<int_type>(c); }
 
     /// Checks whether two values of type int_type are equal.
@@ -96,10 +98,10 @@ namespace util
 
 #if 0
   template<class Traits>
-  util::size_t string_find(const Traits::char_type* str1, util::size_t count1, util::size_t pos, const Traits::char_type* str2, util::size_t count2);
+  util::size_t string_find(const Traits::value_type* str1, util::size_t count1, util::size_t pos, const Traits::value_type* str2, util::size_t count2);
 
   template<>
-  util::size_t string_find<char_traits<char> >(const char_traits<char>::char_type* str1, util::size_t count1, util::size_t pos, const char_traits<char>::char_type* str2, util::size_t count2)
+  util::size_t string_find<char_traits<char> >(const char_traits<char>::value_type* str1, util::size_t count1, util::size_t pos, const char_traits<char>::value_type* str2, util::size_t count2)
   {
 
   }
@@ -112,21 +114,19 @@ namespace util
   /// Standard C library functions are based on char type. So the template
   /// parameter CharT is currently limited to char or unsigned char.
   // ---------------------------------------------------
-  template<int Size, class CharT, class Traits = util::char_traits<CharT> >
+  template<int Size, class CharT, class Traits = char_traits<CharT> >
   class basic_string
   {
   public:
-    using char_type = CharT;
     using traits_type = Traits;
-    using pointer = char_type*;
-    using const_pointer = const char_type*;
-    typedef char_type& reference;
-    typedef const char_type& const_reference;
-    typedef char_type* iterator;
+    using value_type = CharT;                 // acc. to standard, this is named value_type instead of char_type
+    using size_type = size_t;                 // should be std::allocator_traits<Allocator>::size_type 
+    using pointer = value_type*;              // should be std::allocator_traits<Allocator>::pointer
+    using const_pointer = const value_type*;  // should be std::allocator_traits<Allocator>::const_pointer
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* iterator;
     typedef const_pointer const_iterator;
-
-    /// The string class
-    //typedef basic_string<Size, CharT> this_type;
 
     /// The maximal size of the string
     static constexpr util::size_t MaxLength = Size;
@@ -136,7 +136,7 @@ namespace util
 
   protected:
     /// array of elements
-    char_type elements[Size + 1U];
+    value_type elements[Size + 1U];
 
     /// iterator one past the last element. If no elements, points to begin.
     iterator it_end;
@@ -166,7 +166,7 @@ namespace util
     /// Replaces the contents with count copies of character ch.
     /// If count is greater than max_size(), the contents 
     /// is replaced with max_size() copies of character ch.
-    basic_string& assign(util::size_t count, char_type ch)
+    basic_string& assign(util::size_t count, value_type ch)
     {
       // limit count to the available space
       count = util::min(count, max_size());
@@ -209,7 +209,7 @@ namespace util
       {
         auto it = begin();
         util::size_t count = max_size();
-        while ((*s != static_cast<char_type>(0)) && (count > 0U))
+        while ((*s != static_cast<value_type>(0)) && (count > 0U))
         {
           *it++ = *s++;
           count--;
@@ -246,7 +246,7 @@ namespace util
     /// Returns a pointer to a null-terminated character array with data equivalent to those stored in the string.
     const_pointer c_str() const noexcept
     { 
-      *it_end = static_cast<char_type>(0); 
+      *it_end = static_cast<value_type>(0); 
       return begin(); 
     }
 
@@ -341,7 +341,7 @@ namespace util
       {
         auto it = end();
         util::size_t count = remaining_size();
-        while ((*s != static_cast<char_type>(0)) && (count > 0U))
+        while ((*s != static_cast<value_type>(0)) && (count > 0U))
         {
           *it++ = *s++;
           count--;
@@ -365,7 +365,7 @@ namespace util
     /// Appends string str, character ch, or a null-terminated character string
     template<int Size2>
     basic_string& operator+=(const basic_string<Size2, CharT>& str) { return append(str); }
-    basic_string& operator+=(char_type ch) { return append(1, ch); }
+    basic_string& operator+=(value_type ch) { return append(1, ch); }
     basic_string& operator+=(const_pointer s) { return append(s); }
 
     /// Search
@@ -377,15 +377,35 @@ namespace util
     {
       util::size_t ret = npos;
 
+      if (str.length() == static_cast<size_t>(0))
+      {
+        ret = 0U;
+      }
+      
       if (pos < size())
       {
-        const_pointer pSrc = c_str() + pos;
-        const_pointer pStr = str.c_str();
-        const_pointer pPos = strstr(pSrc, pStr); // note: strstr works with char*
-        // const_pointer pPos = string_find<traits_type>(pSrc, size() - pos, pos, pStr, traits_type::length(pStr));
-        if (pPos != nullptr)
+        const_iterator itSrc = begin() + pos; // points to the character of the first character match (if exists)
+        const_iterator itPvt = itSrc;         // points to the character of a substring search
+        const_iterator itStr = str.begin();   // points to the character of a substring search
+        while ((itSrc != end()) && (itStr != str.end()) && (itPvt != end()))
         {
-          ret = (pPos - pSrc) + pos;
+          if (traits_type::eq(*itPvt, *itStr))
+          {
+            // characters are equal, check next character
+            itStr++;
+            itPvt++;
+          }
+          else
+          {
+            // characters are not equal, re-start search beginning at character where search started
+            itStr = str.begin();
+            itSrc++;
+            itPvt = itSrc;
+          }
+        }
+        if ((itStr == str.end()) && (itSrc != itPvt))
+        {
+          ret = itSrc - begin();
         }
       }
 
@@ -399,22 +419,43 @@ namespace util
     {
       util::size_t ret = npos;
 
+      if (traits_type::length(s) == static_cast<size_t>(0))
+      {
+        ret = 0U;
+      }
+
       if (pos < size())
       {
-        const char* pSrc = static_cast<const char*>(c_str()) + pos;
-        const char* pStr = static_cast<const char*>(s);
-        const char* pPos = strstr(pSrc, pStr);
-        if (pPos != nullptr)
+        const_pointer pSrc = c_str() + pos; // points to the character of the first character match (if exists)
+        const_pointer pPvt = pSrc;         // points to the character of a substring search
+        const_pointer pStr = s;            // points to the character of a substring search
+        while ((*pSrc != static_cast<value_type>(0)) && (*pStr != static_cast<value_type>(0)) && (*pPvt != static_cast<value_type>(0)))
         {
-          ret = (pPos - pSrc) + pos;
+          if (traits_type::eq(*pPvt, *pStr))
+          {
+            // characters are equal, check next character
+            pStr++;
+            pPvt++;
+          }
+          else
+          {
+            // characters are not equal, re-start search beginning at character where search started
+            pStr = s;
+            pSrc++;
+            pPvt = pSrc;
+          }
+        }
+        if ((*pStr == static_cast<value_type>(0)) && (pSrc != pPvt))
+        {
+          ret = pSrc - c_str();
         }
       }
+
 
       return ret;
     }
 
-    /// Finds the first character ch
-    /// The search start at position pos.
+    /// Finds the first character ch. The search start at position pos.
     util::size_t find(CharT ch, util::size_t pos = 0) const noexcept
     {
       util::size_t ret = npos;
@@ -436,97 +477,15 @@ namespace util
     
     /// Compares two strings
     template<int Size2>
-    int compare(const basic_string<Size2, char_type>& str) const noexcept { return strcmp(c_str(), str.c_str()); }
+    int compare(const basic_string<Size2, value_type>& str) const noexcept { return strcmp(c_str(), str.c_str()); }
 
     /// Compares this string to the null-terminated character sequence beginning at the character pointed to by s
     int compare(const_pointer s) const noexcept { return strcmp(c_str(), s); }
-  };
-
-#if 0
-  // ---------------------------------------------------
-  /// A simple string stream class with a fixed size.
-  // ---------------------------------------------------
-  template<int Size, class CharT, class Traits = util::char_traits<CharT> >
-  class basic_istringstream
-  {
-  public:
-    /// the character type
-    typedef CharT char_type;
-
-    /// this class type
-    typedef basic_istringstream<char_type, Size> this_type;
-
-    /// Helper.
-    /// Normally defined in header <ios>.
-    /// The type std::streamsize is an implementation-defined signed integral type used 
-    /// to represent the number of characters transferred in an I/O operation or the size 
-    /// of an I/O buffer. It is used as a signed counterpart of std::size_t, similar to 
-    /// the POSIX type ssize_t.
-    typedef int streamsize;
-
-    /// the string type
-    using string_type = basic_string<char_type, Size>;
-
-    /// The maximal size of the string
-    static constexpr util::size_t MaxLength = Size;
-
-  protected:
-    /// a string holds the data
-    string_type my_str;
-
-  public:
-    /// construct
-    basic_istringstream() {}
-    explicit basic_istringstream(const string_type& str) { my_str = str; }
-    explicit basic_istringstream(const_pointer s) { my_str = s; }
-
-    /// destruct
-    ~basic_istringstream() = default;
-
-    // In C++ standard, the following member functions are inherited from std::basic_istream
-
-    // Unformatted input
-
-    /// extracts characters
-    int_type get();
-    basic_istringstream& get(char_type& ch);
-    basic_istringstream& get(char_type* s, streamsize count);
-    basic_istringstream& get(char_type* s, streamsize count, char_type delim);
-
-      reads the next character without extracting it
-      peek
-
-      unextracts a character
-      unget
-
-      puts a character into input stream
-      putback
-
-      extracts characters until the given character is found
-      getline
-
-      extracts and discards characters until the given character is found
-      ignore
-
-      extracts blocks of characters
-      read
-
-      extracts already available blocks of characters
-      readsome
-
-      returns number of characters extracted by last unformatted input operation
-      gcount
-
-   //Positioning
-
-      returns the input position indicator
-      tellg
-
-      sets the input position indicator
-      seekg
 
   };
-#endif
+
+  typedef basic_string<16, char> string16;
+  typedef basic_string<64, char> string64;
 
   // ---------------------------------------------------
   /// Interprets a signed integer value in the string str
