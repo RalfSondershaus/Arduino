@@ -78,7 +78,7 @@ namespace util
     static size_t length(const char_type* s) { return strlen(s); }
 
     /// finds a character in a character sequence
-    static const char_type* find(const char_type* ptr, size_t count, const char_type& ch) { reinterpret_cast<const char_type*>(memchr(ptr, ch, count)); }
+    static const char_type* find(const char_type* ptr, size_t count, const char_type& ch) { return static_cast<const char_type*>(memchr(ptr, ch, count)); }
 
     /// Converts int_type to equivalent char_type.
     static constexpr char_type to_char_type(int_type c) noexcept { return static_cast<char_type>(c); }
@@ -144,23 +144,49 @@ namespace util
     /// Returns the number of remaining bytes until string is full
     util::size_t remaining_size() const { return max_size() - size(); }
 
+    /// Compare p_left and p_right
+    static int traits_compare(const_pointer p_left, size_type size_left, const_pointer p_right, size_type size_right)
+    {
+      int ret = traits_type::compare(p_left, p_right, util::min(size_left, size_right));
+
+      if (ret == 0U)
+      {
+        if (size_left < size_right) 
+        {
+          ret = -1;
+        }
+        else if (size_left > size_right) 
+        {
+          ret = 1;
+        }
+        else
+        {
+          // ret = 0;
+        }
+      }
+
+      return ret;
+    }
+
   public:
     /// Construct
     basic_string() { clear(); }
     basic_string(const_reference v) { assign(1, v); }
     basic_string(const_pointer s) { assign(s); }
+    template<int Size2>
+    basic_string(const basic_string<Size2, value_type>& s) { assign(s); }
 
     /// Copy construct
-    template<int Size2>
-    basic_string(const basic_string<Size2, CharT>& s) { assign(s); }
+    basic_string(const basic_string& s) { assign(s); }
 
     /// destruct
     ~basic_string() = default;
 
     /// Replaces the contents of the string with a copy of s
-    /// or with the contents of the string with those of null-terminated character string
+    /// or with the contents of the string with those of null-terminated character string.
     template<int Size2>
-    basic_string& operator=(const basic_string<Size2, CharT>& s) { return assign(s); }
+    basic_string& operator=(const basic_string<Size2, value_type>& s) { return assign(s); }
+    basic_string& operator=(const basic_string& s) { return assign(s); }
     basic_string& operator=(const_pointer s) { return assign(s); }
 
     /// Replaces the contents with count copies of character ch.
@@ -174,9 +200,16 @@ namespace util
       return *this;
     }
 
-    /// Replaces the contents with a copy of str. Equivalent to *this = str;
+    /// Replaces the contents with a copy of s. Equivalent to *this = str;
+    basic_string& assign(const basic_string& s)
+    {
+      it_end = util::copy_n(s.begin(), s.size(), begin());
+      return *this;
+    }
+
+    /// Replaces the contents with a copy of s. Equivalent to *this = s;
     template<int Size2>
-    basic_string& assign(const basic_string<Size2, CharT>& s)
+    basic_string& assign(const basic_string<Size2, value_type>& s)
     {
       util::size_t count = util::min(s.size(), max_size());
       it_end = util::copy_n(s.begin(), count, begin());
@@ -187,6 +220,7 @@ namespace util
     /// This range can contain null characters.
     basic_string& assign(const_pointer s, util::size_t count)
     {
+      std::cout << "assign(const_pointer s, util::size_t count)" << std::endl;
       if (s != nullptr)
       {
         // limit count to the available space
@@ -375,47 +409,13 @@ namespace util
     template<int Size2>
     util::size_t find(const basic_string<Size2, CharT>& str, util::size_t pos = 0) const noexcept
     {
-      util::size_t ret = npos;
-
-      if (str.length() == static_cast<size_t>(0))
-      {
-        ret = 0U;
-      }
-      
-      if (pos < size())
-      {
-        const_iterator itSrc = begin() + pos; // points to the character of the first character match (if exists)
-        const_iterator itPvt = itSrc;         // points to the character of a substring search
-        const_iterator itStr = str.begin();   // points to the character of a substring search
-        while ((itSrc != end()) && (itStr != str.end()) && (itPvt != end()))
-        {
-          if (traits_type::eq(*itPvt, *itStr))
-          {
-            // characters are equal, check next character
-            itStr++;
-            itPvt++;
-          }
-          else
-          {
-            // characters are not equal, re-start search beginning at character where search started
-            itStr = str.begin();
-            itSrc++;
-            itPvt = itSrc;
-          }
-        }
-        if ((itStr == str.end()) && (itSrc != itPvt))
-        {
-          ret = itSrc - begin();
-        }
-      }
-
-      return ret;
+      return find(str.c_str(), pos);
     }
 
     /// Finds the first substring equal to the character string pointed to by s.
     /// The length of the string is determined by the first null character.
     /// The search start at position pos.
-    util::size_t find(const_pointer s, util::size_t pos = 0) const
+    util::size_t find(const_pointer s, util::size_t pos = 0) const noexcept
     {
       util::size_t ret = npos;
 
@@ -455,18 +455,17 @@ namespace util
       return ret;
     }
 
-    /// Finds the first character ch. The search start at position pos.
-    util::size_t find(CharT ch, util::size_t pos = 0) const noexcept
+    /// Finds the first occurance of character ch. The search starts at position pos.
+    util::size_t find(value_type ch, util::size_t pos = 0) const noexcept
     {
       util::size_t ret = npos;
 
       if (pos < size())
       {
-        const char* pSrc = static_cast<const char*>(c_str()) + pos;
-        const char* pPos = strchr(pSrc, static_cast<int>(ch));
-        if (pPos != nullptr)
+        const_pointer p = traits_type::find(c_str() + pos, size() - pos, ch);
+        if (p != nullptr)
         {
-          ret = (pPos - pSrc) + pos;
+          ret = p - c_str();
         }
       }
 
@@ -477,10 +476,10 @@ namespace util
     
     /// Compares two strings
     template<int Size2>
-    int compare(const basic_string<Size2, value_type>& str) const noexcept { return strcmp(c_str(), str.c_str()); }
+    int compare(const basic_string<Size2, value_type>& str) const noexcept { return traits_compare(data(), length(), str.data(), str.length()); }
 
     /// Compares this string to the null-terminated character sequence beginning at the character pointed to by s
-    int compare(const_pointer s) const noexcept { return strcmp(c_str(), s); }
+    int compare(const_pointer s) const noexcept { return traits_compare(data(), length(), s, traits_type::length(s)); }
 
   };
 
@@ -488,15 +487,25 @@ namespace util
   typedef basic_string<64, char> string64;
 
   // ---------------------------------------------------
-  /// Interprets a signed integer value in the string str
+  /// Interprets a signed integer value in the string str.
+  /// If str is empty or does not have the expected form, no conversion is performed.
+  /// If no conversion is performed, pos is set to 
+  /// @param str    the string to be interpreted
   /// @param pos    address of an integer to store the number of characters processed
+  /// @param base   base of the interpreted integer value
+  /// @param err    if not null, provides the last errno. errno is ERANGE if converted value falls out of range
   // ---------------------------------------------------
   template<int Size>
-  int stoi(const util::basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10, int * err = nullptr)
+  int stoi(const basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10, int * err = nullptr)
   {
     char* endpos;
     const char* startpos = str.c_str();
-    int ret = static_cast<int>(strtol(startpos, &endpos, base));
+    long v = strtol(startpos, &endpos, base);
+    if (startpos == endpos)
+    {
+      // something went wrong (str is empty or does not have the expected form)
+      v = 0;
+    }
     if (pos != nullptr)
     {
       *pos = endpos - startpos;
@@ -505,7 +514,7 @@ namespace util
     {
       *err = errno;
     }
-    return ret;
+    return static_cast<int>(v);
   }
 
   /// Interprets a signed integer value in the string str
