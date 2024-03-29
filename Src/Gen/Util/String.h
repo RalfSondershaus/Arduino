@@ -220,7 +220,6 @@ namespace util
     /// This range can contain null characters.
     basic_string& assign(const_pointer s, util::size_t count)
     {
-      std::cout << "assign(const_pointer s, util::size_t count)" << std::endl;
       if (s != nullptr)
       {
         // limit count to the available space
@@ -489,14 +488,15 @@ namespace util
   // ---------------------------------------------------
   /// Interprets a signed integer value in the string str.
   /// If str is empty or does not have the expected form, no conversion is performed.
-  /// If no conversion is performed, pos is set to 
+  /// If no conversion is performed, pos is set to 0.
+  /// If the converted value falls out of range of corresponding return type, a range error occurs (setting errno to ERANGE)
+  /// 
   /// @param str    the string to be interpreted
-  /// @param pos    address of an integer to store the number of characters processed
+  /// @param pos    if not null, address of an integer to store the number of characters processed
   /// @param base   base of the interpreted integer value
-  /// @param err    if not null, provides the last errno. errno is ERANGE if converted value falls out of range
   // ---------------------------------------------------
   template<int Size>
-  int stoi(const basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10, int * err = nullptr)
+  int stoi(const basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10)
   {
     char* endpos;
     const char* startpos = str.c_str();
@@ -510,41 +510,58 @@ namespace util
     {
       *pos = endpos - startpos;
     }
-    if (err)
-    {
-      *err = errno;
-    }
     return static_cast<int>(v);
   }
 
+  // ---------------------------------------------------
   /// Interprets a signed integer value in the string str
-  /// @param pos    address of an integer to store the number of characters processed
+  /// If the converted value falls out of range of corresponding return type, a range error occurs (setting errno to ERANGE)
+  /// 
+  /// @param str    the string to be interpreted
+  /// @param pos    if not null, address of an integer to store the number of characters processed
+  /// @param base   base of the interpreted integer value
+  // ---------------------------------------------------
   template<int Size>
-  long stol(const util::basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10)
+  long stol(const basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10)
   {
     char* endpos;
     const char* startpos = str.c_str();
-    long ret = strtol(startpos, &endpos, base);
+    long v = strtol(startpos, &endpos, base);
+    if (startpos == endpos)
+    {
+      // something went wrong (str is empty or does not have the expected form)
+      v = 0;
+    }
     if (pos != nullptr)
     {
       *pos = endpos - startpos;
     }
-    return ret;
+    return v;
   }
 
+  // ---------------------------------------------------
   /// Interprets an unsigned integer value in the string str
-  /// @param pos    address of an integer to store the number of characters processed
+  /// 
+  /// @param str    the string to be interpreted
+  /// @param pos    if not null, address of an integer to store the number of characters processed
+  /// @param base   base of the interpreted integer value
+  // ---------------------------------------------------
   template<int Size>
-  unsigned long stoul(const util::basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10)
+  unsigned long stoul(const basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10)
   {
     char* endpos;
     const char* startpos = str.c_str();
-    unsigned long ret = strtoul(startpos, &endpos, base);
+    unsigned long v = strtoul(startpos, &endpos, base);
+    if (startpos == endpos)
+    {
+      // something went wrong (str is empty or does not have the expected form)
+      v = 0;
+    }
     if (pos != nullptr)
     {
       *pos = endpos - startpos;
     }
-    return ret;
+    return v;
   }
 } // namespace util
 
