@@ -452,31 +452,76 @@ TEST(Ut_String, Compare_with_string)
   EXPECT_EQ(strA.compare(strB), -1);
 }
 
+TEST(Ut_String, stoi_base0)
+{
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    int n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    { "0", 0, 1U },
+    { "  0", 0, 3U },
+    { "1", 1, 1U },
+    { "-1", -1, 2U },
+    { "-32768", INT16_MIN, 6U },
+    { "32767", INT16_MAX, 5U },
+    { "-2147483648", INT32_MIN, 11U }, // for 32 bit architectures
+    { "2147483647", INT32_MAX, 10U },   // for 32 bit architectures
+    { "word with 1", 0, 0U },
+    { "-0x8000", INT16_MIN, 7U },
+    { "0x7FFF", INT16_MAX, 6U },
+    { "-0x00008000", INT16_MIN, 11U },
+    { "0x00007FFF", INT16_MAX, 10U },
+    { "-010", -8, 4U }, // octal base
+    { "-015", -(8+5), 4U }, // octal base
+    { "010", 8, 3U }, // octal base
+    { "00", 0, 2U }, // octal base
+    { "017", 8+7, 3U }, // octal base
+  };
+  int i, n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoi<int>(aSteps[i].str, &pos, 0);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
 TEST(Ut_String, stoi_base10)
 {
   typedef struct
   {
     util::basic_string<16, char> str;
     int n;
+    size_t pos;
   } tStep;
   static const tStep aSteps[] =
   {
-    { "0", 0 },
-    { "  0", 0 },
-    { "1", 1 },
-    { "-1", -1 },
-    { "-32768", INT16_MIN },
-    { "32767", INT16_MAX },
-    { "-2147483648", INT32_MIN }, // for 32 bit architectures
-    { "2147483647", INT32_MAX },   // for 32 bit architectures
-    { "word with 1", 0 },
+    { "0", 0, 1U },
+    { "  0", 0, 3U },
+    { "1", 1, 1U },
+    { "-1", -1, 2U },
+    { "-32768", INT16_MIN, 6U },
+    { "32767", INT16_MAX, 5U },
+    { "-2147483648", INT32_MIN, 11U}, // for 32 bit architectures
+    { "2147483647", INT32_MAX, 10U },   // for 32 bit architectures
+    { "-21474836480", 0, 0U }, // out of range for 32 bit architectures
+    { "21474836470", 0, 0U },  // out of range for 32 bit architectures
+    { "word with 1", 0, 0U }
   };
   int i, n;
+  size_t pos;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
-    n = util::stoi(aSteps[i].str);
+    n = util::stoi<int>(aSteps[i].str, &pos);
     EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
   }
 }
 
@@ -485,27 +530,405 @@ TEST(Ut_String, stoi_base16)
   typedef struct
   {
     util::basic_string<16, char> str;
-    long n;
+    int n;
+    size_t pos;
   } tStep;
   static const tStep aSteps[] =
   {
-    { "0", 0 },
-    { "  0", 0 },
-    { "1", 1 },
-    { "  1", 1 },
-    { "-1", -1 },
-    { "-8000", INT16_MIN },
-    { "7FFF", INT16_MAX },
-    { "-80000000", INT32_MIN }, // for 32 bit architectures
-    { "7FFFFFFF", INT32_MAX },   // for 32 bit architectures
-    { "word with 1", 0 },
+    { "0", 0, 1U },
+    { "  0", 0, 3U },
+    { "1", 1, 1U },
+    { "  1", 1, 3U },
+    { "-1", -1, 2U },
+    { "-8000", INT16_MIN, 5U },
+    { "7FFF", INT16_MAX, 4U },
+    { "-0x8000", INT16_MIN, 7U },
+    { "0x7FFF", INT16_MAX, 6U },
+    { "-80000000", INT32_MIN, 9U }, // for 32 bit architectures
+    { "7FFFFFFF", INT32_MAX, 8U },  // for 32 bit architectures
+    { "-800000000", 0, 0U },        // out of range for 32 bit architectures
+    { "7FFFFFFFF", 0, 0U },         // out of range for 32 bit architectures
+    { "word with 1", 0, 0U }
   };
   int i, n;
+  size_t pos;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
-    n = util::stoi(aSteps[i].str, nullptr, 16);
+    n = util::stoi<int> (aSteps[i].str, &pos, 16);
     EXPECT_EQ(n, aSteps[i].n);
-    EXPECT_EQ(errno, 0);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
+TEST(Ut_String, stoui_uint32_base16)
+{
+  using basetype = uint32;
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    basetype n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    { "0", 0U, 1U },
+    { "  0", 0U, 3U },
+    { "1", 1U, 1U },
+    { "  1", 1U, 3U },
+    { "-1", 0U, 0U },
+    { "-8000", 0U, 0U },
+    { "FFFF", UINT16_MAX, 4U },
+    { "-80000000", 0U, 0U },
+    { "FFFFFFFF", UINT32_MAX, 8U },
+    { "word with 1", 0U, 0U }
+  };
+  int i;
+  basetype n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoui<basetype>(aSteps[i].str, &pos, 16);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
+TEST(Ut_String, stoui_uint16_base16)
+{
+  using basetype = uint16;
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    basetype n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    { "0", 0U, 1U },
+    { "  0", 0U, 3U },
+    { "1", 1U, 1U },
+    { "  1", 1U, 3U },
+    { "-1", 0U, 0U },
+    { "-8000", 0U, 0U },
+    { "FF", UINT8_MAX, 2U },
+    { "FFFF", UINT16_MAX, 4U },
+    { "-80000000", 0U, 0U },
+    { "FFFFFFFF", 0U, 0U },
+    { "word with 1", 0U, 0U }
+  };
+  int i;
+  basetype n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoui<basetype>(aSteps[i].str, &pos, 16);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
+TEST(Ut_String, stoui_uint8_base16)
+{
+  using basetype = uint8;
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    basetype n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    { "0", 0U, 1U },
+    { "  0", 0U, 3U },
+    { "1", 1U, 1U },
+    { "  1", 1U, 3U },
+    { "-1", 0U, 0U },
+    { "-8000", 0U, 0U },
+    { "FF", UINT8_MAX, 2U },
+    { "FFFF", 0U, 0U },
+    { "-80000000", 0U, 0U },
+    { "FFFFFFFF", 0U, 0U },
+    { "word with 1", 0U, 0U }
+  };
+  int i;
+  basetype n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoui<basetype>(aSteps[i].str, &pos, 16);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
+TEST(Ut_String, stoui_uint32_base10)
+{
+  using basetype = uint32;
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    basetype n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    { "0", 0U, 1U },
+    { "  0", 0U, 3U },
+    { "1", 1U, 1U },
+    { "  1", 1U, 3U },
+    { "-1", 0U, 0U },
+    { "-8000", 0U, 0U },
+    { "255", UINT8_MAX, 3U },
+    { "-128", 0U, 0U },
+    { "65535", UINT16_MAX, 5U },
+    { "-32768", 0U, 0U },
+    { "-2147483648", 0U, 0U },
+    { "4294967295", UINT32_MAX, 10U },
+    { "word with 1", 0U, 0U }
+  };
+  int i;
+  basetype n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoui<basetype>(aSteps[i].str, &pos, 10);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
+TEST(Ut_String, stoui_uint16_base10)
+{
+  using basetype = uint16;
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    basetype n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    { "0", 0U, 1U },
+    { "  0", 0U, 3U },
+    { "1", 1U, 1U },
+    { "  1", 1U, 3U },
+    { "-1", 0U, 0U },
+    { "-8000", 0U, 0U },
+    { "255", UINT8_MAX, 3U },
+    { "-128", 0U, 0U },
+    { "65535", UINT16_MAX, 5U },
+    { "-32768", 0U, 0U },
+    { "-2147483648", 0U, 0U },
+    { "4294967295", 0U, 0U },
+    { "word with 1", 0U, 0U }
+  };
+  int i;
+  basetype n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoui<basetype>(aSteps[i].str, &pos, 10);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
+TEST(Ut_String, stoui_uint8_base10)
+{
+  using basetype = uint8;
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    basetype n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    { "0", 0U, 1U },
+    { "  0", 0U, 3U },
+    { "1", 1U, 1U },
+    { "  1", 1U, 3U },
+    { "-1", 0U, 0U },
+    { "-8000", 0U, 0U },
+    { "255", UINT8_MAX, 3U },
+    { "-128", 0U, 0U },
+    { "65535", 0U, 0U },
+    { "-32768", 0U, 0U },
+    { "-2147483648", 0U, 0U },
+    { "4294967295", 0U, 0U },
+    { "word with 1", 0U, 0U }
+  };
+  int i;
+  basetype n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoui<basetype>(aSteps[i].str, &pos, 10);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
+TEST(Ut_String, stoui_uint32_base0)
+{
+  using basetype = uint32;
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    basetype n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    { "0", 0U, 1U },
+    { "  0", 0U, 3U },
+    { "1", 1U, 1U },
+    { "  1", 1U, 3U },
+    { "-1", 0U, 0U },
+    { "-8000", 0U, 0U },
+    { "255", UINT8_MAX, 3U },
+    { "65535", UINT16_MAX, 5U },
+    { "4294967295", UINT32_MAX, 10U },
+    { "0xFF", UINT8_MAX, 4U },
+    { "0xFFFF", UINT16_MAX, 6U },
+    { "0xFFFFFFFF", UINT32_MAX, 10U },
+    { "0x00", 0U, 4U },
+    { "00",0U, 2U },
+    { "0377", UINT8_MAX, 4U },
+    { "0177777", UINT16_MAX, 7U },
+    { "037777777777", UINT32_MAX, 12U },
+  };
+  int i;
+  basetype n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoui<basetype>(aSteps[i].str, &pos, 0);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
+TEST(Ut_String, stoui_uint16_base0)
+{
+  using basetype = uint16;
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    basetype n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    { "0", 0U, 1U },
+    { "  0", 0U, 3U },
+    { "1", 1U, 1U },
+    { "  1", 1U, 3U },
+    { "-1", 0U, 0U },
+    { "-8000", 0U, 0U },
+    { "255", UINT8_MAX, 3U },
+    { "65535", UINT16_MAX, 5U },
+    { "4294967295", 0U, 0U },
+    { "0xFF", UINT8_MAX, 4U },
+    { "0xFFFF", UINT16_MAX, 6U },
+    { "0xFFFFFFFF", 0U, 0U },
+    { "0x00", 0U, 4U },
+    { "00",0U, 2U },
+    { "0377", UINT8_MAX, 4U },
+    { "0177777", UINT16_MAX, 7U },
+    { "037777777777", 0U, 0U },
+  };
+  int i;
+  basetype n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoui<basetype>(aSteps[i].str, &pos, 0);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
+TEST(Ut_String, stoui_uint8_base0)
+{
+  using basetype = uint8;
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    basetype n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    { "0", 0U, 1U },
+    { "  0", 0U, 3U },
+    { "1", 1U, 1U },
+    { "  1", 1U, 3U },
+    { "-1", 0U, 0U },
+    { "-8000", 0U, 0U },
+    { "255", UINT8_MAX, 3U },
+    { "65535", 0U, 0U },
+    { "4294967295", 0U, 0U },
+    { "0xFF", UINT8_MAX, 4U },
+    { "0xFFFF", 0U, 0U },
+    { "0xFFFFFFFF", 0U, 0U },
+    { "0x00", 0U, 4U },
+    { "00",0U, 2U },
+    { "0377", UINT8_MAX, 4U },
+    { "0177777", 0U, 0U },
+    { "037777777777", 0U, 0U },
+  };
+  int i;
+  basetype n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoui<basetype>(aSteps[i].str, &pos, 0);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
+  }
+}
+
+TEST(Ut_String, stoui_uint8_base2)
+{
+  using basetype = uint8;
+  typedef struct
+  {
+    util::basic_string<16, char> str;
+    basetype n;
+    size_t pos;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    {         "0",        0U, 1U },
+    { "        0",        0U, 9U },
+    { "        1",        1U, 9U },
+    { "       11",        3U, 9U },
+    { "      011",        3U, 9U },
+    { "      111",        7U, 9U },
+    { " 11111111", UINT8_MAX, 9U },
+    { "011111111", UINT8_MAX, 9U },
+    { "111111111",        0U, 0U },
+    { "012111111",        1U, 2U },
+  };
+  int i;
+  basetype n;
+  size_t pos;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    n = util::stoui<basetype>(aSteps[i].str, &pos, 2);
+    EXPECT_EQ(n, aSteps[i].n);
+    EXPECT_EQ(pos, aSteps[i].pos);
   }
 }

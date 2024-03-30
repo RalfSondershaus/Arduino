@@ -1,7 +1,7 @@
 /**
  * Substitude for <numerical_limit>
  * 
- * @file Platform/avr/avrgcc/Platform_Limits.h
+ * @file Platform/x86/msvc/Platform_Limits.h
  */
 
 #ifndef LIMITS_H_
@@ -16,8 +16,8 @@ namespace platform
   {
   public:
     /// min and max. Postfix _ is required because of old compiler #defines (for example, avr gcc)
-    static constexpr T min_() noexcept { return T(); }
-    static constexpr T max_() noexcept { return T(); }
+    static constexpr T min_() noexcept { return std::numeric_limits<T>::min(); }
+    static constexpr T max_() noexcept { return std::numeric_limits<T>::max(); }
   };
 
   template<> class numeric_limits<uint8>

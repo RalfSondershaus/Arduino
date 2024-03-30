@@ -28,7 +28,8 @@
 #include <string.h> // strchr, strstr, memmove
 #include <stdlib.h> // strtol
 #include <stdio.h>  // EOF
-#include <errno.h>  // errno
+//#include <errno.h>  // errno
+#include <Platform_Limits.h>
 #include <Util/Algorithm.h>
 #include <Util/Ios_Type.h> // streamoff
 
@@ -482,8 +483,285 @@ namespace util
 
   };
 
-  typedef basic_string<16, char> string16;
-  typedef basic_string<64, char> string64;
+  // ---------------------------------------------------
+  /// Error codes for string function such as strtoi64
+  // ---------------------------------------------------
+  typedef enum
+  {
+    ERR_NONE = 0,   ///< no error
+    ERR_RANGE       ///< out of range
+  } tStringError;
+
+  int isspace(int ch);
+  bool isnull(char ch);
+
+  // ---------------------------------------------------
+  /// Interprets a signed integer value in the string str.
+  /// (optional) plus or minus sign
+  /// (optional) prefix 0 for octal base (applies only when base is 8 or 0)
+  /// (optional) prefix 0x or 0X for hexadecimal base (applies only when base is 16 or 0)
+  // ---------------------------------------------------
+  template<typename T>
+  T strtoi(const char* str, char** endptr, int base, tStringError * err = nullptr)
+  {
+    bool negative = false;
+    bool foundDigit = false;
+    T value = static_cast<T>(0);
+    tStringError strerr = tStringError::ERR_NONE;
+
+    // Set endptr if provided, will be updated later if a valid digit is found
+    if (endptr != nullptr)
+    {
+      *endptr = (char*)str;
+    }
+
+    // Skip leading whitespace
+    while (!isnull(*str) && isspace(*str))
+    {
+      str++;
+    }
+
+    // Handle sign
+    if (*str == '-')
+    {
+      negative = true;
+      str++;
+    }
+    else if (*str == '+')
+    {
+      str++;
+    }
+    else
+    {
+      // nothing to do
+    }
+
+    // Determine base if not specified
+    if (base == 0)
+    {
+      if (*str == '0')
+      {
+        if ((str[1] == 'x') || (str[1] == 'X'))
+        {
+          base = 16;
+          str += 2;
+        }
+        else
+        {
+          base = 8;
+          str++;
+        }
+      }
+      else
+      {
+        base = 10;
+      }
+    }
+
+    // Skip a leading 0x or 0X
+    if (base == 16)
+    {
+      if (*str == '0')
+      {
+        if ((str[1] == 'x') || (str[1] == 'X'))
+        {
+          str += 2;
+        }
+      }
+    }
+
+    // Convert digits to value
+    while (true)
+    {
+      char digit;
+
+      if ((*str >= '0') && (*str <= '9'))
+      {
+        digit = *str - '0';
+      }
+      else if ((*str >= 'A') && (*str <= 'Z'))
+      {
+        digit = (*str - 'A') + 10;
+      }
+      else if ((*str >= 'a') && (*str <= 'z'))
+      {
+        digit = (*str - 'a') + 10;
+      }
+      else
+      {
+        // Invalid character, stop conversion
+        if ((!foundDigit) && (base == 8))
+        {
+          // special case: base is 0 or 8 and string is "0":
+          // ensure that endptr is set later on
+          foundDigit = true;
+        }
+        break;
+      }
+
+      if (digit >= base)
+      {
+        // Digit out of range for base, stop conversion
+        break;
+      }
+
+      // Apply sign. Sign is applied here to ensure overflow check for signed integer values
+      if (negative)
+      {
+        digit = -digit;
+      }
+
+      foundDigit = true;
+      if (util::math::muladd_overflow(value, static_cast<T>(base), static_cast<T>(digit), &value))
+      {
+        // overflow, stop conversion and report error
+        strerr = tStringError::ERR_RANGE;
+        break;
+      }
+      str++;
+    }
+
+    // Set endptr if provided, if a valid digit was found and if there was no error
+    if (endptr != nullptr)
+    {
+      if (foundDigit && (strerr == ERR_NONE))
+      {
+        *endptr = (char*)str;
+      }
+    }
+
+    // Set err if provided
+    if (err != nullptr)
+    {
+      *err = strerr;
+    }
+
+    return value;
+  }
+
+  // ---------------------------------------------------
+  /// Interprets an unsigned integer value in the string str.
+  /// (optional) plus or minus sign
+  /// (optional) prefix 0 for octal base (applies only when base is 8 or 0)
+  /// (optional) prefix 0x or 0X for hexadecimal base (applies only when base is 16 or 0)
+  // ---------------------------------------------------
+  template<typename T>
+  T strtoui(const char* str, char** endptr, int base, tStringError* err = nullptr)
+  {
+    bool foundDigit = false;
+    T value = static_cast<T>(0);
+    tStringError strerr = tStringError::ERR_NONE;
+
+    // Set endptr if provided, will be updated later if a valid digit is found
+    if (endptr != nullptr)
+    {
+      *endptr = (char*)str;
+    }
+
+    // Skip leading whitespace
+    while (!isnull(*str) && isspace(*str))
+    {
+      str++;
+    }
+
+    // Determine base if not specified
+    if (base == 0)
+    {
+      if (*str == '0')
+      {
+        if ((str[1] == 'x') || (str[1] == 'X'))
+        {
+          base = 16;
+          str += 2;
+        }
+        else
+        {
+          base = 8;
+          str++;
+        }
+      }
+      else
+      {
+        base = 10;
+      }
+    }
+
+    // Skip a leading 0x or 0X
+    if (base == 16)
+    {
+      if (*str == '0')
+      {
+        if ((str[1] == 'x') || (str[1] == 'X'))
+        {
+          str += 2;
+        }
+      }
+    }
+
+    // Convert digits to value
+    while (true)
+    {
+      char digit;
+
+      if ((*str >= '0') && (*str <= '9'))
+      {
+        digit = *str - '0';
+      }
+      else if ((*str >= 'A') && (*str <= 'Z'))
+      {
+        digit = (*str - 'A') + 10;
+      }
+      else if ((*str >= 'a') && (*str <= 'z'))
+      {
+        digit = (*str - 'a') + 10;
+      }
+      else
+      {
+        // Invalid character, stop conversion
+        if ((!foundDigit) && (base == 8))
+        {
+          // special case: base is 0 or 8 and string is "0":
+          // ensure that endptr is set later on
+          foundDigit = true;
+        }
+        break;
+      }
+
+      if (digit >= base)
+      {
+        // Digit out of range for base, stop conversion
+        break;
+      }
+
+      foundDigit = true;
+
+      if (util::math::muladd_overflow(value, static_cast<T>(base), static_cast<T>(digit), &value))
+      {
+        // overflow, stop conversion and report error
+        strerr = tStringError::ERR_RANGE;
+        break;
+      }
+
+      str++;
+    }
+
+    // Set endptr if provided, if a valid digit was found and if there was no error
+    if (endptr != nullptr)
+    {
+      if (foundDigit && (strerr == ERR_NONE))
+      {
+        *endptr = (char*)str;
+      }
+    }
+
+    // Set err if provided
+    if (err != nullptr)
+    {
+      *err = strerr;
+    }
+
+    return value;
+  }
 
   // ---------------------------------------------------
   /// Interprets a signed integer value in the string str.
@@ -495,47 +773,26 @@ namespace util
   /// @param pos    if not null, address of an integer to store the number of characters processed
   /// @param base   base of the interpreted integer value
   // ---------------------------------------------------
-  template<int Size>
-  int stoi(const basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10)
+  template<typename T, int Size>
+  T stoi(const basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10)
   {
     char* endpos;
     const char* startpos = str.c_str();
-    long v = strtol(startpos, &endpos, base);
-    if (startpos == endpos)
-    {
-      // something went wrong (str is empty or does not have the expected form)
-      v = 0;
-    }
-    if (pos != nullptr)
-    {
-      *pos = endpos - startpos;
-    }
-    return static_cast<int>(v);
-  }
 
-  // ---------------------------------------------------
-  /// Interprets a signed integer value in the string str
-  /// If the converted value falls out of range of corresponding return type, a range error occurs (setting errno to ERANGE)
-  /// 
-  /// @param str    the string to be interpreted
-  /// @param pos    if not null, address of an integer to store the number of characters processed
-  /// @param base   base of the interpreted integer value
-  // ---------------------------------------------------
-  template<int Size>
-  long stol(const basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10)
-  {
-    char* endpos;
-    const char* startpos = str.c_str();
-    long v = strtol(startpos, &endpos, base);
+    T v = strtoi<T>(startpos, &endpos, base);
+
     if (startpos == endpos)
     {
       // something went wrong (str is empty or does not have the expected form)
       v = 0;
     }
+
+    // Set pos if provided
     if (pos != nullptr)
     {
       *pos = endpos - startpos;
     }
+
     return v;
   }
 
@@ -546,21 +803,26 @@ namespace util
   /// @param pos    if not null, address of an integer to store the number of characters processed
   /// @param base   base of the interpreted integer value
   // ---------------------------------------------------
-  template<int Size>
-  unsigned long stoul(const basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10)
+  template<typename T, int Size>
+  T stoui(const basic_string<Size, char>& str, size_t* pos = nullptr, int base = 10)
   {
     char* endpos;
     const char* startpos = str.c_str();
-    unsigned long v = strtoul(startpos, &endpos, base);
+
+    T v = strtoui<T>(startpos, &endpos, base);
+
     if (startpos == endpos)
     {
       // something went wrong (str is empty or does not have the expected form)
       v = 0;
     }
+
+    // Set pos if provided
     if (pos != nullptr)
     {
       *pos = endpos - startpos;
     }
+
     return v;
   }
 } // namespace util
