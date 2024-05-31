@@ -37,12 +37,17 @@ namespace util
     template<typename W> constexpr size_t bits_per_word() noexcept { return bits_per_char() * sizeof(W); }
     template<typename W> constexpr W all_one() noexcept { return static_cast<W>(~static_cast<W>(0)); }
     template<typename W> constexpr W all_zero() noexcept { return static_cast<W>(0); }
+    /// Returns a bit mask for a single bit such as 0b00000001U for bit_mask_n<uint8>(0U)
     template<typename W> constexpr W bit_mask(size_t bitpos) noexcept { return static_cast<W>(1) << bitpos; }
+    /// Returns a bit mask for nr_bits such as 0b00001111U for bit_mask_n<uint8>(4U)
+    template<typename W> constexpr W bit_mask_n(size_t nr_bits) { return ((1U << (nr_bits + 1U)) - 1U); }
     template<typename W> constexpr bool test(W w, size_t bitpos) noexcept { return (w & bit_mask<W>(bitpos)) != static_cast<W>(0); }
     template<typename W> constexpr size_t nr_LSB_zeros(W w) noexcept;
     template<typename W> constexpr size_t first(W w, size_t notfound) noexcept;
     template<typename W> constexpr size_t nr_words(size_t nbits) noexcept { return (nbits + (bits_per_word<W>() - static_cast<size_t>(1))) / bits_per_word<W>(); }
-
+    template<typename W1, typename W2> constexpr W2 stencil(W1 w, W1 mask) { return static_cast<W2>(w & mask); }
+    /// Extract the value at position pos and length nr_bits. W needs to be an unsigned type.
+    template<typename W> W extract(W w, size_t pos, size_t nr_bits) { return static_cast<W>((w >> pos) & bit_mask_n<W>(nr_bits)); }
     template<typename W> constexpr size_t nr_LSB_zeros(W w) noexcept
     {
       size_t cnt = 0;

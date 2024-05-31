@@ -83,6 +83,9 @@
 # TARGET_MCU_VARIANT  such as M4F, M0PLUS, AVtiny, mega (AVmega),
 # TARGET_MCU_DEVICE   such as atmega2560, atmega328p
 
+# make: *** No rule to make target 'Build/Tmp/Test.obj', needed by 'Build/Bin/Ut_Packet.exe'.  Stop.
+# -> Check upper case and lower case of filenames such as Test vs. test
+
 SHELL = /bin/bash
 
 # target platform: MCU family plus compiler
@@ -112,8 +115,9 @@ PATH_SRC                    = $(PATH_ROOT)/Src
 PATH_SRC_PRJ                = $(PATH_SRC)/Prj
 PATH_SRC_GEN                = $(PATH_SRC)/Gen
 PATH_SRC_ARDUINO_BASE       = $(PATH_SRC)/Gen/Arduino
-PATH_SRC_ARDUINO_CORE       = $(PATH_SRC_ARDUINO_BASE)/avr/cores/arduino
-PATH_SRC_ARDUINO_VARIANTS   = $(PATH_SRC_ARDUINO_BASE)/avr/variants
+PATH_SRC_ARDUINO_CORE       = $(PATH_SRC_ARDUINO_BASE)/avr/1.8.6/cores/arduino
+PATH_SRC_ARDUINO_LIBRARIES  = $(PATH_SRC_ARDUINO_BASE)/avr/1.8.6/libraries
+PATH_SRC_ARDUINO_VARIANTS   = $(PATH_SRC_ARDUINO_BASE)/avr/1.8.6/variants
 PATH_SRC_ARDUINO_WIN32_BASE = $(PATH_SRC)/Gen/Arduino_win32
 PATH_SRC_ARDUINO_WIN32_CORE = $(PATH_SRC_ARDUINO_BASE)/avr/cores
 PATH_SRC_GOOGLETEST         = $(PATH_SRC)/Gen/Test/googletest-main/googletest
@@ -135,6 +139,7 @@ PATH_OBJ                    = $(PATH_TMP)
 # Tools
 # ---------------------------------------------------
 AVRGCC  = avr-gcc
+GCC     = gcc
 OBJCOPY = $(PATH_AVRGNU)/bin/avr-objcopy
 SIZE    = $(PATH_AVRGNU)/bin/avr-size
 AVRDUDE = $(PATH_AVRDUDE)/avrdude

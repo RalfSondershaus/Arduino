@@ -50,11 +50,11 @@ namespace util
     static const chararray ws =
     {
       ' ',  // space (0x20)
-      '\f', // form feed (0x0c)
-      '\n', // line feed (0x0a)
-      '\r', // carriage return (0x0d)
       '\t', // horizontal tab (0x09)
-      '\v'  // vertical tab (0x0b)
+      '\n', // line feed (0x0a)
+      '\v', // vertical tab (0x0b)
+      '\f', // form feed (0x0c)
+      '\r', // carriage return (0x0d)
     };
 
     return util::find(ws.begin(), ws.end(), static_cast<unsigned char>(ch)) != ws.end();

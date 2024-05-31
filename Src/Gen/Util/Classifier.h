@@ -51,10 +51,18 @@ namespace util
       classifier_limits<NrClasses> limits; ///< debounce and limits
     };
 
+    /// Example byte layout with NrClassifiers = 6, NrClasses = 5:
+    /// 
+    /// 12 byte per classifier:
+    ///  0     ucPin
+    ///  1     ucDebounce
+    ///  2- 6  aucLo 0 ... 4
+    ///  7-11  aucHi 0 ... 4
     template<int NrClassifiers, int NrClasses>
     struct input_classifier_cal
     {
-      util::array<input_classifier_single<NrClasses>, NrClassifiers> classifiers; ///< pin, debounce and limits
+      typedef input_classifier_single<NrClasses> input_classifier_single_type;
+      util::array<input_classifier_single_type, NrClassifiers> classifiers; ///< pin, debounce and limits
     };
   } // namespace cal
 

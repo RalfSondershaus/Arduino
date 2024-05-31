@@ -62,6 +62,112 @@ namespace util
       return static_cast<uint32>(t);
     }
 
+    // -----------------------------------------------------------------------------
+    /// Add with overflow check: returns true if an overflow is detected, false otherwise.
+    /// Adds a and b and stores the result in r if no overflow is detected.
+    /// Does not modify r if an overflow is detected.
+    // -----------------------------------------------------------------------------
+    template<typename T>
+    bool add_overflow(T a, T b, T* r)
+    {
+      bool ret = false;
+
+      if (((b > static_cast<T>(0)) && (a > (platform::numeric_limits<T>::max_() - b)))
+       || ((b < static_cast<T>(0)) && (a < (platform::numeric_limits<T>::min_() - b))))
+      {
+        // overflow
+        ret = true;
+      }
+      else
+      {
+        *r = a + b;
+      }
+      return ret;
+    }
+
+    // -----------------------------------------------------------------------------
+    /// Multiply with overflow check: returns true if an overflow is detected, false otherwise.
+    /// Multiplies a and b and stores the result in r if no overflow is detected.
+    /// Does not modify r if an overflow is detected.
+    // -----------------------------------------------------------------------------
+    template<typename T>
+    bool mul_overflow(T a, T b, T* r)
+    {
+      bool ret = false;
+
+      if (a > static_cast<T>(0))
+      {
+        if (b > static_cast<T>(0))
+        {
+          // a positive, b positive
+          if (a > platform::numeric_limits<T>::max_() / b)
+          {
+            ret = true;
+          }
+        }
+        else
+        {
+          // a positive, b nonpositive
+          if (b < platform::numeric_limits<T>::min_() / a)
+          {
+            ret = true;
+          }
+        }
+      }
+      else
+      {
+        if (b > static_cast<T>(0))
+        {
+          // a nonpositive, b positive
+          if (a < platform::numeric_limits<T>::min_() / b)
+          {
+            ret = true;
+          }
+        }
+        else
+        {
+          // a nonpositive, b nonpositive
+          if ((a != static_cast<T>(0)) && (b < (platform::numeric_limits<T>::max_() / a)))
+          {
+            ret = true;
+          }
+        }
+      }
+
+      // multiply only if there is no overflow
+      if (ret == false)
+      {
+        *r = a * b;
+      }
+
+      return ret;
+    }
+
+    // -----------------------------------------------------------------------------
+    /// Multiply-add with overflow check: returns true if an overflow is detected, false otherwise.
+    /// Calculates (a * b) + c and stores the result in r if no overflow is detected.
+    /// Does not modify r if an overflow is detected.
+    // -----------------------------------------------------------------------------
+    template<typename T>
+    bool muladd_overflow(T a, T b, T c, T* r)
+    {
+      bool ret = false;
+
+      if (util::math::mul_overflow(a, b, r))
+      {
+        ret = true;
+      }
+      else
+      {
+        if (util::math::add_overflow(*r, c, r))
+        {
+          ret = true;
+        }
+      }
+
+      return ret;
+    }
+
     // ----------------------------------------------------------------------------
     /// - class vec: A N-dimensional vector
     // ----------------------------------------------------------------------------

@@ -62,14 +62,86 @@ namespace util
   /// beginning at d_first (copy destination range).
   // ------------------------------------------------------------------------------
   template< class InputIt, class OutputIt >
-  OutputIt copy(InputIt first, InputIt last, OutputIt d_first)
+  OutputIt copy(InputIt s_first, InputIt last, OutputIt d_first)
   {
     while (first != last)
     {
-      *d_first++ = *first++;
+      *d_first++ = *s_first++;
     }
 
     return d_first;
+  }
+
+  // ------------------------------------------------------------------------------
+  /// Copies exactly count values from the range beginning at first to the range 
+  /// beginning at d_first.
+  /// 
+  /// Returns iterator in the destination range, pointing past the last element 
+  /// copied if count > 0 or d_first otherwise.
+  // ------------------------------------------------------------------------------
+  template< class InputIt, class Size, class OutputIt >
+  OutputIt copy_n(InputIt s_first, Size count, OutputIt d_first)
+  {
+    while (count > 0U)
+    {
+      *d_first++ = *s_first++;
+      count--;
+    }
+
+    return d_first;
+  }
+
+  // ------------------------------------------------------------------------------
+  /// Assigns the given value to the elements in the range [first, last)
+  // ------------------------------------------------------------------------------
+  template< class ForwardIt, class T >
+  void fill(ForwardIt d_first, ForwardIt d_last, const T& value)
+  {
+    while (d_first != d_last)
+    {
+      *d_first++ = value;
+    }
+  }
+
+  // ------------------------------------------------------------------------------
+  /// Assigns the given value to the first count elements in the range beginning at 
+  /// first if count > 0. Does nothing otherwise.
+  // ------------------------------------------------------------------------------
+  template< class OutputIt, class Size, class T >
+  OutputIt fill_n(OutputIt d_first, Size count, const T& value)
+  {
+    while (count > 0U)
+    {
+      *d_first++ = value;
+      count--;
+    }
+
+    return d_first;
+  }
+
+  // ------------------------------------------------------------------------------
+  /// Copies count bytes from the object pointed to by src to the object pointed to 
+  /// by dest. Both objects are reinterpreted as arrays of unsigned char.
+  /// Returns dest.
+  // ------------------------------------------------------------------------------
+  void* memcpy(void* dest, const void* src, size_t count);
+
+  template<typename T, typename... U>
+  T make_number(U...);
+
+  template<uint16, uint8, uint8>
+  uint16 make_number(uint8 hi, uint8 lo)
+  {
+    return static_cast<uint16>((static_cast<uint16>(hi) << 8U) | static_cast<uint16>(lo));
+  }
+  
+  // ------------------------------------------------------------------------------
+  /// Returns the smaller of the given values.
+  // ------------------------------------------------------------------------------
+  template<class T>
+  const T& min(const T& a, const T& b) 
+  { 
+    return (a < b) ? a : b; 
   }
 
   // ------------------------------------------------------------------------------

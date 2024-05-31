@@ -28,7 +28,6 @@
 #include <string.h> // strchr, strstr, memmove
 #include <stdlib.h> // strtol
 #include <stdio.h>  // EOF
-//#include <errno.h>  // errno
 #include <Platform_Limits.h>
 #include <Util/Algorithm.h>
 #include <Util/Ios_Type.h> // streamoff
@@ -99,10 +98,10 @@ namespace util
 
 #if 0
   template<class Traits>
-  util::size_t string_find(const Traits::value_type* str1, util::size_t count1, util::size_t pos, const Traits::value_type* str2, util::size_t count2);
+  size_t string_find(const Traits::value_type* str1, size_t count1, size_t pos, const Traits::value_type* str2, size_t count2);
 
   template<>
-  util::size_t string_find<char_traits<char> >(const char_traits<char>::value_type* str1, util::size_t count1, util::size_t pos, const char_traits<char>::value_type* str2, util::size_t count2)
+  size_t string_find<char_traits<char> >(const char_traits<char>::value_type* str1, size_t count1, size_t pos, const char_traits<char>::value_type* str2, size_t count2)
   {
 
   }
@@ -130,10 +129,10 @@ namespace util
     typedef const_pointer const_iterator;
 
     /// The maximal size of the string
-    static constexpr util::size_t MaxLength = Size;
+    static constexpr size_t MaxLength = Size;
 
-    /// This is a special value equal to the maximum value representable by the type util::size_t
-    static constexpr util::size_t npos = static_cast<util::size_t>(-1);
+    /// This is a special value equal to the maximum value representable by the type size_t
+    static constexpr size_t npos = static_cast<size_t>(-1);
 
   protected:
     /// array of elements
@@ -143,7 +142,7 @@ namespace util
     iterator it_end;
 
     /// Returns the number of remaining bytes until string is full
-    util::size_t remaining_size() const { return max_size() - size(); }
+    size_t remaining_size() const { return max_size() - size(); }
 
     /// Compare p_left and p_right
     static int traits_compare(const_pointer p_left, size_type size_left, const_pointer p_right, size_type size_right)
@@ -193,18 +192,18 @@ namespace util
     /// Replaces the contents with count copies of character ch.
     /// If count is greater than max_size(), the contents 
     /// is replaced with max_size() copies of character ch.
-    basic_string& assign(util::size_t count, value_type ch)
+    basic_string& assign(size_t count, value_type ch)
     {
       // limit count to the available space
-      count = util::min(count, max_size());
-      it_end = util::fill_n(begin(), count, ch);
+      count = ::util::min(count, max_size());
+      it_end = ::util::fill_n(begin(), count, ch);
       return *this;
     }
 
     /// Replaces the contents with a copy of s. Equivalent to *this = str;
     basic_string& assign(const basic_string& s)
     {
-      it_end = util::copy_n(s.begin(), s.size(), begin());
+      it_end = ::util::copy_n(s.begin(), s.size(), begin());
       return *this;
     }
 
@@ -212,14 +211,14 @@ namespace util
     template<int Size2>
     basic_string& assign(const basic_string<Size2, value_type>& s)
     {
-      util::size_t count = util::min(s.size(), max_size());
-      it_end = util::copy_n(s.begin(), count, begin());
+      size_t count = ::util::min(s.size(), max_size());
+      it_end = ::util::copy_n(s.begin(), count, begin());
       return *this;
     }
 
     /// Replaces the contents with copies of the characters in the range [s, s + count). 
     /// This range can contain null characters.
-    basic_string& assign(const_pointer s, util::size_t count)
+    basic_string& assign(const_pointer s, size_t count)
     {
       if (s != nullptr)
       {
@@ -242,7 +241,7 @@ namespace util
       if (s != nullptr)
       {
         auto it = begin();
-        util::size_t count = max_size();
+        size_t count = max_size();
         while ((*s != static_cast<value_type>(0)) && (count > 0U))
         {
           *it++ = *s++;
@@ -265,13 +264,13 @@ namespace util
 
     /// Returns a reference to the character at specified location pos. Bounds checking is performed.
     /// If pos is out of bounds, a reference to the first element is returned.
-    reference at(util::size_t pos) { return (check_boundary(pos)) ? elements[pos] : elements[0]; }
-    const_reference at(util::size_t pos) const { return (check_boundary(pos)) ? elements[pos] : elements[0]; }
+    reference at(size_t pos) { return (check_boundary(pos)) ? elements[pos] : elements[0]; }
+    const_reference at(size_t pos) const { return (check_boundary(pos)) ? elements[pos] : elements[0]; }
 
     /// Returns a reference to the character at specified location pos. No bounds checking is performed.
     /// Bounds can be checked with check_boundary(pos) before calling this function.
-    reference operator[](util::size_t pos) { return elements[pos]; }
-    const_reference operator[](util::size_t pos) const { return elements[pos]; }
+    reference operator[](size_t pos) { return elements[pos]; }
+    const_reference operator[](size_t pos) const { return elements[pos]; }
 
     /// Returns a pointer to the underlying array serving as character storage.
     /// The returned array is not required to be null-terminated.
@@ -285,7 +284,7 @@ namespace util
     }
 
     /// Return true if the index is valid (within boundaries)
-    bool check_boundary(util::size_t pos) const { return (pos >= static_cast<util::size_t>(0)) && (pos < size()); }
+    bool check_boundary(size_t pos) const { return (pos >= static_cast<size_t>(0)) && (pos < size()); }
 
     /// Iterators
     
@@ -303,14 +302,14 @@ namespace util
     bool empty() const { return begin() == end(); }
 
     /// Returns the number of characters
-    util::size_t size() const { return end() - begin(); }
-    util::size_t length() const { return size(); }
+    size_t size() const { return end() - begin(); }
+    size_t length() const { return size(); }
 
     /// Returns the maximum number of elements the string is able to hold
-    constexpr util::size_t max_size() const { return Size; }
+    constexpr size_t max_size() const { return Size; }
 
     /// Returns the number of characters that can be held in currently allocated storage
-    constexpr util::size_t capacity() { return max_size(); }
+    constexpr size_t capacity() { return max_size(); }
 
     /// Modifiers
 
@@ -318,10 +317,10 @@ namespace util
     void clear() { it_end = &elements[0]; }
 
     /// Appends count copies of character ch.
-    basic_string& append(util::size_t count, CharT ch)
+    basic_string& append(size_t count, CharT ch)
     {
       // limit count to the available space
-      count = util::min(count, remaining_size());
+      count = min(count, remaining_size());
       it_end = util::fill_n(end(), count, ch);
       return *this;
     }
@@ -330,14 +329,14 @@ namespace util
     template<int Size2>
     basic_string& append(const basic_string<Size2, CharT>& str)
     {
-      util::size_t count = util::min(str.size(), remaining_size());
+      size_t count = util::min(str.size(), remaining_size());
       it_end = util::copy_n(str.begin(), count, end());
       return *this;
     }
 
     /// Appends a substring[pos, pos + count) of str
     template<int Size2>
-    basic_string& append(const basic_string<Size2, CharT>& str, util::size_t pos, util::size_t count)
+    basic_string& append(const basic_string<Size2, CharT>& str, size_t pos, size_t count)
     {
       if (pos < str.size())
       {
@@ -351,12 +350,12 @@ namespace util
     }
 
     /// Appends characters in the range [s, s + count). This range can contain null characters.
-    basic_string& append(const_pointer s, util::size_t count)
+    basic_string& append(const_pointer s, size_t count)
     {
       if (s != nullptr)
       {
         // limit count to the available space
-        count = util::min(count, remaining_size());
+        count = min(count, remaining_size());
         auto it = end();
         while (count > 0U)
         {
@@ -374,7 +373,7 @@ namespace util
       if (s != nullptr)
       {
         auto it = end();
-        util::size_t count = remaining_size();
+        size_t count = remaining_size();
         while ((*s != static_cast<value_type>(0)) && (count > 0U))
         {
           *it++ = *s++;
@@ -407,7 +406,7 @@ namespace util
     /// Finds the first substring equal to str.
     /// Returns position of the first character of the found substring or npos if no such substring is found
     template<int Size2>
-    util::size_t find(const basic_string<Size2, CharT>& str, util::size_t pos = 0) const noexcept
+    size_t find(const basic_string<Size2, CharT>& str, size_t pos = 0) const noexcept
     {
       return find(str.c_str(), pos);
     }
@@ -415,9 +414,9 @@ namespace util
     /// Finds the first substring equal to the character string pointed to by s.
     /// The length of the string is determined by the first null character.
     /// The search start at position pos.
-    util::size_t find(const_pointer s, util::size_t pos = 0) const noexcept
+    size_t find(const_pointer s, size_t pos = 0) const noexcept
     {
-      util::size_t ret = npos;
+      size_t ret = npos;
 
       if (traits_type::length(s) == static_cast<size_t>(0))
       {
@@ -456,9 +455,9 @@ namespace util
     }
 
     /// Finds the first occurance of character ch. The search starts at position pos.
-    util::size_t find(value_type ch, util::size_t pos = 0) const noexcept
+    size_t find(value_type ch, size_t pos = 0) const noexcept
     {
-      util::size_t ret = npos;
+      size_t ret = npos;
 
       if (pos < size())
       {
