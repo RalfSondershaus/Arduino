@@ -211,12 +211,6 @@
     <Filter Include="Src\Gen\Arduino\avr">
       <UniqueIdentifier>{908d66a7-35d9-4fb2-9fd1-df702e4a6a9b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Gen\Arduino\avr\cores">
-      <UniqueIdentifier>{0ce84d32-bd96-4d50-a754-e03b929d1afe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Src\Gen\Arduino\avr\cores\arduino">
-      <UniqueIdentifier>{461680be-583e-4673-9a19-e89ad09a2eb4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Prj\App\Signal\Cal">
       <UniqueIdentifier>{f753aa4c-aba2-4071-9d1f-972a791a6bc4}</UniqueIdentifier>
     </Filter>
@@ -240,6 +234,42 @@
     </Filter>
     <Filter Include="Src\Prj\UnitTest\Gen\Util\Ut_Fix_Queue">
       <UniqueIdentifier>{efd459d4-87f9-47ce-bcd6-20728b336990}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Gen\Dcc\Ut_Filter">
+      <UniqueIdentifier>{a44023fb-f11f-4752-bffc-2653802d9821}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Gen\Dcc\Ut_Filter">
+      <UniqueIdentifier>{e4cf6604-654e-463a-bf54-f01578df39c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\App\Signal\Com">
+      <UniqueIdentifier>{1ecb037b-b8af-4976-a0b1-3970f1106179}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Gen\Arduino\avr\1.8.6">
+      <UniqueIdentifier>{e33e17b9-13db-4a6f-abd2-4bf710ac6ff3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Gen\Arduino\avr\1.8.6\cores">
+      <UniqueIdentifier>{0ce84d32-bd96-4d50-a754-e03b929d1afe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino">
+      <UniqueIdentifier>{461680be-583e-4673-9a19-e89ad09a2eb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Gen\Util\Ut_String">
+      <UniqueIdentifier>{f88cbf62-188b-4275-af0b-13dd5bc14fde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Algorithm">
+      <UniqueIdentifier>{be52bdd8-86d0-4691-a569-b68bdf6ad5a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Gen\Util\Ut_Algorithm">
+      <UniqueIdentifier>{d355df4e-fe5d-4131-8305-1de87538f1b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Gen\Util\Ut_String">
+      <UniqueIdentifier>{5e54dddc-87c9-43e2-ad26-75be8b2780d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Prj\UnitTest\Gen\Util\Ut_Sstream">
+      <UniqueIdentifier>{1edb6716-f620-4162-b339-d46755281e6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Sstream">
+      <UniqueIdentifier>{a62f2576-0802-4c5c-8e77-937adff738d4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -312,78 +342,6 @@
     <ClCompile Include="Src\Prj\App\Signal\Signal.cpp">
       <Filter>Src\Prj\App\Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\abi.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\CDC.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial0.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial1.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial2.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial3.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\hooks.c">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\IPAddress.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\main.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\new.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\PluggableUSB.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\Print.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\Stream.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\Tone.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\USBCore.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\WInterrupts.c">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\wiring.c">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\wiring_analog.c">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\wiring_digital.c">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\wiring_pulse.c">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\wiring_shift.c">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\WMath.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gen\Arduino\avr\cores\arduino\WString.cpp">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Prj\App\Signal\Cal\CalM.cpp">
       <Filter>Src\Prj\App\Signal\Cal</Filter>
     </ClCompile>
@@ -410,6 +368,108 @@
     </ClCompile>
     <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Fix_Queue\Test.cpp">
       <Filter>Src\Prj\UnitTest\Gen\Util\Ut_Fix_Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Dcc\Ut_Filter\test.cpp">
+      <Filter>Src\Prj\UnitTest\Gen\Dcc\Ut_Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\App\Signal\DccDecoder.cpp">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\App\Signal\Com\ComR.cpp">
+      <Filter>Src\Prj\App\Signal\Com</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Util\Algorithm.cpp">
+      <Filter>Src\Gen\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\abi.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\CDC.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\HardwareSerial.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\HardwareSerial0.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\HardwareSerial1.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\HardwareSerial2.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\HardwareSerial3.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\hooks.c">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\IPAddress.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\main.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\new.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\PluggableUSB.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\Print.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\Stream.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\Tone.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\USBCore.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\WInterrupts.c">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\wiring.c">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\wiring_analog.c">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\wiring_digital.c">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\wiring_pulse.c">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\wiring_shift.c">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\WMath.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\WString.cpp">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\App\Signal\Com\SerDrv.cpp">
+      <Filter>Src\Prj\App\Signal\Com</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_String\Test.cpp">
+      <Filter>Src\Prj\UnitTest\Gen\Util\Ut_String</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Algorithm\Test.cpp">
+      <Filter>Src\Prj\UnitTest\Gen\Util\Ut_Algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Util\String.cpp">
+      <Filter>Src\Gen\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_Sstream\Test.cpp">
+      <Filter>Src\Prj\UnitTest\Gen\Util\Ut_Sstream</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gen\Util\Locale.cpp">
+      <Filter>Src\Gen\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -617,63 +677,6 @@
     <ClInclude Include="Src\Gen\Nvm\Nvm_Cfg_Mac.h">
       <Filter>Src\Gen\Nvm</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Arduino.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\binary.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Client.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\HardwareSerial_private.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\IPAddress.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\new.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\PluggableUSB.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Print.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Printable.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Server.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Stream.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\Udp.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\USBAPI.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\USBCore.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\USBDesc.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\WCharacter.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\wiring_private.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Gen\Arduino\avr\cores\arduino\WString.h">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Prj\App\Signal\Cfg_Prj.h">
       <Filter>Src\Prj\App\Signal</Filter>
     </ClInclude>
@@ -711,6 +714,114 @@
       <Filter>Src\Gen\Util</Filter>
     </ClInclude>
     <ClInclude Include="Src\Gen\Util\Fix_Queue.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Ptr.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Dcc\Filter.h">
+      <Filter>Src\Gen\Dcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\DccDecoder.h">
+      <Filter>Src\Prj\App\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Com\ComR.h">
+      <Filter>Src\Prj\App\Signal\Com</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\Arduino.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\binary.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\Client.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\HardwareSerial.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\HardwareSerial_private.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\IPAddress.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\new.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\PluggableUSB.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\Print.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\Printable.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\Server.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\Stream.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\Udp.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\USBAPI.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\USBCore.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\USBDesc.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\WCharacter.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\wiring_private.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\WString.h">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Prj\App\Signal\Com\SerDrv.h">
+      <Filter>Src\Prj\App\Signal\Com</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\String.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\StreamBuf.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Ios.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Istream.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Iterator.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Locale.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Ios_Type.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\ctype.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Sstream.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\vecmath.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Ios_Fwd.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Locale_facets.h">
       <Filter>Src\Gen\Util</Filter>
     </ClInclude>
   </ItemGroup>
@@ -760,9 +871,6 @@
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_InputClassifier\Makefile_Prj.gmk">
       <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_InputClassifier</Filter>
     </None>
-    <None Include="Src\Gen\Arduino\avr\cores\arduino\wiring_pulse.S">
-      <Filter>Src\Gen\Arduino\avr\cores\arduino</Filter>
-    </None>
     <None Include="Build\make\Prj\UnitTest\Prj\Ut_Signal\Makefile_Prj.gmk">
       <Filter>Build\make\Prj\UnitTest\Prj\Ut_Signal</Filter>
     </None>
@@ -774,6 +882,21 @@
     </None>
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Fix_Queue\Makefile_Prj.gmk">
       <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_Fix_Queue</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Gen\Dcc\Ut_Filter\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Gen\Dcc\Ut_Filter</Filter>
+    </None>
+    <None Include="Src\Gen\Arduino\avr\1.8.6\cores\arduino\wiring_pulse.S">
+      <Filter>Src\Gen\Arduino\avr\1.8.6\cores\arduino</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Algorithm\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_Algorithm</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_String\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_String</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Sstream\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_Sstream</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@
 #                   supported: mega, uno, win64, win32
 #
 # ARG_COMPILER      name of the compiler
-#                   supported: avr_gcc, msvc
+#                   supported: avr_gcc, msvc, gcc
 #
 # ARG_BSW               base software that is required by the project
 #                       supported: arduino, arduino_win32, none

@@ -50,11 +50,12 @@ endif
 # Select compiler
 # ---------------------------------------------------
 
-# ---------------------------------------------------
-# ---------------------------------------------------
-# ---------------------------------------------------
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # AVR_GCC
-# ---------------------------------------------------
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ifeq ($(ARG_COMPILER),avrgcc)
 CC := $(AVRGCC)
 
@@ -195,12 +196,11 @@ AVRDUDE_FLAGS = -C$(PATH_AVRDUDE)/avrdude.conf      \
                 -D
 
 
-# ---------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------
-
-# ---------------------------------------------------
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # MSVC (Microsoft)
-# ---------------------------------------------------
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Supported platforms with MSVC (Microsoft):
 #   X86 and msvc
 #   X64 and msvc
@@ -265,9 +265,10 @@ endif
 # /Ob2	                  The default value under /O1 and /O2. Allows the compiler to expand any function not explicitly marked for no inlining
 # /Ob3	                  This option specifies more aggressive inlining than /Ob2, but has the same restrictions. The /Ob3 option is available starting in Visual Studio 2019.
 # /Oy-                    /Oy enables frame-pointer omission and /Oy- disables omission. In x64 compilers, /Oy and /Oy- are not available. If required, defined in Makefile_Target.gmk.
+# /P                      Preprocesses C and C++ source files and writes the preprocessed output to a file.
 # /permissive-            Specify standards conformance mode to the compiler. Use this option to help you identify and fix conformance issues in your code, to make it both more correct and more portable.
 # /RTC1                   Enable fast runtime checks (equivalent to /RTCsu).
-# /scanDependencies       This compiler option generates a JSON file that lists module and header-unit dependencies according to C++ Standard proposal P1689R5 Format for describing dependencies of source files.
+# /scanDependencies (f)   This compiler option generates a JSON file that lists module and header-unit dependencies according to C++ Standard proposal P1689R5 Format for describing dependencies of source files. f is filename or path
 # /sdl 	                  Enable more security features and warnings.
 # /W3                     Specifies how the compiler generates warnings for a given compilation. /W3: recommend that you use this option to provide lint-like warnings.
 # /W4                     Specifies how the compiler generates warnings for a given compilation. /W4: For a new project, it may be best to use /W4 in all compilations. This option helps ensure the fewest possible hard-to-find code defects.
@@ -340,6 +341,88 @@ endif
 # Select target file extension
 # ---------------------------------------------------
 OBJ_FILENAME_EXT := obj
+
+
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# GCC
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+else ifeq ($(ARG_COMPILER),gcc)
+CC := $(GCC)
+
+# ---------------------------------------------------
+# Compiler include pathes; typically just required to print compiler include paths for Visual Studio browsing
+# ---------------------------------------------------
+C_INCLUDES_COMPILER =
+
+# ---------------------------------------------------
+# Include pathes for platform dependend header files
+# ---------------------------------------------------
+C_INCLUDES := $(C_INCLUDES)   \
+             -I$(PATH_SRC_GEN)/Platform                                         \
+             -I$(PATH_SRC_GEN)/Platform/$(TARGET_MCU_FAMILY)/$(ARG_COMPILER)
+
+# ---------------------------------------------------
+# Add compiler #defines for the target.
+# ---------------------------------------------------
+ifeq ($(TARGET_MCU_FAMILY),X86)
+C_DEFINES := $(C_DEFINES) \
+             -D "WIN32"
+
+else
+$(error ------ Invalid build command line parameter TARGET_MCU_FAMILY $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: X86) ------
+endif
+
+# ---------------------------------------------------
+# Compiler flags. See also https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
+#
+# -g    Produce debugging information in the operating system’s native format (stabs, COFF, XCOFF, or DWARF). GDB can work with this debugging information.
+# -M    Instead of outputting the result of preprocessing, output a rule suitable for make describing the dependencies of the main source file. 
+# -O1   Optimize. Optimizing compilation takes somewhat more time, and a lot more memory for a large function. (Same as -O)
+# -O2   Optimize even more. GCC performs nearly all supported optimizations that do not involve a space-speed tradeoff. 
+# -O3   Optimize yet more. -O3 turns on all optimizations specified by -O2 and also turns on more optimization flags.
+# -O0   Reduce compilation time and make debugging produce the expected results. This is the default.
+# -Os   Optimize for size. -Os enables all -O2 optimizations except those that often increase code size.
+# -Og   Optimize debugging experience. -Og should be the optimization level of choice for the standard edit-compile-debug cycle.
+# -Oz   Optimize aggressively for size rather than speed.
+# -Ofast Disregard strict standards compliance. -Ofast enables all -O3 optimizations. It also enables optimizations that are not valid for all standard-compliant programs.
+# -v    Print (on standard error output) the commands executed to run the stages of compilation.
+# --version Display the version number and copyrights of the invoked GCC.
+# -Wall This enables all the warnings about constructions that some users consider questionable, and that are easy to avoid (or modify to prevent the warning), even in conjunction with macros.
+# ---------------------------------------------------
+CFLAGS := $(CFLAGS)  \
+          -Wall
+
+C_DEFINES := $(C_DEFINES) \
+          -D "_DEBUG"     \
+          -D "_CONSOLE"   \
+          -D "_UNICODE"   \
+          -D "UNICODE" 
+
+# ---------------------------------------------------
+# How to print compiler version flags
+# ---------------------------------------------------
+CCVERSIONFLAGS := --version
+
+# ---------------------------------------------------
+# Linker flags
+# See also https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html.
+# See also https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
+# ---------------------------------------------------
+ifeq ($(TARGET_MCU_FAMILY),X86)
+LFLAGS := $(LFLAGS)
+          
+else
+$(error ------ Invalid build command line parameter TARGET_MCU_FAMILY $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: X86) ------
+endif
+
+# ---------------------------------------------------
+# Select target file extension
+# ---------------------------------------------------
+OBJ_FILENAME_EXT := o
 
 
 # ---------------------------------------------------

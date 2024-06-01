@@ -55,4 +55,29 @@ $(TARGET_FILENAME_BASE).exe: $(FILES_O)
 	@echo +++++ linking $@ +++++
 	$(CC) -Fe"$@" $(FILES_O) $(LFLAGS)
 
+# ---------------------------------------------------
+# GCC
+# ---------------------------------------------------
+else ifeq ($(ARG_COMPILER),gcc)
+
+$(PATH_OBJ)/%.o: %.c
+	@echo +++++ compile $< to $@
+	$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< 2> $(PATH_ERR)/$(basename $(@F)).err
+
+$(PATH_OBJ)/%.o: %.cc
+	@echo +++++ compile $< to $@
+	$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< 2> $(PATH_ERR)/$(basename $(@F)).err
+
+$(PATH_OBJ)/%.o: %.cpp
+	@echo +++++ compile $< to $@
+	$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< 2> $(PATH_ERR)/$(basename $(@F)).err
+
+$(TARGET_FILENAME_BASE).exe: $(FILES_O)
+	@echo +++++ linking $@ +++++
+	$(CC) $(FILES_O) $(LFLAGS) -o $(TARGET_FILENAME_BASE).exe
+
+else
+
+$(error ------ Invalid build command line parameter ARG_COMPILER $(ARG_COMPILER). Supported: avrgcc,msvc,gcc) ------
+
 endif
