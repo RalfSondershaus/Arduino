@@ -25,9 +25,28 @@
 #define UTIL_ARRAY_H
 
 #include <Std_Types.h>
+#include <Util/Algorithm.h>
 
 namespace util
 {
+  // ---------------------------------------------------
+  /// Returns a pointer to the beginning of array
+  // ---------------------------------------------------
+  template <class T, size_t N>
+  constexpr T* begin(T(&arr)[N]) noexcept
+  {
+    return arr;
+  }
+
+  // ---------------------------------------------------
+  /// Returns a pointer to the end of array
+  // ---------------------------------------------------
+  template <class T, size_t N>
+  constexpr T* end(T(&arr)[N]) noexcept
+  {
+    return &arr[N];
+  }
+
   // ---------------------------------------------------
   /// A simple container class which supports
   /// - begin

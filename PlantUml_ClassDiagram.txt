@@ -1,0 +1,180 @@
+@startuml
+'
+' Static class diagram
+'
+
+node Algorithm [
+  **Algorithm**
+  * is_in_interval
+  * find
+  * copy
+  * copy_n
+  * fill
+  * fill_n
+  * memcpy
+  * make_number
+  * min
+  * add_no_overflow
+  * ramp
+]
+
+class ios_base {
+  +typedef fmtflags
+  +typedef iostate
+  +typedef openmode
+  +typedef seekdir
+
+  #fmtflags my_fmtflags
+  #iostate my_iostate
+  #locale my_locale
+  .. locale support ..
+  +getloc()
+  +imbue(locale&)
+}
+
+class basic_ios {
+  #basic_streambuf *my_sb
+  
+  +basic_ios(basic_streambuf*)
+  +good()
+  +eof()
+  +fail()
+  +setstate(iostate)
+  +rdbuf()
+  .. locale support ..
+  +imbue(const locale&)
+}
+
+class locale {
+  +class facet
+  +class id
+  
+  +combine
+  +get_facet
+}
+
+class locale_facet {
+}
+
+class ctype_base {
+  +typedef mask
+}
+
+class ctype {
+  +widen(char)
+  +narrow(char_type,char)
+  +toupper(char_type)
+  +tolower(char_type)
+}
+
+class numpunct {
+  +decimal_point()
+  +thousands_sep()
+}
+
+class num_get {
+  +using istreambuf_iterator as <InputIt> 
+  +using <InputIt> as iter_type
+  +gets(iter_type,iter_type,ios_base,ios_base::iostate,T)
+  +getu(iter_type,iter_type,ios_base,ios_base::iostate,T)
+  #put_integer()
+}
+
+class basic_streambuf {
+  +pubsetbuf(char_type*, streamsize)
+  +pubseekoff(off_type,ios_base::seekdir,ios_base::openmode)
+  +pubseekpos(pos_type,ios_base::openmode)
+  +snextc()
+  +sbumpc()
+  +sgetc()
+  +sgetn()
+  .. locale support ..
+  +pubimbue(const locale&)
+  +getloc()
+  #(v) imbue(const locale&)
+  #setbuf(char_type*,streamsize)
+  #seekoff(off_type,ios_base::seekdir,ios_base::opemmode)
+  #seekpos(pos_type,ios_base::openmode)
+  #underflow()
+  #uflow()
+  #char_type *my_eback
+  #char_type *my_gptr
+  #char_type *my_egptr
+}
+
+class basic_stringbuf {
+  +basic_stringbuf()
+  +basic_stringbuf(const basic_string&,ios_base::openmode)
+  +str()
+  #setbuf(char_type*,streamsize)
+  #seekoff(off_type,ios_base::seekdir,ios_base::opemmode)
+  #seekpos(pos_type,ios_base::openmode)
+  #underflow()
+  #uflow()
+  #basic_string str
+}
+
+class istreambuf_iterator {
+  +istreambuf_iterator(basic_istream&)
+  +istreambuf_iterator(basic_streambuf*)
+  +operator*()
+  +operator++()
+  #basic_streambuf *pBuf
+}
+
+class istream_iterator {
+  +istream_iterator(basic_istream&)
+  #basic_istream *pistr
+}
+
+class basic_istream {
+  +basic_istream(basic_streambuf*)
+  .. formatted input ..
+  +operator>>(sint16&)
+  +operator>>(uint16&)
+  .. unformatted input ..
+  +get()
+  +get(char_type&)
+  +get(char_type*,streamsize)
+  +get(char_type*,streamsize, char_type)
+  +gcount()
+  .. positioning ..
+  +tellg()
+}
+
+class basic_istringstream {
+  +basic_istringstream(const basic_string&, ios_base::openmode)
+  +rdbuf()
+  +str()
+  #basic_stringbuf my_strbuf
+
+}
+
+ios_base *-- locale
+
+locale +-- locale_facet
+
+locale_facet <|-- ctype_base
+ctype_base   <|-- ctype
+locale_facet <|-- numpunct
+locale_facet <|-- num_get
+
+basic_ios           --> locale : requires
+basic_istream       --> num_get : requires
+ios_base            <|-- basic_ios
+basic_ios           <|-- basic_istream
+basic_ios            o-- basic_streambuf
+basic_istream       <|-- basic_istringstream
+basic_streambuf     <|-- basic_stringbuf
+basic_streambuf     *--  locale
+istreambuf_iterator o-- basic_streambuf
+istreambuf_iterator --> basic_istream : requires
+basic_istringstream *-- basic_stringbuf
+istream_iterator    o-- basic_istream
+
+
+istreambuf_iterator <-- num_get : requires
+ctype               <-- num_get : requires
+numpunct            <-- num_get : requires
+ios_base            <-- num_get : requires
+@enduml

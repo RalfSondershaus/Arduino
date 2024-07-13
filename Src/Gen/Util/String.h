@@ -25,12 +25,13 @@
 #define UTIL_STRING_H
 
 #include <Std_Types.h>
-#include <string.h> // strchr, strstr, memmove
-#include <stdlib.h> // strtol
-#include <stdio.h>  // EOF
 #include <Platform_Limits.h>
 #include <Util/Algorithm.h>
+#include <Util/Math.h>
 #include <Util/Ios_Type.h> // streamoff
+
+#include <string.h>
+#include <stdio.h>
 
 namespace util
 {
@@ -65,10 +66,10 @@ namespace util
 
     /// Copies count characters from src to dest.
     /// Performs correctly even if the ranges[src, src + count) and [dest, dest + count) overlap
-    static char_type* move(char_type* dest, const char_type* src, size_t count) { memmove(dest, src, count * sizeof(char_type)); }
+    static char_type* move(char_type* dest, const char_type* src, size_t count) { return static_cast<char_type*>(memmove(dest, src, count * sizeof(char_type))); }
 
     /// copies a character sequence
-    static char_type* copy(char_type* dest, const char_type* src, size_t count) { memcpy(dest, src, count * sizeof(char_type)); }
+    static char_type* copy(char_type* dest, const char_type* src, size_t count) { return static_cast<char_type*>(memcpy(dest, src, count * sizeof(char_type))); }
 
     /// Compares the first count characters of the character strings s1 and s2. The comparison is done lexicographically.
     /// If count is zero, strings are considered equal.
@@ -832,7 +833,7 @@ namespace util
 template<int Size, class CharT>
 util::basic_string<Size, CharT> operator+(const util::basic_string<Size, CharT>& lhs, const util::basic_string<Size, CharT>& rhs)
 {
-  std::basic_string<Size, CharT> str = lhs;
+  util::basic_string<Size, CharT> str = lhs;
   str += rhs;
   return str;
 }

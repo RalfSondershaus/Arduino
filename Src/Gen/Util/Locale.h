@@ -26,11 +26,8 @@
 
 #include <Std_Types.h>
 #include <Platform_Limits.h>
-#include <Util/Ios.h>       // util::ios_base
-#include <Util/Iterator.h>  // util::begin, util::end, util::streambuf_iterator
 #include <Util/String.h>    // util::char_traits
 #include <Util/Array.h>
-#include <iostream>
 
 namespace util
 {
@@ -95,20 +92,17 @@ namespace util
       /// default initialized to zero during static initialization
       id()
       {
-        std::cout << "locale::id::id(): unique_id = " << unique_id << std::endl;
       }
 
       /// no copy constructur since an id shall be unique
       id(const id&) = delete;
 
-      /// return the id and construct a new id if no id was provided before
+      /// returns the (unique) id and generates a new id if no id was provided before
       operator size_t() 
       { 
-        std::cout << "locale::id::operator size_t(): unique_id=" << unique_id << std::endl;
         if (unique_id == 0)
         {
           unique_id = static_cast<size_t>(++id_cnt);
-          std::cout << "locale::id::operator size_t(): unique_id=" << unique_id << std::endl;
         }
         return unique_id;
       }
@@ -124,7 +118,7 @@ namespace util
     // pointer to a facet
     using const_facet_pointer = const facet*;
     // array type of facets
-    using facet_array_type = typename array<const_facet_pointer, id::kMaxNrFacets>;
+    using facet_array_type = array<const_facet_pointer, id::kMaxNrFacets>;
 
   protected:
     /// The global C++ locale. There is just one global C++ locale.

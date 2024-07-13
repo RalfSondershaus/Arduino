@@ -1,0 +1,25 @@
+{
+    "makefile.makefilePath": "Build/make/Makefile.gmk",
+    "makefile.makePath": "make",
+    "makefile.configurations": [
+        {
+            "name": "Ut_String_Unity_gcc all",
+            "makeArgs": [
+                "UnitTest/Gen/Util/Ut_String_Unity win32 gcc none unity all"
+            ],
+            "problemMatchers": [
+                "$gcc",
+                "$msvc"
+            ]
+        }
+    ],
+    "files.associations": {
+        "array": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "iterator": "cpp",
+        "string_view": "cpp"
+    },
+    "ceedlingExplorer.shellPath": "null"
+}

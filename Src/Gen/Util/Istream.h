@@ -26,10 +26,10 @@
 
 #include <Std_Types.h>
 #include <Platform_Limits.h>
-#include <Util/Ios.h>         // util::ios_base
-#include <Util/Iterator.h>    // util::char_traits
+#include <Util/Ios_base.h>      // util::ios_base
+#include <Util/Iterator.h>      // util::char_traits
 #include <Util/Locale_facets.h> // util::num_get
-#include <Util/StreamBuf.h>   // util::basic_streambuf
+#include <Util/StreamBuf.h>     // util::basic_streambuf
 
 namespace util
 {
@@ -103,7 +103,6 @@ namespace util
 
           while ((!traits_type::eq_int_type(traits_type::eof(), nc))
             && (facet.isspace(traits_type::to_char_type(nc))))
-            //&& (!util::isspace(traits_type::to_char_type(nc))))
           {
             nc = rdbuf()->snextc();
           }
@@ -124,16 +123,17 @@ namespace util
       const sentry ok(*this);
       long val;
       iostate err = goodbit;
+      my_gcount = 0;
       if (ok)
       {
-        use_facet<num_get_type>(getloc()).gets(*this, 0, *this, err, val);
-        //num_get_type::get(*this, 0, *this, err, val);
+        const num_get_type& facet = util::use_facet<num_get_type>(getloc());
+        facet.gets(*this, 0, *this, err, val);
         if (val > platform::numeric_limits<sint16>::max_())
         {
           err |= failbit;
           value = platform::numeric_limits<sint16>::max_();
         }
-        else if (val < platform::numeric_limits<sint16>::max_())
+        else if (val < platform::numeric_limits<sint16>::min_())
         {
           err |= failbit;
           value = platform::numeric_limits<sint16>::min_();
@@ -154,6 +154,7 @@ namespace util
       const sentry ok(*this);
       unsigned long val;
       iostate err = goodbit;
+      my_gcount = 0;
       if (ok)
       {
         const num_get_type& facet = util::use_facet<num_get_type>(getloc());

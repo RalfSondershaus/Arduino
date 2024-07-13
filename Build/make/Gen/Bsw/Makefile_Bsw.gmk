@@ -34,8 +34,9 @@ FILES_BSW :=  $(FILES_BSW)                             \
               $(PATH_SRC_ARDUINO_CORE)/WMath           \
               $(PATH_SRC_ARDUINO_CORE)/WString
 
-C_INCLUDES := $(C_INCLUDES)                         \
-              -I$(PATH_SRC_ARDUINO_CORE)            \
+C_INCLUDES := $(C_INCLUDES)                                 \
+              -I$(PATH_SRC_ARDUINO_CORE)                    \
+              -I$(PATH_SRC_ARDUINO_LIBRARIES)/EEPROM/src    \
               -I$(PATH_SRC_GEN)/Os/Arduino/$(ARG_COMPILER)
 
 # old stuff for FreeRTOS
@@ -76,5 +77,22 @@ FILES_BSW_TEST := $(FILES_BSW_TEST) \
 C_INCLUDES := $(C_INCLUDES)                         \
               -I$(PATH_SRC_GOOGLETEST)              \
               -I$(PATH_SRC_GOOGLETEST)/include
+
+endif
+
+# ---------------------------------------------------
+# ARG_TESTFRAMEWORK: unity
+# ---------------------------------------------------
+ifeq ($(ARG_TESTFRAMEWORK),unity)
+FILES_BSW_TEST := $(FILES_BSW_TEST)                 \
+                  $(PATH_SRC_UNITY)/src/unity
+
+C_INCLUDES := $(C_INCLUDES)                         \
+              -I$(PATH_SRC_UNITY)/src
+
+# add -g to produce debugging information
+CFLAGS := $(CFLAGS) \
+          -g
+LFLAGS := $(LFLAGS) -g
 
 endif

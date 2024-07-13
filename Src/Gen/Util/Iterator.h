@@ -31,25 +31,6 @@
 
 namespace util
 {
-
-  // ---------------------------------------------------
-  /// Returns a pointer to the beginning of array
-  // ---------------------------------------------------
-  template <class T, size_t N>
-  constexpr T* begin(T(&array)[N]) noexcept 
-  {
-    return array;
-  }
-
-  // ---------------------------------------------------
-  /// Returns a pointer to the end of array
-  // ---------------------------------------------------
-  template <class T, size_t N>
-  constexpr T* end(T(&array)[N]) noexcept
-  {
-    return &array[N];
-  }
-
   // ---------------------------------------------------
   /// A single-pass input iterator that reads successive characters 
   /// from the std::basic_streambuf object for which it was constructed.
@@ -161,7 +142,7 @@ namespace util
     {
       if (pistr != nullptr)
       {
-        if (!(*_pistr >> val))
+        if (!(*pistr >> val))
         {
           pistr = nullptr;
         }

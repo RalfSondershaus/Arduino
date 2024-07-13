@@ -22,7 +22,7 @@
 #                       supported: arduino, arduino_win32, none
 #
 # ARG_TESTFRAMEWORK     test framework that is required by the project
-#                       supported: googletest, none
+#                       supported: googletest, unity, none
 #
 # Command           such as all, clean, program
 #
@@ -121,6 +121,7 @@ PATH_SRC_ARDUINO_VARIANTS   = $(PATH_SRC_ARDUINO_BASE)/avr/1.8.6/variants
 PATH_SRC_ARDUINO_WIN32_BASE = $(PATH_SRC)/Gen/Arduino_win32
 PATH_SRC_ARDUINO_WIN32_CORE = $(PATH_SRC_ARDUINO_BASE)/avr/cores
 PATH_SRC_GOOGLETEST         = $(PATH_SRC)/Gen/Test/googletest-main/googletest
+PATH_SRC_UNITY             ?= $(PATH_TOOLS)/unity
 PATH_SRC_PRJ_PROJECT        = $(PATH_SRC_PRJ)/$(ARG_PROJECT)
 PATH_BUILD_MAKE             = $(PATH_BUILD)/make
 PATH_BUILD_GEN              = $(PATH_BUILD_MAKE)/Gen
@@ -139,7 +140,7 @@ PATH_OBJ                    = $(PATH_TMP)
 # Tools
 # ---------------------------------------------------
 AVRGCC  = avr-gcc
-GCC     = gcc
+GCC     = g++
 OBJCOPY = $(PATH_AVRGNU)/bin/avr-objcopy
 SIZE    = $(PATH_AVRGNU)/bin/avr-size
 AVRDUDE = $(PATH_AVRDUDE)/avrdude
@@ -263,13 +264,22 @@ ifneq ($(MAKECMDGOALS),rebuild)
 endif
 
 # ------------------------------------------------------------------------------
+# Execute code after build
+# ------------------------------------------------------------------------------
+ifeq ($(ARG_TESTFRAMEWORK),unity)
+RUN_DEP := run
+else
+RUN_DEP :=
+endif
+
+# ------------------------------------------------------------------------------
 # Rules
 # ------------------------------------------------------------------------------
 
 # Implicit rules are not used, instead pattern rules with %.c are used, see below
 .SUFFIXES:
 
-all: PrintIncludePaths $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
+all: PrintIncludePaths PrintCompiler $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT) $(RUN_DEP)
 
 rebuild: clean PrintIncludePaths all
 
@@ -295,6 +305,10 @@ PrintCompiler:
 	@echo $(LFLAGS)
 	@echo +++ version
 	@-$(CC) $(CCVERSIONFLAGS)
+
+run: $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
+	@echo ++++++ Running ++++++
+	@$(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
 
 .PHONY: clean
 clean:

@@ -17,3 +17,8 @@ Install.txt
 Tmp/Arduino.log
 Tmp/Arduino.vcxprojAssemblyReference.cache
 Tmp/Arduino.log
+Debug/ConsoleApplication1.exe
+Debug/ConsoleApplication1.pdb
+Src/Gen/Test/googletest-main/googletest/src/gtest-all.ii
+Src/Gen/Test/googletest-main/googletest/src/gtest-all.s
+Src/Gen/Test/googletest-main/googletest/src/output.txt

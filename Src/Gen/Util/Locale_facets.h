@@ -29,7 +29,7 @@
 #include <Util/Ios.h>       // util::ios_base
 #include <Util/Ios_Fwd.h>   // util::streambuf_iterator
 #include <Util/String.h>    // util::char_traits
-#include <Util/Locale.h>
+#include <Util/Locale.h>    // util::locale::facet
 #include <Util/Array.h>
 
 namespace util
@@ -314,47 +314,54 @@ namespace util
     static locale::id id; // { locale::id::kNumGet };
 
   public:
-    /// Parses the sequences of characters between in and end for a numerical value, and stores it into v.
-    /// It uses formatting options selected in str. When necessary, it updates err.
+    /// Parses the sequences of characters between start and end for a numerical value, and stores it into v.
+    /// It uses formatting options selected in str. When necessary, it updates state.
     /// Implementation for signed types.
     template<typename T>
-    iter_type gets(iter_type in, iter_type end, ios_base& iosbase, ios_base::iostate& err, T& val)
+    iter_type gets(iter_type start, iter_type end, ios_base& iosbase, ios_base::iostate& state, T& val) const
     {
       char acBuf[kMaxIntDigits];
       char* pEnd;
       int nBase;
       util::tStringError strerr;
 
-      nBase = put_integer(acBuf, kMaxIntDigits, in, end, iosbase.flags(), iosbase.getloc());
+      nBase = put_integer(acBuf, kMaxIntDigits, start, end, iosbase.flags(), iosbase.getloc());
+
       // On success, convert integer
       if (acBuf[0] != 0)
       {
         val = util::strtoi<T>(acBuf, &pEnd, nBase, &strerr);
         if (strerr != tStringError::ERR_NONE)
         {
-          err = ios_base::failbit;
+          state = ios_base::failbit;
           val = 0;
         }
       }
       else
       {
-        err = ios_base::failbit;
+        state = ios_base::failbit;
         val = 0;
       }
 
-      return in;
+      if (start == end)
+      {
+        state |= ios_base::eofbit;
+      }
+
+      return start;
     }
 
     // unsigned types
     template<typename T>
-    iter_type getu(iter_type in, iter_type end, ios_base& str, ios_base::iostate& err, T& val) const
+    iter_type getu(iter_type start, iter_type end, ios_base& str, ios_base::iostate& state, T& val) const
     {
       char acBuf[kMaxIntDigits];
       char* pEnd;
       int nBase;
       util::tStringError strerr;
 
-      nBase = put_integer(acBuf, kMaxIntDigits, in, end, str.flags(), str.getloc());
+      nBase = put_integer(acBuf, kMaxIntDigits, start, end, str.flags(), str.getloc());
+
       // On success, convert integer
       if (acBuf[0] != 0)
       {
@@ -367,17 +374,22 @@ namespace util
         val = util::strtoui<T>(pBuf, &pEnd, nBase, &strerr);
         if (strerr != tStringError::ERR_NONE)
         {
-          err = ios_base::failbit;
+          state = ios_base::failbit;
           val = 0;
         }
       }
       else
       {
-        err = ios_base::failbit;
+        state = ios_base::failbit;
         val = 0;
       }
 
-      return in;
+      if (start == end)
+      {
+        state |= ios_base::eofbit;
+      }
+
+      return start;
     }
 
   protected:
@@ -438,7 +450,7 @@ namespace util
       fmt = fmt & util::ios_base::basefield;
 
       // copy leading plus sign and minus sign
-      if ((first != end) && (pBuf < pBufEnd))
+      if (first != end)
       {
         c = narrow(first, ctype_fac);
         if ((c == '+') || (c == '-'))
@@ -510,6 +522,14 @@ namespace util
           // invalid character, stop to copy characters
           break;
         }
+      }
+
+      // If first is EOF, first still has a pointer to the buffer. 
+      // Force first == end to enable calling functions to check for first == end.
+      // (first == end if both first and end have a pointer to a buffer, or both don't have a pointer to a buffer.)
+      if ((first != end) && traits_type::eq_int_type(traits_type::eof(), *first))
+      {
+        ++first;
       }
 
       if ((!hasDigit) || (len == 0))

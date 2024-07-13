@@ -25,7 +25,7 @@
 #define UTIL_STREAMBUF_H
 
 #include <Std_Types.h>
-#include <Util/Ios.h>       // streamsize, ios_base
+#include <Util/Ios_base.h>       // streamsize, ios_base
 #include <Util/Locale.h>
 
 namespace util

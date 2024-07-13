@@ -1,0 +1,134 @@
+@startuml
+'
+' File include diagram
+'
+
+
+file stdint_h as "
+  **stdint.h**
+"
+file stddef_h as "
+  **stddef.h**
+"
+file Compiler_h as "
+  **Compiler.h**
+"
+file Platform_Limits_h as "
+  **Platform_Limits.h**
+"
+file Std_Types_h as "
+  **Std_Types.h**
+"
+
+file Algorithm_h as "
+  **Algorithm.h**
+"
+file Array_h as "
+  **Array.h**
+"
+file Locale_h as "
+  **Locale.h**  
+  * locale
+  ** facet
+  ** id
+  * use_facet
+  * has_facet
+"
+file Locale_facets_h as "
+  **Locale_facets.h**
+  * ctype_base (public locale::facet)
+  * ctype
+  * numpunct
+  * num_get
+"
+file Ios_h as "
+  **Ios.h**
+  * ios_base
+  * basic_ios
+"
+file Ios_Fwd_h as "
+  **Ios_Fwd.h**
+"
+file Ios_Type_h as "
+  **Ios_Type.h**
+"
+file Istream_h as "
+  **Istream.h**
+"
+file Iterator_h as "
+  **Iterator.h**
+"
+file Sstream_h as "
+  **Sstream.h**
+  * basic_stringbuf (public basic_streambuf)
+  * basic_istringstream (public basic_istream)
+"
+file StreamBuf_h as "
+  **StreamBuf.h**
+  * basic_streambuf
+"
+file String_h as "
+  **String.h**
+"
+
+stdint_h      <-- Platform_Types_h : includes
+stddef_h      <-- Platform_Types_h : includes
+
+Platform_Types_h  <-- Std_Types_h : includes
+Compiler_h        <-- Std_Types_h : includes
+
+Platform_Types_h  <-- Platform_Limits_h : includes
+
+' Std_Types_h       <-- Locale_h : includes
+Platform_Limits_h <-- Locale_h : includes
+Ios_h             <-- Locale_h : includes
+Iterator_h        <-- Locale_h : includes
+String_h          <-- Locale_h : includes
+Array_h           <-- Locale_h : includes
+
+' Std_Types_h       <-- Locale_facets_h : includes
+Platform_Limits_h <-- Locale_facets_h : includes
+Ios_h             <-- Locale_facets_h : includes
+Ios_Fwd_h         <-- Locale_facets_h : includes
+String_h          <-- Locale_facets_h : includes
+Locale_h          <-- Locale_facets_h : includes
+Array_h           <-- Locale_facets_h : includes
+
+' Std_Types_h       <-- Ios_h : includes
+Ios_Type_h        <-- Ios_h : includes
+String_h          <-- Ios_h : includes
+Locale_h          <-- Ios_h : includes
+
+' Std_Types_h       <-- Ios_Type_h : includes
+
+' Std_Types_h       <-- Ios_Fwd_h : includes
+
+' Std_Types_h       <-- Iterator_h : includes
+Ios_Fwd_h         <-- Iterator_h : includes
+
+' Std_Types_h       <-- String_h : includes
+Platform_Limits_h <-- String_h : includes
+Algorithm_h       <-- String_h : includes
+Ios_Type_h        <-- String_h : includes
+
+' Std_Types_h       <-- Array_h : includes
+Algorithm_h       <-- Array_h : includes
+
+' Std_Types_h       <-- Sstream_h : Includes 
+String_h          <-- Sstream_h : Includes
+StreamBuf_h       <-- Sstream_h : Includes
+Istream_h         <-- Sstream_h : Includes
+
+' Std_Types_h       <-- StreamBuf_h : includes
+Io_hs             <-- StreamBuf_h : includes
+Locale_h          <-- StreamBuf_h : includes
+
+' Std_Types_h       <-- Istream_h : includes
+Platform_Limits_h <-- Istream_h : includes
+Ios_h             <-- Istream_h : includes
+Iterator_h        <-- Istream_h : includes
+Locale_facets_h   <-- Istream_h : includes
+StreamBuf_h       <-- Istream_h : includes
+
+num_get           --> StreamBuf : is_template_parameter
+@enduml

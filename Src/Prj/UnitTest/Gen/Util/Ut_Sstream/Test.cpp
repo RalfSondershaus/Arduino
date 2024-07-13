@@ -271,15 +271,300 @@ TEST(Ut_Sstream, Formatted_input_uint16)
   EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
   stream >> un;
   EXPECT_EQ(un, 12345);
+  EXPECT_EQ(stream.gcount(), 0);
   EXPECT_EQ(stream.eof(), true);
   EXPECT_EQ(stream.fail(), false);
-  EXPECT_EQ(stream.gcount(), 5);
 
   std::istringstream ss("12345");
   EXPECT_EQ(ss.tellg(), 0);
   ss >> un;
   EXPECT_EQ(un, 12345);
-  EXPECT_EQ(ss.gcount(), 5);
+  EXPECT_EQ(ss.gcount(), 0);
   EXPECT_EQ(ss.eof(), true);
   EXPECT_EQ(ss.fail(), false);
 }
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_uint16_hex)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+  using traits_t = istringstream_t::traits_type;
+  using string_t = istringstream_t::string_type;
+
+  istringstream_t stream("0xA000");
+  uint16 un;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> un;
+  EXPECT_EQ(un, 0xA000);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), false);
+
+  std::istringstream ss("0xA000");
+  EXPECT_EQ(ss.tellg(), 0);
+  ss >> un;
+  EXPECT_EQ(un, 0xA000);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), false);
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_uint16_2x)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+  using traits_t = istringstream_t::traits_type;
+  using string_t = istringstream_t::string_type;
+
+  istringstream_t stream("12345 678");
+  uint16 un;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> un;
+  EXPECT_EQ(un, 12345);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> un;
+  EXPECT_EQ(un, 678);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), false);
+
+  std::istringstream ss("12345 678");
+  EXPECT_EQ(ss.tellg(), 0);
+  ss >> un;
+  EXPECT_EQ(un, 12345);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> un;
+  EXPECT_EQ(un, 678);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), false);
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_uint16_2x_char)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+  using traits_t = istringstream_t::traits_type;
+  using string_t = istringstream_t::string_type;
+
+  istringstream_t stream("12345 a 678");
+  uint16 un;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> un;
+  EXPECT_EQ(un, 12345);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> un;
+  EXPECT_EQ(un, 0);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), true);
+  stream >> un;
+  EXPECT_EQ(un, 0);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), true);
+
+  std::istringstream ss("12345 a 678");
+  EXPECT_EQ(ss.tellg(), 0);
+  ss >> un;
+  EXPECT_EQ(un, 12345);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> un;
+  EXPECT_EQ(un, 0);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), true);
+  ss >> un;
+  EXPECT_EQ(un, 0);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), true);
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_sint16_pos)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+  using traits_t = istringstream_t::traits_type;
+  using string_t = istringstream_t::string_type;
+
+  istringstream_t stream("12345");
+  sint16 n;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> n;
+  EXPECT_EQ(n, 12345);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), false);
+
+  std::istringstream ss("12345");
+  EXPECT_EQ(ss.tellg(), 0);
+  ss >> n;
+  EXPECT_EQ(n, 12345);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), false);
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_sint16_neg)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+  using traits_t = istringstream_t::traits_type;
+  using string_t = istringstream_t::string_type;
+
+  istringstream_t stream("-12345");
+  sint16 n;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> n;
+  EXPECT_EQ(n, -12345);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), false);
+
+  std::istringstream ss("-12345");
+  EXPECT_EQ(ss.tellg(), 0);
+  ss >> n;
+  EXPECT_EQ(n, -12345);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), false);
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_sint16_pos_hex)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+  using traits_t = istringstream_t::traits_type;
+  using string_t = istringstream_t::string_type;
+
+  istringstream_t stream("0xA000");
+  sint16 n;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> n;
+  EXPECT_EQ(n, 0xA000);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), false);
+
+  std::istringstream ss("0xA000");
+  EXPECT_EQ(ss.tellg(), 0);
+  ss >> n;
+  EXPECT_EQ(n, 0xA000);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), false);
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_sint16_neg_hex)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+  using traits_t = istringstream_t::traits_type;
+  using string_t = istringstream_t::string_type;
+
+  istringstream_t stream("-0xA000");
+  sint16 n;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> n;
+  EXPECT_EQ(n, -0xA000);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), false);
+
+  std::istringstream ss("-0xA000");
+  EXPECT_EQ(ss.tellg(), 0);
+  ss >> n;
+  EXPECT_EQ(n, -0xA000);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), false);
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_sint16_pos_big)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+  using traits_t = istringstream_t::traits_type;
+  using string_t = istringstream_t::string_type;
+
+  istringstream_t stream("32767 32768");
+  sint16 n;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> n;
+  EXPECT_EQ(n, 32767);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> n;
+  EXPECT_EQ(n, 32767);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), true);
+
+  std::istringstream ss("32767 32768");
+  EXPECT_EQ(ss.tellg(), 0);
+  ss >> n;
+  EXPECT_EQ(n, 32767);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> n;
+  EXPECT_EQ(n, 32767);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), true);
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_sint16_neg_big)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+  using traits_t = istringstream_t::traits_type;
+  using string_t = istringstream_t::string_type;
+
+  istringstream_t stream("-32768 -32769");
+  sint16 n;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> n;
+  EXPECT_EQ(n, -32768);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> n;
+  EXPECT_EQ(n, -32768);
+  EXPECT_EQ(stream.gcount(), 0);
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), true);
+
+  std::istringstream ss("-32768 -32769");
+  EXPECT_EQ(ss.tellg(), 0);
+  ss >> n;
+  EXPECT_EQ(n, -32768);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> n;
+  EXPECT_EQ(n, -32768);
+  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), true);
+}
+

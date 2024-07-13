@@ -49,14 +49,8 @@ namespace util
 
   void locale::construct()
   {
-    std::cout << "locale::construct(): num_get<char>::id=" << num_get<char>::id << std::endl;
     facets.at(num_get<char>::id ) = &global_facets.num_get_;
-    std::cout << "locale::construct(): num_get<char>::id=" << num_get<char>::id << std::endl;
-    std::cout << "locale::construct(): ctype<char>::id=" << ctype<char>::id << std::endl;
     facets.at(ctype<char>::id   ) = &global_facets.ctype_;
-    std::cout << "locale::construct(): ctype<char>::id=" << ctype<char>::id << std::endl;
-    std::cout << "locale::construct(): numpunct<char>::id=" << numpunct<char>::id << std::endl;
     facets.at(numpunct<char>::id) = &global_facets.numpunct_;
-    std::cout << "locale::construct(): numpunct<char>::id=" << numpunct<char>::id << std::endl;
   }
 } // namespace util

@@ -271,6 +271,12 @@
     <Filter Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Sstream">
       <UniqueIdentifier>{a62f2576-0802-4c5c-8e77-937adff738d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Prj\UnitTest\Gen\Util\Ut_String_Unity">
+      <UniqueIdentifier>{08253c06-c757-4b53-b8da-c9ca2e30e928}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build\make\Prj\UnitTest\Gen\Util\Ut_String_Unity">
+      <UniqueIdentifier>{e48cc457-a666-4a72-88ef-9fea1616f4fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gen\Dcc\Decoder.cpp">
@@ -470,6 +476,9 @@
     </ClCompile>
     <ClCompile Include="Src\Gen\Util\Locale.cpp">
       <Filter>Src\Gen\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Prj\UnitTest\Gen\Util\Ut_String_Unity\Test.cpp">
+      <Filter>Src\Prj\UnitTest\Gen\Util\Ut_String_Unity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -794,7 +803,7 @@
     <ClInclude Include="Src\Gen\Util\StreamBuf.h">
       <Filter>Src\Gen\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Gen\Util\Ios.h">
+    <ClInclude Include="Src\Gen\Util\Basic_ios.h">
       <Filter>Src\Gen\Util</Filter>
     </ClInclude>
     <ClInclude Include="Src\Gen\Util\Istream.h">
@@ -822,6 +831,12 @@
       <Filter>Src\Gen\Util</Filter>
     </ClInclude>
     <ClInclude Include="Src\Gen\Util\Locale_facets.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Ios_base.h">
+      <Filter>Src\Gen\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Gen\Util\Ramp.h">
       <Filter>Src\Gen\Util</Filter>
     </ClInclude>
   </ItemGroup>
@@ -897,6 +912,9 @@
     </None>
     <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_Sstream\Makefile_Prj.gmk">
       <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_Sstream</Filter>
+    </None>
+    <None Include="Build\make\Prj\UnitTest\Gen\Util\Ut_String_Unity\Makefile_Prj.gmk">
+      <Filter>Build\make\Prj\UnitTest\Gen\Util\Ut_String_Unity</Filter>
     </None>
   </ItemGroup>
 </Project>
