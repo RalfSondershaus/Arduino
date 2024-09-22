@@ -78,12 +78,20 @@ namespace util
     }
 
     /// Initialize internal structure: ramp uses the given slope which is adjusted by timestep.
+    ///
+    /// If target value is reached before timestep is elapsed, slope is set to maximum value.
     /// 
     /// @param slope [./ms]
     /// @param timestep [ms]
     void update_delta_from_slope(base_type slope, base_type timestep)
     {
-        delta = slope * timestep;
+      //delta = slope * timestep
+      if (math::mul_overflow(slope, timestep, &delta))
+      {
+        // overflow detected, fallback is maximal value for delta
+        // (If target value is reached before timestep is elapsed, slope is set to maximum value.)
+        delta = platform::numeric_limits<base_type>::max_();
+      }
     }
   public:
 

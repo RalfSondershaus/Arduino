@@ -121,7 +121,7 @@ PATH_SRC_ARDUINO_VARIANTS   = $(PATH_SRC_ARDUINO_BASE)/avr/1.8.6/variants
 PATH_SRC_ARDUINO_WIN32_BASE = $(PATH_SRC)/Gen/Arduino_win32
 PATH_SRC_ARDUINO_WIN32_CORE = $(PATH_SRC_ARDUINO_BASE)/avr/cores
 PATH_SRC_GOOGLETEST         = $(PATH_SRC)/Gen/Test/googletest-main/googletest
-PATH_SRC_UNITY             ?= $(PATH_TOOLS)/unity
+PATH_SRC_UNITY              = $(PATH_SRC)/Gen/Test/unity
 PATH_SRC_PRJ_PROJECT        = $(PATH_SRC_PRJ)/$(ARG_PROJECT)
 PATH_BUILD_MAKE             = $(PATH_BUILD)/make
 PATH_BUILD_GEN              = $(PATH_BUILD_MAKE)/Gen
@@ -217,10 +217,17 @@ C_INCLUDES_GEN := $(C_INCLUDES_GEN)\
                  -I$(PATH_SRC_GEN)
 
 # ---------------------------------------------------
-# Default: add path to project folder to project specific compiler include pathes
+# Default: add path to project folder at the beginning so that 
+# project-specific header files are found before generic ones 
+# (in case the project-specific C_INCLUDES_PRJ is configured with
+# generic pathes or in case the C_INCLUDES_PRJ is configured with
+# a path to the project folder but we want to unit test a single module
+# of the project with own configurations for RTE)
 # ---------------------------------------------------
-C_INCLUDES_PRJ := $(C_INCLUDES_PRJ) \
-                 -I$(PATH_SRC_PRJ_PROJECT)
+C_INCLUDES_PRJ := -I$(PATH_SRC_PRJ_PROJECT) \
+                  $(C_INCLUDES_PRJ)
+                  
+                 
 
 # ---------------------------------------------------
 # Object files
@@ -264,29 +271,20 @@ ifneq ($(MAKECMDGOALS),rebuild)
 endif
 
 # ------------------------------------------------------------------------------
-# Execute code after build
-# ------------------------------------------------------------------------------
-ifeq ($(ARG_TESTFRAMEWORK),unity)
-RUN_DEP := run
-else
-RUN_DEP :=
-endif
-
-# ------------------------------------------------------------------------------
 # Rules
 # ------------------------------------------------------------------------------
 
 # Implicit rules are not used, instead pattern rules with %.c are used, see below
 .SUFFIXES:
 
-all: PrintIncludePaths PrintCompiler $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT) $(RUN_DEP)
+all: PrintIncludePaths PrintCompiler $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
 
 rebuild: clean PrintIncludePaths all
 
 # sed is used instead of subst because some make implementations cannot replace $(SolutionDir).
 # Comments on sed: 
 #   The s Command: 
-#     The syntax of the s command is ‘s/regexp/replacement/flags'
+#     The syntax of the s command is ï¿½s/regexp/replacement/flags'
 #     The / characters may be uniformly replaced by any other single character within any given s command.
 #     g: Apply the replacement to all matches to the regexp, not just the first.
 .PHONY: PrintIncludePaths

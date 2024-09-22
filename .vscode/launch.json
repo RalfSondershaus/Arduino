@@ -26,6 +26,59 @@
                 }
             ],
             "preLaunchTask": "Build UnitTest/Gen/Util/Ut_String_Unity gcc"
+        },
+        {
+            "name": "Debug Ut_Signal_LedRouter",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\Build\\bin\\Ut_Signal_LedRouter.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}\\Build\\bin",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Users\\Papi\\W\\tools\\MinGW\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build UnitTest/Prj/Ut_Signal_LedRouter gcc"
+        },
+        {
+            "name": "Debug Ut_Ramp",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\Build\\bin\\Ut_Ramp.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}\\Build\\bin",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Users\\Papi\\W\\tools\\MinGW\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build UnitTest/Gen/Util/Ut_Ramp gcc"
         }
+
     ]
 }
