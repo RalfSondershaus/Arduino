@@ -68,7 +68,7 @@ class Logger : public std::ofstream
 public:
   void start(const std::string& filename)
   {
-    open(filename, std::ios::trunc);
+    open(filename);
   }
   void stop()
   {
@@ -77,14 +77,14 @@ public:
 };
 
 // ------------------------------------------------------------------------------------------------
-/// Test if aspects and dim ramps are ok for
+/// Test if dim ramps and gamma correction are ok for
 /// - setIntensityAndSpeed
 ///
 /// Check for every onboard target:
 /// - 100% with max speed (slope); overflow protection in ramps is tested implicitly here
 /// - 0% with max speed
 // ------------------------------------------------------------------------------------------------
-TEST(Ut_LedRouter, setIntensityAndSpeed_1)
+TEST(Ut_LedRouter, setIntensityAndSpeed_100_0x8000)
 {
   Logger log;
   signal::LedRouter router;
@@ -103,8 +103,6 @@ TEST(Ut_LedRouter, setIntensityAndSpeed_1)
       {   0,  intensity16_type::intensity_100(), rte::kSpeed16Max, intensity8_255::intensity_100() }
     , {  10,  intensity16_type::intensity_0  (), rte::kSpeed16Max, intensity8_255::intensity_0  () }
   } };
-
-  //init();
 
   // For each onboard target
   tgt.type = target_type::kOnboard;
@@ -127,25 +125,21 @@ TEST(Ut_LedRouter, setIntensityAndSpeed_1)
 }
 
 // ------------------------------------------------------------------------------------------------
-/// Test if aspects and dim ramps are ok for
+/// Test if dim ramps and gamma correction are ok for
 /// - setIntensityAndSpeed
 ///
 /// Check for every onboard target:
-/// - 100% with max speed (slope); overflow protection in ramps is tested implicitly here
-/// - 0% with max speed
+/// - Start with 0%
+/// - 50% with slope 0x0100 (128 ms from 0% to 100%, so ca. 74 ms from 0% to 50%)
 // ------------------------------------------------------------------------------------------------
-TEST(Ut_LedRouter, setIntensityAndSpeed_2)
+TEST(Ut_LedRouter, setIntensityAndSpeed_0_50_0x0100)
 {
   Logger log;
   signal::LedRouter router;
   target_type tgt;
 
-  /// 16 bit, [./ms], 0 = zero speed, 65535 = 65535 / ms
-  /// If used for intensity:
-  /// - 0x8000 / ms is 100% / ms (fastest, see also kSpeed16Max)
-  /// - 0x4000 / ms is  50% / ms
-  /// - 0x0001 / ms is  0.000030517% / ms = 0.03% / s = 1.83% / min (slowest)
-  /// - 0x0100 / ms = 0x0100 / 0x8000 % / ms = 0,0078125% / ms ~ 128 ms
+  const bool doLog = false;
+
   typedef struct
   {
     ramp_base_type ms; // [ms] current time
@@ -154,38 +148,25 @@ TEST(Ut_LedRouter, setIntensityAndSpeed_2)
     intensity8_255 expectedPwm;
   } step_type;
 
-  const util::array<step_type, 27> aSteps = 
+  const util::array<step_type, 11> aSteps = 
   { {
         { .ms =  0, .intensity = convert_intensity_to_16( 0), .slope = rte::kSpeed16Max, .expectedPwm = static_cast<intensity8_255>(0) }
       , { .ms = 10, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(2) }
       , { .ms = 20, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(2) }
-      , { .ms = 30, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 40, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 50, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 60, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 70, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 80, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 90, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 100, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 110, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 120, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 130, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 140, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 150, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 160, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 170, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 180, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 190, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 200, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 210, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 220, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 230, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 240, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 250, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
-      , { .ms = 260, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
+      , { .ms = 30, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(4) }
+      , { .ms = 40, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(6) }
+      , { .ms = 50, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(9) }
+      , { .ms = 60, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(13) }
+      , { .ms = 70, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(16) }
+      , { .ms = 80, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(16) }
+      , { .ms = 90, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(16) }
+      , { .ms = 100, .intensity = convert_intensity_to_16(50), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(16) }
   } };
 
-  log.start("setIntensityAndSpeed_2.txt");
+  if (doLog)
+  {
+    log.start("setIntensityAndSpeed_0_50_0x0100.txt");
+  }
 
   // For each onboard target
   tgt.type = target_type::kOnboard;
@@ -202,11 +183,240 @@ TEST(Ut_LedRouter, setIntensityAndSpeed_2)
       router.setIntensityAndSpeed(tgt, step->intensity, step->slope);
       router.cycle();
       rte::ifc_onboard_target_duty_cycles::readElement(tgt.idx, pwm);
-      log << step->ms << " " << static_cast<int>(pwm) << std::endl;
-      //EXPECT_EQ(static_cast<int>(pwm), static_cast<int>(step->expectedPwm));
+      if (doLog)
+      {
+        log << step->ms << " " << static_cast<int>(pwm) << std::endl;
+      }
+      EXPECT_EQ(static_cast<int>(pwm), static_cast<int>(step->expectedPwm));
     }
   }
-  log.stop();
+  if (doLog)
+  {
+    log.stop();
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
+/// Test if dim ramps and gamma correction are ok for
+/// - setIntensityAndSpeed
+///
+/// Check for every onboard target:
+/// - Start with 50%
+/// - 0% with slope 0x0100 (128 ms from 0% to 100%, so ca. 74 ms from 0% to 50%)
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_LedRouter, setIntensityAndSpeed_50_0_0x0100)
+{
+  Logger log;
+  signal::LedRouter router;
+  target_type tgt;
+
+  const bool doLog = false;
+
+  typedef struct
+  {
+    ramp_base_type ms; // [ms] current time
+    intensity16_type intensity;
+    speed16_ms_type slope;
+    intensity8_255 expectedPwm;
+  } step_type;
+
+  const util::array<step_type, 10> aSteps = 
+  { {
+        { .ms =  0, .intensity = convert_intensity_to_16(50), .slope = rte::kSpeed16Max, .expectedPwm = static_cast<intensity8_255>(16) }
+      , { .ms = 10, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(10) }
+      , { .ms = 20, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(7) }
+      , { .ms = 30, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(4) }
+      , { .ms = 40, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
+      , { .ms = 50, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(2) }
+      , { .ms = 60, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(1) }
+      , { .ms = 70, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(0) }
+      , { .ms = 80, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(0) }
+      , { .ms = 90, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(0) }
+  } };
+
+  if (doLog)
+  {
+    log.start("setIntensityAndSpeed_50_0_0x0100.txt");
+  }
+
+  // For each onboard target
+  tgt.type = target_type::kOnboard;
+  for (tgt.idx = 0; tgt.idx < cfg::kNrOnboardTargets; tgt.idx++)
+  {
+    router.init();
+    // ... and for each step
+    for (auto step = aSteps.begin(); step != aSteps.end(); step++)
+    {
+      // ... set target intensity and check output target intensity
+      intensity8_255 pwm;
+      stubs::millis = step->ms;
+      stubs::micros = 1000U * stubs::millis;
+      router.setIntensityAndSpeed(tgt, step->intensity, step->slope);
+      router.cycle();
+      rte::ifc_onboard_target_duty_cycles::readElement(tgt.idx, pwm);
+      if (doLog)
+      {
+        log << step->ms << " " << static_cast<int>(pwm) << std::endl;
+      }
+      EXPECT_EQ(static_cast<int>(pwm), static_cast<int>(step->expectedPwm));
+    }
+  }
+  if (doLog)
+  {
+    log.stop();
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
+/// Test if dim ramps and gamma correction are ok for
+/// - setIntensityAndSpeed
+///
+/// Check for every onboard target:
+/// - Start with 100%
+/// - 0% with slope 0x0100 (128 ms from 0% to 100%, so ca. 74 ms from 0% to 50%)
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_LedRouter, setIntensityAndSpeed_100_0_0x0100)
+{
+  Logger log;
+  signal::LedRouter router;
+  target_type tgt;
+
+  const bool doLog = false;
+
+  typedef struct
+  {
+    ramp_base_type ms; // [ms] current time
+    intensity16_type intensity;
+    speed16_ms_type slope;
+    intensity8_255 expectedPwm;
+  } step_type;
+
+  const util::array<step_type, 15> aSteps = 
+  { {
+        { .ms =  0, .intensity = convert_intensity_to_16(100), .slope = rte::kSpeed16Max, .expectedPwm = static_cast<intensity8_255>(255) }
+      , { .ms = 10, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(165) }
+      , { .ms = 20, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(107) }
+      , { .ms = 30, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(69) }
+      , { .ms = 40, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(45) }
+      , { .ms = 50, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(29) }
+      , { .ms = 60, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(19) }
+      , { .ms = 70, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(12) }
+      , { .ms = 80, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(8) }
+      , { .ms = 90, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(5) }
+      , { .ms = 100, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(3) }
+      , { .ms = 110, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(2) }
+      , { .ms = 120, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(1) }
+      , { .ms = 130, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(0) }
+      , { .ms = 140, .intensity = convert_intensity_to_16( 0), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(0) }
+  } };
+
+  if (doLog)
+  {
+    log.start("setIntensityAndSpeed_100_0_0x0100.txt");
+  }
+
+  // For each onboard target
+  tgt.type = target_type::kOnboard;
+  for (tgt.idx = 0; tgt.idx < cfg::kNrOnboardTargets; tgt.idx++)
+  {
+    router.init();
+    // ... and for each step
+    for (auto step = aSteps.begin(); step != aSteps.end(); step++)
+    {
+      // ... set target intensity and check output target intensity
+      intensity8_255 pwm;
+      stubs::millis = step->ms;
+      stubs::micros = 1000U * stubs::millis;
+      router.setIntensityAndSpeed(tgt, step->intensity, step->slope);
+      router.cycle();
+      rte::ifc_onboard_target_duty_cycles::readElement(tgt.idx, pwm);
+      if (doLog)
+      {
+        log << step->ms << " " << static_cast<int>(pwm) << std::endl;
+      }
+      EXPECT_EQ(static_cast<int>(pwm), static_cast<int>(step->expectedPwm));
+    }
+  }
+  if (doLog)
+  {
+    log.stop();
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
+/// Test if dim ramps and gamma correction are ok for
+/// - setIntensityAndSpeed
+///
+/// Check for every onboard target:
+/// - Start with 100%
+/// - 0% with slope 0x0100 (128 ms from 0% to 100%, so ca. 74 ms from 0% to 50%)
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_LedRouter, setIntensityAndSpeed_0_100_0x0100)
+{
+  Logger log;
+  signal::LedRouter router;
+  target_type tgt;
+
+  const bool doLog = false;
+
+  typedef struct
+  {
+    ramp_base_type ms; // [ms] current time
+    intensity16_type intensity;
+    speed16_ms_type slope;
+    intensity8_255 expectedPwm;
+  } step_type;
+
+  const util::array<step_type, 15> aSteps = 
+  { {
+        { .ms =  0, .intensity = convert_intensity_to_16(0), .slope = rte::kSpeed16Max, .expectedPwm = static_cast<intensity8_255>(0) }
+      , { .ms = 10, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(2) }
+      , { .ms = 20, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(2) }
+      , { .ms = 30, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(4) }
+      , { .ms = 40, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(6) }
+      , { .ms = 50, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(9) }
+      , { .ms = 60, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(13) }
+      , { .ms = 70, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(21) }
+      , { .ms = 80, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(32) }
+      , { .ms = 90, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(49) }
+      , { .ms = 100, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(76) }
+      , { .ms = 110, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(117) }
+      , { .ms = 120, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(180) }
+      , { .ms = 130, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(255) }
+      , { .ms = 140, .intensity = convert_intensity_to_16(100), .slope = 0x0100          , .expectedPwm = static_cast<intensity8_255>(255) }
+  } };
+
+  if (doLog)
+  {
+    log.start("setIntensityAndSpeed_0_100_0x0100.txt");
+  }
+
+  // For each onboard target
+  tgt.type = target_type::kOnboard;
+  for (tgt.idx = 0; tgt.idx < cfg::kNrOnboardTargets; tgt.idx++)
+  {
+    router.init();
+    // ... and for each step
+    for (auto step = aSteps.begin(); step != aSteps.end(); step++)
+    {
+      // ... set target intensity and check output target intensity
+      intensity8_255 pwm;
+      stubs::millis = step->ms;
+      stubs::micros = 1000U * stubs::millis;
+      router.setIntensityAndSpeed(tgt, step->intensity, step->slope);
+      router.cycle();
+      rte::ifc_onboard_target_duty_cycles::readElement(tgt.idx, pwm);
+      if (doLog)
+      {
+        log << step->ms << " " << static_cast<int>(pwm) << std::endl;
+      }
+      EXPECT_EQ(static_cast<int>(pwm), static_cast<int>(step->expectedPwm));
+    }
+  }
+  if (doLog)
+  {
+    log.stop();
+  }
 }
 
 void setUp(void)
@@ -221,8 +431,11 @@ int main(void)
 {
   UNITY_BEGIN();
 
-  RUN_TEST(setIntensityAndSpeed_1);
-  RUN_TEST(setIntensityAndSpeed_2);
+  RUN_TEST(setIntensityAndSpeed_100_0x8000);
+  RUN_TEST(setIntensityAndSpeed_0_50_0x0100);
+  RUN_TEST(setIntensityAndSpeed_50_0_0x0100);
+  RUN_TEST(setIntensityAndSpeed_100_0_0x0100);
+  RUN_TEST(setIntensityAndSpeed_0_100_0x0100);
 
   return UNITY_END();
 }
