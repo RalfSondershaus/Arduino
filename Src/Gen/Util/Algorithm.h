@@ -135,12 +135,21 @@ namespace util
   }
   
   // ------------------------------------------------------------------------------
-  /// Returns the smaller of the given values.
+  /// Returns the smaller value of the given values.
   // ------------------------------------------------------------------------------
   template<class T>
   const T& min(const T& a, const T& b) 
   { 
     return (a < b) ? a : b; 
+  }
+
+  // ------------------------------------------------------------------------------
+  /// Returns the greater value of the given values.
+  // ------------------------------------------------------------------------------
+  template<class T>
+  const T& max(const T& a, const T& b) 
+  { 
+    return (a > b) ? a : b; 
   }
 
   // ------------------------------------------------------------------------------

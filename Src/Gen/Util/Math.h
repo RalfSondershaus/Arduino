@@ -86,6 +86,27 @@ namespace util
     }
 
     // -----------------------------------------------------------------------------
+    /// Substract with underflow check.
+    /// Substracts b from a and stores the result in r.
+    /// If b is positive and greater than a, r is set to zero (underflow).
+    /// If b is negative and less than a, r is set to zero (crossing zero from negative numbers to positive numbers)
+    // -----------------------------------------------------------------------------
+    template<typename T>
+    void sub_underflow_sat(T a, T b, T* r)
+    {
+      if (((b > static_cast<T>(0)) && (a < b))
+       || ((b < static_cast<T>(0)) && (a > b)))
+      {
+        // underflow
+        *r = 0;
+      }
+      else
+      {
+        *r = a - b;
+      }
+    }
+
+    // -----------------------------------------------------------------------------
     /// Multiply with overflow check: returns true if an overflow is detected, false otherwise.
     /// Multiplies a and b and stores the result in r if no overflow is detected.
     /// Does not modify r if an overflow is detected.
