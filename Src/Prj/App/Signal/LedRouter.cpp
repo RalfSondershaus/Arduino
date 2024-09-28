@@ -29,7 +29,7 @@ namespace signal
   /// 
   /// Intensity [0 ... 255] to PWM [0 ... 255]
   // --------------------------------------------------------------------------------------------
-  static const LedRouter::intensity8_type aunIntensity2Pwm[256u] =
+  static const LedRouter::intensity8_255_type::base_type aunIntensity2Pwm[256u] =
   {
     /*          0    1    2    3    4    5    6    7    8    9  */
     /*   0 */   0,   1,   1,   1,   1,   1,   1,   1,   1,   1,
@@ -69,8 +69,9 @@ namespace signal
 
     for (auto it = ramps_onboard.begin(); it != ramps_onboard.end(); it++)
     {
-      const intensity8_type intensity = scale_16_8(it->step());
-      const intensity8_type pwm = aunIntensity2Pwm[intensity];
+      const intensity16_type intensity16{ it->step() };
+      const intensity8_255_type intensity{ rte::convert<intensity8_255_type, intensity16_type>(intensity16) };
+      const intensity8_255_type pwm{ aunIntensity2Pwm[intensity] };
       rte::ifc_onboard_target_duty_cycles::writeElement(pos, pwm);
       pos++;
     }
@@ -89,7 +90,7 @@ namespace signal
   {
     switch (tgt.type)
     {
-    case cal::target_type::kOnboard:
+    case target_type::kOnboard:
     {
       if (ramps_onboard.check_boundary(tgt.idx))
       {
@@ -97,7 +98,7 @@ namespace signal
       }
     }
     break;
-    case cal::target_type::kExternal:
+    case target_type::kExternal:
       break;
     default:
       break;
@@ -116,7 +117,7 @@ namespace signal
   {
     switch (tgt.type)
     {
-    case cal::target_type::kOnboard:
+    case target_type::kOnboard:
     {
       if (ramps_onboard.check_boundary(tgt.idx))
       {
@@ -124,7 +125,7 @@ namespace signal
       }
     }
     break;
-    case cal::target_type::kExternal:
+    case target_type::kExternal:
       break;
     default:
       break;
@@ -142,7 +143,7 @@ namespace signal
   {
     switch (tgt.type)
     {
-    case cal::target_type::kOnboard:
+    case target_type::kOnboard:
     {
       if (ramps_onboard.check_boundary(tgt.idx))
       {
@@ -150,7 +151,7 @@ namespace signal
       }
     }
     break;
-    case cal::target_type::kExternal:
+    case target_type::kExternal:
       break;
     default:
       break;
