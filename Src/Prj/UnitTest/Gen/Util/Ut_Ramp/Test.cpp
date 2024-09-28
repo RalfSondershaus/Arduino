@@ -60,6 +60,8 @@ static void test_ramp(const int cycleTime, const T startIntensity, const T endIn
   Logger log;
   ramp_type myRamp;
 
+  // prepare intermediate variables to calculate expected values and
+  // ensure that the target intensity is reached with the number of steps
   ramp_base_type curInc;
   if (util::math::mul_overflow<ramp_base_type>(slope, cycleTime, &curInc))
   {
@@ -74,13 +76,21 @@ static void test_ramp(const int cycleTime, const T startIntensity, const T endIn
     log.start("test_ramp.txt");
   }
 
+  // jump to start intensity as test start condition
+  myRamp.init_from_slope(startIntensity, platform::numeric_limits<ramp_base_type>::max_(), cycleTime);
+  myRamp.step();
+
+  EXPECT_EQ(myRamp.get_tgt(), startIntensity);
+  EXPECT_EQ(myRamp.get_cur(), startIntensity);
+
+  // configure target intensity and slope for this test
   myRamp.init_from_slope(endIntensity, slope, cycleTime);
 
   EXPECT_EQ(myRamp.get_tgt(), endIntensity);
-  EXPECT_EQ(myRamp.get_cur(), static_cast<ramp_base_type>(0));
+  EXPECT_EQ(myRamp.get_cur(), startIntensity);
 
   ms = 0;
-  expectedCur = 0;
+  expectedCur = startIntensity;
   // for each step
   for (int step = 0; step < nrSteps; step++)
   {
@@ -143,6 +153,32 @@ TEST(Ut_Ramp, do_ramp_16bit_10_0x0_0x8000_0x0010)
 TEST(Ut_Ramp, do_ramp_16bit_10_0x0_0x8000_0x0100)
 {
   test_ramp<uint16_t>(10, 0x0, 0x8000, 0x0100, false);
+}
+
+// ------------------------------------------------------------------------------------------------
+/// Test with
+/// - uint16
+/// - cycle time     10
+/// - Start          0% (0x0)
+/// - End           50% (0x4000)
+/// - Speed      0x0100
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_Ramp, do_ramp_16bit_10_0x0_0x4000_0x0100)
+{
+  test_ramp<uint16_t>(10, 0x0, 0x4000, 0x0100, false);
+}
+
+// ------------------------------------------------------------------------------------------------
+/// Test with
+/// - uint16
+/// - cycle time     10
+/// - Start         50% (0x4000)
+/// - End          100% (0x8000)
+/// - Speed      0x0100
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_Ramp, do_ramp_16bit_10_0x4000_0x8000_0x0100)
+{
+  test_ramp<uint16_t>(10, 0x4000, 0x8000, 0x0100, true);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -357,7 +393,9 @@ int main(void)
   RUN_TEST(do_ramp_16bit_10_0x0_0x8000_0x0001);
   RUN_TEST(do_ramp_16bit_10_0x0_0x8000_0x0010);
   RUN_TEST(do_ramp_16bit_10_0x0_0x8000_0x0100);
+  RUN_TEST(do_ramp_16bit_10_0x0_0x4000_0x0100);
   RUN_TEST(do_ramp_16bit_10_0x0_0x8000_0x8000);
+  RUN_TEST(do_ramp_16bit_10_0x4000_0x8000_0x0100);
   RUN_TEST(do_ramp_16bit_20_0x0_0x8000_0x0001);
   RUN_TEST(do_ramp_16bit_20_0x0_0x8000_0x0010);
   RUN_TEST(do_ramp_16bit_20_0x0_0x8000_0x0100);
