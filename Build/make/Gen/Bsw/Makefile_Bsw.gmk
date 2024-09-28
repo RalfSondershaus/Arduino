@@ -93,6 +93,7 @@ C_INCLUDES := $(C_INCLUDES)                         \
 # add -g to produce debugging information
 CFLAGS := $(CFLAGS) \
           -g
-LFLAGS := $(LFLAGS) -g
+LFLAGS := $(LFLAGS) \
+          -g
 
 endif

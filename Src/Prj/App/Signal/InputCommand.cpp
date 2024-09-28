@@ -29,13 +29,21 @@ namespace signal
   {
     cmd_type cmd = rte::kInvalidCmd;
 
-    if (in.type == cal::input_type::kClassified)
+    if (in.bits.type == cal::input_type::kClassified)
     {
-      const rte::classified_values_array::size_type pos = static_cast<rte::classified_values_array::size_type>(in.idx);
+      const rte::classified_values_array::size_type pos = static_cast<rte::classified_values_array::size_type>(in.bits.idx);
       if (rte::ifc_classified_values::boundaryCheck(pos))
       {
         rte::ifc_classified_values::readElement(pos, cmd);
       }
+    }
+    else if (in.bits.type == cal::input_type::kDcc)
+    { 
+
+    }
+    else
+    {
+      // intentionally left empty
     }
 
     return cmd;

@@ -30,12 +30,44 @@
 #include <Std_Types.h>
 #include <Dcc/BitExtractor.h>
 #include <Dcc/PacketExtractor.h>
+#include <Dcc/Filter.h>
 #include <Util/Fix_Queue.h>
+#include <Util/Ptr.h>
 
 namespace dcc
 {
   // ---------------------------------------------------------------------
-  /// Main class
+  /// The Decoder class is the main class. It converts received DCC signals
+  /// into packets and pushes the packets into an internal FIFO buffer.
+  /// 
+  /// Clients can access the FIFO buffer with an interface that is similar to 
+  /// a std::deque interface with functions such as
+  /// - empty()
+  /// - front()
+  /// - pop()
+  /// - size()
+  /// 
+  /// Typical application:
+  /// 
+  /// <CODE>
+  /// Decoder myDec;
+  /// Decoder::PacketType packet;
+  /// int DccPinNr = 2;
+  /// 
+  /// myDec.init(DccPinNr);
+  /// 
+  /// while (1)
+  /// {
+  ///   myDec.fetch();
+  /// 
+  ///   while (!myDec.empty())
+  ///   {
+  ///     packet = myDec.front();
+  ///     myDec.pop();
+  ///     // do something useful witch packet
+  ///   }
+  /// }
+  /// </CODE>
   // ---------------------------------------------------------------------
   class Decoder
   {
@@ -55,7 +87,7 @@ namespace dcc
 
     // ---------------------------------------------------
     /// Interface for a handler that is called if a packet is received.
-    /// Stores received packets and counts how often a packet is received.
+    /// Stores received packets into a FIFO buffer.
     // ---------------------------------------------------
     template<uint8 MaxNrPackets>
     class FifoHandlerIfc : public HandlerIfc
@@ -63,25 +95,45 @@ namespace dcc
     public:
       /// Packet FIFO buffer
       typedef util::fix_queue<PacketType, MaxNrPackets> PacketFifoType;
+      typedef dcc::Filter<PacketType> FilterType;
+      typedef util::ptr<const FilterType> FilterPointerType;
       using size_type = typename PacketFifoType::size_type;
 
     protected:
       PacketFifoType packetFifo;
+      FilterPointerType filterPtr;
       bool bOverflow;
+
+      /// Returns true if the packet passes a filter. Returns false otherwise.
+      /// Returns true if no filter has been assigned.
+      bool filter(const PacketType& pkt) const
+      {
+        bool bRet = true;
+
+        if (filterPtr)
+        {
+          bRet = filterPtr->filter(pkt);
+        }
+
+        return bRet;
+      }
 
     public:
       /// Default constructor
       FifoHandlerIfc() : bOverflow(false)
       {}
       /// Destructor
-      virtual ~FifoHandlerIfc() = default;
+      ~FifoHandlerIfc() override = default;
 
       /// Store the received packet into the list of packets (if it does not exist already)
-      virtual void packetReceived(const PacketType& pkt) override
+      void packetReceived(const PacketType& pkt) override
       {
         if (packetFifo.size() < packetFifo.MaxSize)
         {
-          packetFifo.push(pkt);
+          if (filter(pkt))
+          {
+            packetFifo.push(pkt);
+          }
         }
         else
         {
@@ -96,19 +148,23 @@ namespace dcc
 
       bool isOverflow() const noexcept  { return bOverflow; }
       void clearOverflow() noexcept     { bOverflow = false; }
+
+      void setFilter(const FilterType& filter) { filterPtr = &filter; }
     };
 
     typedef FifoHandlerIfc<kMaxNrPackets> FifoHandlerIfcType;
 
     /// Handler for available packets
     FifoHandlerIfcType fifoHandler;
-    /// The state machine for short and long half bits (-> detecting "1" and "0" and INVALID)
-    BitExtractorType bitExtr;
     /// The packet extractor
     PacketExtractorType pktExtr;
+    /// The state machine for short and long half bits (-> detecting "1" and "0" and INVALID)
+    BitExtractorType bitExtr;
 
   public:
     using size_type = typename FifoHandlerIfcType::PacketFifoType::size_type;
+    using FilterType = typename FifoHandlerIfcType::FilterType;
+    using FilterPointerType = typename FifoHandlerIfcType::FilterPointerType;
 
     /// Constructor
     Decoder() : pktExtr(fifoHandler), bitExtr(pktExtr) {}
@@ -117,18 +173,24 @@ namespace dcc
 
     /// Initialize with interrupt pin
     void init(uint8 ucIntPin);
-    /// Convert latest data into packets
+    /// Convert latest data into packets and push the packets into the FIFO buffer.
     void fetch();
 
-    /// Returns reference to the first packet in the queue. 
+    /// Enable the decoder to filter packets. 
+    /// Only packets that pass the filter are stored in the FIFO buffer.
+    void setFilter(const FilterType& filter) { fifoHandler.setFilter(filter); }
+
+    /// Returns reference to the first packet in the FIFO buffer.
     const PacketType& front() const { return fifoHandler.front(); }
-    /// Removes an element from the front
+    /// Removes the first packet from the FIFO buffer.
     void pop() { fifoHandler.pop(); }
-    /// Checks if the underlying container has no elements
+    /// Returns true if the FIFO buffer is empty, returns false otherwise.
     bool empty() const { return fifoHandler.empty(); }
-    /// Returns the number of elements in the underlying fifo
+    /// Returns the number of elements in the FIFO buffer
     size_type size() const { return fifoHandler.size(); }
 
+    /// For debugging: get number of interrupts called since system start.
+    /// Counter can overflow and start at 0 again.
     uint16 getNrInterrupts() const;
   };
 } // namespace dcc

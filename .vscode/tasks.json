@@ -128,6 +128,26 @@
         },
         {
             "type": "cppbuild",
+            "label": "Rebuild UnitTest/Prj/Ut_Signal_LedRouter gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Prj/Ut_Signal_LedRouter",
+                "win32",
+                "gcc",
+                "none",
+                "unity",
+                "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
             "label": "Build UnitTest/Gen/Util/Ut_Ramp gcc",
             "command": ".\\Build\\Build.bat",
             "args": [

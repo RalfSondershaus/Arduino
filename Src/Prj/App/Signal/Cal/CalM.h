@@ -3,9 +3,9 @@
  *
  * @author Ralf Sondershaus
  *
- * @brief Access to calibration parameters
+ * @brief Access to calibration parameters for project signal
  *
- * @copyright Copyright 2022 Ralf Sondershaus
+ * @copyright Copyright 2022 - 2024 Ralf Sondershaus
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,10 +36,28 @@ namespace cal
     signal_cal_type signals;
     input_classifier_cal_type input_classifiers;
     led_cal_type leds;
+    dcc_cal_type dcc;
+
+    bool valid;
 
   protected:
+    /// Calc data for leds from signals
     void calcLeds();
 
+    /// Load values from EEPROM
+    bool readAll();
+    void readSignals();
+    void readClassifiers();
+
+    /// Save data to EEPROM if a value differs from the value already stored in the EEPROM
+    bool updateSignals();
+    bool updateClassifiers();
+
+    /// Returns true if the EEPROM coding data are valid
+    bool isValid();
+
+    /// Returns checksum for all calibration data
+    uint8 calcChecksum();
   public:
     CalM();
 
@@ -49,9 +67,20 @@ namespace cal
     void cycle100();
 
     /// references to coding parameters
-    const signal_cal_type *           get_signal()             { return &signals; }
-    const input_classifier_cal_type * get_input_classifiers()  { return &input_classifiers; }
-    const led_cal_type *              get_leds()               { return &leds; }
+    const signal_cal_type *           get_signal()             { return (valid) ? (&signals) : (nullptr); }
+    const input_classifier_cal_type * get_input_classifiers()  { return (valid) ? (&input_classifiers) : (nullptr); }
+    const led_cal_type *              get_leds()               { return (valid) ? (&leds) : (nullptr); }
+    const dcc_cal_type *              get_dcc()                { return (valid) ? (&dcc) : (nullptr); }
+
+    /// Save data to RAM. Doesn't not store data in EEPROM (call update() for this).
+    /// Return true is successful, returns false otherwise.
+    bool set_signal(uint8 ucSignalId, const signal_type& values);
+    bool set_classifier(uint8 ucClassifierId, const input_classifier_single_type& values);
+
+    /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
+    /// Validate the data after write.
+    /// Returns true if successful, returns false otherwise.
+    bool update();
   };
 
 } // namespace cal

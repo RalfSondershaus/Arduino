@@ -1,4 +1,4 @@
-/**
+ /**
  * @file Cal/CalM_Type_Prj.h
  *
  * @brief Defines project specific calibration types.
@@ -29,18 +29,26 @@
 namespace cal
 {
   /// Define inputs: classified AD values, commands received via busses (such as DCC), etc
-  typedef struct
+  typedef union
   {
     enum
     {
       kNone = 0,
-      kClassified = 1
+      kClassified = 1,
+      kDcc = 2
     };
-    uint8 type : 2; ///< [kNone, kClassified] type of command sources, more in future
-    uint8 idx : 6; ///< Index of the input element on RTE
+
+    struct
+    {
+      uint8 type : 2; ///< [kNone, kClassified, kDcc] type of command sources, more in future
+      uint8 idx : 6; ///< Index of the input element on RTE
+    } bits;
+
+    uint8 raw;
   } input_type;
 
   /// Define target outputs such as onboard or external and which output pin
+  /// 1 byte (8 bits)
   typedef struct
   {
     enum
@@ -55,6 +63,7 @@ namespace cal
   } target_type;
 
   /// Define signal target intensities
+  /// 2 bytes (16 bits)
   typedef struct
   {
     uint8 aspect; ///< A bit per output, max. 8 outputs: 0 = 0%, 1 = 100%, LSB = 1st output, MSB = 8th output
@@ -62,6 +71,24 @@ namespace cal
   } aspect_type;
 
   /// Coding data type for a signal
+  /// 
+  /// Example byte layout with kNrSignalAspects = 5, kNrSignalTargets = 5
+  /// and 18 bytes alltogether
+  /// <CODE>
+  ///  0     input
+  ///  1, 2  aspect 0   (aspect, blink)
+  ///  3, 4  aspect 1   (aspect, blink)
+  ///  5, 6  aspect 2   (aspect, blink)
+  ///  7, 8  aspect 3   (aspect, blink)
+  ///  9,10  aspect 4   (aspect, blink)
+  /// 11     target 0   (type, idx)
+  /// 12     target 1   (type, idx)
+  /// 13     target 2   (type, idx)
+  /// 14     target 3   (type, idx)
+  /// 15     target 4   (type, idx)
+  /// 16     changeOverTime
+  /// 17     blinkChangeOverTime;
+  /// </CODE>
   typedef struct
   {
     input_type input;
@@ -74,15 +101,24 @@ namespace cal
   /// Calibration data type for each signal
   typedef util::array<signal_type, cfg::kNrSignals> signal_cal_type;
 
+  /// Calibration data for DccDecoder
+  typedef struct
+  {
+    uint16 address;
+  } dcc_type;
+
+  /// Calibration data for DccDecoder
+  using dcc_cal_type = dcc_type;
+
   /// Calibration data for input classifiers is taken over from util::input_classifier
   typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> input_classifier_type;
   using input_classifier_cal_type = input_classifier_type::input_classifier_cal_type;
+  using input_classifier_single_type = input_classifier_cal_type::input_classifier_single_type;
 
   /// Calibration data type for LED complex device drivers
   /// A bit for each pin: 1 = is output, 0 = is not output
   typedef util::bitset<uint32_t, cfg::kCalTgtNrBits> led_output_rw_type;
   using led_cal_type = led_output_rw_type;
-
 } // namespace cal
 
 #endif // CALM_TYPE_PRJ_H_

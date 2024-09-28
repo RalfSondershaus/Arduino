@@ -30,6 +30,8 @@ namespace cfg
   constexpr int kNrClassifiers = 6; ///< Number of (AD value) classifiers
   constexpr int kNrClassifierClasses = 5; ///< Number of classifier classes
 
+  constexpr int kNrDccAddresses = 6;  ///< Number of DCC addresses supported
+
   constexpr uint8 kNrSignals = 6; ///< Maximal number of signals
   constexpr uint8 kNrSignalAspects = 5; ///< Maximal number of signal aspects
   constexpr uint8 kNrSignalTargets = 5; ///< Maximal number of LED strings of a signal
@@ -37,11 +39,8 @@ namespace cfg
   constexpr int kNrOnboardTargets = 54; ///< We support up to 54 onboard LED targets (some of them with PWM))
   constexpr int kNrExternalTargets = 32; ///< We support up to 32 external outputs (such as 4 shift registers with 8 bit each)
   constexpr int kNrTargets = kNrOnboardTargets + kNrExternalTargets;
-  /// Number of bits that are required to store numbers from 0 ... max(kNrOnboardTargets, kNrExternalTargets)
-  /// and the corresponding power of two.
-  /// TODO: Can be replaced by a macro
-  /// If kCalTgtNrBits > 6, you need to modify the base type of cal::target_type (which is currently uint8)
-  /// because 2 bits are required beside kCalTgtNrBits.
+  /// Number of bits that are required to store numbers from 0 ... max(kNrOnboardTargets, kNrExternalTargets).
+  /// If kCalTgtNrBits > 6, you need to modify the base type of cal::target_type (which is currently uint8).
   constexpr uint8 kCalTgtNrBits = 6U;
   constexpr uint8 kCalTgtNrBitsPinsPow2 = 64U;
 

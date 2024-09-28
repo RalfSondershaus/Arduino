@@ -56,6 +56,9 @@ endif
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # AVR_GCC
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Supported target MCUs with AVR_GCC:
+# - ARG_TARGET_ECU mega
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ifeq ($(ARG_COMPILER),avrgcc)
 CC := $(AVRGCC)
 
@@ -142,14 +145,14 @@ OBJCOPYFLAGS =  -O ihex \
 # See https://www.avrfreaks.net/forum/cannot-connect-avrdude-mega2560
 
 # -p partno         This is the only mandatory option and it tells AVRDUDE what type of part (MCU) that is connected to the programmer.
-# -b baudrate       Override the RS-232 connection baud rate specified in the respective programmer’s entry of the configuration file. 
+# -b baudrate       Override the RS-232 connection baud rate specified in the respective programmerï¿½s entry of the configuration file. 
 # -B bitclock       Specify the bit clock period for the JTAG interface or the ISP clock (JTAG ICE only).
 # -c programmer-id  Specify the programmer to be used.
 # -C config-file    Use the specified config file for configuration data. This file contains all programmer and part definitions that AVRDUDE knows about.
 # -D                Disable auto erase for flash.
-# -e                Causes a chip erase to be executed. This will reset the contents of the flash ROM and EEPROM to the value ‘0xff’, and clear all lock bits.
+# -e                Causes a chip erase to be executed. This will reset the contents of the flash ROM and EEPROM to the value ï¿½0xffï¿½, and clear all lock bits.
 # -E exitspec[,...] By default, AVRDUDE leaves the parallel port in the same state at exit as it has been found at startup.
-#                   This option modifies the state of the ‘/RESET’ and ‘Vcc’ lines the parallel port is left at, according to the exitspec arguments provided.
+#                   This option modifies the state of the ï¿½/RESETï¿½ and ï¿½Vccï¿½ lines the parallel port is left at, according to the exitspec arguments provided.
 # -F                Normally, AVRDUDE tries to verify that the device signature read from the part is reasonable before continuing. 
 #                   Since it can happen from time to time that a device has a broken (erased or overwritten) device signature but is otherwise operating normally, 
 #                   this options is provided to override the check.
@@ -163,11 +166,11 @@ OBJCOPYFLAGS =  -O ihex \
 # -u                Disables the default behaviour of reading out the fuses three times before programming, 
 #                   then verifying at the end of programming that the fuses have not changed.
 # -s                Disable safemode prompting.
-# -t                Tells AVRDUDE to enter the interactive “terminal” mode instead of up- or downloading files.
+# -t                Tells AVRDUDE to enter the interactive ï¿½terminalï¿½ mode instead of up- or downloading files.
 # -U memtype:op:filename[:format]
-#                   Perform a memory operation. Multiple ‘-U’ options can be specified in order to operate on multiple memories on the same command-line invocation.
-#                   The memtype field specifies the memory type to operate on. Use the ‘-v’ option on the command line or the part command from terminal mode 
-#                   to display all the memory types supported by a particular device. Typically, a device’s memory configuration at least contains the memory 
+#                   Perform a memory operation. Multiple ï¿½-Uï¿½ options can be specified in order to operate on multiple memories on the same command-line invocation.
+#                   The memtype field specifies the memory type to operate on. Use the ï¿½-vï¿½ option on the command line or the part command from terminal mode 
+#                   to display all the memory types supported by a particular device. Typically, a deviceï¿½s memory configuration at least contains the memory 
 #                   types flash and eeprom.
 #                   All memory types currently known are: 
 #                     flash    The flash ROM of the device. 
@@ -317,7 +320,7 @@ CCVERSIONFLAGS :=
 # Linker flags
 # See https://learn.microsoft.com/de-de/cpp/build/reference/link-pass-options-to-linker?source=recommendations&view=msvc-170
 # See https://learn.microsoft.com/en-us/cpp/build/reference/linker-options?view=msvc-170
-# /link (Optionen an Linker übergeben)
+# /link (Optionen an Linker ï¿½bergeben)
 # The /link option and its linker options must appear after any file names and CL options. 
 # A space is required between /link and any linker options.
 # /DEBUG    The /DEBUG option creates debugging information for the executable. 
@@ -350,6 +353,9 @@ OBJ_FILENAME_EXT := obj
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # GCC
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Supported target MCUs with AVR_GCC:
+# - ARG_TARGET_ECU win32
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 else ifeq ($(ARG_COMPILER),gcc)
 CC := $(GCC)
 
@@ -379,7 +385,7 @@ endif
 # ---------------------------------------------------
 # Compiler flags. See also https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
 #
-# -g    Produce debugging information in the operating system’s native format (stabs, COFF, XCOFF, or DWARF). GDB can work with this debugging information.
+# -g    Produce debugging information in the operating systemï¿½s native format (stabs, COFF, XCOFF, or DWARF). GDB can work with this debugging information.
 # -M    Instead of outputting the result of preprocessing, output a rule suitable for make describing the dependencies of the main source file. 
 # -O1   Optimize. Optimizing compilation takes somewhat more time, and a lot more memory for a large function. (Same as -O)
 # -O2   Optimize even more. GCC performs nearly all supported optimizations that do not involve a space-speed tradeoff. 
@@ -429,6 +435,6 @@ OBJ_FILENAME_EXT := o
 # ---------------------------------------------------
 else
 
-$(error ------ Invalid build command line parameter ARG_COMPILER $(ARG_COMPILER) for ARG_TARGET_ECU $(ARG_TARGET_ECU). Supported: avrgcc,msvc) ------
+$(error ------ Invalid build command line parameter ARG_COMPILER $(ARG_COMPILER) for ARG_TARGET_ECU $(ARG_TARGET_ECU). Supported: avrgcc,msvc,gcc) ------
 
 endif

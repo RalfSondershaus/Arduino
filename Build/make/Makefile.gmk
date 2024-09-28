@@ -279,7 +279,7 @@ endif
 
 all: PrintIncludePaths PrintCompiler $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
 
-rebuild: clean PrintIncludePaths all
+rebuild: clean all
 
 # sed is used instead of subst because some make implementations cannot replace $(SolutionDir).
 # Comments on sed: 

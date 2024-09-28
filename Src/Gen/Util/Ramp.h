@@ -132,8 +132,8 @@ namespace util
     /// For example, if the unit of timestep is [ms], the unit of slope must be [./ms].
     /// 
     /// @param yend Target value
-    /// @param slope Speed / slope to reach the target value. 
-    /// @timestep Cycle time for updates. Defines update rate per cyclic call.
+    /// @param slope Slope to reach the target value.
+    /// @param timestep Cycle time for updates. Defines update rate per cyclic call.
     void init_from_slope(base_type yend, base_type slope, base_type timestep)
     {
       tgt = yend;

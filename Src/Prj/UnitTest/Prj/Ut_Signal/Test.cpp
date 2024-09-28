@@ -3,7 +3,7 @@
  *
  * @brief Unit tests for project Signal
  *
- * @copyright Copyright 2022 Ralf Sondershaus
+ * @copyright Copyright 2022 - 2024 Ralf Sondershaus
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,7 +18,7 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
+#include <unity_adapt.h>
 #include <Cal/CalM.h>
 #include <Rte/Rte.h>
 #include <InputClassifier.h>
@@ -94,15 +94,15 @@ TEST(Ut_Signal, Default_Green_Red)
     , {  30,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
     , {  40,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
     , {  50,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 16,  16,   0,   0,   0 } }
-    , {  60,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 28,  28,   0,   0,   0 } }
+    , {  60,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 27,  27,   0,   0,   0 } }
     , {  70,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 48,  48,   0,   0,   0 } }
-    , {  80,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 84,  84,   0,   0,   0 } }
+    , {  80,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 82,  82,   0,   0,   0 } }
     , {  90,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {145, 145,   0,   0,   0 } }
-    , { 100,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {255, 255,   0,   0,   0 } }
+    , { 100,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {250, 250,   0,   0,   0 } }
     , { 510,  CLASSIFIER_PIN0, kGreenLo, rte::kInvalidCmd, {255, 255,   0,   0,   0 }}
-    , { 560,  CLASSIFIER_PIN0, kGreenLo,                1, {148, 148,   0,   0,   0 }}
+    , { 560,  CLASSIFIER_PIN0, kGreenLo,                1, {145, 145,   0,   0,   0 }}
     , { 570,  CLASSIFIER_PIN0, kGreenLo,                1, { 84,  84,   0,   0,   0 }}
-    , { 580,  CLASSIFIER_PIN0, kGreenLo,                1, { 49,  49,   0,   0,   0 }}
+    , { 580,  CLASSIFIER_PIN0, kGreenLo,                1, { 48,  48,   0,   0,   0 }}
     , { 590,  CLASSIFIER_PIN0, kGreenLo,                1, { 28,  28,   0,   0,   0 }}
     , { 600,  CLASSIFIER_PIN0, kGreenLo,                1, { 16,  16,   0,   0,   0 }}
     , { 610,  CLASSIFIER_PIN0, kGreenLo,                1, {  9,   9,   0,   0,   0 }}
@@ -115,15 +115,15 @@ TEST(Ut_Signal, Default_Green_Red)
     , { 680,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   5,   0,   0 } }
     , { 690,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   9,   0,   0 } }
     , { 700,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  16,   0,   0 } }
-    , { 710,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  28,   0,   0 } }
+    , { 710,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  27,   0,   0 } }
     , { 720,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  48,   0,   0 } }
-    , { 730,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  84,   0,   0 } }
+    , { 730,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  82,   0,   0 } }
     , { 740,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 145,   0,   0 } }
-    , { 750,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 255,   0,   0 } }
+    , { 750,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0, 250,   0,   0 } }
     , { 760,  CLASSIFIER_PIN0,   kRedLo, rte::kInvalidCmd, {  0,   0, 255,   0,   0 } }
-    , { 810,  CLASSIFIER_PIN0,   kRedLo,                0, {  0,   0, 148,   0,   0 } }
+    , { 810,  CLASSIFIER_PIN0,   kRedLo,                0, {  0,   0, 145,   0,   0 } }
     , { 820,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  84,   0,   0 } }
-    , { 830,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  49,   0,   0 } }
+    , { 830,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  48,   0,   0 } }
     , { 840,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  28,   0,   0 } }
     , { 850,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,  16,   0,   0 } }
     , { 860,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  0,   0,   9,   0,   0 } }
@@ -136,11 +136,11 @@ TEST(Ut_Signal, Default_Green_Red)
     , { 930,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
     , { 940,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
     , { 950,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 16,  16,   0,   0,   0 } }
-    , { 960,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 28,  28,   0,   0,   0 } }
+    , { 960,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 27,  27,   0,   0,   0 } }
     , { 970,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 48,  48,   0,   0,   0 } }
-    , { 980,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 84,  84,   0,   0,   0 } }
+    , { 980,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, { 82,  82,   0,   0,   0 } }
     , { 990,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {145, 145,   0,   0,   0 } }
-    , {1000,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {255, 255,   0,   0,   0 } }
+    , {1000,  CLASSIFIER_PIN0,        0, rte::kInvalidCmd, {250, 250,   0,   0,   0 } }
   };
 
   input_classifier_type classifiers;
@@ -168,7 +168,7 @@ TEST(Ut_Signal, Default_Green_Red)
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
-      rte::intensity8_t u8DutyCycle;
+      rte::intensity8_255 u8DutyCycle;
       rte::Ifc_OnboardTargetDutyCycles::size_type pos = static_cast<rte::Ifc_OnboardTargetDutyCycles::size_type>(rte::calib_mgr.signals[kSignalId].targets[i].idx);
       EXPECT_EQ(rte::ifc_onboard_target_duty_cycles::readElement(pos, u8DutyCycle), rte::ret_type::OK);
       log << std::setw(3) << (int)u8DutyCycle << ", ";

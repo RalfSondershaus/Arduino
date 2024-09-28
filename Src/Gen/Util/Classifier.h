@@ -26,7 +26,7 @@
 #ifndef UTIL_CLASSIFIER_H__
 #define UTIL_CLASSIFIER_H__
 
-#include <Arduino.h>
+#include <Arduino.h> // analogRead
 #include <Std_Types.h>
 #include <Platform_Limits.h>
 #include <Util/Timer.h>
@@ -98,9 +98,9 @@ namespace util
     static constexpr class_type kInvalidIndex = platform::numeric_limits<class_type>::max_();
 
   protected:
+    cal_const_pointer pCfg;      ///< Pointer to the configuration
     class_type currentClass;     ///< Index for anLow and anHigh for last AD sample value, 0 ... NrClasses-1; nCurClass = INVALID_INDEX if no valid class from last sample
     MilliTimer tmrDebounce;      ///< Timer until button is considered to be pressed
-    cal_const_pointer pCfg;      ///< Pointer to the configuration
 
   public:
     /// Default constructor
@@ -189,6 +189,8 @@ namespace util
   /// Classify 10-bit unsigned AD values into 8-bit unsigned class indices.
   ///
   /// Is based on configuration parameters that need to be provided.
+  ///
+  /// Requires the function analogRead(uint8 ucPic) to get the latest AD value.
   ///
   /// @tparam NrClassifiers Number of AD channels that shall be classified
   /// @tparam NrClasses Number of classes that the values shall be classified into

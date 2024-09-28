@@ -3,4 +3,4 @@
 #
 
 # Files
-FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/test
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test

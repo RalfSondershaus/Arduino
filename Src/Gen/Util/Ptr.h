@@ -56,8 +56,8 @@ namespace util
     ~ptr() = default;
 
     /// assignment
-    This& operator=(const This& p) noexcept { pntr = p.pntr; }
-    This& operator=(This&& p) noexcept { pntr = p.pntr; }
+    This& operator=(const This& p) noexcept { pntr = p.pntr; return *this; }
+    This& operator=(This&& p) noexcept { pntr = p.pntr; return *this; }
 
     /// Returns the stored pointer
     pointer get() const noexcept { return pntr; }

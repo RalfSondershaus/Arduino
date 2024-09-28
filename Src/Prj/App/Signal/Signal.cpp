@@ -47,6 +47,11 @@ namespace signal
 
     rte::dimtime8_10ms_t dimtime = static_cast<rte::dimtime8_10ms_t>(cal_getChangeOverTime(pCal));
 
+    if (dimtime == static_cast<rte::dimtime8_10ms_t>(0))
+    {
+      dimtime = 1;
+    }
+
     cmd_type cmd = rte::ifc_rte_get_cmd::call(cal_getInput(pCal));
 
     // switch on RED if a valid command hasn't been received since system start.
@@ -101,6 +106,7 @@ namespace signal
       if (dimtime != last_dim_time)
       {
         // dimtime [10 ms]
+        // Division by zero is not possible because dimtime is checked above.
         // speed [(0x0000 ... 0x8000) / ms]
         // calculate speed for ramp from 0x0000 (0%) to 0x8000 (100%) within dimtime
         const speed16_ms_type speed = rte::kIntensity16_100 / scale_10ms_1ms(dimtime);

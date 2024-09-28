@@ -40,7 +40,7 @@ namespace signal
     using aspect_type = cal::aspect_type;
     using size_type = util::array<aspect_type, cfg::kNrSignalAspects>::size_type;
     using dimtime8_10ms_type = rte::dimtime8_10ms_t;
-    using intensity16_type = rte::intensity16_t;
+    using intensity16_type = rte::intensity16;
     using speed16_ms_type = rte::speed16_ms_t;
 
     /// Access calibration data

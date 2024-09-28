@@ -1,11 +1,11 @@
  /**
- * @file test.cpp
+ * @file Test.cpp
    *
    * @author Ralf Sondershaus
    *
- * Google Test for Gen/Dcc/Packet.h
+   * Unit Test for Gen/Dcc/Packet.h
    *
-   * @copyright Copyright 2018 - 2023 Ralf Sondershaus
+   * @copyright Copyright 2018 - 2024 Ralf Sondershaus
    *
    * This program is free software: you can redistribute it and/or modify it
    * under the terms of the GNU General Public License as published by the
@@ -21,34 +21,48 @@
    * along with this program.  If not, see <https://www.gnu.org/licenses/>.
    */
 
-#include <Dcc/Packet.h>
-#include <gtest/gtest.h>
+#include <unity_adapt.h>
 #include <array>
+#include <Dcc/Packet.h>
 
-TEST(Ut_Packet, packet_empty)
+/// Helper function: add all bits of a byte to a packet. Start with MSB, end with LSB.
+template<int N>
+void addByteToPacket(dcc::Packet<N>& pkt, uint8 byte)
+{
+  for (size_t i = 0; i < 8U; i++)
+  {
+    pkt.addBit((byte & static_cast<uint8>(0x80)) ? 1U : 0U);
+    byte <<= 1U;
+  }
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_001_empty)
 {
   dcc::Packet<6> packet;
   int i;
 
   for (i = 0; i < 6; i++)
   {
-    EXPECT_EQ(packet.refByte(i), 0);
+    EXPECT_EQ(packet.refByte(i), static_cast<uint8>(0));
   }
   EXPECT_EQ(packet.getNrBytes(), 0u);
 }
 
-TEST(Ut_Packet, packet_add_2_bits)
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_002_add_2_bits)
 {
   dcc::Packet<6> packet;
 
   packet.addBit(1);
-  EXPECT_EQ(packet.refByte(0), 1);
+  EXPECT_EQ(packet.refByte(0), static_cast<uint8>(1));
   packet.addBit(1);
-  EXPECT_EQ(packet.refByte(0), 3);
+  EXPECT_EQ(packet.refByte(0), static_cast<uint8>(3));
   EXPECT_EQ(packet.getNrBytes(), 1u);
 }
 
-TEST(Ut_Packet, packet_add_16_bits)
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_003_add_16_bits)
 {
   dcc::Packet<6> packet;
   std::array<uint8_t, 8> byte0 = { 1, 0, 1, 1,  0, 1, 1, 0 };
@@ -74,7 +88,8 @@ TEST(Ut_Packet, packet_add_16_bits)
   }
 }
 
-TEST(Ut_Packet, packet_copy_constructor)
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_004_copy_constructor)
 {
   dcc::Packet<6> packet;
   std::array<uint8_t, 8> byte0 = { 1, 0, 1, 1,  0, 1, 1, 0 };
@@ -91,12 +106,13 @@ TEST(Ut_Packet, packet_copy_constructor)
   }
 
   auto packet_copy = packet; // copy initialization
-  EXPECT_EQ(packet_copy.refByte(0), 0b10110110u);
-  EXPECT_EQ(packet_copy.refByte(1), 0b01100001u);
+  EXPECT_EQ(packet_copy.refByte(0), static_cast<uint8>(0b10110110u));
+  EXPECT_EQ(packet_copy.refByte(1), static_cast<uint8>(0b01100001u));
   EXPECT_EQ(packet_copy.getNrBytes(), 2u);
 }
 
-TEST(Ut_Packet, packet_copy_assignment)
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_005_copy_assignment)
 {
   dcc::Packet<6> packet;
   dcc::Packet<6> packet_copy;
@@ -114,12 +130,13 @@ TEST(Ut_Packet, packet_copy_assignment)
   }
 
   packet_copy = packet; // copy assignment
-  EXPECT_EQ(packet_copy.refByte(0), 0b10110110u);
-  EXPECT_EQ(packet_copy.refByte(1), 0b01100001u);
+  EXPECT_EQ(packet_copy.refByte(0), static_cast<uint8>(0b10110110u));
+  EXPECT_EQ(packet_copy.refByte(1), static_cast<uint8>(0b01100001u));
   EXPECT_EQ(packet_copy.getNrBytes(), 2u);
 }
 
-TEST(Ut_Packet, packet_operator_equal)
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_006_operator_equal)
 {
   dcc::Packet<6> packet;
   dcc::Packet<6> packet_copy;
@@ -143,4 +160,145 @@ TEST(Ut_Packet, packet_operator_equal)
   packet.addBit(1);
 
   EXPECT_EQ(packet_copy == packet, false);
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_007_checksum_BasicAccessory_Correct)
+{
+  dcc::Packet<6> packet;
+  bool result;
+
+  // BasicAccessory
+  // {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
+  // {preamble} 0 10000001 0 1111CDDD 0 EEEEEEEE 1
+  addByteToPacket(packet, 0b10000001U);
+  addByteToPacket(packet, 0b11110000U);
+  addByteToPacket(packet, packet.refByte(0) ^ packet.refByte(1));
+
+  result = packet.testChecksum();
+  EXPECT_EQ(result, true);
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_008_checksum_BasicAccessory_Incorrect)
+{
+  dcc::Packet<6> packet;
+  bool result;
+
+  // BasicAccessory
+  // {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
+  // {preamble} 0 10000001 0 1111CDDD 0 EEEEEEEE 1
+  addByteToPacket(packet, 0b10000001U);
+  addByteToPacket(packet, 0b11110000U);
+  addByteToPacket(packet, 0U);
+
+  result = packet.testChecksum();
+  EXPECT_EQ(result, false);
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_009_checksum_ExtendedAccessory_Correct)
+{
+  dcc::Packet<6> packet;
+  bool result;
+
+  // ExtendedAccessory
+  // {preamble} 0 10AAAAAA 0 0AAA0AA1 0 000XXXXX 0 EEEEEEEE 1
+  // {preamble} 0 10000001 0 01110111 0 00010101 0 EEEEEEEE 1
+  addByteToPacket(packet, 0b10000001U);
+  addByteToPacket(packet, 0b11110111U);
+  addByteToPacket(packet, 0b00010101U);
+  addByteToPacket(packet, (packet.refByte(0) ^ packet.refByte(1)) ^ packet.refByte(2));
+
+  result = packet.testChecksum();
+  EXPECT_EQ(result, true);
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_010_checksum_ExtendedAccessory_Incorrect)
+{
+  dcc::Packet<6> packet;
+  bool result;
+
+  // ExtendedAccessory
+  // {preamble} 0 10AAAAAA 0 0AAA0AA1 0 000XXXXX 0 EEEEEEEE 1
+  // {preamble} 0 10000001 0 01110111 0 00010101 0 EEEEEEEE 1
+  addByteToPacket(packet, 0b10000001U);
+  addByteToPacket(packet, 0b11110111U);
+  addByteToPacket(packet, 0b00010101U);
+  addByteToPacket(packet, 0U);
+
+  result = packet.testChecksum();
+  EXPECT_EQ(result, false);
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_011_type_BasicAccessory_Correct)
+{
+  dcc::Packet<6> packet;
+  dcc::Packet<6>::packet_type type;
+
+  // BasicAccessory
+  // {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
+  // {preamble} 0 10000001 0 1111CDDD 0 EEEEEEEE 1
+  addByteToPacket(packet, 0b10000001U);
+  addByteToPacket(packet, 0b11110111U);
+  addByteToPacket(packet, packet.refByte(0) ^ packet.refByte(1));
+
+  type = packet.decode();
+  EXPECT_EQ(type, dcc::Packet<6>::packet_type::BasicAccessory);
+  EXPECT_EQ(packet.getType(), dcc::Packet<6>::packet_type::BasicAccessory);
+  EXPECT_EQ(packet.baGetC(), static_cast<uint8>(0U));
+  EXPECT_EQ(packet.baGetD(), static_cast<uint8>(0b111U));
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_012_type_ExtendedAccessory_Correct)
+{
+  dcc::Packet<6> packet;
+  dcc::Packet<6>::packet_type type;
+
+  // ExtendedAccessory
+  // {preamble} 0 10AAAAAA 0 0AAA0AA1 0 000XXXXX 0 EEEEEEEE 1
+  // {preamble} 0 10000001 0 01110111 0 00010101 0 EEEEEEEE 1
+  addByteToPacket(packet, 0b10000001U);
+  addByteToPacket(packet, 0b01110111U);
+  addByteToPacket(packet, 0b00010101U);
+  addByteToPacket(packet, (packet.refByte(0) ^ packet.refByte(1)) ^ packet.refByte(2));
+
+  type = packet.decode();
+  EXPECT_EQ(type, dcc::Packet<6>::packet_type::ExtendedAccessory);
+  EXPECT_EQ(packet.getType(), dcc::Packet<6>::packet_type::ExtendedAccessory);
+  EXPECT_EQ(packet.eaGetAspect(), static_cast<uint8>(0b00010101U));
+}
+
+/// @brief This function is called before running a test case
+void setUp(void)
+{
+}
+
+/// @brief This function is called after running a test case
+void tearDown(void)
+{
+}
+
+/// @brief This function runs all test cases
+int main(void)
+{
+  UNITY_BEGIN();
+
+  RUN_TEST(packet_001_empty);
+  RUN_TEST(packet_002_add_2_bits);
+  RUN_TEST(packet_003_add_16_bits);
+  RUN_TEST(packet_004_copy_constructor);
+  RUN_TEST(packet_005_copy_assignment);
+  RUN_TEST(packet_006_operator_equal);
+  RUN_TEST(packet_007_checksum_BasicAccessory_Correct);
+  RUN_TEST(packet_008_checksum_BasicAccessory_Incorrect);
+  RUN_TEST(packet_009_checksum_ExtendedAccessory_Correct);
+  RUN_TEST(packet_010_checksum_ExtendedAccessory_Incorrect);
+  RUN_TEST(packet_011_type_BasicAccessory_Correct);
+  RUN_TEST(packet_012_type_ExtendedAccessory_Correct);
+
+  return UNITY_END();
 }

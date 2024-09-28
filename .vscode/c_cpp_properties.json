@@ -3,8 +3,11 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/../../Tools/unity/src"
+                "${workspaceFolder}/Src/Gen/**",
+                "${workspaceFolder}/Src/Gen/Test/unity/src",
+                "${workspaceFolder}/Src/Gen/Test/stubs/Arduino",
+                "${workspaceFolder}/Src/Prj/App/Signal",
+                "${workspaceFolder}/Src/Prj/App/Signal/**"
             ],
             "defines": [
                 "_DEBUG",

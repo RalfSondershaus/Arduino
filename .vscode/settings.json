@@ -19,7 +19,11 @@
         "string": "cpp",
         "vector": "cpp",
         "iterator": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "chrono": "cpp",
+        "iosfwd": "cpp"
     },
-    "ceedlingExplorer.shellPath": "null"
+    "ceedlingExplorer.shellPath": "cmd",
+    "ceedlingExplorer.projectPath": "W:\\repos\\Arduino\\Test\\Arduino",
+    "C_Cpp.errorSquiggles": "enabled"
 }

@@ -38,9 +38,14 @@ if "%3" == "gcc" (
 ::   and those that depend on it, cannot be remade, the other prerequisites of 
 ::   these targets can be processed all the same.
 :: make -i (or --ignore-errors)
-::   When you run make with the ‘-i’ or ‘--ignore-errors’ flag, errors are ignored in all recipes of all rules. 
+::   When you run make with the -i or --ignore-errors flag, errors are ignored in all recipes of all rules. 
 ::   A rule in the makefile for the special target .IGNORE has the same effect, if there are no prerequisites. 
 ::   This is less flexible but sometimes useful.
+:: make -d (or --debug[=options])
+::   Print debugging information in addition to normal processing. The debugging information says which files
+::   are being considered for remaking, which file-times are being compared and with what results, which files 
+::   actually need to be remade, which implicit rules are considered and which are appliedâ€”everything interesting 
+::   about how make decides what to do. The -d option is equivalent to â€˜--debug=aâ€™ (see below).
 
 :: After each shell invocation returns, make looks at its exit status. If the shell completed successfully 
 :: (the exit status is zero), the next line in the recipe is executed in a new shell; after the last line 
@@ -50,8 +55,8 @@ if "%3" == "gcc" (
 :: the mkdir command to ensure that a directory exists. If the directory already exists, mkdir will report an 
 :: error, but you probably want make to continue regardless.
 ::
-:: To ignore errors in a recipe line, write a ‘-’ at the beginning of the line’s text (after the initial tab). 
-:: The ‘-’ is discarded before the line is passed to the shell for execution.
+:: To ignore errors in a recipe line, write a ï¿½-ï¿½ at the beginning of the lineï¿½s text (after the initial tab). 
+:: The ï¿½-ï¿½ is discarded before the line is passed to the shell for execution.
 
 :: MS Visual Studio: current directory is project directory (Arduino.vcproj)
 make -s -f ./Build/make/Makefile.gmk ARG_PROJECT=%1 ARG_TARGET_ECU=%2 ARG_COMPILER=%3 ARG_BSW=%4 ARG_TESTFRAMEWORK=%5 %6

@@ -1,11 +1,11 @@
 /**
-  * @file test.cpp
+  * @file Test.cpp
   *
   * @author Ralf Sondershaus
   *
-  * Google Test for Gen/Dcc/BitExtractor.h and Gen/Dcc/PacketExtractor.h
+  * Unit Test for Gen/Dcc/BitExtractor.h and Gen/Dcc/PacketExtractor.h
   *
-  * @copyright Copyright 2018 - 2023 Ralf Sondershaus
+  * @copyright Copyright 2018 - 2024 Ralf Sondershaus
   *
   * This program is free software: you can redistribute it and/or modify it
   * under the terms of the GNU General Public License as published by the
@@ -21,9 +21,9 @@
   * along with this program. If not, see <https://www.gnu.org/licenses/>.
   */
 
-#include <Dcc/PacketExtractor.h>
-#include <gtest/gtest.h>
+#include <unity_adapt.h>
 #include <array>
+#include <Dcc/PacketExtractor.h>
 
 typedef dcc::PacketExtractor<> PacketExtractorType;
 
@@ -58,7 +58,7 @@ TEST(Ut_PacketExtractor, packetextractor_preamble_invalid_1_bit)
 // -----------------------------------------------------------------------
 /// @brief Test an invalid preamble (9x "1" are received instead of 10x "1")
 // -----------------------------------------------------------------------
-TEST(Ut_PacketExtractor, packetextractor_preamble_invalid_9_bit)
+TEST(Ut_PacketExtractor, packetextractor_preamble_invalid_9_bit_without_packets)
 {
   std::array<uint8_t, 9 + 1 + 8 + 1 + 8 + 1> input = 
   {
@@ -71,6 +71,40 @@ TEST(Ut_PacketExtractor, packetextractor_preamble_invalid_9_bit)
   };
   PacketExtractorHandlerClass packethandler;
   PacketExtractorType packetextractor(packethandler);
+  for (auto it = input.begin(); it != input.end(); it++)
+  {
+    if (*it == 0)
+    {
+      packetextractor.zero();
+    }
+    else
+    {
+      packetextractor.one();
+    }
+  }
+  EXPECT_EQ(packethandler.nReceived, 0);
+}
+
+// -----------------------------------------------------------------------
+/// @brief Test a valid preamble (9x "1" are received instead of 10x "1")
+// -----------------------------------------------------------------------
+TEST(Ut_PacketExtractor, packetextractor_preamble_invalid_9_bit_with_packets)
+{
+  std::array<uint8_t, 9 + 1 + 8 + 1 + 8 + 1> input =
+  {
+    1, 1, 1, 1,  1, 1, 1, 1,  1,
+    0,
+    1, 0, 1, 0,  1, 0, 1, 0,
+    0,
+    1, 1, 1, 0,  1, 0, 1, 0,
+    1,
+  };
+  PacketExtractorHandlerClass packethandler;
+  PacketExtractorType packetextractor(packethandler);
+  dcc::Packet<> packet;
+
+  packet.refByte(0) = 0b10101010;
+  packet.refByte(1) = 0b11101010;
   for (auto it = input.begin(); it != input.end(); it++)
   {
     if (*it == 0)
@@ -119,4 +153,27 @@ TEST(Ut_PacketExtractor, packetextractor_preamble_valid_10_bit)
   EXPECT_EQ(packethandler.nReceived, 1);
   EXPECT_EQ(packet.refByte(0) == packethandler.lastpacket.refByte(0), true);
   EXPECT_EQ(packet.refByte(1) == packethandler.lastpacket.refByte(1), true);
+}
+
+/// @brief This function is called before each test case
+void setUp(void)
+{
+}
+
+/// @brief This function is called before each test case
+void tearDown(void)
+{
+}
+
+/// @brief This function calls all test cases
+int main(void)
+{
+  UNITY_BEGIN();
+
+  RUN_TEST(packetextractor_preamble_invalid_1_bit);
+  RUN_TEST(packetextractor_preamble_invalid_9_bit_without_packets);
+  RUN_TEST(packetextractor_preamble_invalid_9_bit_with_packets);
+  RUN_TEST(packetextractor_preamble_valid_10_bit);
+
+  return UNITY_END();
 }
