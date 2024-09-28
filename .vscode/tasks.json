@@ -166,6 +166,26 @@
             ],
             "group": "build"
         },
+        {
+            "type": "cppbuild",
+            "label": "Rebuild UnitTest/Gen/Util/Ut_Ramp gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Gen/Util/Ut_Ramp",
+                "win32",
+                "gcc",
+                "none",
+                "unity",
+                "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
     ],
     "version": "2.0.0"
 }

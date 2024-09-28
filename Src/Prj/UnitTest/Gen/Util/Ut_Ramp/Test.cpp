@@ -244,7 +244,7 @@ TEST(Ut_Ramp, do_ramp_16bit_20_0x0_0x8000_0x0100)
 // ------------------------------------------------------------------------------------------------
 TEST(Ut_Ramp, do_ramp_16bit_20_0x0_0x8000_0x1000)
 {
-  test_ramp<uint16_t>(20, 0x0, 0x8000, 0x1000, true);
+  test_ramp<uint16_t>(20, 0x0, 0x8000, 0x1000, false);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -258,6 +258,88 @@ TEST(Ut_Ramp, do_ramp_16bit_20_0x0_0x8000_0x1000)
 TEST(Ut_Ramp, do_ramp_16bit_20_0x0_0x8000_0x8000)
 {
   test_ramp<uint16_t>(20, 0x0, 0x8000, 0x8000, false);
+}
+
+// ------------------------------------------------------------------------------------------------
+/// Test with
+/// - uint16
+/// - cycle time     10
+/// - Start          0% (0x0)
+/// - End          100% (0x8000)
+/// - Speed      0x0100
+/// - set target value and speed before each step()
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_Ramp, do_ramp_16bit_10_0x0_0x8000_0x0100_set_and_step)
+{
+  using ramp_base_type = uint16;
+  using ramp_type = typename util::ramp<ramp_base_type>;
+  /// 16 bit, [./ms], 0 = zero speed, 65535 = 65535 / ms
+  /// If used for intensity:
+  /// - 0x8000 / ms is 100% / ms (fastest, see also kSpeed16Max)
+  /// - 0x4000 / ms is  50% / ms
+  /// - 0x0001 / ms is  0.000030517% / ms = 0.03% / s = 1.83% / min (slowest)
+  typedef struct
+  {
+    ramp_base_type ms; // [ms] current time
+    ramp_base_type expectedCur;
+  } step_type;
+
+  Logger log;
+  const bool doLog = true;
+  ramp_type myRamp;
+  const ramp_base_type slope = 0x0100;
+  const ramp_base_type cycleTime = 10;
+  const ramp_base_type endIntensity = 0x8000;
+  ramp_base_type curInc;
+  
+  if (util::math::mul_overflow<ramp_base_type>(slope, cycleTime, &curInc))
+  {
+    curInc = platform::numeric_limits<ramp_base_type>::max_();
+  }
+  const int nrSteps = (0x8000 / curInc) + 2;
+  ramp_base_type expectedCur;
+  int ms;
+
+  if (doLog)
+  {
+    log.start("do_ramp_16bit_10_0x0_0x8000_0x0100_set_and_step.txt");
+  }
+
+  myRamp.init_from_slope(endIntensity, slope, cycleTime);
+
+  EXPECT_EQ(myRamp.get_tgt(), endIntensity);
+  EXPECT_EQ(myRamp.get_cur(), static_cast<ramp_base_type>(0));
+
+  ms = 0;
+  expectedCur = 0;
+  // for each step
+  for (int step = 0; step < nrSteps; step++)
+  {
+    ms += cycleTime;
+
+    // expectedCur += curInc;
+    if (util::math::add_overflow<ramp_base_type>(expectedCur, curInc, &expectedCur))
+    {
+      expectedCur = endIntensity;
+    }
+    expectedCur = util::min(endIntensity, expectedCur);
+
+    myRamp.init_from_slope(endIntensity, slope, cycleTime);
+    const ramp_base_type cur = myRamp.step();
+
+    if (doLog)
+    {
+      log << ms << " " << static_cast<int>(cur) << std::endl;
+    }
+
+    EXPECT_EQ(static_cast<int>(cur)             , static_cast<int>(expectedCur));
+    EXPECT_EQ(static_cast<int>(myRamp.get_cur()), static_cast<int>(expectedCur));
+  }
+
+  if (doLog)
+  {
+    log.stop();
+  }
 }
 
 void setUp(void)
@@ -281,6 +363,7 @@ int main(void)
   RUN_TEST(do_ramp_16bit_20_0x0_0x8000_0x0100);
   RUN_TEST(do_ramp_16bit_20_0x0_0x8000_0x1000);
   RUN_TEST(do_ramp_16bit_20_0x0_0x8000_0x8000);
+  RUN_TEST(do_ramp_16bit_10_0x0_0x8000_0x0100_set_and_step);
 
   return UNITY_END();
 }
