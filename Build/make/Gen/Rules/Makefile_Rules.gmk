@@ -4,8 +4,8 @@
 # batch operator > redirects standard output to a file
 # batch operator 2> redirects standard output and error output to a file
 #
-# To ignore errors in a recipe line, write a ‘-’ at the beginning of the line’s text 
-# (after the initial tab). The ‘-’ is discarded before the line is passed to the shell for execution
+# To ignore errors in a recipe line, write a ï¿½-ï¿½ at the beginning of the lineï¿½s text 
+# (after the initial tab). The ï¿½-ï¿½ is discarded before the line is passed to the shell for execution
 #
 # Remove source file prefixes ./../ in order to make VS find the source files:
 # $(SED) s:./../::
@@ -13,7 +13,7 @@
 # ---------------------------------------------------
 # AVR GCC
 # ---------------------------------------------------
-ifeq ($(ARG_COMPILER),avrgcc)
+ifeq ($(ARG_COMPILER),avr_gcc)
 $(TARGET_FILENAME_BASE).elf: $(FILES_O)
 	@echo +++++ linking $(basename $@).elf +++++
 	@$(CC) $(LFLAGS) $(FILES_O) -o $(basename $@).elf
@@ -81,6 +81,6 @@ $(TARGET_FILENAME_BASE).exe: $(FILES_O)
 
 else
 
-$(error ------ Invalid build command line parameter ARG_COMPILER $(ARG_COMPILER). Supported: avrgcc,msvc,gcc) ------
+$(error ------ Invalid build command line parameter ARG_COMPILER $(ARG_COMPILER). Supported: avr_gcc,msvc,gcc) ------
 
 endif

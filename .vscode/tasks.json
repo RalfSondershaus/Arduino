@@ -8,7 +8,7 @@
                 "UnitTest/Gen/Util/Ut_String_Unity",
                 "win32",
                 "gcc",
-                "none",
+                "win",
                 "unity",
                 "all"
             ],
@@ -31,7 +31,7 @@
                 "UnitTest/Gen/Dcc/Ut_Packet",
                 "win32",
                 "gcc",
-                "none",
+                "win",
                 "unity",
                 "all"
             ],
@@ -54,7 +54,7 @@
                 "UnitTest/Gen/Dcc/Ut_PacketExtractor",
                 "win32",
                 "gcc",
-                "none",
+                "win",
                 "unity",
                 "all"
             ],
@@ -74,7 +74,7 @@
                 "UnitTest/Prj/Ut_Signal",
                 "win32",
                 "gcc",
-                "none",
+                "win",
                 "unity",
                 "all"
             ],
@@ -94,7 +94,7 @@
                 "UnitTest/Prj/Ut_Signal_LedRouter",
                 "win32",
                 "gcc",
-                "none",
+                "win",
                 "unity",
                 "all"
             ],
@@ -114,7 +114,7 @@
                 "UnitTest/Prj/Ut_Signal_LedRouter",
                 "win32",
                 "gcc",
-                "none",
+                "win",
                 "unity",
                 "run"
             ],
@@ -134,9 +134,69 @@
                 "UnitTest/Prj/Ut_Signal_LedRouter",
                 "win32",
                 "gcc",
-                "none",
+                "win",
                 "unity",
                 "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Rebuild UnitTest/Prj/Ut_Signal_LedRouter avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Prj/Ut_Signal_LedRouter",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build UnitTest/Prj/Ut_Signal_LedRouter avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Prj/Ut_Signal_LedRouter",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Run UnitTest/Gen/Util/Ut_Signal_LedRouter avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Prj/Ut_Signal_LedRouter",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "download"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -154,7 +214,7 @@
                 "UnitTest/Gen/Util/Ut_Ramp",
                 "win32",
                 "gcc",
-                "none",
+                "win",
                 "unity",
                 "all"
             ],
@@ -174,7 +234,7 @@
                 "UnitTest/Gen/Util/Ut_Ramp",
                 "win32",
                 "gcc",
-                "none",
+                "win",
                 "unity",
                 "run"
             ],
@@ -194,7 +254,7 @@
                 "UnitTest/Gen/Util/Ut_Ramp",
                 "win32",
                 "gcc",
-                "none",
+                "win",
                 "unity",
                 "rebuild"
             ],

@@ -59,4 +59,4 @@ if "%3" == "gcc" (
 :: The �-� is discarded before the line is passed to the shell for execution.
 
 :: MS Visual Studio: current directory is project directory (Arduino.vcproj)
-make -s -f ./Build/make/Makefile.gmk ARG_PROJECT=%1 ARG_TARGET_ECU=%2 ARG_COMPILER=%3 ARG_BSW=%4 ARG_TESTFRAMEWORK=%5 %6
+make -s -f ./Build/make/Makefile.gmk ARG_PROJECT=%1 ARG_TARGET_ECU=%2 ARG_COMPILER=%3 ARG_BSW=%4 ARG_BSW_TESTFRAMEWORK=%5 %6

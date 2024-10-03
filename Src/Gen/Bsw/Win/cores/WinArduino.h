@@ -1,10 +1,10 @@
 /**
- * @file Arduino.h
+ * @file WinArduino.h
  * @author Ralf Sondershaus
  *
- * @brief Declares stub functions of Arduino official library on Windows.
+ * @brief Arduino interface to run on Win32
  *
- * @copyright Copyright 2024 Ralf Sondershaus
+ * @copyright Copyright 2022 Ralf Sondershaus
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,35 +19,17 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef STUB_ARDUINO_H_
-#define STUB_ARDUINO_H_
+#ifndef WINARDUINO_H_
+#define WINARDUINO_H_
 
 #include <Std_Types.h>
-#include <Util/Array.h>
-#include <Arduino_cfg.h>
-
-constexpr int NPINS = 60;
-
-namespace stubs
-{
-  extern util::array<uint8, NPINS> pinMode;
-  extern util::array<uint8, NPINS> digitalWrite;
-  extern util::array<int, NPINS> analogRead;
-
-#if CFG_STUB_MICROS == CFG_STUB_ON
-  extern unsigned long micros;
-#endif
-#if CFG_STUB_MILLIS == CFG_STUB_ON
-  extern unsigned long millis;
-#endif
-}
 
 #ifdef __cplusplus
 extern "C"{
 #endif
 
-#define INPUT       0x0
-#define OUTPUT      0x1
+#define INPUT 0x0
+#define OUTPUT 0x1
 
 void init(void);
 
@@ -67,10 +49,10 @@ void attachInterrupt(uint8_t, void (*)(void), int mode);
 void detachInterrupt(uint8_t);
 
 void setup(void);
-void loop(void);
+bool loop(void);
 
 #ifdef __cplusplus
 } // extern "C"
 #endif
 
-#endif // STUB_ARDUINO_H_
+#endif // WINARDUINO_H_

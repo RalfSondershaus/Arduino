@@ -1,9 +1,19 @@
 /**
- * @file Arduino_cfg_type.h
+ * @file Hal/Win/Timer/Timer.h
  * @author Ralf Sondershaus
  *
- * @brief Defines compiler defines to configure the stubbing
+ * @brief HAL layer for timers, abstracts parts of Arduino's Arduino.h for Windows
  *
+ * This file calls Arduino functions such as
+ * - millis
+ * - micros
+ * 
+ * A file Timer/Timer.h exists multiple times to support stubs and architectures other
+ * than Arduino.
+ * 
+ * This version of Timer/Timer.h supports to run the code on Windows and use default
+ * C++ function to get timer values.
+ * 
  * @copyright Copyright 2024 Ralf Sondershaus
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -19,10 +29,15 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef STUB_ARDUINO_CFG_TYPE_H_
-#define STUB_ARDUINO_CFG_TYPE_H_
+#ifndef HAL_TIMER_H
+#define HAL_TIMER_H
 
-#define CFG_STUB_OFF        0
-#define CFG_STUB_ON         1
+#include <WinArduino.h>
 
-#endif // STUB_ARDUINO_CFG_TYPE_H_
+namespace hal
+{
+    unsigned long millis() { return ::millis(); }
+    unsigned long micros() { return ::micros(); }
+}
+
+#endif // HAL_TIMER_H

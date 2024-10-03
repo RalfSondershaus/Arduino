@@ -57,7 +57,7 @@ void EXPECT_EQ<bool>(bool actual, bool expected)
 template<> void EXPECT_EQ<int>(int actual, int expected)          { TEST_ASSERT_EQUAL_INT(expected, actual); }
 template<> void EXPECT_EQ<uint8>(uint8 actual, uint8 expected)    { TEST_ASSERT_EQUAL_UINT8(expected, actual); }
 template<> void EXPECT_EQ<uint16>(uint16 actual, uint16 expected) { TEST_ASSERT_EQUAL_UINT16(expected, actual); }
-template<> void EXPECT_EQ<size_t>(size_t actual, size_t expected) { TEST_ASSERT_EQUAL_size_t(expected, actual); }
+template<> void EXPECT_EQ<uint32>(uint32 actual, uint32 expected) { TEST_ASSERT_EQUAL_UINT32(expected, actual); }
 
 /// Declares a test function
 #define TEST(group, test_fct)       void test_fct(void)

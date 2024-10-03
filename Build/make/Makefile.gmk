@@ -18,11 +18,11 @@
 # ARG_COMPILER      name of the compiler
 #                   supported: avr_gcc, msvc, gcc
 #
-# ARG_BSW               base software that is required by the project
-#                       supported: arduino, arduino_win32, none
+# ARG_BSW                   base software that is required by the project
+#                           supported: arduino, win, none
 #
-# ARG_TESTFRAMEWORK     test framework that is required by the project
-#                       supported: googletest, unity, none
+# ARG_BSW_TESTFRAMEWORK     test framework that is required by the project
+#                           supported: googletest, unity, none
 #
 # Command           such as all, clean, program
 #
@@ -114,14 +114,16 @@ PATH_TOOLS                  = $(PATH_ROOT)/../../Tools
 PATH_SRC                    = $(PATH_ROOT)/Src
 PATH_SRC_PRJ                = $(PATH_SRC)/Prj
 PATH_SRC_GEN                = $(PATH_SRC)/Gen
-PATH_SRC_ARDUINO_BASE       = $(PATH_SRC)/Gen/Arduino
+PATH_SRC_BSW                = $(PATH_SRC_GEN)/Bsw
+PATH_SRC_HAL                = $(PATH_SRC_GEN)/Hal
+PATH_SRC_ARDUINO_BASE       = $(PATH_SRC_BSW)/Arduino
 PATH_SRC_ARDUINO_CORE       = $(PATH_SRC_ARDUINO_BASE)/avr/1.8.6/cores/arduino
 PATH_SRC_ARDUINO_LIBRARIES  = $(PATH_SRC_ARDUINO_BASE)/avr/1.8.6/libraries
 PATH_SRC_ARDUINO_VARIANTS   = $(PATH_SRC_ARDUINO_BASE)/avr/1.8.6/variants
-PATH_SRC_ARDUINO_WIN32_BASE = $(PATH_SRC)/Gen/Arduino_win32
-PATH_SRC_ARDUINO_WIN32_CORE = $(PATH_SRC_ARDUINO_BASE)/avr/cores
-PATH_SRC_GOOGLETEST         = $(PATH_SRC)/Gen/Test/googletest-main/googletest
-PATH_SRC_UNITY              = $(PATH_SRC)/Gen/Test/unity
+PATH_SRC_WIN_BASE           = $(PATH_SRC_BSW)/Win
+PATH_SRC_WIN_CORE           = $(PATH_SRC_WIN_BASE)/cores
+PATH_SRC_GOOGLETEST         = $(PATH_SRC_GEN)/Test/googletest-main/googletest
+PATH_SRC_UNITY              = $(PATH_SRC_GEN)/Test/unity
 PATH_SRC_PRJ_PROJECT        = $(PATH_SRC_PRJ)/$(ARG_PROJECT)
 PATH_BUILD_MAKE             = $(PATH_BUILD)/make
 PATH_BUILD_GEN              = $(PATH_BUILD_MAKE)/Gen
@@ -139,7 +141,7 @@ PATH_OBJ                    = $(PATH_TMP)
 # ---------------------------------------------------
 # Tools
 # ---------------------------------------------------
-AVRGCC  = avr-gcc
+AVRGCC  = $(PATH_AVRGNU)/bin/avr-gcc
 GCC     = g++
 OBJCOPY = $(PATH_AVRGNU)/bin/avr-objcopy
 SIZE    = $(PATH_AVRGNU)/bin/avr-size
@@ -180,10 +182,10 @@ LFLAGS =
 # Defines  TARGET_MCU_VARIANT, supported: mega, default
 # Defines  TARGET_MCU_DEVICE, supported: atmega2560, atmega328p, x86
 # Defines  CC
-# Modifies C_FLAGS
-# Modifies C_INCLUDES
-# Modifies C_INCLUDES_COMPILER
-# Modifies TARGET_FILENAME_EXT
+# Defines  C_FLAGS_PLATFORM
+# Defines  C_INCLUDES_PLATFORM
+# Defines  C_INCLUDES_COMPILER
+# Defines  TARGET_FILENAME_EXT
 # Defines  OBJ_FILENAME_EXT
 # Modifies LFLAGS
 # Modifies some more variables
@@ -196,9 +198,9 @@ LFLAGS =
 # Modifies FILES_GEN
 # Modifies FILES_BSW
 # Modifies FILES_BSW_TEST
-# Modifies C_INCLUDES
-# Modifies C_DEFINES
-# Modifies some more variables
+# Defines  C_INCLUDES_BSW
+# Defines  C_DEFINES_BSW
+# Defines  C_DEFINES_BSW_TEST
 # ---------------------------------------------------
 -include $(PATH_BUILD_BSW)/Makefile_Bsw.gmk
 
@@ -206,7 +208,8 @@ LFLAGS =
 # include project specific makefile
 #
 # Defines FILES_PRJ
-# Modifies some more variables
+# Defines C_INCLUDES_PRJ
+# Defines C_DEFINES_PRJ
 # ---------------------------------------------------
 -include $(PATH_BUILD_PRJ)/$(ARG_PROJECT)/Makefile_Prj.gmk
 
@@ -218,7 +221,7 @@ C_INCLUDES_GEN := $(C_INCLUDES_GEN)\
 
 # ---------------------------------------------------
 # Default: add path to project folder at the beginning so that 
-# project-specific header files are found before generic ones 
+# project-specific header files are found and included before generic ones 
 # (in case the project-specific C_INCLUDES_PRJ is configured with
 # generic pathes or in case the C_INCLUDES_PRJ is configured with
 # a path to the project folder but we want to unit test a single module
@@ -227,8 +230,6 @@ C_INCLUDES_GEN := $(C_INCLUDES_GEN)\
 C_INCLUDES_PRJ := -I$(PATH_SRC_PRJ_PROJECT) \
                   $(C_INCLUDES_PRJ)
                   
-                 
-
 # ---------------------------------------------------
 # Object files
 # ---------------------------------------------------
@@ -241,10 +242,16 @@ TARGET_FILENAME_BASE = $(PATH_BIN)/$(PROJECT_NAME)
 
 # ---------------------------------------------------
 # Finalize compiler include pathes.
+#
+# Include project specific pathes first to ensure that project specific versions
+# of header files are included instead of generic versions.
 # ---------------------------------------------------
-C_INCLUDES := $(C_INCLUDES)          \
-              $(C_INCLUDES_PRJ)      \
+C_INCLUDES := $(C_INCLUDES_PRJ)      \
+			  $(C_INCLUDES_BSW)      \
+              $(C_INCLUDES_BSW_TEST) \
+			  $(C_INCLUDES_PLATFORM) \
               $(C_INCLUDES_GEN)
+
 #              $(C_INCLUDES_COMPILER)
 
 # ------------------------------------------------------------------------------
@@ -264,7 +271,7 @@ C_INCLUDES := $(C_INCLUDES)          \
 VPATH = $(sort $(dir $(FILES_PRJ))) $(sort $(dir $(FILES_BSW) $(FILES_BSW_TEST) $(FILES_GEN)))
 
 # ------------------------------------------------------------------------------
-# Include dependeny files
+# Include dependency files
 # ------------------------------------------------------------------------------
 ifneq ($(MAKECMDGOALS),rebuild)
 -include $(subst .$(OBJ_FILENAME_EXT),.d,$(FILES_O))
@@ -291,17 +298,17 @@ rebuild: clean all
 PrintIncludePaths:
 	@echo ++++++ include paths ++++++
 	@echo $(C_INCLUDES)
-	@echo ++++++ include paths for Visual Studio browsing ++++++
-	@echo $(C_INCLUDES) | $(SED) s:-I./../:\$(DOLLAR)\(SolutionDir\)\:g | $(SED) s:' ':\;:g
+	# Uncomment if you want to copy pathes to MS Visual Studio
+	# @echo ++++++ include paths for Visual Studio browsing ++++++
+	# @echo $(C_INCLUDES) | $(SED) s:-I./../:\$(DOLLAR)\(SolutionDir\)\:g | $(SED) s:' ':\;:g
 
 .PHONY: PrintCompiler
 PrintCompiler:
-	@echo ++++++ compiler information ++++++
-	@echo +++ CFLAGS
-	@echo $(CFLAGS)
-	@echo +++ LFLAGS
+	@echo ++++++ compiler flags ++++++
+	@echo $(CFLAGS) $(C_DEFINES)
+	@echo ++++++ linker flags ++++++
 	@echo $(LFLAGS)
-	@echo +++ version
+	@echo ++++++ compiler version ++++++
 	@-$(CC) $(CCVERSIONFLAGS)
 
 run: $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)

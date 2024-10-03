@@ -33,9 +33,11 @@
 #include <Rte/Rte.h>
 #include <LedRouter.h>
 #include <Util/Array.h>
+#include <Hal/Timer.h>
+#ifdef WIN32
 #include <ios> // for Logger on Windows
 #include <fstream> // for Logger on Windows
-
+#endif
 
 // ------------------------------------------------------------------------------------------------
 /// Used types
@@ -61,6 +63,7 @@ constexpr signal::LedRouter::intensity16_type convert_intensity_to_16(int intens
   return intensity16_type((intensity * intensity16_type::intensity_100()) / 100);
 }
 
+#ifdef WIN32
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
 class Logger : public std::ofstream
@@ -75,6 +78,29 @@ public:
     close();
   }
 };
+#else
+// ------------------------------------------------------------------------------------------------
+/// This dummy logger for Arduino is doing nothing.
+// ------------------------------------------------------------------------------------------------
+class Logger
+{
+public:
+  void start(const char* filename)
+  {
+  }
+  void stop()
+  {
+  }
+  Logger& operator<<(uint16) { return *this; }
+  Logger& operator<<(const char *) { return *this; }
+};
+
+namespace std
+{
+  // simple fix for std::endl on Arduino
+  constexpr char endl = '\n';
+}
+#endif
 
 // ------------------------------------------------------------------------------------------------
 /// Test if dim ramps and gamma correction are ok for
@@ -86,7 +112,6 @@ public:
 // ------------------------------------------------------------------------------------------------
 TEST(Ut_LedRouter, setIntensityAndSpeed_100_0x8000)
 {
-  Logger log;
   signal::LedRouter router;
   target_type tgt;
 
@@ -114,8 +139,8 @@ TEST(Ut_LedRouter, setIntensityAndSpeed_100_0x8000)
     {
       // ... set target intensity and check output target intensity
       intensity8_255 pwm;
-      stubs::millis = step->ms;
-      stubs::micros = 1000U * stubs::millis;
+      hal::stubs::millis = step->ms;
+      hal::stubs::micros = 1000U * hal::stubs::millis;
       router.setIntensityAndSpeed(tgt, step->intensity, step->slope);
       router.cycle();
       rte::ifc_onboard_target_duty_cycles::readElement(tgt.idx, pwm);
@@ -178,8 +203,8 @@ TEST(Ut_LedRouter, setIntensityAndSpeed_0_50_0x0100)
     {
       // ... set target intensity and check output target intensity
       intensity8_255 pwm;
-      stubs::millis = step->ms;
-      stubs::micros = 1000U * stubs::millis;
+      hal::stubs::millis = step->ms;
+      hal::stubs::micros = 1000U * hal::stubs::millis;
       router.setIntensityAndSpeed(tgt, step->intensity, step->slope);
       router.cycle();
       rte::ifc_onboard_target_duty_cycles::readElement(tgt.idx, pwm);
@@ -249,8 +274,8 @@ TEST(Ut_LedRouter, setIntensityAndSpeed_50_0_0x0100)
     {
       // ... set target intensity and check output target intensity
       intensity8_255 pwm;
-      stubs::millis = step->ms;
-      stubs::micros = 1000U * stubs::millis;
+      hal::stubs::millis = step->ms;
+      hal::stubs::micros = 1000U * hal::stubs::millis;
       router.setIntensityAndSpeed(tgt, step->intensity, step->slope);
       router.cycle();
       rte::ifc_onboard_target_duty_cycles::readElement(tgt.idx, pwm);
@@ -325,8 +350,8 @@ TEST(Ut_LedRouter, setIntensityAndSpeed_100_0_0x0100)
     {
       // ... set target intensity and check output target intensity
       intensity8_255 pwm;
-      stubs::millis = step->ms;
-      stubs::micros = 1000U * stubs::millis;
+      hal::stubs::millis = step->ms;
+      hal::stubs::micros = 1000U * hal::stubs::millis;
       router.setIntensityAndSpeed(tgt, step->intensity, step->slope);
       router.cycle();
       rte::ifc_onboard_target_duty_cycles::readElement(tgt.idx, pwm);
@@ -401,8 +426,8 @@ TEST(Ut_LedRouter, setIntensityAndSpeed_0_100_0x0100)
     {
       // ... set target intensity and check output target intensity
       intensity8_255 pwm;
-      stubs::millis = step->ms;
-      stubs::micros = 1000U * stubs::millis;
+      hal::stubs::millis = step->ms;
+      hal::stubs::micros = 1000U * hal::stubs::millis;
       router.setIntensityAndSpeed(tgt, step->intensity, step->slope);
       router.cycle();
       rte::ifc_onboard_target_duty_cycles::readElement(tgt.idx, pwm);
@@ -427,7 +452,11 @@ void tearDown(void)
 {
 }
 
-int main(void)
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
 {
   UNITY_BEGIN();
 
@@ -437,5 +466,8 @@ int main(void)
   RUN_TEST(setIntensityAndSpeed_100_0_0x0100);
   RUN_TEST(setIntensityAndSpeed_0_100_0x0100);
 
-  return UNITY_END();
+  UNITY_END();
+
+   // Return false to stop program execution (relevant on Windows)
+  return false;
 }

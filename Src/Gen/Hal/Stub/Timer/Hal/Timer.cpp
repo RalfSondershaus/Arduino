@@ -1,9 +1,13 @@
 /**
- * @file Arduino_cfg.h
+ * @file Hal/Stub/Timer/Timer.c
  * @author Ralf Sondershaus
  *
- * @brief Defines compiler defines to configure the stubbing
+ * @brief HAL layer for timers, provides stubs for parts of Arduino's Arduino.h
  *
+ * This file provides stubs for Arduino functions such as
+ * - millis
+ * - micros
+ * 
  * @copyright Copyright 2024 Ralf Sondershaus
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -19,24 +23,14 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef STUB_ARDUINO_CFG_H_
-#define STUB_ARDUINO_CFG_H_
 
-#include <Arduino_cfg_type.h>
-#include <Arduino_cfg_prj.h>
+#include <Hal/Timer.h>
 
-#ifndef CFG_STUB_MILLIS
-/**
- * Default: Stub millis() with stubs::millis
- */
-#define CFG_STUB_MILLIS     CFG_STUB_ON
-#endif
-
-#ifndef CFG_STUB_MICROS
-/**
- * Default: Stub micros() with stubs::micros.
- */
-#define CFG_STUB_MICROS     CFG_STUB_ON
-#endif
-
-#endif // STUB_ARDUINO_CFG_H_
+namespace hal
+{
+    namespace stubs
+    {
+        unsigned long micros;
+        unsigned long millis;
+    }
+}

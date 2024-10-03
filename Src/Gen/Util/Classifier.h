@@ -26,7 +26,7 @@
 #ifndef UTIL_CLASSIFIER_H__
 #define UTIL_CLASSIFIER_H__
 
-#include <Arduino.h> // analogRead
+#include <Hal/Gpio.h>
 #include <Std_Types.h>
 #include <Platform_Limits.h>
 #include <Util/Timer.h>
@@ -266,7 +266,7 @@ namespace util
     /// Get / calculate AD value for the given pin
     int get_ADC(uint8 ucPin) const
     {
-      return analogRead(static_cast<int>(ucPin));
+      return hal::analogRead(static_cast<int>(ucPin));
     }
 
     /// Returns classified values. No range check on i.

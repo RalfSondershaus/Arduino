@@ -1,9 +1,16 @@
 /**
- * @file Arduino_cfg.h
+ * @file Hal/Stub/Gpio/Gpio.cpp
  * @author Ralf Sondershaus
  *
- * @brief Defines compiler defines to configure the stubbing
+ * @brief HAL layer for GPIOs, defines stubs for parts of Arduino's Arduino.h
  *
+ * This file defines stub functions for Arduino functions such as
+ * - pinMode
+ * - digitalWrite
+ * - digitalRead
+ * - analogRead
+ * - analogWrite
+ * 
  * @copyright Copyright 2024 Ralf Sondershaus
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -19,19 +26,17 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef STUB_ARDUINO_CFG_PRJ_H_
-#define STUB_ARDUINO_CFG_PRJ_H_
+#include <Hal/Gpio.h>
+#include <Util/Array.h>
 
-#include <Arduino_cfg_type.h>
-
-/**
- * Default: Stub millis() with stubs::millis
- */
-#define CFG_STUB_MILLIS     CFG_STUB_ON
-
-/**
- * Default: Stub micros() with stubs::micros.
- */
-#define CFG_STUB_MICROS     CFG_STUB_ON
-
-#endif // STUB_ARDUINO_CFG_PRJ_H_
+namespace hal
+{
+    namespace stubs
+    {
+        util::array<uint8, kNrPins> pinMode;
+        util::array<uint8, kNrPins> digitalWrite;
+        util::array<uint8, kNrPins> digitalRead;
+        util::array<int, kNrPins> analogRead;
+        uint8_t analogReference;
+    }
+}

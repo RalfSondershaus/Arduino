@@ -26,7 +26,7 @@
 #ifndef TIMER_H__
 #define TIMER_H__
 
-#include <Arduino.h>
+#include <Hal/Timer.h>
 
 namespace util
 {
@@ -57,7 +57,7 @@ namespace util
   class MicroTimer
   {
   public:
-    /// Timer data type
+    /// Timer data type. Use same type as Arduino does (unsigned long)
     typedef unsigned long time_type;
 
   protected:
@@ -86,7 +86,7 @@ namespace util
     bool timeout() const { return ((static_cast<time_type>(getCurrentTime() - ulTimer)) & static_cast<time_type>(0x80000000u)) == static_cast<time_type>(0u); }
 
     /// Return current time [us]
-    static time_type getCurrentTime(void) { return micros(); }
+    static time_type getCurrentTime(void) { return hal::micros(); }
   };
 
   // --------------------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ namespace util
     bool timeout(void) const { return ((static_cast<time_type>(getCurrentTime() - ulTimer)) & static_cast<time_type>(0x80000000u)) == static_cast<time_type>(0u); }
 
     /// Return current time [us]
-    static time_type getCurrentTime(void) { return millis(); }
+    static time_type getCurrentTime(void) { return hal::millis(); }
   };
 
 } // namespace Util

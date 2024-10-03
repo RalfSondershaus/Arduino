@@ -2,13 +2,18 @@
 # Project specific Makefile for unit test of LedRouter (of project Signal)
 #
 
+# We want to stub Gpio and Timer, so we need to add the source files
+# and the include pathes
+
 # Files
-FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                     \
-            $(PATH_SRC_GEN)/Test/stubs/Arduino/win32/Arduino \
-            $(PATH_SRC_GEN)/Rte/Rte                          \
-            $(PATH_SRC_PRJ)/App/Signal/LedRouter
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                \
+            $(PATH_SRC_GEN)/Rte/Rte                     \
+            $(PATH_SRC_PRJ)/App/Signal/LedRouter        \
+            $(PATH_SRC_HAL)/Stub/Gpio/Hal/Gpio          \
+            $(PATH_SRC_HAL)/Stub/Timer/Hal/Timer
 
 # Includes
 C_INCLUDES_PRJ := $(C_INCLUDES_PRJ)                     \
-                  -I$(PATH_SRC_GEN)/Test/stubs/Arduino  \
-                  -I$(PATH_SRC_PRJ)/App/Signal
+                  -I$(PATH_SRC_PRJ)/App/Signal          \
+                  -I$(PATH_SRC_HAL)/Stub/Gpio           \
+                  -I$(PATH_SRC_HAL)/Stub/Timer

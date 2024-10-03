@@ -17,37 +17,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <Arduino.h>
-#include <Util/Array.h>
-
-// we need chrono if millis is based on system tick instead of stub variables
-#if CFG_STUB_MILLIS == CFG_STUB_OFF
+#include <WinArduino.h>
 #include <chrono>
-#endif
-
-namespace stubs
-{
-  util::array<uint8, NPINS> pinMode;
-  util::array<uint8, NPINS> digitalWrite;
-  util::array<int, NPINS> analogWrite;
-  util::array<int, NPINS> analogRead;
-#if CFG_STUB_MILLIS == CFG_STUB_ON
-  unsigned long micros;
-  unsigned long millis;
-#endif
-}
 
 // ------------------------------------------------------------------
 /// Initialize internals
 // ------------------------------------------------------------------
 void init(void)
 {
-  util::fill(stubs::pinMode.begin(), stubs::pinMode.end(), 0);
-  util::fill(stubs::digitalWrite.begin(), stubs::digitalWrite.end(), 0);
-  util::fill(stubs::analogWrite.begin(), stubs::analogWrite.end(), 0);
-  util::fill(stubs::analogRead.begin(), stubs::analogRead.end(), 0);
-  stubs::micros = 0;
-  stubs::millis = 0;
 }
 
 // ------------------------------------------------------------------
@@ -55,16 +32,13 @@ void init(void)
 // ------------------------------------------------------------------
 void pinMode(uint8_t ucPin, uint8_t ucMode)
 {
-  stubs::pinMode[ucPin] = ucMode;
 }
 
 // ------------------------------------------------------------------
 /// 
 // ------------------------------------------------------------------
 void digitalWrite(uint8_t ucPin, uint8_t ucVal)
-{
-  stubs::digitalWrite[ucPin] = ucVal;
-}
+{}
 
 // ------------------------------------------------------------------
 /// 
@@ -79,7 +53,7 @@ int digitalRead(uint8_t ucPin)
 // ------------------------------------------------------------------
 int analogRead(uint8_t ucPin)
 {
-  return stubs::analogRead[ucPin];
+  return 0;
 }
 
 // ------------------------------------------------------------------
@@ -93,7 +67,6 @@ void analogReference(uint8_t mode)
 // ------------------------------------------------------------------
 void analogWrite(uint8_t ucPin, int nVal)
 {
-  stubs::analogWrite[ucPin] = nVal;
 }
 
 // ------------------------------------------------------------------
@@ -101,11 +74,7 @@ void analogWrite(uint8_t ucPin, int nVal)
 // ------------------------------------------------------------------
 unsigned long millis()
 {
-#if CFG_STUB_MILLIS == CFG_STUB_ON
-  return stubs::millis;
-#else
-  return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).count();
-#endif
+  return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 // ------------------------------------------------------------------
@@ -113,9 +82,5 @@ unsigned long millis()
 // ------------------------------------------------------------------
 unsigned long micros()
 {
-#if CFG_STUB_MICROS == CFG_STUB_ON
-  return stubs::micros;
-#else
-  return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now()).count();
-#endif
+  return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }

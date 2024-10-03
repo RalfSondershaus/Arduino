@@ -17,7 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <Arduino.h>
+#include <WinArduino.h>
 
 int main(void)
 {
@@ -27,7 +27,10 @@ int main(void)
     
 	for (;;) 
   {
-		loop();
+		if (!loop())
+    {
+      break;
+    }
 	}
         
 	return 0;

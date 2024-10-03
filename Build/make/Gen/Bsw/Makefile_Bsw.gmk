@@ -1,8 +1,21 @@
 # 
 # Makefile for base software configuration
 #
-# Depends on ARG_BSW (arduino, none)
-# Depends on ARG_TESTFRAMEWORK (googletest, none)
+# Depends on ARG_BSW (arduino, win)
+# Depends on ARG_BSW_TESTFRAMEWORK (googletest, unity, none)
+
+# BSW: main
+#         init
+#         setup
+#         loop
+#      MCAL
+#         Gpio
+#         Timer
+#      DRIVER
+#         Serial
+#         
+# HAL: Gpio 
+#      Timer
 
 # ---------------------------------------------------
 # ARG_BSW: arduino
@@ -34,10 +47,18 @@ FILES_BSW :=  $(FILES_BSW)                             \
               $(PATH_SRC_ARDUINO_CORE)/WMath           \
               $(PATH_SRC_ARDUINO_CORE)/WString
 
-C_INCLUDES := $(C_INCLUDES)                                 \
-              -I$(PATH_SRC_ARDUINO_CORE)                    \
-              -I$(PATH_SRC_ARDUINO_LIBRARIES)/EEPROM/src    \
-              -I$(PATH_SRC_GEN)/Os/Arduino/$(ARG_COMPILER)
+C_INCLUDES_BSW := -I$(PATH_SRC_ARDUINO_CORE)                    \
+                  -I$(PATH_SRC_ARDUINO_LIBRARIES)/EEPROM/src    \
+                  -I$(PATH_SRC_GEN)/Os/Arduino/$(ARG_COMPILER)  \
+                  -I$(PATH_SRC_GEN)/Hal/Arduino/Gpio            \
+                  -I$(PATH_SRC_GEN)/Hal/Arduino/Timer           \
+                  -I$(PATH_SRC_GEN)/Hal/Arduino/Unity
+
+# On Arduino, Unity needs to include a config file with Arduino specific #defines
+# We define it here because this is the place for Arduino specific definitions.
+# If Unity is not used, the #define doesn't matter.
+C_DEFINES := $(C_DEFINES) \
+             -DUNITY_INCLUDE_CONFIG_H
 
 # old stuff for FreeRTOS
 #             -I$(PATH_SRC_GEN)/OS/Arduino/$(CC)
@@ -45,55 +66,41 @@ C_INCLUDES := $(C_INCLUDES)                                 \
 endif
 
 # ---------------------------------------------------
-# ARG_BSW: arduino_win32
+# ARG_BSW: win
 # ---------------------------------------------------
-ifeq ($(ARG_BSW),arduino_win32)
-FILES_BSW :=  $(FILES_BSW)                          \
-              $(PATH_SRC_ARDUINO_WIN32_CORE)/main
+ifeq ($(ARG_BSW),win)
+FILES_BSW :=  $(FILES_BSW)                    \
+              $(PATH_SRC_WIN_CORE)/main       \
+              $(PATH_SRC_WIN_CORE)/WinArduino
 
-C_INCLUDES := $(C_INCLUDES)                         \
-              -I$(PATH_SRC_ARDUINO_WIN32_CORE)
+C_INCLUDES_BSW := -I$(PATH_SRC_WIN_CORE)            \
+                  -I$(PATH_SRC_GEN)/Hal/Win/Gpio    \
+                  -I$(PATH_SRC_GEN)/Hal/Win/Timer
 
-# ---------------------------------------------------
-# Linker flags. See also https://learn.microsoft.com/en-us/cpp/build/reference/linker-options?view=msvc-170
-# /DEBUG    The /DEBUG option creates debugging information for the executable. 
-#           The linker uses the base name of the program and the extension .pdb to name the program database, 
-#           and embeds the path where it was created. 
-#           To override this default, set /PDB and specify a different file name.
-# /PDB:(Use Program Database)   A user-specified name for the program database (PDB) that the linker creates. It replaces the default name.
-LFLAGS := $(LFLAGS)           \
-          -DEBUG              \
-          -SUBSYSTEM:CONSOLE
 endif
 
 # ---------------------------------------------------
 # ARG_TESTFRAMEWORK: googletest
 # ---------------------------------------------------
-ifeq ($(ARG_TESTFRAMEWORK),googletest)
+ifeq ($(ARG_BSW_TESTFRAMEWORK),googletest)
 FILES_BSW_TEST := $(FILES_BSW_TEST) \
                   $(PATH_SRC_GOOGLETEST)/src/gtest-all \
                   $(PATH_SRC_GOOGLETEST)/src/gtest_main
 
-C_INCLUDES := $(C_INCLUDES)                         \
-              -I$(PATH_SRC_GOOGLETEST)              \
-              -I$(PATH_SRC_GOOGLETEST)/include
+C_INCLUDES_BSW_TEST := -I$(PATH_SRC_GOOGLETEST)         \
+                       -I$(PATH_SRC_GOOGLETEST)/include
 
 endif
 
 # ---------------------------------------------------
 # ARG_TESTFRAMEWORK: unity
 # ---------------------------------------------------
-ifeq ($(ARG_TESTFRAMEWORK),unity)
+ifeq ($(ARG_BSW_TESTFRAMEWORK),unity)
 FILES_BSW_TEST := $(FILES_BSW_TEST)                 \
-                  $(PATH_SRC_UNITY)/src/unity
+                  $(PATH_SRC_UNITY)/src/unity       \
+                  $(PATH_SRC_UNITY)/unity_main
 
-C_INCLUDES := $(C_INCLUDES)                         \
-              -I$(PATH_SRC_UNITY)/src
-
-# add -g to produce debugging information
-CFLAGS := $(CFLAGS) \
-          -g
-LFLAGS := $(LFLAGS) \
-          -g
+C_INCLUDES_BSW_TEST := -I$(PATH_SRC_UNITY)/src      \
+                       -I$(PATH_SRC_UNITY)
 
 endif
