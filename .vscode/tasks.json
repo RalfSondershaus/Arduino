@@ -266,6 +266,66 @@
             ],
             "group": "build"
         },
+        {
+            "type": "cppbuild",
+            "label": "Build UnitTest/Gen/Util/Ut_Ramp avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Gen/Util/Ut_Ramp",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Run UnitTest/Gen/Util/Ut_Ramp avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Gen/Util/Ut_Ramp",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "download"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Rebuild UnitTest/Gen/Util/Ut_Ramp avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Gen/Util/Ut_Ramp",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
     ],
     "version": "2.0.0"
 }

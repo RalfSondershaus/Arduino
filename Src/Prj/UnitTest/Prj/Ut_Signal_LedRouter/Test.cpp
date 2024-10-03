@@ -38,6 +38,9 @@
 #include <ios> // for Logger on Windows
 #include <fstream> // for Logger on Windows
 #endif
+#ifdef ARDUINO
+#include <Arduino.h>
+#endif
 
 // ------------------------------------------------------------------------------------------------
 /// Used types
@@ -60,7 +63,7 @@ constexpr signal::LedRouter::intensity16_type convert_intensity_to_16(int intens
 { 
   //                       int         uint16
   // type conversion:      int         int
-  return intensity16_type((intensity * intensity16_type::intensity_100()) / 100);
+  return intensity16_type((static_cast<uint32_t>(intensity) * intensity16_type::intensity_100()) / 100);
 }
 
 #ifdef WIN32
@@ -468,6 +471,6 @@ bool test_loop(void)
 
   UNITY_END();
 
-   // Return false to stop program execution (relevant on Windows)
+  // Return false to stop program execution (relevant on Windows)
   return false;
 }

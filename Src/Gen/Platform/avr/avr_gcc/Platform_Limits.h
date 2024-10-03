@@ -1,7 +1,7 @@
 /**
  * Substitude for <numerical_limit>
  * 
- * @file Platform/avr/avrgcc/Platform_Limits.h
+ * @file Platform/avr/avr_gcc/Platform_Limits.h
  */
 
 #ifndef PLATFORM_LIMITS_H_

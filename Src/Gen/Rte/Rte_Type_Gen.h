@@ -143,8 +143,9 @@ namespace rte
   inline constexpr Dest convert(const Source& src) { return Dest(); }
 
   /// Returns the 16 bit intensity from 8 bit intensity with 100%=255
+  /// TODO Get data type with bigger size from intensity16::base_type instead of using uint64_t.
   template<>
-  inline constexpr intensity16 convert<intensity16, intensity8_255>(const intensity8_255& src) { return static_cast<intensity16>((src * kIntensity16_100) / 255U); }
+  inline constexpr intensity16 convert<intensity16, intensity8_255>(const intensity8_255& src) { return static_cast<intensity16>((static_cast<uint32_t>(src) * kIntensity16_100) / 255U); }
 
   /// Returns the 16 bit intensity from 8 bit intensity with 100%=128
   template<>
@@ -155,8 +156,9 @@ namespace rte
   inline constexpr intensity8 convert<intensity8, intensity16>(const intensity16& src) { return intensity8(static_cast<intensity8::base_type>(src / (kIntensity16_100 / kIntensity8_100))); }
 
   /// Returns the 8 bit intensity (100% = 255) from 16 bit intensity
+  /// TODO Get data type with bigger size from intensity16::base_type instead of using uint64_t.
   template<>
-  inline constexpr intensity8_255 convert<intensity8_255, intensity16>(const intensity16& src) { return intensity8_255(static_cast<intensity8_255::base_type>((src * kIntensity8_255_100) / kIntensity16_100)); }
+  inline constexpr intensity8_255 convert<intensity8_255, intensity16>(const intensity16& src) { return intensity8_255(static_cast<intensity8_255::base_type>((static_cast<uint32_t>(src) * kIntensity8_255_100) / kIntensity16_100)); }
 
   /// 16 bit, [./ms], 0 = zero speed, 65535 = 65535 / ms
   /// If used for intensity:

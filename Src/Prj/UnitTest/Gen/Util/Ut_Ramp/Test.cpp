@@ -22,10 +22,12 @@
 #include <Util/Ramp.h>
 #include <Util/Math.h>
 
+#ifdef WIN32
 #include <ios> // for Logger on Windows
 #include <fstream> // for Logger on Windows
+#endif
 
-
+#ifdef WIN32
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
 class Logger : public std::ofstream
@@ -33,13 +35,36 @@ class Logger : public std::ofstream
 public:
   void start(const std::string& filename)
   {
-    open(filename, std::ios::out);
+    open(filename);
   }
   void stop()
   {
     close();
   }
 };
+#else
+// ------------------------------------------------------------------------------------------------
+/// This dummy logger for Arduino is doing nothing.
+// ------------------------------------------------------------------------------------------------
+class Logger
+{
+public:
+  void start(const char* filename)
+  {
+  }
+  void stop()
+  {
+  }
+  Logger& operator<<(uint16) { return *this; }
+  Logger& operator<<(const char *) { return *this; }
+};
+
+namespace std
+{
+  // simple fix for std::endl on Arduino
+  constexpr char endl = '\n';
+}
+#endif
 
 template<class T>
 static void test_ramp(const int cycleTime, const T startIntensity, const T endIntensity, const T slope, const bool doLog)
@@ -421,7 +446,11 @@ void tearDown(void)
 {
 }
 
-int main(void)
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
 {
   UNITY_BEGIN();
 
@@ -440,5 +469,8 @@ int main(void)
   RUN_TEST(do_ramp_16bit_20_0x0_0x8000_0x8000);
   RUN_TEST(do_ramp_16bit_10_0x0_0x8000_0x0100_set_and_step);
 
-  return UNITY_END();
+  (void) UNITY_END();
+
+  // Return false to stop program execution (relevant on Windows)
+  return false;
 }
