@@ -34,10 +34,7 @@
 #include <LedRouter.h>
 #include <Util/Array.h>
 #include <Hal/Timer.h>
-#ifdef WIN32
-#include <ios> // for Logger on Windows
-#include <fstream> // for Logger on Windows
-#endif
+#include <Test/Logger.h>
 #ifdef ARDUINO
 #include <Arduino.h>
 #endif
@@ -65,45 +62,6 @@ constexpr signal::LedRouter::intensity16_type convert_intensity_to_16(int intens
   // type conversion:      int         int
   return intensity16_type((static_cast<uint32_t>(intensity) * intensity16_type::intensity_100()) / 100);
 }
-
-#ifdef WIN32
-// ------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------
-class Logger : public std::ofstream
-{
-public:
-  void start(const std::string& filename)
-  {
-    open(filename);
-  }
-  void stop()
-  {
-    close();
-  }
-};
-#else
-// ------------------------------------------------------------------------------------------------
-/// This dummy logger for Arduino is doing nothing.
-// ------------------------------------------------------------------------------------------------
-class Logger
-{
-public:
-  void start(const char* filename)
-  {
-  }
-  void stop()
-  {
-  }
-  Logger& operator<<(uint16) { return *this; }
-  Logger& operator<<(const char *) { return *this; }
-};
-
-namespace std
-{
-  // simple fix for std::endl on Arduino
-  constexpr char endl = '\n';
-}
-#endif
 
 // ------------------------------------------------------------------------------------------------
 /// Test if dim ramps and gamma correction are ok for

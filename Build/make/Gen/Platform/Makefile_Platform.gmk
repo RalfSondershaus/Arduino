@@ -375,9 +375,12 @@ C_INCLUDES_COMPILER =
 # Add compiler #defines for the target.
 # ---------------------------------------------------
 ifeq ($(TARGET_MCU_FAMILY),X86)
-C_DEFINES := $(C_DEFINES) \
-             -D "WIN32"
-
+C_DEFINES := $(C_DEFINES)  \
+             -D WIN32      \
+             -D _DEBUG     \
+             -D _CONSOLE   \
+             -D _UNICODE   \
+             -D UNICODE
 else
 $(error ------ Invalid build command line parameter ARG_TARGET_ECU $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: X86) ------
 endif
@@ -407,12 +410,6 @@ ifeq ($(ARG_BSW_TESTFRAMEWORK),unity)
 CFLAGS := $(CFLAGS) \
           -g
 endif
-
-C_DEFINES := $(C_DEFINES) \
-          -D "_DEBUG"     \
-          -D "_CONSOLE"   \
-          -D "_UNICODE"   \
-          -D "UNICODE" 
 
 # ---------------------------------------------------
 # How to print compiler version flags

@@ -19,47 +19,18 @@
  */
 
 #include <unity_adapt.h>
+#include <Test/Logger.h>
 #include <Cal/CalM.h>
+#include <Hal/Timer.h>
+#include <Hal/Gpio.h>
 #include <Rte/Rte.h>
 #include <InputClassifier.h>
 #include <array>
 #include <algorithm>
-#include <ios> // for Logger
-#include <fstream> // for Logger
 
 #include "CalM_config.h"
 
-class Logger : public std::ofstream
-{
-public:
-  void start(const std::string& filename)
-  {
-    open(filename, std::ios::trunc);
-  }
-  void stop()
-  {
-    close();
-  }
-};
-
-/// Stub variables
-static unsigned long Arduino_Stub_MicrosReturnValue;
-static unsigned long Arduino_Stub_MillisReturnValue;
-static std::array<int, 255> Arduino_Stub_analogRead_ReturnValues;
-
-/// Return current time [us]
-unsigned long micros() { return Arduino_Stub_MicrosReturnValue; }
-/// Return current time [ms]
-unsigned long millis() { return Arduino_Stub_MillisReturnValue; }
-/// Return analogue value
-int analogRead(uint8 ucPin) { return Arduino_Stub_analogRead_ReturnValues[ucPin]; }
-
 typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> input_classifier_type;
-
-static void PreTest()
-{
-  std::fill(Arduino_Stub_analogRead_ReturnValues.begin(), Arduino_Stub_analogRead_ReturnValues.end(), 0);
-}
 
 // ------------------------------------------------------------------------------------------------
 /// Test if aspects and dim ramps are ok for
@@ -145,37 +116,59 @@ TEST(Ut_Signal, Default_Green_Red)
 
   input_classifier_type classifiers;
   cal::input_type in;
-  int nStep;
+  size_t nStep;
   constexpr int kSignalId = 0;
 
-  log.start("InputClassifier_test_1.txt");
-
-  PreTest();
+  log.start("Default_Green_Red.txt");
 
   rte::start();
 
-  in.type = cal::input_type::kClassified;
-  in.idx = 0;
+  in.bits.type = cal::input_type::kClassified;
+  in.bits.idx = 0;
 
   for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
   {
-    Arduino_Stub_analogRead_ReturnValues[aSteps[nStep].nPin] = aSteps[nStep].nAdc;
-    Arduino_Stub_MillisReturnValue = aSteps[nStep].ms;
-    Arduino_Stub_MicrosReturnValue = 1000U * Arduino_Stub_MillisReturnValue;
+    hal::stubs::analogRead[aSteps[nStep].nPin] = aSteps[nStep].nAdc;
+    hal::stubs::millis = aSteps[nStep].ms;
+    hal::stubs::micros = 1000U * hal::stubs::millis;
     rte::exec();
     rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
-      rte::intensity8_255 u8DutyCycle;
+      rte::intensity8_255 pwm;
       rte::Ifc_OnboardTargetDutyCycles::size_type pos = static_cast<rte::Ifc_OnboardTargetDutyCycles::size_type>(rte::calib_mgr.signals[kSignalId].targets[i].idx);
-      EXPECT_EQ(rte::ifc_onboard_target_duty_cycles::readElement(pos, u8DutyCycle), rte::ret_type::OK);
-      log << std::setw(3) << (int)u8DutyCycle << ", ";
-      EXPECT_EQ(u8DutyCycle, aSteps[nStep].au8Curs[i]);
+      rte::ifc_onboard_target_duty_cycles::readElement(pos, pwm);
+      log << std::setw(3) << (int)pwm << ", ";
+      EXPECT_EQ((uint8)pwm, aSteps[nStep].au8Curs[i]);
     }
     log << std::endl;
   }
 
   log.stop();
+}
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+}
+
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
+{
+  UNITY_BEGIN();
+
+  RUN_TEST(Default_Green_Red);
+
+  (void) UNITY_END();
+
+  // Return false to stop program execution (relevant on Windows)
+  return false;
 }
