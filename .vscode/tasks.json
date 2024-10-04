@@ -88,6 +88,106 @@
         },
         {
             "type": "cppbuild",
+            "label": "Rebuild UnitTest/Prj/Ut_Signal gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Prj/Ut_Signal",
+                "win32",
+                "gcc",
+                "win",
+                "unity",
+                "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Run UnitTest/Prj/Ut_Signal gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Prj/Ut_Signal",
+                "win32",
+                "gcc",
+                "win",
+                "unity",
+                "run"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build UnitTest/Prj/Ut_Signal avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Prj/Ut_Signal",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Rebuild UnitTest/Prj/Ut_Signal avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Prj/Ut_Signal",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Run UnitTest/Prj/Ut_Signal avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Prj/Ut_Signal",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "download"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
             "label": "Build UnitTest/Prj/Ut_Signal_LedRouter gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
