@@ -164,6 +164,14 @@ namespace signal
   // -----------------------------------------------------------------------------------
   void LedRouter::init()
   {
+    for (auto it = ramps_onboard.begin(); it != ramps_onboard.end(); it++)
+    {
+      it->clear();
+    }
+    for (auto it = ramps_external.begin(); it != ramps_external.end(); it++)
+    {
+      it->clear();
+    }
   }
 
   // -----------------------------------------------------------------------------------

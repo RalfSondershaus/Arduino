@@ -66,6 +66,8 @@ namespace std
 {
   // simple fix for std::endl on Arduino
   constexpr char endl = '\n';
+  // simple fix for std::setw on Arduino
+  uint16 setw(int) { return 0; }
 }
 #endif
 

@@ -45,6 +45,7 @@ RTE_DEF_OBJ_END
 RTE_DEF_INIT_RUNABLE_START
 RTE_DEF_INIT_RUNABLE(cal::CalM, calib_mgr, init)
 RTE_DEF_INIT_RUNABLE(signal::InputClassifier, input_classifier, init)
+RTE_DEF_INIT_RUNABLE(signal::SignalHandler, signal_handler, init)
 RTE_DEF_INIT_RUNABLE(signal::LedRouter, led_router, init)
 RTE_DEF_INIT_RUNABLE_END
 
@@ -57,7 +58,6 @@ RTE_DEF_CYCLIC_RUNABLE_END
 
 RTE_DEF_PORT_SR_START
 RTE_DEF_PORT_SR_CONTAINER(rte::Ifc_ClassifiedValues, ifc_classified_values)
-RTE_DEF_PORT_SR_CONTAINER(rte::Ifc_SignalTargetIntensities, ifc_signal_target_intensities)
 RTE_DEF_PORT_SR_CONTAINER(rte::Ifc_OnboardTargetDutyCycles, ifc_onboard_target_duty_cycles)
 RTE_DEF_PORT_SR_CONTAINER(rte::Ifc_ExternalTargetDutyCycles, ifc_external_target_duty_cycles)
 RTE_DEF_PORT_SR_END

@@ -26,11 +26,14 @@ namespace signal
 {
 
   // -----------------------------------------------------------------------------------
-  /// Initializes output if calibration data are available (set_cal needs to be called
-  /// before).
+  /// Initialize to default values of default constructor
   // -----------------------------------------------------------------------------------
   void Signal::init()
   {
+    aspect_tgt.aspect = 0;
+    aspect_tgt.blink = 0;
+    last_dim_time = 0;
+    changeOverTimer.start(0);
   }
 
   // -----------------------------------------------------------------------------------
@@ -123,9 +126,14 @@ namespace signal
   }
 
   // -----------------------------------------------------------------------------------
+    /// Initialize to default values of default constructor
   // -----------------------------------------------------------------------------------
   void SignalHandler::init()
   {
+      for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
+      {
+        sigit->init();
+      }
   }
 
   // -----------------------------------------------------------------------------------

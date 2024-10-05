@@ -61,7 +61,6 @@ namespace signal
     using ramp_base_type = intensity16_type::base_type;
     using ret_type = rte::ret_type;
     using cmd_type = rte::cmd_type;
-    using size_type = rte::Ifc_SignalTargetIntensities::size_type;
     using target_type = rte::target_type;
 
     typedef util::ramp<ramp_base_type> ramp_type;

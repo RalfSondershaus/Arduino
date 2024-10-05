@@ -25,12 +25,71 @@
 #include <Hal/Gpio.h>
 #include <Rte/Rte.h>
 #include <InputClassifier.h>
-#include <array>
-#include <algorithm>
+#include <Util/Array.h>
+
+#ifdef ARDUINO
+#include <Arduino.h>
+#endif
+
+#define PRINT_RTE     0
 
 #include "CalM_config.h"
 
 typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> input_classifier_type;
+
+// ---------------------------------------------------------------------------
+/// Set elements of RTE arrays to 0
+// ---------------------------------------------------------------------------
+static void cleanRte()
+{
+  rte::classified_values_array classified_array;
+  //rte::signal_intensity_array_type signal_intensities;
+  rte::onboard_target_array onboard_targets;
+
+  for (auto it = classified_array.begin(); it != classified_array.end(); it++)
+  {
+    *it = 0;
+  }
+  rte::ifc_classified_values::write(classified_array);
+
+  for (auto it = onboard_targets.begin(); it != onboard_targets.end(); it++)
+  {
+    *it = 0;
+  }
+  rte::ifc_onboard_target_duty_cycles::write(onboard_targets);
+}
+
+// ---------------------------------------------------------------------------
+/// Print elements of RTE to serial interface or stdout
+// ---------------------------------------------------------------------------
+static void printRte()
+{
+#if PRINT_RTE == 1
+  rte::classified_values_array classified_array;
+  rte::onboard_target_array onboard_targets;
+
+  rte::ifc_classified_values::read(classified_array);
+  rte::ifc_onboard_target_duty_cycles::read(onboard_targets);
+
+#ifdef ARDUINO
+  Serial.print("ifc_classified_values: ");
+  for (auto it = classified_array.begin(); it != classified_array.end(); it++)
+  {
+    Serial.print(*it);
+    Serial.print(" ");
+  }
+  Serial.println();
+
+  Serial.println("ifc_onboard_target_duty_cycles: ");
+  for (auto it = onboard_targets.begin(); it != onboard_targets.end(); it++)
+  {
+    Serial.print(*it);
+    Serial.print(" ");
+  }
+  Serial.println();
+#endif // ARDUINO
+#endif // PRINT_RTE
+}
 
 // ------------------------------------------------------------------------------------------------
 /// Test if aspects and dim ramps are ok for
@@ -41,7 +100,7 @@ typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> i
 // ------------------------------------------------------------------------------------------------
 TEST(Ut_Signal, Default_Green_Red)
 {
-  typedef std::array<uint8, cfg::kNrSignalTargets> signal_target_array;
+  typedef util::array<uint8, cfg::kNrSignalTargets> signal_target_array;
   using size_type = signal_target_array::size_type;
   using time_type = input_classifier_type::classifier_type::time_type;
   using cmd_type = rte::cmd_type;
@@ -121,6 +180,9 @@ TEST(Ut_Signal, Default_Green_Red)
 
   log.start("Default_Green_Red.txt");
 
+  hal::stubs::analogRead[aSteps[0].nPin] = aSteps[0].nAdc;
+  hal::stubs::millis = aSteps[0].ms;
+  hal::stubs::micros = 1000U * hal::stubs::millis;
   rte::start();
 
   in.bits.type = cal::input_type::kClassified;
@@ -132,6 +194,7 @@ TEST(Ut_Signal, Default_Green_Red)
     hal::stubs::millis = aSteps[nStep].ms;
     hal::stubs::micros = 1000U * hal::stubs::millis;
     rte::exec();
+    printRte();
     rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
@@ -151,6 +214,7 @@ TEST(Ut_Signal, Default_Green_Red)
 
 void setUp(void)
 {
+  cleanRte();
 }
 
 void tearDown(void)

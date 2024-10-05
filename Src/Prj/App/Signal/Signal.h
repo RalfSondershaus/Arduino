@@ -73,7 +73,7 @@ namespace signal
     Signal() : aspect_tgt{ 0U, 0U }, last_dim_time(0U)
     {}
 
-    /// Initialization
+    /// Initialize to default values of default constructor
     void init();
     /// Check cmd and turn on current and target aspect if required
     void exec(const cal::signal_type * pCal);

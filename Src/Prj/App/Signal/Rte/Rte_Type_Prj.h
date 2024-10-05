@@ -58,9 +58,6 @@ namespace rte
     uint8 changeOverTime; ///< [10 ms] dim time if aspect changes
   } signal_intensity_type;
 
-  /// Target intensities for all signals
-  typedef util::array<signal_intensity_type, cfg::kNrSignals> signal_intensity_array_type;
-
   /// The target intensities are written into an array of this type
   typedef util::array<intensity8_255, cfg::kNrOnboardTargets> onboard_target_array;
   typedef util::array<intensity8_255, cfg::kNrExternalTargets> external_target_array;
@@ -72,11 +69,6 @@ namespace rte
   /// SR interface for classified values
   // -----------------------------------------------------------------------------------
   typedef rte::ifc_sr_array<classified_values_array> Ifc_ClassifiedValues;
-
-  // -----------------------------------------------------------------------------------
-  /// SR interface for signal target intensities
-  // -----------------------------------------------------------------------------------
-  typedef rte::ifc_sr_array< signal_intensity_array_type> Ifc_SignalTargetIntensities;
 
   // -----------------------------------------------------------------------------------
   /// SR interface for onboard and external target duty cycles

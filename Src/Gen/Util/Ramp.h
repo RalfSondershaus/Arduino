@@ -105,6 +105,14 @@ namespace util
       init(ystart, yend, dt, timestep);
     }
 
+    /// @brief Set to no ramp (initialize to default values, same as default constructor)
+    void clear()
+    {
+      cur = 0;
+      tgt = 0;
+      delta = 0;
+    }
+
     /// Return target values and current value
     base_type get_tgt() const noexcept { return tgt; }
     base_type get_cur() const noexcept { return cur; }

@@ -21,7 +21,6 @@
 #include "InputClassifier.h"
 #include "Cfg_Prj.h"
 #include <Rte/Rte.h>
-#include <Arduino.h>
 
 namespace signal
 {

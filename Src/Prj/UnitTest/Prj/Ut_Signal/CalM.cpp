@@ -22,7 +22,6 @@
 
 #include <Cal/CalM.h>
 #include <Rte/Rte.h>
-#include <Arduino.h>
 
 #include "CalM_config.h"
 
