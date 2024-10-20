@@ -21,7 +21,7 @@
 
 // Standard library headers
 #include <cstdint>
-#include <cstddef>
+#include <cstddef> // size_t, ptrdiff_t
 
 /*
    integer types

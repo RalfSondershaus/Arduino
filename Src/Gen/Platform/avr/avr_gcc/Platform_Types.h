@@ -20,7 +20,7 @@
 
 // Atmel's AVR GCC version doesn't have C++ standard headers, so we use C standard headers instead.
 #include <stdint.h>
-#include <stddef.h> // size_t
+#include <stddef.h> // size_t, ptrdiff_t
 
 /* 
   integer types.
