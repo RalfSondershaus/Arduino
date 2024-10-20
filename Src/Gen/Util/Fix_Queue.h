@@ -85,6 +85,8 @@ namespace util
     bool empty() const { return container.empty(); }
     /// Returns the number of elements in the underlying container
     size_type size() const { return container.size(); }
+    /// Returns the maximum possible number of elements (capacity).
+    constexpr size_type max_size() noexcept { return container.max_size(); }
     /// @}
 
     /// @name modifiers
