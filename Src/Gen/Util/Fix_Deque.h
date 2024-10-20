@@ -300,7 +300,9 @@ namespace util
     iterator erase(const_iterator pos);
     iterator erase(const_iterator first, const_iterator last);
 
-    /// adds an element to the end
+    /// Adds an element to the end if space is available.
+    /// Does nothing if space is not available anymore
+    /// (can be checked with size() < max_size() before).
     void push_back(const T& value)
     {
       if (size() < max_size())
