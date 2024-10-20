@@ -3,7 +3,7 @@
   *
   * @author Ralf Sondershaus
   *
-  * @brief Wraps a pointer but does not dynamic memory management.
+  * @brief Wraps a pointer.
   *
   * @copyright Copyright 2023 Ralf Sondershaus
   *
