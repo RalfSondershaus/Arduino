@@ -63,9 +63,12 @@ namespace util
   template< class InputIt, class OutputIt >
   OutputIt copy(InputIt s_first, InputIt last, OutputIt d_first)
   {
-    while (s_first != last)
+    if (s_first != d_first)
     {
-      *d_first++ = *s_first++;
+      while (s_first != last)
+      {
+        *d_first++ = *s_first++;
+      }
     }
 
     return d_first;
@@ -81,10 +84,13 @@ namespace util
   template< class InputIt, class Size, class OutputIt >
   OutputIt copy_n(InputIt s_first, Size count, OutputIt d_first)
   {
-    while (count > 0U)
+    if (s_first != d_first)
     {
-      *d_first++ = *s_first++;
-      count--;
+      while (count > 0U)
+      {
+        *d_first++ = *s_first++;
+        count--;
+      }
     }
 
     return d_first;
