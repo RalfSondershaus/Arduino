@@ -38,13 +38,19 @@ namespace util
 
   /// The type std::streamoff is an implementation-defined signed integral (since C++11) type 
   /// of sufficient size to represent the maximum possible file size supported by the operating system.
-  using streamoff = long;
+  ///
+  /// We use the POSIX type ssize_t here which can represent [-1, SSIZE_MAX] and fits our needs.
+  /// In the C++ standard, however, std::streamoff is typically 64 bit wide (long long int).
+  ///
+  /// Do not use types such as long here in order to enable template functions to be partially specialized
+  /// independent of ssize_t being int (on Windows) or long (on Arduino).
+  using streamoff = ::ssize_t;
 
   /// The type std::streamsize is an implementation-defined signed integral type used to represent the 
   /// number of characters transferred in an I/O operation or the size of an I/O buffer.
   /// It is used as a signed counterpart of size_t, similar to the POSIX type ssize_t.
   /// Except in the constructors of std::strstreambuf, negative values of std::streamsize are never used.
-  using streamsize = long;
+  using streamsize = ::ssize_t;
 
   /// Returns size_t from v.
   /// Assumes that streamsize is used as a signed counterpart of size_t.

@@ -26,7 +26,8 @@
 
 #include <Std_Types.h>
 #include <Platform_Limits.h>
-#include <Util/Ios_base.h>      // util::ios_base
+#include <Util/Locale_Fwd.h>    // util::num_get
+#include <Util/Basic_Ios.h>     // util::basic_ios, util::ios_base
 #include <Util/Iterator.h>      // util::char_traits
 #include <Util/Locale_facets.h> // util::num_get
 #include <Util/StreamBuf.h>     // util::basic_streambuf
@@ -90,30 +91,30 @@ namespace util
     /// std::use_facet.
     bool ipfx(bool noskip = false)
     {
-      if (!good())
+      if (!this->good())
       {
-        setstate(failbit);
+        this->setstate(ios_base::failbit);
       }
       else
       {
         if (!noskip)
         {
-          int_type nc = rdbuf()->sgetc();
-          const ctype_type& facet = util::use_facet<ctype_type>(getloc());
+          int_type nc = this->rdbuf()->sgetc();
+           const ctype_type& facet = util::use_facet<ctype_type>(this->getloc());
 
           while ((!traits_type::eq_int_type(traits_type::eof(), nc))
             && (facet.isspace(traits_type::to_char_type(nc))))
           {
-            nc = rdbuf()->snextc();
+            nc = this->rdbuf()->snextc();
           }
 
           if (traits_type::eq_int_type(traits_type::eof(), nc))
           {
-            setstate(eofbit | failbit);
+            this->setstate(ios_base::eofbit | ios_base::failbit);
           }
         }
       }
-      return good();
+      return this->good();
     }
 
     // Formatted input
@@ -122,20 +123,20 @@ namespace util
     {
       const sentry ok(*this);
       long val;
-      iostate err = goodbit;
+      ios_base::iostate err = ios_base::goodbit;
       my_gcount = 0;
       if (ok)
       {
-        const num_get_type& facet = util::use_facet<num_get_type>(getloc());
+        const num_get_type& facet = util::use_facet<num_get_type>(this->getloc());
         facet.gets(*this, 0, *this, err, val);
         if (val > platform::numeric_limits<sint16>::max_())
         {
-          err |= failbit;
+          err |= ios_base::failbit;
           value = platform::numeric_limits<sint16>::max_();
         }
         else if (val < platform::numeric_limits<sint16>::min_())
         {
-          err |= failbit;
+          err |= ios_base::failbit;
           value = platform::numeric_limits<sint16>::min_();
         }
         else
@@ -144,7 +145,7 @@ namespace util
         }
       }
 
-      setstate(err);
+      this->setstate(err);
 
       return *this;
     }
@@ -153,15 +154,15 @@ namespace util
     {
       const sentry ok(*this);
       unsigned long val;
-      iostate err = goodbit;
+      ios_base::iostate err = ios_base::goodbit;
       my_gcount = 0;
       if (ok)
       {
-        const num_get_type& facet = util::use_facet<num_get_type>(getloc());
+        const num_get_type& facet = util::use_facet<num_get_type>(this->getloc());
         facet.getu(*this, 0, *this, err, val);
         if (val > platform::numeric_limits<uint16>::max_())
         {
-          err |= failbit;
+          err |= ios_base::failbit;
           value = platform::numeric_limits<uint16>::max_();
         }
         else
@@ -170,7 +171,7 @@ namespace util
         }
       }
 
-      setstate(err);
+      this->setstate(err);
 
       return *this;
     }
@@ -188,21 +189,21 @@ namespace util
 
       if (ok)
       {
-        ret = rdbuf()->sgetc();
+        ret = this->rdbuf()->sgetc();
         if (traits_type::eq_int_type(ret, traits_type::eof()))
         {
-          setstate(failbit | eofbit);
+          this->setstate(ios_base::failbit | ios_base::eofbit);
         }
         else
         {
-          rdbuf()->sbumpc();
+          this->rdbuf()->sbumpc();
           my_gcount = 1;
         }
       }
       else
       {
         ret = traits_type::eof();
-        setstate(failbit | eofbit);
+        this->setstate(ios_base::failbit | ios_base::eofbit);
       }
       return ret;
     }
@@ -223,7 +224,7 @@ namespace util
     /// characters and stores them into character string pointed to by s until '\n' is found.
     basic_istream& get(char_type* s, streamsize count)
     {
-      const ctype_type& facet = util::use_facet<ctype_type>(getloc());
+      const ctype_type& facet = util::use_facet<ctype_type>(this->getloc());
       return get(s, count, facet.widen('\n'));
     }
 
@@ -237,17 +238,17 @@ namespace util
     basic_istream& get(char_type* s, streamsize count, char_type delim)
     {
       const sentry ok(*this, true);
-      iostate state = goodbit;
+      ios_base::iostate state = ios_base::goodbit;
       my_gcount = 0;
 
       if (ok)
       {
-        int_type n = rdbuf()->sgetc();
+        int_type n = this->rdbuf()->sgetc();
         while (count > static_cast<streamsize>(1))
         {
           if (traits_type::eq_int_type(n, traits_type::eof()))
           {
-            state |= eofbit;
+            state |= ios_base::eofbit;
             break;
           }
           else if (traits_type::eq(traits_type::to_char_type(n), delim))
@@ -259,22 +260,22 @@ namespace util
             *s++ = traits_type::to_char_type(n);
             my_gcount++;
           }
-          n = rdbuf()->snextc();
+          n = this->rdbuf()->snextc();
           count--;
         }
       }
       else
       {
-        state |= failbit | eofbit;
+        state |= ios_base::failbit | ios_base::eofbit;
       }
 
       // if no characters were extracted, sets failbit
       if (my_gcount == 0)
       {
-        state |= failbit;
+        state |= ios_base::failbit;
       }
 
-      setstate(state);
+      this->setstate(state);
       *s = char_type(); // terminating 0
       return *this;
     }
@@ -318,7 +319,7 @@ namespace util
       const sentry ok(*this, true);
       if (ok)
       {
-        p = rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
+        p = this->rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
       }
       else
       {

@@ -22,6 +22,36 @@
 #include <stdint.h>
 #include <stddef.h> // size_t, ptrdiff_t
 
+/* In the C++ standard, fundamtental types are defined with a minimum width,
+   see also https://eel.is/c++draft/tab:basic.fundamental.width
+
+   signed char     8
+   short int      16
+   int            16
+   long int       32
+   long long int  64
+*/
+
+/*
+   C++11 standard
+   
+   3.9.1 Fundamental types [basic.fundamental]
+
+   Objects declared as characters (char) shall be large enough to store any member of the 
+   implementation's basic character set. If a character from this set is stored in a character 
+   object, the integral value of that character object is equal to the value of the single 
+   character literal form of that character. It is implementation-defined whether a char 
+   object can hold negative values. Characters can be explicitly declared unsigned or signed. 
+   Plain char, signed char, and unsigned char are three distinct types. A char, a signed char,
+   and an unsigned char occupy the same amount of storage and have the same alignment 
+   requirements (basic.types); that is, they have the same object representation. 
+   For character types, all bits of the object representation participate in the value 
+   representation. For unsigned character types, all possible bit patterns of the value 
+   representation represent numbers. These requirements do not hold for other types. In any 
+   particular implementation, a plain char object can take on either the same values as a 
+   signed char or an unsigned char; which one is implementation-defined.
+ */
+
 /* 
   integer types.
 
@@ -42,11 +72,11 @@
   SF - Single Float
   DF - Double Float
 */
-typedef int8_t sint8;
+typedef int8_t sint8;    // note: char is a different type, see 3.9.1 Fundamental types
 typedef int16_t sint16;
 typedef int32_t sint32;
 typedef int64_t sint64;
-typedef uint8_t uint8;
+typedef uint8_t uint8;   // note: char is a different type, see 3.9.1 Fundamental types
 typedef uint16_t uint16;
 typedef uint32_t uint32;
 typedef uint64_t uint64;
@@ -61,6 +91,9 @@ typedef uint_least32_t uint32_least;
 /* floating types */
 typedef float float32;
 typedef double float64;
+
+/* POSIX types */
+typedef sint32 ssize_t;
 
 /* CPU_TYPE */
 #define CPU_TYPE_8        8

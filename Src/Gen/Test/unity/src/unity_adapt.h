@@ -26,6 +26,8 @@
 
 #include <Unity.h>
 #include <Std_Types.h>
+#include <Util/Ios_Type.h>
+//#include <iostream>
 
 /// @brief Introduce Google Test like expect macros
 /// @tparam T Type to be checked such as uint8, int, size_t
@@ -35,6 +37,8 @@ template<typename T>
 void EXPECT_EQ(T actual, T expected)
 {
   // not implemented yet
+  // std::cout << typeid(T).name() << std::endl;
+  //#error not implemented yet: typeid(T).name()
   TEST_ASSERT_FALSE(true);
 }
 
@@ -54,10 +58,18 @@ void EXPECT_EQ<bool>(bool actual, bool expected)
   }
 }
 
-template<> void EXPECT_EQ<int>(int actual, int expected)          { TEST_ASSERT_EQUAL_INT(expected, actual); }
-template<> void EXPECT_EQ<uint8>(uint8 actual, uint8 expected)    { TEST_ASSERT_EQUAL_UINT8(expected, actual); }
-template<> void EXPECT_EQ<uint16>(uint16 actual, uint16 expected) { TEST_ASSERT_EQUAL_UINT16(expected, actual); }
-template<> void EXPECT_EQ<uint32>(uint32 actual, uint32 expected) { TEST_ASSERT_EQUAL_UINT32(expected, actual); }
+// Remark: [C++11 standard, 3.9.1 Fundamental types] "Plain char, signed char, and unsigned char are three distinct types."
+
+template<> void EXPECT_EQ<char>(char actual, char expected)        { TEST_ASSERT_EQUAL_CHAR(expected, actual); }
+template<> void EXPECT_EQ<sint8>(sint8 actual, sint8 expected)     { TEST_ASSERT_EQUAL_INT8(expected, actual); }
+template<> void EXPECT_EQ<sint16>(sint16 actual, sint16 expected)  { TEST_ASSERT_EQUAL_INT16(expected, actual); }
+template<> void EXPECT_EQ<sint32>(sint32 actual, sint32 expected)  { TEST_ASSERT_EQUAL_INT32(expected, actual); }
+template<> void EXPECT_EQ<sint64>(sint64 actual, sint64 expected)  { TEST_ASSERT_EQUAL_INT64(expected, actual); }
+template<> void EXPECT_EQ<uint8>(uint8 actual, uint8 expected)     { TEST_ASSERT_EQUAL_UINT8(expected, actual); }
+template<> void EXPECT_EQ<uint16>(uint16 actual, uint16 expected)  { TEST_ASSERT_EQUAL_UINT16(expected, actual); }
+template<> void EXPECT_EQ<uint32>(uint32 actual, uint32 expected)  { TEST_ASSERT_EQUAL_UINT32(expected, actual); }
+template<> void EXPECT_EQ<uint64>(uint64 actual, uint64 expected)  { TEST_ASSERT_EQUAL_UINT64(expected, actual); }
+template<> void EXPECT_EQ<util::streampos>(util::streampos actual, util::streampos expected) { EXPECT_EQ<util::streamoff>(expected, actual); }
 
 /// Declares a test function
 #define TEST(group, test_fct)       void test_fct(void)

@@ -26,7 +26,7 @@
 
 #include <Std_Types.h>
 #include <Platform_Limits.h>
-#include <Util/Ios.h>       // util::ios_base
+#include <Util/Ios_base.h>  // util::ios_base
 #include <Util/Ios_Fwd.h>   // util::streambuf_iterator
 #include <Util/String.h>    // util::char_traits
 #include <Util/Locale.h>    // util::locale::facet
@@ -298,7 +298,7 @@ namespace util
   // ---------------------------------------------------
   /// 
   // ---------------------------------------------------
-  template<class CharT, class InputIt = istreambuf_iterator<CharT> >
+  template<class CharT, class InputIt>
   class num_get : public locale::facet
   {
   public:
@@ -395,10 +395,10 @@ namespace util
   protected:
     /// Returns true if c7 is
     /// - 0-7
-    /// - 8, 9 if fmt is hex, zero_, or dec
-    /// - A-F if fmt is hex or zero_
+    /// - 8, 9 if nBase is 10 or 16
+    /// - A-F if nBase is 16
     /// - + or -
-    static bool is_digit(char c7, ios_base::fmtflags fmt)
+    static bool is_digit(char c7, int nBase)
     {
       bool ret;
 
@@ -410,11 +410,11 @@ namespace util
       {
         ret = true;
       }
-      else if ((fmt & (util::ios_base::dec | util::ios_base::hex | util::ios_base::zero_)) && (c7 >= '8') && (c7 <= '9'))
+      else if ((nBase >= 8) && (c7 >= '8') && (c7 <= '9'))
       {
         ret = true;
       }
-      else if ((fmt & (util::ios_base::hex | util::ios_base::zero_)) && (c7 >= 'A') && (c7 <= 'F'))
+      else if ((nBase == 16) && (c7 >= 'A') && (c7 <= 'F'))
       {
         ret = true;
       }
@@ -506,7 +506,7 @@ namespace util
       while (first != end)
       {
         c = narrow(first, ctype_fac);
-        if (is_digit(c, fmt) && (pBuf < pBufEnd))
+        if (is_digit(c, nBase) && (pBuf < pBufEnd))
         {
           *pBuf++ = c;
           ++first;

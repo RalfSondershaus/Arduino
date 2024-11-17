@@ -16,3 +16,6 @@ $(PATH_OBJ)/Test.$(OBJ_FILENAME_EXT): $(PATH_SRC_GEN)/Util/Locale_facets.h \
                                       $(PATH_SRC_GEN)/Util/Ios_base.h      \
                                       $(PATH_SRC_GEN)/Util/Basic_ios.h     \
                                       $(PATH_SRC_GEN)/Util/Ios_Fwd.h
+                                      
+CFLAGS := $(CFLAGS) \
+          -DUNITY_SUPPORT_64

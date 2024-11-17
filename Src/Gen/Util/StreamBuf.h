@@ -64,7 +64,7 @@ namespace util
     }
 
     /// Sets the position indicator to an absolute position (pos).
-    pos_type pubseekpos(pos_type pos, ios_base::openmode which = std::ios_base::in | std::ios_base::out)
+    pos_type pubseekpos(pos_type pos, ios_base::openmode which = ios_base::in | ios_base::out)
     {
       return seekpos(pos, which);
     }
@@ -150,7 +150,7 @@ namespace util
 
     /// Sets the position indicator to an absolute position.
     /// The base class version of this function has no effect.
-    virtual pos_type seekpos(pos_type pos, ios_base::openmode which = ios_base::in | std::ios_base::out)
+    virtual pos_type seekpos(pos_type pos, ios_base::openmode which = ios_base::in | ios_base::out)
     {
       (void)pos;
       (void)which;

@@ -23,10 +23,12 @@
 
 #include <Std_Types.h>
 #include <Platform_Limits.h>
-#include <Util/Ios.h>       // util::ios_base
+#include <Util/Ios_base.h>       // util::ios_base
 #include <Util/Locale.h>
 #include <Util/Locale_facets.h>
-#include <iostream>
+#include <Util/Locale_Fwd.h>     // for default template parameters
+#include <Util/Istream.h>
+//#include <iostream>
 
 namespace util
 {

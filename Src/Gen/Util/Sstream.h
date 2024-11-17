@@ -44,8 +44,13 @@ namespace util
   class basic_stringbuf : public basic_streambuf<CharT, Traits>
   {
   public:
-    using string_type = typename basic_string<Size, char_type, traits_type>;
-    using basic_streambuf_type = basic_streambuf<char_type, traits_type>;
+    using char_type = CharT;
+    using traits_type = Traits;
+    using string_type = basic_string<Size, CharT, Traits>;
+    using basic_streambuf_type = basic_streambuf<CharT, Traits>;
+    using pos_type = typename basic_streambuf_type::pos_type;
+    using off_type = typename basic_streambuf_type::off_type;
+    using int_type = typename basic_streambuf_type::int_type;
 
     static constexpr int kSize = Size;
 
@@ -59,7 +64,7 @@ namespace util
       if ((which & ios_base::in) != 0)
       {
         // set begin, current, end
-        setg(my_str.begin(), my_str.begin(), my_str.end());
+        this->setg(my_str.begin(), my_str.begin(), my_str.end());
       }
     }
 
@@ -70,23 +75,23 @@ namespace util
       (void)n;
       return nullptr;
     }
-    
+
     /// Sets the position indicator to a position relative to beg, cur, or end.
     /// Repositions gptr and pptr depending on parameter which.
-    virtual pos_type seekoff(off_type off, ios_base::seekdir dir, ios_base::openmode which = ios_base::in | ios_base::out) override
+    pos_type seekoff(off_type off, ios_base::seekdir dir, ios_base::openmode which = ios_base::in | ios_base::out) override
     {
       off_type newoff;
       switch (dir)
       {
       case ios_base::beg: newoff = 0; break;
-      case ios_base::end: newoff = egptr() - gptr(); break;
-      case ios_base::cur: newoff = gptr() - eback(); break;
+      case ios_base::end: newoff = this->egptr() - this->gptr(); break;
+      case ios_base::cur: newoff = this->gptr() - this->eback(); break;
       default: newoff = 0; break;
       }
 
-      char_type* const newgptr = eback() + (newoff + off);
+      char_type* const newgptr = this->eback() + (newoff + off);
 
-      if ((newgptr < eback()) || (newgptr > egptr()))
+      if ((newgptr < this->eback()) || (newgptr > this->egptr()))
       {
         newoff = static_cast<off_type>(-1);
       }
@@ -94,7 +99,7 @@ namespace util
       {
         if (which & ios_base::in)
         {
-          setg(eback(), newgptr, egptr());
+          this->setg(this->eback(), newgptr, this->egptr());
         }
       }
 
@@ -103,11 +108,11 @@ namespace util
 
     /// Sets the position indicator to the absolute position pos.
     /// Repositions gptr and pptr depending on parameter which.
-    virtual pos_type seekpos(pos_type pos, ios_base::openmode which = ios_base::in | ios_base::out) override
+    pos_type seekpos(pos_type pos, ios_base::openmode which = ios_base::in | ios_base::out) override
     {
-      char_type* const newgptr = eback() + pos;
+      char_type* const newgptr = this->eback() + pos;
 
-      if ((newgptr < eback()) || (newgptr >= egptr()))
+      if ((newgptr < this->eback()) || (newgptr >= this->egptr()))
       {
         pos = static_cast<off_type>(-1);
       }
@@ -115,7 +120,7 @@ namespace util
       {
         if (which & ios_base::in)
         {
-          setg(eback(), newgptr, egptr());
+          this->setg(this->eback(), newgptr, this->egptr());
         }
       }
 
@@ -177,7 +182,7 @@ namespace util
     /// construct
     explicit basic_istringstream() : basic_istringstream(ios_base::in) {}
     explicit basic_istringstream(ios_base::openmode mode) : basic_istream_type(&my_strbuf), my_strbuf(mode) {}
-    explicit basic_istringstream(const string_type& s, ios_base::openmode mode = ios_base::in) :basic_istream_type(&my_strbuf), my_strbuf(s, mode) {}
+    explicit basic_istringstream(const string_type& s, ios_base::openmode mode = ios_base::in) : basic_istream_type(&my_strbuf), my_strbuf(s, mode) {}
 
     stringbuf_type* rdbuf() const { return const_cast<stringbuf_type *>(&my_strbuf); }
 

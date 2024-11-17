@@ -55,6 +55,11 @@ namespace util
     /// otherwise the behavior is undefined.
     basic_ios() {}
 
+    /// Sets the associated stream buffer to sb and initializes the internal state.
+    /// The postconditions of this function are indicated as follows:
+    /// rdbuf()    sb
+    /// rdstate()  goodbit if sb is not a null pointer, otherwise badbit.
+    /// flags()    skipws | dec
     void init(basic_streambuf_type* sb)
     {
       my_sb = sb;

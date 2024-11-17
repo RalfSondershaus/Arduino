@@ -428,6 +428,126 @@
         },
         {
             "type": "cppbuild",
+            "label": "Build UnitTest/Gen/Util/Ut_Sstream gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Gen/Util/Ut_Sstream",
+                "win32",
+                "gcc",
+                "win",
+                "unity",
+                "all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Run UnitTest/Gen/Util/Ut_Sstream gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Gen/Util/Ut_Sstream",
+                "win32",
+                "gcc",
+                "win",
+                "unity",
+                "run"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Rebuild UnitTest/Gen/Util/Ut_Sstream gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Gen/Util/Ut_Sstream",
+                "win32",
+                "gcc",
+                "win",
+                "unity",
+                "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build UnitTest/Gen/Util/Ut_Sstream avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Gen/Util/Ut_Sstream",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Run UnitTest/Gen/Util/Ut_Sstream avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Gen/Util/Ut_Sstream",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "download"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Rebuild UnitTest/Gen/Util/Ut_Sstream avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "UnitTest/Gen/Util/Ut_Sstream",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "unity",
+                "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
             "label": "Build UnitTest/Gen/Util/Ut_Vector gcc",
             "command": ".\\Build\\Build.bat",
             "args": [

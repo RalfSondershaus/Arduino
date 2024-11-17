@@ -47,6 +47,9 @@ typedef uint_least32_t uint32_least;
 typedef float float32;
 typedef double float64;
 
+/* POSIX types */
+typedef sint32 ssize_t;
+
 /* CPU_TYPE */
 #define CPU_TYPE_8 8
 #define CPU_TYPE_16 16

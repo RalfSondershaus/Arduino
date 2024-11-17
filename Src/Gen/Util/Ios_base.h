@@ -76,7 +76,10 @@ namespace util
     iostate my_iostate;
     locale my_locale;
 
-    /// only derived classes may construct std::ios_base
+    /// Only derived classes may construct std::ios_base.
+    /// The internal state is undefined after the construction.
+    /// The derived class must call std::basic_ios::init() to complete initialization 
+    /// before first use or before destructor; otherwise the behavior is undefined
     ios_base() = default;
 
   public:
