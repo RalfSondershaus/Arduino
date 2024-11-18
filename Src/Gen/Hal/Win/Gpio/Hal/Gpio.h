@@ -39,13 +39,13 @@
 #include <WinArduino.h>
 
 namespace hal
-{xxx
-    void pinMode        (uint8_t pin, uint8_t mode)     { ::pinMode(pin, mode); }
-    void digitalWrite   (uint8_t pin, uint8_t value)    { ::digitalWrite(pin, value); }
-    int  digitalRead    (uint8_t pin)                   { return ::digitalRead(pin); }
-    int  analogRead     (uint8_t pin)                   { return ::analogRead(pin); }
-    void analogReference(uint8_t mode)                  { ::analogReference(mode); }
-    void analogWrite    (uint8_t pin, int value)        { ::analogWrite(pin, value); }
+{
+    inline void pinMode        (uint8_t pin, uint8_t mode)     { ::pinMode(pin, mode); }
+    inline void digitalWrite   (uint8_t pin, uint8_t value)    { ::digitalWrite(pin, value); }
+    inline int  digitalRead    (uint8_t pin)                   { return ::digitalRead(pin); }
+    inline int  analogRead     (uint8_t pin)                   { return ::analogRead(pin); }
+    inline void analogReference(uint8_t mode)                  { ::analogReference(mode); }
+    inline void analogWrite    (uint8_t pin, int value)        { ::analogWrite(pin, value); }
 }
 
 #endif // HAL_GPIO_H

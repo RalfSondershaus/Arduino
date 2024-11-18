@@ -2,8 +2,8 @@
 :: %1  Project name, e.g. BlinkSample
 :: %2  Target platform, supported: mega,uno,win32,win64
 :: %3  Compiler, supported: avrgcc, msvc
-:: %4  Base software, supported: arduino, none
-:: %4  test framework, supported: googletest, none
+:: %4  Base software, supported: arduino, win, none
+:: %4  test framework, supported: googletest, unity, none
 :: %6  Command, e.g. all, clean
 
 @echo off

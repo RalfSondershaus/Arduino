@@ -6,8 +6,8 @@
 FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/InputClassifier \
             $(PATH_SRC_PRJ_PROJECT)/InputCommand    \
             $(PATH_SRC_PRJ_PROJECT)/LedRouter       \
-            $(PATH_SRC_PRJ_PROJECT)/Main            \
             $(PATH_SRC_PRJ_PROJECT)/Signal          \
+            $(PATH_SRC_PRJ_PROJECT)/SignalMain      \
             $(PATH_SRC_PRJ_PROJECT)/Cal/CalM        \
             $(PATH_SRC_GEN)/Util/Algorithm          \
             $(PATH_SRC_GEN)/Dcc/Decoder             \

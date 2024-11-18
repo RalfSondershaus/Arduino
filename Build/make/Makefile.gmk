@@ -150,6 +150,7 @@ CAT		= cat
 CL      = cl
 RM      = rm
 RMDIR   = del
+MKDIR   = mkdir
 SED     = sed
 AWK     = awk
 
@@ -284,7 +285,7 @@ endif
 # Implicit rules are not used, instead pattern rules with %.c are used, see below
 .SUFFIXES:
 
-all: PrintIncludePaths PrintCompiler $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
+all: PrintIncludePaths PrintCompiler Directories $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
 
 rebuild: clean all
 
@@ -310,6 +311,17 @@ PrintCompiler:
 	@echo $(LFLAGS)
 	@echo ++++++ compiler version ++++++
 	@-$(CC) $(CCVERSIONFLAGS)
+
+.PHONY: Directories
+Directories:
+ifeq ($(wildcard $(PATH_OBJ)/*),)
+	@echo +++++ creating folder $(PATH_OBJ)
+	@-$(MKDIR) $(PATH_OBJ)
+endif
+ifeq ($(wildcard $(PATH_BIN)/*),)
+	@echo +++++ creating folder $(PATH_BIN)
+	@-$(MKDIR) $(PATH_BIN)
+endif
 
 run: $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
 	@echo ++++++ Running ++++++

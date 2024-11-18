@@ -43,8 +43,8 @@
 
 namespace hal
 {
-    unsigned long millis() { return ::millis(); }
-    unsigned long micros() { return ::micros(); }
+    inline unsigned long millis() { return ::millis(); }
+    inline unsigned long micros() { return ::micros(); }
 }
 
 #endif // HAL_TIMER_H
