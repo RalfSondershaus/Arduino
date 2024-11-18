@@ -2,6 +2,116 @@
     "tasks": [
         {
             "type": "cppbuild",
+            "label": "Build App/Signal avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "App/Signal",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "none",
+                "all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "cppbuild",
+            "label": "Rebuild App/Signal avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "App/Signal",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "none",
+                "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build App/BlinkSample2 avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "App/BlinkSample2",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "none",
+                "all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+            }
+        },
+        {
+            "type": "cppbuild",
+            "label": "Rebuild App/BlinkSample2 avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "App/BlinkSample2",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "none",
+                "rebuild"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+            }
+        },
+        {
+            "type": "cppbuild",
+            "label": "Run App/BlinkSample2 avr_gcc",
+            "command": ".\\Build\\Build.bat",
+            "args": [
+                "App/BlinkSample2",
+                "mega",
+                "avr_gcc",
+                "arduino",
+                "none",
+                "download"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
             "label": "Build UnitTest/Gen/Util/Ut_String_Unity gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
@@ -19,8 +129,7 @@
                 "$gcc"
             ],
             "group": {
-                "kind": "build",
-                "isDefault": true
+                "kind": "build"
             }
         },
         {

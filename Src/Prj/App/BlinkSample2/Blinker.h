@@ -26,15 +26,13 @@
 #include <Std_Types.h>
 #include <Rte/Rte_Type_Ifc.h>
 
-typedef rte::ifc_sr<unsigned int> Ifc_Blinker;
-
 // --------------------------------------------------------------------------------------------
 /// Blink the LED on pin 13 (LED on board).
 // --------------------------------------------------------------------------------------------
 class Blinker
 {
 protected:
-  const int nLedPin = 13;
+  static constexpr int kLedPin = 13;
   unsigned int unIntensity;   ///< [0...255] intensity value
   bool bUp;                   ///< upwards counting (true) or downwards counting (false)
 

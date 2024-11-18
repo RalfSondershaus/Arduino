@@ -69,13 +69,13 @@ unsigned int int2Pwm(unsigned int unInt)
 void Blinker::init(void)
 {
   // Most Arduinos have an on-board LED you can control. On Mega, it is attached to digital pin 13.
-  pinMode(nLedPin, OUTPUT);
+  pinMode(kLedPin, OUTPUT);
 }
 
 /// Main execution function
 void Blinker::run(void)
 {
-  analogWrite(nLedPin, int2Pwm(unIntensity));
+  analogWrite(kLedPin, int2Pwm(unIntensity));
 
   //Serial.print("Alive ");
   //Serial.print(int2Pwm(unIntensity));
