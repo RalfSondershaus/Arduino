@@ -22,6 +22,7 @@
 #define HAL_SERIAL_H_
 
 #include <Std_Types.h>
+#include <Arduino.h>
 
 namespace hal
 {
@@ -34,12 +35,32 @@ namespace hal
   namespace serial
   {
     /// Start serial communication
-    void begin(unsigned long baudrate);
+    void begin(unsigned long baudrate)    { Serial.begin(baudrate); }
     /// Get the number of bytes (characters) available for reading from the serial port.
-    int available(void);
+    int available(void)                   { return Serial.available(); }
     /// The first byte of incoming serial data available (or -1 if no data is available).
-    int read(void);
-  }
+    int read(void)                        { return Serial.read(); }
+
+    /// Print functions
+    inline size_t print(const char *p)                       { return Serial.print(p); }
+    inline size_t print(char c)                              { return Serial.print(c); }
+    inline size_t print(unsigned char uc, int base = DEC)    { return Serial.print(uc, base); }
+    inline size_t print(int n, int base = DEC)               { return Serial.print(n, base); }
+    inline size_t print(unsigned int un, int base = DEC)     { return Serial.print(un, base); }
+    inline size_t print(long n, int base = DEC)              { return Serial.print(n, base); }
+    inline size_t print(unsigned long un, int base = DEC)    { return Serial.print(un, base); }
+    inline size_t print(double d, int digits = 2)            { return Serial.print(d, digits); }
+
+    inline size_t println(const char *p)                       { return Serial.println(p); }
+    inline size_t println(char c)                              { return Serial.println(c); }
+    inline size_t println(unsigned char uc, int base = DEC)    { return Serial.println(uc, base); }
+    inline size_t println(int n, int base = DEC)               { return Serial.println(n, base); }
+    inline size_t println(unsigned int un, int base = DEC)     { return Serial.println(un, base); }
+    inline size_t println(long n, int base = DEC)              { return Serial.println(n, base); }
+    inline size_t println(unsigned long un, int base = DEC)    { return Serial.println(un, base); }
+    inline size_t println(double d, int digits = 2)            { return Serial.println(d, digits); }
+    inline size_t println()                                    { return Serial.println(); }
+}
 } // namespace com
 
 #endif // SERDRV_H_

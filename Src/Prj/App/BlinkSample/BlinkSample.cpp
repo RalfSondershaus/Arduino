@@ -21,7 +21,8 @@
  */
 
 #include <Rte/Rte.h>
-#include <Arduino.h>
+#include <Hal/Gpio.h>
+#include <Hal/Serial.h>
 
 // --------------------------------------------------------------------------------------------
 /// Intensity [0 ... 255] to Arduino PWM [0 ... 255]
@@ -69,17 +70,17 @@ unsigned int int2Pwm(unsigned int unInt)
 void Blinker::init(void)
 {
   // Most Arduinos have an on-board LED you can control. On Mega, it is attached to digital pin 13.
-  pinMode(kLedPin, OUTPUT);
+  hal::pinMode(kLedPin, OUTPUT);
 }
 
 /// Main execution function
 void Blinker::run(void)
 {
-  analogWrite(kLedPin, int2Pwm(unIntensity));
+  hal::analogWrite(kLedPin, int2Pwm(unIntensity));
 
-  //Serial.print("Alive ");
-  //Serial.print(int2Pwm(unIntensity));
-  //Serial.println();
+  hal::serial::print("Alive ");
+  hal::serial::print(int2Pwm(unIntensity));
+  hal::serial::println();
 
   if (bUp)
   {
@@ -117,7 +118,7 @@ void Blinker::run(void)
 // --------------------------------------------------------------------------------------------
 void setup()
 {
-  //Serial.begin(9600);
+  hal::serial::begin(115200);
   rte::start();
 }
 
