@@ -48,10 +48,10 @@
         },
         {
             "type": "cppbuild",
-            "label": "Build App/BlinkSample2 avr_gcc",
+            "label": "Build App/BlinkSample avr_gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "App/BlinkSample2",
+                "App/BlinkSample",
                 "mega",
                 "avr_gcc",
                 "arduino",
@@ -70,10 +70,10 @@
         },
         {
             "type": "cppbuild",
-            "label": "Rebuild App/BlinkSample2 avr_gcc",
+            "label": "Rebuild App/BlinkSample avr_gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "App/BlinkSample2",
+                "App/BlinkSample",
                 "mega",
                 "avr_gcc",
                 "arduino",
@@ -92,10 +92,10 @@
         },
         {
             "type": "cppbuild",
-            "label": "Run App/BlinkSample2 avr_gcc",
+            "label": "Run App/BlinkSample avr_gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "App/BlinkSample2",
+                "App/BlinkSample",
                 "mega",
                 "avr_gcc",
                 "arduino",

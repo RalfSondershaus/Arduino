@@ -1,7 +1,0 @@
-# 
-# Project specific Makefile for BlinkSample2
-#
-
-# Files
-FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/BlinkSample2 \
-            $(PATH_SRC_GEN)/Rte/Rte
