@@ -1,11 +1,40 @@
 {
+    "inputs": [
+        {
+            "id": "AppProjectName",
+            "type": "pickString",
+            "description": "Select project name",
+            "default": "App/Signal",
+            "options": [ 
+                "App/BlinkSample", 
+                "App/Signal", 
+            ]
+        },
+        {
+            "id": "UnitTestProjectName",
+            "type": "pickString",
+            "description": "Select project name",
+            "default": "UnitTest/Gen/Util/Ut_Sstream",
+            "options": [ 
+                "UnitTest/Gen/Util/Ut_Packet",
+                "UnitTest/Gen/Util/Ut_PacketExtractor",
+                "UnitTest/Gen/Util/Ut_Ramp",
+                "UnitTest/Gen/Util/Ut_Sstream",
+                "UnitTest/Gen/Util/Ut_String_Unity",
+                "UnitTest/Gen/Util/Ut_Vector",
+                "UnitTest/Prj/Ut_Signal",
+                "UnitTest/Prj/Ut_Signal_LedRouter",
+            ]
+        }
+
+    ],
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "Build App/Signal avr_gcc",
+            "label": "Build App avr_gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "App/Signal",
+                "${input:AppProjectName}",
                 "mega",
                 "avr_gcc",
                 "arduino",
@@ -20,15 +49,14 @@
             ],
             "group": {
                 "kind": "build",
-                "isDefault": true
             }
         },
         {
             "type": "cppbuild",
-            "label": "Rebuild App/Signal avr_gcc",
+            "label": "Rebuild App avr_gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "App/Signal",
+                "${input:AppProjectName}",
                 "mega",
                 "avr_gcc",
                 "arduino",
@@ -48,54 +76,10 @@
         },
         {
             "type": "cppbuild",
-            "label": "Build App/BlinkSample avr_gcc",
+            "label": "Run App avr_gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "App/BlinkSample",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "none",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-            }
-        },
-        {
-            "type": "cppbuild",
-            "label": "Rebuild App/BlinkSample avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "App/BlinkSample",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "none",
-                "rebuild"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-            }
-        },
-        {
-            "type": "cppbuild",
-            "label": "Run App/BlinkSample avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "App/BlinkSample",
+                "${input:AppProjectName}",
                 "mega",
                 "avr_gcc",
                 "arduino",
@@ -112,10 +96,10 @@
         },
         {
             "type": "cppbuild",
-            "label": "Build UnitTest/Gen/Util/Ut_String_Unity gcc",
+            "label": "Build UnitTest Win gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "UnitTest/Gen/Util/Ut_String_Unity",
+                "${input:UnitTestProjectName}",
                 "win32",
                 "gcc",
                 "win",
@@ -134,73 +118,10 @@
         },
         {
             "type": "cppbuild",
-            "label": "Build UnitTest/Gen/Util/Ut_Packet gcc",
+            "label": "Rebuild UnitTest Win gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "UnitTest/Gen/Dcc/Ut_Packet",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
-        {
-            "type": "cppbuild",
-            "label": "Build UnitTest/Gen/Util/Ut_PacketExtractor gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Dcc/Ut_PacketExtractor",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Build UnitTest/Prj/Ut_Signal gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Prj/Ut_Signal",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Rebuild UnitTest/Prj/Ut_Signal gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Prj/Ut_Signal",
+                "${input:UnitTestProjectName}",
                 "win32",
                 "gcc",
                 "win",
@@ -217,10 +138,10 @@
         },
         {
             "type": "cppbuild",
-            "label": "Run UnitTest/Prj/Ut_Signal gcc",
+            "label": "Run UnitTest Win gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "UnitTest/Prj/Ut_Signal",
+                "${input:UnitTestProjectName}",
                 "win32",
                 "gcc",
                 "win",
@@ -237,10 +158,10 @@
         },
         {
             "type": "cppbuild",
-            "label": "Build UnitTest/Prj/Ut_Signal avr_gcc",
+            "label": "Build UnitTest avr_gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "UnitTest/Prj/Ut_Signal",
+                "${input:UnitTestProjectName}",
                 "mega",
                 "avr_gcc",
                 "arduino",
@@ -257,10 +178,10 @@
         },
         {
             "type": "cppbuild",
-            "label": "Rebuild UnitTest/Prj/Ut_Signal avr_gcc",
+            "label": "Rebuild UnitTest avr_gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "UnitTest/Prj/Ut_Signal",
+                "${input:UnitTestProjectName}",
                 "mega",
                 "avr_gcc",
                 "arduino",
@@ -277,495 +198,15 @@
         },
         {
             "type": "cppbuild",
-            "label": "Run UnitTest/Prj/Ut_Signal avr_gcc",
+            "label": "Run UnitTest avr_gcc",
             "command": ".\\Build\\Build.bat",
             "args": [
-                "UnitTest/Prj/Ut_Signal",
+                "${input:UnitTestProjectName}",
                 "mega",
                 "avr_gcc",
                 "arduino",
                 "unity",
                 "download"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Build UnitTest/Prj/Ut_Signal_LedRouter gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Prj/Ut_Signal_LedRouter",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Run UnitTest/Prj/Ut_Signal_LedRouter gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Prj/Ut_Signal_LedRouter",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "run"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Rebuild UnitTest/Prj/Ut_Signal_LedRouter gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Prj/Ut_Signal_LedRouter",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "rebuild"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Rebuild UnitTest/Prj/Ut_Signal_LedRouter avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Prj/Ut_Signal_LedRouter",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "rebuild"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Build UnitTest/Prj/Ut_Signal_LedRouter avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Prj/Ut_Signal_LedRouter",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Run UnitTest/Gen/Util/Ut_Signal_LedRouter avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Prj/Ut_Signal_LedRouter",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "download"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Build UnitTest/Gen/Util/Ut_Ramp gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Ramp",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Run UnitTest/Gen/Util/Ut_Ramp gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Ramp",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "run"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Rebuild UnitTest/Gen/Util/Ut_Ramp gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Ramp",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "rebuild"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Build UnitTest/Gen/Util/Ut_Ramp avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Ramp",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Run UnitTest/Gen/Util/Ut_Ramp avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Ramp",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "download"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Rebuild UnitTest/Gen/Util/Ut_Ramp avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Ramp",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "rebuild"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Build UnitTest/Gen/Util/Ut_Sstream gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Sstream",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Run UnitTest/Gen/Util/Ut_Sstream gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Sstream",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "run"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Rebuild UnitTest/Gen/Util/Ut_Sstream gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Sstream",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "rebuild"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Build UnitTest/Gen/Util/Ut_Sstream avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Sstream",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Run UnitTest/Gen/Util/Ut_Sstream avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Sstream",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "download"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Rebuild UnitTest/Gen/Util/Ut_Sstream avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Sstream",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "rebuild"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Build UnitTest/Gen/Util/Ut_Vector gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Vector",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Run UnitTest/Gen/Util/Ut_Vector gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Vector",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "run"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Rebuild UnitTest/Gen/Util/Ut_Vector gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Vector",
-                "win32",
-                "gcc",
-                "win",
-                "unity",
-                "rebuild"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Build UnitTest/Gen/Util/Ut_Vector avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Vector",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "all"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Run UnitTest/Gen/Util/Ut_Vector avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Vector",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "download"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build"
-        },
-        {
-            "type": "cppbuild",
-            "label": "Rebuild UnitTest/Gen/Util/Ut_Vector avr_gcc",
-            "command": ".\\Build\\Build.bat",
-            "args": [
-                "UnitTest/Gen/Util/Ut_Vector",
-                "mega",
-                "avr_gcc",
-                "arduino",
-                "unity",
-                "rebuild"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
