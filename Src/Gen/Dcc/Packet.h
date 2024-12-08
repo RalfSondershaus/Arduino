@@ -140,11 +140,11 @@ namespace dcc
       return b_ret;
     }
 
-    /// returns an iterator to the beginning
+    /// returns an iterator to the first byte
     iterator begin() { return bytes.begin(); }
     const_iterator begin() const { return bytes.begin(); }
 
-    /// return an iterator to the end of used bytes (one beyond last used byte)
+    /// return an iterator to one beyond the last used byte
     iterator end_used() { return bytes.begin() + getNrBytes(); }
     const_iterator end_used() const { return bytes.begin() + getNrBytes(); }
 
@@ -207,11 +207,28 @@ namespace dcc
           // The most significant bits of the 9 - bit address are bits 4 - 6 of the
           // second data byte. By convention these bits(bits 4 - 6 of the second data byte)
           // are in ones complement.
+          // Addresses are often extended with the 2 most significant bits of DDD
+          // so that the 9 bit address is extended to a 11 bit address.
+          // For example, Fleischmann Profi Boss, magnetic devices.
+          // AAA AAAAAA = 1 and DD D = 00 0 means address 1
+          // AAA AAAAAA = 1 and DD D = 01 0 means address 2
+          // AAA AAAAAA = 1 and DD D = 10 0 means address 3
+          // AAA AAAAAA = 1 and DD D = 11 0 means address 4
+          // AAA AAAAAA = 2 and DD D = 00 0 means address 5
+          // ...
+          // AAA AAAAAA = 3 and DD D = 00 0 means address 9
+          // etc
           type = BasicAccessory;
-          data.address = static_cast<uint16>(
-            (util::bits::stencil<uint8, uint16>( refByte(0), 0b00111111U)) |
-            (util::bits::stencil<uint8, uint16>(~refByte(1), 0b01110000U) << 2U)
+          address_type addr = static_cast<address_type>(
+            (util::bits::stencil<uint8, address_type>( refByte(0), 0b00111111U)) |
+            (util::bits::stencil<uint8, address_type>(~refByte(1), 0b01110000U) << 2U)
             );
+          // Two possible ways to calculate:
+          // addr--; addr = addr << 2 | baGetDAddr(); addr++;
+          //         addr = addr << 2 | baGetDAddr(); addr -= 3;
+          addr = static_cast<address_type>((addr << 2U) | baGetDAddr());
+          addr -= 3;
+          data.address = addr;
         }
         else
         {
@@ -229,7 +246,7 @@ namespace dcc
         // {preamble} 0 [ AAAAAAAA ] 0 {instruction-bytes} 0 EEEEEEEE 1 
         // {preamble} 0 [ 11AAAAAA ] 0 {instruction-bytes} 0 EEEEEEEE 1 
         // The first address byte contains 8 bits of address information.
-        // If the most significant bits of the address are "11"and the remaining bits are not “111111”,
+        // If the most significant bits of the address are "11"and the remaining bits are not ï¿½111111ï¿½,
         // then a second address byte must immediately follow.
         // This second address byte will then contain an additional 8 bits of address data.
         // The most significant bit of two byte addresses is bit 5 of the first address byte. (bits #6 and 
@@ -261,7 +278,7 @@ namespace dcc
     /// 11101000-11111110   232 - 254   Reserved for Future Use
     /// 11111111            255         Idle Packet
     /// The first address byte contains 8 bits of address information. If the most significant bits of the address are "11"and 
-    /// the remaining bits are not “111111”, then a second address byte must immediately follow.
+    /// the remaining bits are not ï¿½111111ï¿½, then a second address byte must immediately follow.
     /// This second address byte will then contain an additional 8 bits of address data.
     /// The most significant bit of two byte addresses is bit 5 of the first address byte. (bits #6 and #7 having the value of "1" in this case.
     packet_type decode()
@@ -324,10 +341,13 @@ namespace dcc
 
     /// Basic accessory: returns C
     /// {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
+    /// C is typically not used but has the constant value 1.
     uint8 baGetC() const { return static_cast<uint8>((refByte(1) & 0b00001000U) >> 3U); }
     /// Basic accessory: returns DDD
     /// {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
-    uint8 baGetD() const { return static_cast<uint8>(refByte(1) & 0b00000111U); }
+    uint8 baGetD() const       { return static_cast<uint8>( refByte(1) & 0b00000111U); }
+    uint8 baGetDAddr() const   { return static_cast<uint8>((refByte(1) & 0b00000110U) >> 1U); }
+    uint8 baGetDSwitch() const { return static_cast<uint8>( refByte(1) & 0b00000001U); }
   };
   
 } // namespace dcc

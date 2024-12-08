@@ -45,6 +45,7 @@ namespace util
     template<typename W> constexpr size_t nr_LSB_zeros(W w) noexcept;
     template<typename W> constexpr size_t first(W w, size_t notfound) noexcept;
     template<typename W> constexpr size_t nr_words(size_t nbits) noexcept { return (nbits + (bits_per_word<W>() - static_cast<size_t>(1))) / bits_per_word<W>(); }
+    /// Returns w & mask (both of type W1) as type W2.
     template<typename W1, typename W2> constexpr W2 stencil(W1 w, W1 mask) { return static_cast<W2>(w & mask); }
     /// Extract the value at position pos and length nr_bits. W needs to be an unsigned type.
     template<typename W> W extract(W w, size_t pos, size_t nr_bits) { return static_cast<W>((w >> pos) & bit_mask_n<W>(nr_bits)); }

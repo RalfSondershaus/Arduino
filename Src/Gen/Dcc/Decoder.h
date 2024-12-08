@@ -33,6 +33,7 @@
 #include <Dcc/Filter.h>
 #include <Util/Fix_Queue.h>
 #include <Util/Ptr.h>
+#include <Hal/Serial.h>
 
 namespace dcc
 {
@@ -72,16 +73,24 @@ namespace dcc
   class Decoder
   {
   public:
-    typedef BitExtractorConstants<> BitExtractorConstantsType;
-    typedef PacketExtractor<> PacketExtractorType;
-    typedef BitExtractor<BitExtractorConstantsType, PacketExtractorType> BitExtractorType;
+    using BitExtractorConstantsType = BitExtractorConstants<>;
+    using PacketExtractorType = PacketExtractor<>;
+    using BitExtractorType = BitExtractor<BitExtractorConstantsType, PacketExtractorType>;
 
-    typedef PacketExtractorType::PacketType PacketType;
+    using PacketType = PacketExtractorType::PacketType;
 
-    /// Such a handler is called if a new packet is received
-    typedef PacketExtractorType::HandlerIfc HandlerIfc;
+    /// Such a handler is called when a new packet is received
+    using HandlerIfc = PacketExtractorType::HandlerIfc;
 
-    static constexpr uint8 kMaxNrPackets = 10;
+    /// This number of packets can be stored in the FIFO
+    static constexpr uint8 kPacketsFifoSize = 10;
+
+    /// Statistics for internal timer buffer (for debugging purposes)
+    typedef struct
+    {
+      uint16 maxSize;
+      uint16 curSize;
+    } IsrStats;
 
   protected:
 
@@ -94,16 +103,17 @@ namespace dcc
     {
     public:
       /// Packet FIFO buffer
-      typedef util::fix_queue<PacketType, MaxNrPackets> PacketFifoType;
-      typedef dcc::Filter<PacketType> FilterType;
-      typedef util::ptr<const FilterType> FilterPointerType;
+      using PacketFifoType = util::fix_queue<PacketType, MaxNrPackets>;
+      using FilterType = dcc::Filter<PacketType>;
+      using FilterPointerType = util::ptr<const FilterType>;
       using size_type = typename PacketFifoType::size_type;
+
+      uint32 packetCnt;
 
     protected:
       PacketFifoType packetFifo;
       FilterPointerType filterPtr;
       bool bOverflow;
-
       /// Returns true if the packet passes a filter. Returns false otherwise.
       /// Returns true if no filter has been assigned.
       bool filter(const PacketType& pkt) const
@@ -120,25 +130,38 @@ namespace dcc
 
     public:
       /// Default constructor
-      FifoHandlerIfc() : bOverflow(false)
+      FifoHandlerIfc() : bOverflow(false), packetCnt(0)
       {}
       /// Destructor
       ~FifoHandlerIfc() override = default;
 
-      /// Store the received packet into the list of packets (if it does not exist already)
-      void packetReceived(const PacketType& pkt) override
+      /// Decode the packet, apply the filter (if any) and (if filter is passed)
+      /// store it in the packet FIFO.
+      /// TBD Filter out subsequent duplicates
+      void packetReceived(PacketType& pkt) override
       {
         if (packetFifo.size() < packetFifo.MaxSize)
         {
+          pkt.decode();
+          //hal::serial::print(pkt.refByte(0), HEX);
+          //hal::serial::print(pkt.refByte(1), HEX);
+          //hal::serial::print(pkt.refByte(2), HEX);
           if (filter(pkt))
           {
+            //hal::serial::println(" pass");
             packetFifo.push(pkt);
+          }
+          else
+          {
+            //hal::serial::println(" stop");
           }
         }
         else
         {
           bOverflow = true;
         }
+        // for debugging
+        packetCnt++;
       }
 
       const PacketType& front() const   { return packetFifo.front(); }
@@ -152,7 +175,7 @@ namespace dcc
       void setFilter(const FilterType& filter) { filterPtr = &filter; }
     };
 
-    typedef FifoHandlerIfc<kMaxNrPackets> FifoHandlerIfcType;
+    using FifoHandlerIfcType = FifoHandlerIfc<kPacketsFifoSize>;
 
     /// Handler for available packets
     FifoHandlerIfcType fifoHandler;
@@ -189,9 +212,24 @@ namespace dcc
     /// Returns the number of elements in the FIFO buffer
     size_type size() const { return fifoHandler.size(); }
 
+    /// Returns true if the packet FIFO had an overflow 
+    /// (more than kPacketsFifoSize need to be stored).
+    bool fifoOverflow() const noexcept { return fifoHandler.isOverflow(); }
+    size_t fifoSize() const noexcept { return fifoHandler.size(); }
+
+    /// Returns statistics for internal time stamp buffer
+    uint16 isrGetStats(IsrStats& stat) const noexcept;
+    bool isrOverflow() const noexcept;
+
     /// For debugging: get number of interrupts called since system start.
     /// Counter can overflow and start at 0 again.
-    uint16 getNrInterrupts() const;
+    uint32 getNrInterrupts() const;
+    uint32 getNrFetches() const;
+    uint32 getNrOnes() const { return pktExtr.ulOnes; }
+    uint32 getNrZeros() const{ return pktExtr.ulZeros; }
+    uint32 getNrInvalids() const{ return pktExtr.ulInvalids; }
+
+    uint32 getPacketCount() const noexcept { return fifoHandler.packetCnt; }
   };
 } // namespace dcc
 

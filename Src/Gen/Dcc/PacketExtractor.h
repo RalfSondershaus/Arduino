@@ -37,7 +37,7 @@ namespace dcc
     /// size type
     typedef size_t size_type;
 
-    /// Interface for a handler. Such a handler is called if a new packet is available
+    /// Interface for a handler. Such a handler is called when a new packet is available
     class HandlerIfc
     {
     public:
@@ -47,7 +47,10 @@ namespace dcc
       HandlerIfc() {}
       virtual ~HandlerIfc() {}
       /// If a new packet is available, this function is called
-      virtual void packetReceived(const PacketType& pkt) = 0;
+      /// The parameter pkt is not const to enable the handler to
+      /// modify the received packet, e.g. to call decode() for
+      /// address calculation.
+      virtual void packetReceived(PacketType& pkt) = 0;
     };
 
   protected:
@@ -104,16 +107,19 @@ namespace dcc
     {
       invalid();
     }
-
+    uint32 ulOnes;
+    uint32 ulZeros;
+    uint32 ulInvalids;
     /// destructor
     ~PacketExtractor() = default;
     /// event trigger: "1" bit received
-    void one() { execute(BIT_ONE); }
+    void one() { ulOnes++; execute(BIT_ONE); }
     /// event trigger: "0" bit received
-    void zero() { execute(BIT_ZERO); }
+    void zero() { ulZeros++; execute(BIT_ZERO); }
     /// event trigger: Invalid received, reset
     void invalid()
     {
+      ulInvalids++;
       state = STATE_PREAMBLE;
       ucNrOnePreamble = 0u;
       ucNrBitsData = 0u;

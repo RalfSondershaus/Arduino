@@ -35,11 +35,11 @@ namespace hal
   namespace serial
   {
     /// Start serial communication
-    void begin(unsigned long baudrate)    { Serial.begin(baudrate); }
+    inline void begin(unsigned long baudrate)    { Serial.begin(baudrate); }
     /// Get the number of bytes (characters) available for reading from the serial port.
-    int available(void)                   { return Serial.available(); }
+    inline int available(void)                   { return Serial.available(); }
     /// The first byte of incoming serial data available (or -1 if no data is available).
-    int read(void)                        { return Serial.read(); }
+    inline int read(void)                        { return Serial.read(); }
 
     /// Print functions
     inline size_t print(const char *p)                       { return Serial.print(p); }

@@ -27,6 +27,8 @@
 #include <Util/Algorithm.h>
 #include <Util/Timer.h>
 #include <Arduino.h>
+#include <Hal/Serial.h>
+#include <Hal/Timer.h>
 
 /// The Arduino pin for DCC interrupts
 static constexpr uint8 kInterruptPin = 2U;
@@ -137,21 +139,44 @@ void PrintBin(const PacketType& pkt)
 void loop()
 {
   static util::MilliTimer LedTimer;
-
-  myDecoder.fetch();
+  static util::MilliTimer DccTimer;
 
   // alive LED
   if (LedTimer.timeout())
   {
     toggleLedPin();
     LedTimer.start(kBlinkLedPeriod_ms);
+    dcc::Decoder::IsrStats stats;
+    myDecoder.isrGetStats(stats);
+    hal::serial::print(hal::micros());
+    hal::serial::print(" ");
+    hal::serial::print(myDecoder.getNrInterrupts());
+    hal::serial::print(" ");
+    hal::serial::print(myDecoder.getNrFetches());
+    hal::serial::print(" ");
+    hal::serial::print(myDecoder.getNrOnes());
+    hal::serial::print(" ");
+    hal::serial::print(myDecoder.getNrZeros());
+    hal::serial::print(" ");
+    hal::serial::print(myDecoder.getNrInvalids());
+    hal::serial::print(" ");
+    hal::serial::println(myDecoder.getPacketCount());
+    hal::serial::print(" ");
+    hal::serial::print(stats.curSize);
+    hal::serial::print(" ");
+    hal::serial::println(stats.maxSize);
   }
 
-  while (!myDecoder.empty())
+  if (DccTimer.timeout()) 
   {
-    const PacketType& pkt = myDecoder.front();
-    //PrintAscii(pkt);
-    PrintBin(pkt);
-    myDecoder.pop();
+    myDecoder.fetch();
+    while (!myDecoder.empty())
+    {
+      const PacketType& pkt = myDecoder.front();
+      //PrintAscii(pkt);
+      PrintBin(pkt);
+      myDecoder.pop();
+    }
+    DccTimer.start(10);
   }
 }
