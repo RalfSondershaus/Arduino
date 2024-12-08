@@ -22,7 +22,7 @@
   */
 
 #include <Util/Fix_Queue.h>
-#include <gtest/gtest.h>
+#include <unity_adapt.h>
 
   /// Construtor with queue size 5
 TEST(Ut_Fix_Queue, construct_1)
@@ -123,4 +123,80 @@ TEST(Ut_Fix_Queue, push_pop_2)
   size = 0U;
   EXPECT_EQ(myfifo.size(), size);
   EXPECT_EQ(myfifo.empty(), true);
+}
+
+/// Test push and pop with elements and an empty FIFO inbetween
+/// 
+TEST(Ut_Fix_Queue, push_pop_3)
+{
+  constexpr int N = 200;
+  using queue_type = util::fix_queue<int, N>;
+  queue_type myfifo;
+  constexpr int CNT = 3*N/4;
+  size_t cnt = 0;
+
+  for (int i = 0; i < CNT; i++)
+  {
+    EXPECT_EQ(myfifo.size(), cnt);
+    myfifo.push(i);
+    cnt++;
+    EXPECT_EQ(myfifo.size(), cnt);
+    EXPECT_EQ(myfifo.back(), i);
+    EXPECT_EQ(myfifo.front(), 0); // should be first number pushed
+  }
+  for (int i = 0; i < CNT; i++)
+  {
+    EXPECT_EQ(myfifo.size(), cnt);
+    int fi = myfifo.front();
+    myfifo.pop();
+    cnt--;
+    EXPECT_EQ(myfifo.size(), cnt);
+    EXPECT_EQ(fi, i);
+  }
+  cnt = 0;
+  for (int i = 1; i < CNT; i++)
+  {
+    EXPECT_EQ(myfifo.size(), cnt);
+    myfifo.push(i);
+    cnt++;
+    EXPECT_EQ(myfifo.size(), cnt);
+    EXPECT_EQ(myfifo.back(), i);
+    EXPECT_EQ(myfifo.front(), 1); // should be first number pushed
+  }
+  for (int i = 1; i < CNT; i++)
+  {
+    EXPECT_EQ(myfifo.size(), cnt);
+    int fi = myfifo.front();
+    myfifo.pop();
+    cnt--;
+    EXPECT_EQ(myfifo.size(), cnt);
+    EXPECT_EQ(fi, i);
+  }
+}
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+}
+
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
+{
+  UNITY_BEGIN();
+
+  RUN_TEST(construct_1);
+  RUN_TEST(push_pop_1);
+  RUN_TEST(push_pop_2);
+  RUN_TEST(push_pop_3);
+
+  (void) UNITY_END();
+
+  // Return false to stop program execution (relevant on Windows)
+  return false;
 }

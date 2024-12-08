@@ -22,7 +22,7 @@
   */
 
 #include <Util/Fix_Deque.h>
-#include <gtest/gtest.h>
+#include <unity_adapt.h>
 
   /// Construtor with deque size 5
 TEST(Ut_Fix_Deque, construct_1)
@@ -562,7 +562,7 @@ TEST(Ut_Fix_Deque, push_front_push_back_2)
     } expected;
   } tTestStep;
 
-  static const std::vector<tTestStep> aMyTestSteps =
+  static const tTestStep aMyTestSteps[] =
   {
     { PUSH_BACK , 1, { 1U, { 1, 0, 0, 0, 0 } } },
     { PUSH_BACK , 2, { 2U, { 1, 2, 0, 0, 0 } } },
@@ -583,20 +583,22 @@ TEST(Ut_Fix_Deque, push_front_push_back_2)
     { PUSH_FRONT, 1, { 1U, { 1, 0, 0, 0, 0 } } }
   };
   deque_type mydeque;
+  size_t i;
   int n;
 
-  for (auto ts = aMyTestSteps.begin(); ts != aMyTestSteps.end(); ts++)
+  for (i = 0; i < sizeof(aMyTestSteps) / sizeof(tTestStep); i++)
   {
-    switch (ts->cmd)
+    const tTestStep& ts = aMyTestSteps[i];
+    switch (ts.cmd)
     {
-    case PUSH_BACK: { mydeque.push_back(ts->nElement); } break;
-    case PUSH_FRONT: { mydeque.push_front(ts->nElement); } break;
+    case PUSH_BACK: { mydeque.push_back(ts.nElement); } break;
+    case PUSH_FRONT: { mydeque.push_front(ts.nElement); } break;
     case POP_FRONT: { mydeque.pop_front(); } break;
     case POP_BACK: { mydeque.pop_back(); } break;
     default: break;
     }
-    EXPECT_EQ(mydeque.size(), ts->expected.unSize);
-    if (ts->expected.unSize == 0U)
+    EXPECT_EQ(mydeque.size(), ts.expected.unSize);
+    if (ts.expected.unSize == 0U)
     {
       EXPECT_EQ(mydeque.empty(), true);
     }
@@ -607,7 +609,7 @@ TEST(Ut_Fix_Deque, push_front_push_back_2)
     n = 0;
     for (auto cit = mydeque.begin(); cit != mydeque.end(); cit++)
     {
-      EXPECT_EQ(*cit, ts->expected.anElements[n]);
+      EXPECT_EQ(*cit, ts.expected.anElements[n]);
       n++;
     }
   }
@@ -616,7 +618,7 @@ TEST(Ut_Fix_Deque, push_front_push_back_2)
 template<class Deque>
 typename Deque::value_type calc_sum(const Deque& mydeque)
 {
-  Deque::value_type sum = 0;
+  typename Deque::value_type sum = 0;
   for (auto cit = mydeque.begin(); cit != mydeque.end(); cit++)
   {
     sum += *cit;
@@ -649,4 +651,37 @@ TEST(Ut_Fix_Deque, const_iterator_1)
   n = calc_sum(mydeque);
 
   EXPECT_EQ(n, 1);
+}
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+}
+
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
+{
+  UNITY_BEGIN();
+
+  RUN_TEST(construct_1);
+  RUN_TEST(push_back_1);
+  RUN_TEST(push_front_1);
+  RUN_TEST(push_front_push_back_1);
+  RUN_TEST(pop_back_1);
+  RUN_TEST(pop_front_1);
+  RUN_TEST(pop_front_2);
+  RUN_TEST(pop_back_2);
+  RUN_TEST(push_front_push_back_2);
+  RUN_TEST(const_iterator_1);
+
+  (void) UNITY_END();
+
+  // Return false to stop program execution (relevant on Windows)
+  return false;
 }
