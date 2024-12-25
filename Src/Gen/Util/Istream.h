@@ -64,7 +64,7 @@ namespace util
 
   public:
     /// construct
-    explicit basic_istream(basic_streambuf_type* sb)
+    explicit basic_istream(basic_streambuf_type* sb) : my_gcount(0)
     {
       basic_ios_type::init(sb);
     }
@@ -124,7 +124,6 @@ namespace util
       const sentry ok(*this);
       long val;
       ios_base::iostate err = ios_base::goodbit;
-      my_gcount = 0;
       if (ok)
       {
         const num_get_type& facet = util::use_facet<num_get_type>(this->getloc());
@@ -155,7 +154,6 @@ namespace util
       const sentry ok(*this);
       unsigned long val;
       ios_base::iostate err = ios_base::goodbit;
-      my_gcount = 0;
       if (ok)
       {
         const num_get_type& facet = util::use_facet<num_get_type>(this->getloc());
@@ -280,6 +278,70 @@ namespace util
       return *this;
     }
 
+    /// Same as getline(s, count, widen('\n')), that is, reads at most std::max(0, count - 1) 
+    /// characters and stores them into character string pointed to by s until '\n' is found.
+    basic_istream& getline(char_type* s, streamsize count)
+    {
+      const ctype_type& facet = util::use_facet<ctype_type>(this->getloc());
+      return get(s, count, facet.widen('\n'));
+    }
+
+    /// Reads characters and stores them into the successive locations of the character 
+    /// array whose first element is pointed to by s. Characters are extracted and stored 
+    /// until any of the following occurs:
+    /// - end of file condition occurs in the input sequence.
+    /// - the next available character c is the delimiter, as determined by Traits::eq(c, delim). 
+    ///   The delimiter is extracted (unlike basic_istream::get()) and counted towards gcount(), but is not stored.
+    /// - count is non-positive, or count - 1 characters have been extracted (setstate(failbit) is called in this case).
+    basic_istream& getline(char_type* s, streamsize count, char_type delim)
+    {
+      const sentry ok(*this, true);
+      ios_base::iostate state = ios_base::goodbit;
+      my_gcount = 0;
+
+      if (ok)
+      {
+        int_type n = this->rdbuf()->sgetc();
+        while (count > static_cast<streamsize>(1))
+        {
+          if (traits_type::eq_int_type(n, traits_type::eof()))
+          {
+            state |= ios_base::eofbit;
+            break;
+          }
+          else if (traits_type::eq(traits_type::to_char_type(n), delim))
+          {
+            // The delimiter is extracted (unlike basic_istream::get()) and counted
+            // towards gcount(), but is not stored
+            my_gcount++;
+            n = this->rdbuf()->snextc();
+            break;
+          }
+          else 
+          {
+            *s++ = traits_type::to_char_type(n);
+            my_gcount++;
+            n = this->rdbuf()->snextc();
+          }
+          count--;
+        }
+      }
+      else
+      {
+        state |= ios_base::failbit | ios_base::eofbit;
+      }
+
+      // if no characters were extracted, sets failbit
+      if (my_gcount == 0)
+      {
+        state |= ios_base::failbit;
+      }
+
+      this->setstate(state);
+      *s = char_type(); // terminating 0
+      return *this;
+    }
+
     /// Returns the number of characters extracted by the last unformatted input operation, 
     /// or the maximum representable value of std::streamsize if the number is not representable.
     util::streamsize gcount() const { return my_gcount;  }
@@ -295,10 +357,6 @@ namespace util
 
     /// Puts the character ch back to the input stream so the next extracted character will be ch
     basic_istringstream& putback(char_type ch);
-
-    /// extracts characters until the given character is found
-    basic_istringstream& getline(char_type* s, std::streamsize count);
-    basic_istringstream& getline(char_type* s, std::streamsize count, char_type delim);
 
     /// Extracts and discards characters from the input stream until and including delim.
     basic_istringstream& ignore(std::streamsize count = 1, int_type delim = Traits::eof());

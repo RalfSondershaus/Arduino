@@ -482,7 +482,7 @@ namespace util
         if (c == '0')
         {
           ++first;
-          hasDigit = true; // at least one digit is available, special case  "0"
+          hasDigit = true; // at least one digit is available, special case "0"
           if (first != end)
           {
             c = narrow(first, ctype_fac);
@@ -492,13 +492,26 @@ namespace util
               ++first;
               hasDigit = false; // revert: digit was part of 0x or 0X
             }
-            else if (nBase == 0)
+            else 
             {
-              nBase = 8;
+              if (nBase == 0)
+              {
+                nBase = 8;
+              }
+              // special case "0" or "0 ": first points to a non-digit element,
+              // so the single 0 is stored here (because later while loop does
+              // store it only if the character is a digit).
+              if (!is_digit(c, nBase) && (pBuf < pBufEnd))
+              {
+                *pBuf++ = c;
+              }
             }
-            else
-            {
-            }
+          }
+          else
+          {
+            // special case "0" and first == end (e.g. end points to the end
+            // of the search area).
+            *pBuf++ = c;
           }
         }
       }

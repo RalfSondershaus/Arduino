@@ -23,6 +23,7 @@
 
 #if CFG_TEST_WITH_STD == CFG_ON
 #include <sstream>
+#include <iostream>
 #endif
 
 
@@ -286,6 +287,106 @@ TEST(Ut_Sstream, Unformatted_input_get_char_pointer_get_buffer_smaller_than_read
 }
 
 // -------------------------------------------------------------------------
+TEST(Ut_Sstream, Unformatted_input_getline_char_pointer_delimiter_spaces)
+{
+  using istringstream_t = util::basic_istringstream<64, char>;
+  using string_t = istringstream_t::string_type;
+  
+  istringstream_t stream("SET CAL SIGNAL 0 ASPECT 1 ASPECT 11000");
+  constexpr size_t kNrChars = 64; // kNrChars-1 characters are copied (last array element is terminating 0)
+  constexpr char delimSpace = ' ';
+  char s[kNrChars];
+  uint16 un;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  // SET
+  stream.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(string_t{s}.compare(string_t{"SET"}), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 4 });
+  // CAL
+  stream.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(string_t{s}.compare(string_t{"CAL"}), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 4 });
+  // SIGNAL 0 <space>
+  stream.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(string_t{s}.compare(string_t{"SIGNAL"}), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 7 });
+  stream >> un;
+  EXPECT_EQ(un, uint16{ 0U });
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 7 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(string_t{s}.compare(string_t{""}), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 1 });
+  // ASPECT 1 <space>
+  stream.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(string_t{s}.compare(string_t{"ASPECT"}), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 7 });
+  stream >> un;
+  EXPECT_EQ(un, uint16{ 1U });
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 7 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(string_t{s}.compare(string_t{""}), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 1 });
+  // ASPECT 11000
+  stream.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(string_t{s}.compare(string_t{"ASPECT"}), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 7 });
+  stream.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(string_t{s}.compare(string_t{"11000"}), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 5 });
+  EXPECT_EQ(stream.eof(), true);
+
+#if CFG_TEST_WITH_STD == CFG_ON
+  std::istringstream ss("SET CAL SIGNAL 0 ASPECT 1 ASPECT 11000");
+  EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
+  // SET
+  ss.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(std::string{ s }, std::string{ "SET" });
+  EXPECT_EQ(ss.gcount(), 4);
+  // CAL
+  ss.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(std::string{s}.compare(std::string{"CAL"}), 0);
+  EXPECT_EQ(ss.gcount(), 4);
+  // SIGNAL 0 <space>
+  ss.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(std::string{s}.compare(std::string{"SIGNAL"}), 0);
+  EXPECT_EQ(ss.gcount(), 7);
+  ss >> un;
+  EXPECT_EQ(un, uint16{ 0U });
+  EXPECT_EQ(ss.gcount(), 7);
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(std::string{s}.compare(std::string{""}), 0);
+  EXPECT_EQ(ss.gcount(), 1);
+  // ASPECT 1 <space>
+  ss.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(std::string{s}.compare(std::string{"ASPECT"}), 0);
+  EXPECT_EQ(ss.gcount(), 7);
+  ss >> un;
+  EXPECT_EQ(un, uint16{ 1U });
+  EXPECT_EQ(ss.gcount(), 7);
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(std::string{s}.compare(std::string{""}), 0);
+  EXPECT_EQ(ss.gcount(), 1);
+  // ASPECT 11000
+  ss.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(std::string{s}.compare(std::string{"ASPECT"}), 0);
+  EXPECT_EQ(ss.gcount(), 7);
+  ss.getline(s, kNrChars, delimSpace);
+  EXPECT_EQ(std::string{s}.compare(std::string{"11000"}), 0);
+  EXPECT_EQ(ss.gcount(), 5);
+  EXPECT_EQ(ss.eof(), true);
+#endif
+}
+
+// -------------------------------------------------------------------------
 TEST(Ut_Sstream, Formatted_input_uint16)
 {
   using istringstream_t = util::basic_istringstream<16, char>;
@@ -335,6 +436,62 @@ TEST(Ut_Sstream, Formatted_input_uint16_hex)
   EXPECT_EQ(un, uint16{ 0xA000 });
   EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
   EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), false);
+#endif
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_uint16_0)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+
+  istringstream_t stream("0");
+  uint16 un;
+
+  stream.unsetf(util::ios_base::dec);
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> un;
+  EXPECT_EQ(un, uint16{ 0 });
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), false);
+
+#if CFG_TEST_WITH_STD == CFG_ON
+  std::istringstream ss("0");
+  ss.unsetf(std::ios_base::dec);
+  EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
+  ss >> un;
+  EXPECT_EQ(un, uint16{ 0 });
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), false);
+#endif
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_uint16_0_space)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+
+  istringstream_t stream("0 ");
+  uint16 un;
+
+  stream.unsetf(util::ios_base::dec);
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> un;
+  EXPECT_EQ(un, uint16{ 0 });
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+
+#if CFG_TEST_WITH_STD == CFG_ON
+  std::istringstream ss("0 ");
+  ss.unsetf(std::ios_base::dec);
+  EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
+  ss >> un;
+  EXPECT_EQ(un, uint16{ 0 });
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
   EXPECT_EQ(ss.fail(), false);
 #endif
 }
@@ -446,6 +603,63 @@ TEST(Ut_Sstream, Formatted_input_sint16_pos)
   EXPECT_EQ(ss.fail(), false);
 #endif
 }
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_sint16_0)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+
+  istringstream_t stream("0");
+  sint16 n;
+
+  stream.unsetf(util::ios_base::dec);
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> n;
+  EXPECT_EQ(n, sint16{ 0 });
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), false);
+
+#if CFG_TEST_WITH_STD == CFG_ON
+  std::istringstream ss("0");
+  ss.unsetf(std::ios_base::dec);
+  EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
+  ss >> n;
+  EXPECT_EQ(n, sint16{ 0 });
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), false);
+#endif
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_sint16_0_space)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+
+  istringstream_t stream("0 ");
+  sint16 n;
+
+  stream.unsetf(util::ios_base::dec);
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> n;
+  EXPECT_EQ(n, sint16{ 0 });
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+
+#if CFG_TEST_WITH_STD == CFG_ON
+  std::istringstream ss("0 ");
+  ss.unsetf(std::ios_base::dec);
+  EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
+  ss >> n;
+  EXPECT_EQ(n, sint16{ 0 });
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+#endif
+}
+
 
 // -------------------------------------------------------------------------
 TEST(Ut_Sstream, Formatted_input_sint16_neg)
@@ -718,12 +932,17 @@ bool test_loop(void)
   RUN_TEST(Unformatted_input_get_char_pointer_available_too_small);
   RUN_TEST(Unformatted_input_get_char_pointer_empty_stream);
   RUN_TEST(Unformatted_input_get_char_pointer_get_buffer_smaller_than_read_request);
+  RUN_TEST(Unformatted_input_getline_char_pointer_delimiter_spaces);
   RUN_TEST(Formatted_input_uint16);
   RUN_TEST(Formatted_input_uint16_hex);
+  RUN_TEST(Formatted_input_uint16_0);
+  RUN_TEST(Formatted_input_uint16_0_space);
   RUN_TEST(Formatted_input_uint16_2x);
   RUN_TEST(Formatted_input_uint16_2x_char);
   RUN_TEST(Formatted_input_sint16_pos);
   RUN_TEST(Formatted_input_sint16_neg);
+  RUN_TEST(Formatted_input_sint16_0);
+  RUN_TEST(Formatted_input_sint16_0_space);
   RUN_TEST(Formatted_input_sint16_pos_hex);
   RUN_TEST(Formatted_input_sint16_pos_hex_fail);
   RUN_TEST(Formatted_input_sint16_neg_hex);
