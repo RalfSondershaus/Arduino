@@ -96,8 +96,25 @@ $(error ------ Invalid build command line parameter ARG_TARGET_ECU $(ARG_TARGET_
 endif
 
 # ---------------------------------------------------
-# Compiler flags.
+# Compiler flags. See also https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
 # Remark: Use -v flag to make gcc show its configuration including include pathes
+#
+# -g    Produce debugging information in the operating system�s native format (stabs, COFF, XCOFF, or DWARF). GDB can work with this debugging information.
+# -M    Instead of outputting the result of preprocessing, output a rule suitable for make describing the dependencies of the main source file. 
+# -O1   Optimize. Optimizing compilation takes somewhat more time, and a lot more memory for a large function. (Same as -O)
+# -O2   Optimize even more. GCC performs nearly all supported optimizations that do not involve a space-speed tradeoff. 
+# -O3   Optimize yet more. -O3 turns on all optimizations specified by -O2 and also turns on more optimization flags.
+# -O0   Reduce compilation time and make debugging produce the expected results. This is the default.
+# -Os   Optimize for size. -Os enables all -O2 optimizations except those that often increase code size.
+# -Og   Optimize debugging experience. -Og should be the optimization level of choice for the standard edit-compile-debug cycle.
+# -Oz   Optimize aggressively for size rather than speed.
+# -Ofast Disregard strict standards compliance. -Ofast enables all -O3 optimizations. It also enables optimizations that are not valid for all standard-compliant programs.
+# -S    Stop after the stage of compilation proper; do not assemble. The output is in the form of an assembler code file for each non-assembler input file specified.
+#       By default, the assembler file name for a source file is made by replacing the suffix ‘.c’, ‘.i’, etc., with ‘.s’.
+# -v    Print (on standard error output) the commands executed to run the stages of compilation.
+# --version Display the version number and copyrights of the invoked GCC.
+# -Wall This enables all the warnings about constructions that some users consider questionable, and that are easy to avoid (or modify to prevent the warning), even in conjunction with macros.
+# -fverbose-asm
 # ---------------------------------------------------
 CFLAGS := $(CFLAGS)               \
         -c                        \
