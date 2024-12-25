@@ -44,6 +44,11 @@ namespace cfg
   constexpr uint8 kCalTgtNrBits = 6U;
   constexpr uint8 kCalTgtNrBitsPinsPow2 = 64U;
 
+  /// The decoder supports this number of addresses, first address is
+  /// defined by DecoderAddressLSB and DecoderAddressMSB.
+  /// Address range: [first_adress, first_adress + kNrAddresses].
+  constexpr uint8 kNrAddresses = kNrSignals - 1;
+
 } // namespace cfg
 
 #endif // CFG_PRJ_H_

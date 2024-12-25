@@ -33,14 +33,14 @@ namespace cal
   {
     enum
     {
-      kNone = 0,
-      kClassified = 1,
-      kDcc = 2
+      eNone = 0,
+      eClassified = 1,
+      eDcc = 2
     };
 
     struct
     {
-      uint8 type : 2; ///< [kNone, kClassified, kDcc] type of command sources, more in future
+      uint8 type : 2; ///< [eNone, eClassified, eDcc] type of command sources, more in future
       uint8 idx : 6; ///< Index of the input element on RTE
     } bits;
 
@@ -53,12 +53,12 @@ namespace cal
   {
     enum
     {
-      kNone = 0,
-      kOnboard = 1,
-      kExternal = 2
+      eNone = 0,
+      eOnboard = 1,
+      eExternal = 2
     };
 
-    uint8 type : (8U - cfg::kCalTgtNrBits); ///< type of target such as kNone, kOnboard, kExternal
+    uint8 type : (8U - cfg::kCalTgtNrBits); ///< type of target such as eNone, eOnboard, eExternal
     uint8 idx  : (cfg::kCalTgtNrBits);      ///< output pin number
   } target_type;
 
@@ -104,20 +104,26 @@ namespace cal
   /// Calibration data for DccDecoder
   typedef struct
   {
-    uint16 address;
-  } dcc_type;
+    uint8 AddressLSB;
+    uint8 AuxAct;
+    uint8 TimeOn[4];
+    uint8 ManufacturerVersionID;
+    uint8 ManufacturerID;
+    uint8 AddressMSB;
+    uint8 Configuration;
+  } base_cv_type;
 
   /// Calibration data for DccDecoder
-  using dcc_cal_type = dcc_type;
+  using base_cv_cal_type = base_cv_type;
 
   /// Calibration data for input classifiers is taken over from util::input_classifier
-  typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> input_classifier_type;
-  using input_classifier_cal_type = input_classifier_type::input_classifier_cal_type;
+  using input_classifier_type        = util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses>;
+  using input_classifier_cal_type    = input_classifier_type::input_classifier_cal_type;
   using input_classifier_single_type = input_classifier_cal_type::input_classifier_single_type;
 
   /// Calibration data type for LED complex device drivers
   /// A bit for each pin: 1 = is output, 0 = is not output
-  typedef util::bitset<uint32_t, cfg::kCalTgtNrBits> led_output_rw_type;
+  using led_output_rw_type =  util::bitset<uint32_t, cfg::kCalTgtNrBits>;
   using led_cal_type = led_output_rw_type;
 } // namespace cal
 

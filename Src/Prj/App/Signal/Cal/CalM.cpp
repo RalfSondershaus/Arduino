@@ -61,39 +61,17 @@ namespace cal
   // 286 - 297	Classifier 4
   // 298 - 309	Classifier 5     72 bytes for 6 classifiers
 
-  /// Index type for EEPROM
-  typedef uint16 nvm_block_id_type;
+  namespace eeprom
+  {
+    static constexpr uint8 kInitial = 0xFF;
 
-  /// EEPROM base address (129) for CRC
-  static constexpr nvm_block_id_type kCrcBaseNvmId = 129U;
-
-  /// EEPROM base address (130) and 18 bytes per signal
-  static constexpr nvm_block_id_type kSignalBaseNvmId = 130U;
-  static constexpr nvm_block_id_type kSignalLenNvm = 18U;
-
-  /// EEPROM base address (238) and 12 bytes per classifier
-  static constexpr nvm_block_id_type kInputClassifierBaseNvmId = 238U;
-  static constexpr nvm_block_id_type kInputClassifierLenNvm = 12U;
-
-  // first NVM index per signal
-  static const util::array<nvm_block_id_type, cfg::kNrSignals> aSignalBaseNvmIdx = {
-    kSignalBaseNvmId,                     // signal 1
-    kSignalBaseNvmId + 1U * kSignalLenNvm,  // signal 2
-    kSignalBaseNvmId + 2U * kSignalLenNvm,  // signal 3
-    kSignalBaseNvmId + 3U * kSignalLenNvm,  // signal 4
-    kSignalBaseNvmId + 4U * kSignalLenNvm,  // signal 5
-    kSignalBaseNvmId + 5U * kSignalLenNvm   // signal 6
-  };
-
-  // first NVM index per classifier
-  static const util::array<nvm_block_id_type, cfg::kNrSignals> aClassifierBaseNvmIdx = {
-    kInputClassifierBaseNvmId,                                // 1
-    kInputClassifierBaseNvmId + 1U * kInputClassifierLenNvm,  // 2
-    kInputClassifierBaseNvmId + 2U * kInputClassifierLenNvm,  // 3
-    kInputClassifierBaseNvmId + 3U * kInputClassifierLenNvm,  // 4
-    kInputClassifierBaseNvmId + 4U * kInputClassifierLenNvm,  // 5
-    kInputClassifierBaseNvmId + 5U * kInputClassifierLenNvm   // 6
-  };
+    namespace default_values
+    {
+      static const signal_cal_type signals{ CAL_SIGNAL_ARRAY };
+      static const input_classifier_cal_type input_classifiers{ CAL_INPUT_CLASSIFIER_CFG };
+      static const base_cv_cal_type base_cv{ CAL_BASE_CV_CFG };
+    }
+  }
 
   // -----------------------------------------------
   /// Returns CRC8 from EEPROM addresses unStartNvmId ... unStartNvmId + unLen - 1.
@@ -118,20 +96,18 @@ namespace cal
   CalM::CalM()
     : signals{ CAL_SIGNAL_ARRAY }
     , input_classifiers{ CAL_INPUT_CLASSIFIER_CFG }
+    , base_cv{ CAL_BASE_CV_CFG }
+    // member element leds is calculated in init() runable
   {}
 
   // -----------------------------------------------
-  /// Returns true if the EEPROM values are valid based on a checksum.
+  /// Returns true if the EEPROM values are valid.
+  /// That is, if Manufacturer ID is not the EEPROM initial value
+  /// (EEPROM not programmed yet).
   // -----------------------------------------------
   bool CalM::isValid()
   {
-    uint8 ucCrcNvm;
-    uint8 ucCrc;
-
-    ucCrcNvm = EEPROM.read(kCrcBaseNvmId);
-    ucCrc = calcChecksum();
-
-    return ucCrc == ucCrcNvm;
+    return EEPROM.read(eeprom::eManufacturerID) != eeprom::kInitial;
   }
 
   // -----------------------------------------------
@@ -159,73 +135,140 @@ namespace cal
   }
 
   // -----------------------------------------------
-  /// Read values from EEPROM
+  /// Initialize internal data structures and EEPROM values with default values
+  /// from ROM.    
   // -----------------------------------------------
-  void CalM::readSignals()
+  void CalM::initBaseCV()
   {
-    nvm_block_id_type unNvmIdx; // local index
-    auto base_nvm_it = aSignalBaseNvmIdx.begin(); // first (start) index (per signal)
+    util::memcpy(&base_cv, &eeprom::default_values::base_cv, sizeof(base_cv_cal_type));
+    
+    (void)updateBaseCV();
+  }
 
-    for (auto it = signals.begin(); it < signals.end(); it++)
+  // -----------------------------------------------
+  /// Initialize internal data structures and EEPROM values with default values
+  /// from ROM.    
+  // -----------------------------------------------
+  void CalM::initSignals()
+  {
+    const auto it_begin = signals.begin();
+    for (auto it = it_begin; it < signals.end(); it++)
     {
-      unNvmIdx = *base_nvm_it;
-
-      // byte 1: input
-      it->input.raw = EEPROM.read(unNvmIdx); unNvmIdx++;
-
-      // bytes 2 - 11: aspect and blinking
-      for (auto aspect_it = it->aspects.begin(); aspect_it < it->aspects.end(); aspect_it++)
-      {
-        aspect_it->aspect = EEPROM.read(unNvmIdx); unNvmIdx++;
-        aspect_it->blink = EEPROM.read(unNvmIdx); unNvmIdx++;
-      }
-
-      // bytes 12 - 16: targets
-      for (auto target_it = it->targets.begin(); target_it < it->targets.end(); target_it++)
-      {
-        target_it->type = EEPROM.read(unNvmIdx); unNvmIdx++;
-      }
-
-      // bytes 17, 18: change over time and blink change over time
-      it->changeOverTime = EEPROM.read(unNvmIdx); unNvmIdx++;
-      it->blinkChangeOverTime = EEPROM.read(unNvmIdx);
-
-      base_nvm_it++;
+      set_signal(it - it_begin, *it);
     }
+
+    (void)updateSignals();
+  }
+
+  // -----------------------------------------------
+  /// Initialize internal data structures and EEPROM values with default values
+  /// from ROM.    
+  // -----------------------------------------------
+  void CalM::initClassifiers()
+  {
+    const auto it_begin = input_classifiers.classifiers.begin();
+    for (auto it = it_begin; it < input_classifiers.classifiers.end(); it++)
+    {
+      set_classifier(it - it_begin, *it);
+    }
+
+    (void)updateClassifiers();
   }
 
   // -----------------------------------------------
   /// Read values from EEPROM
   // -----------------------------------------------
+  void CalM::readBaseCV()
+  {
+    base_cv.AddressLSB = EEPROM.read(eeprom::eDecoderAddressLSB);
+    base_cv.AddressMSB = EEPROM.read(eeprom::eDecoderAddressMSB);
+    base_cv.AuxAct = EEPROM.read(eeprom::eAuxiliaryActivattion);
+    for (int i = 0; i < 4; i++)
+    {
+      base_cv.TimeOn[i] = EEPROM.read(eeprom::eTimeOnBase + i);
+    }
+    base_cv.ManufacturerID = EEPROM.read(eeprom::eManufacturerID);
+    base_cv.ManufacturerVersionID = EEPROM.read(eeprom::eManufacturerVersionID);
+    base_cv.Configuration = EEPROM.read(eeprom::eConfiguration);
+  }
+
+  // -----------------------------------------------
+  /// Read values from EEPROM and store them in member variable signals.
+  // -----------------------------------------------
+  void CalM::readSignals()
+  {
+    uint16 unEepIdx = eeprom::eSignalBase; // local index, starts with first signal
+
+    for (auto it = signals.begin(); it < signals.end(); it++)
+    {
+      // byte 1: input
+      it->input.raw = EEPROM.read(unEepIdx); unEepIdx++;
+
+      // bytes 2 - 11: aspect and blinking
+      for (auto aspect_it = it->aspects.begin(); aspect_it < it->aspects.end(); aspect_it++)
+      {
+        aspect_it->aspect = EEPROM.read(unEepIdx); unEepIdx++;
+        aspect_it->blink = EEPROM.read(unEepIdx); unEepIdx++;
+      }
+
+      // bytes 12 - 16: targets
+      for (auto target_it = it->targets.begin(); target_it < it->targets.end(); target_it++)
+      {
+        target_it->type = EEPROM.read(unEepIdx); unEepIdx++;
+      }
+
+      // bytes 17, 18: change over time and blink change over time
+      it->changeOverTime = EEPROM.read(unEepIdx); unEepIdx++;
+      it->blinkChangeOverTime = EEPROM.read(unEepIdx);
+    }
+  }
+
+  // -----------------------------------------------
+  /// Read values from EEPROM and store them in member variable input_classifiers.
+  // -----------------------------------------------
   void CalM::readClassifiers()
   {
-    nvm_block_id_type unNvmIdx; // local index
-    auto base_nvm_it = aClassifierBaseNvmIdx.begin(); // first index
+    uint16 unEepIdx = eeprom::eClassifierBase; // local index, starts with first classifier
 
     for (auto it = input_classifiers.classifiers.begin(); it < input_classifiers.classifiers.end(); it++)
     {
-      unNvmIdx = *base_nvm_it;
-
       // byte 1: pin
-      it->ucPin = EEPROM.read(unNvmIdx); unNvmIdx++;
+      it->ucPin = EEPROM.read(unEepIdx); unEepIdx++;
 
       // byte 2: debounce
-      it->limits.ucDebounce = EEPROM.read(unNvmIdx); unNvmIdx++;
+      it->limits.ucDebounce = EEPROM.read(unEepIdx); unEepIdx++;
 
       // bytes 3 - 7: lower limits
       for (auto limit_it = it->limits.aucLo.begin(); limit_it < it->limits.aucLo.end(); limit_it++)
       {
-        *limit_it = EEPROM.read(unNvmIdx); unNvmIdx++;
+        *limit_it = EEPROM.read(unEepIdx); unEepIdx++;
       }
 
       // bytes 8 - 12: upper limits
       for (auto limit_it = it->limits.aucHi.begin(); limit_it < it->limits.aucHi.end(); limit_it++)
       {
-        *limit_it = EEPROM.read(unNvmIdx); unNvmIdx++;
+        *limit_it = EEPROM.read(unEepIdx); unEepIdx++;
       }
-
-      base_nvm_it++;
     }
+  }
+
+  // -----------------------------------------------
+  /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
+  // -----------------------------------------------
+  bool CalM::updateBaseCV()
+  {
+    EEPROM.update(eeprom::eDecoderAddressLSB, base_cv.AddressLSB);
+    EEPROM.update(eeprom::eDecoderAddressMSB, base_cv.AddressMSB);
+    EEPROM.update(eeprom::eAuxiliaryActivattion, base_cv.AuxAct);
+    for (int i = 0; i < 4; i++)
+    {
+      EEPROM.update(eeprom::eTimeOnBase + i, base_cv.TimeOn[i]);
+    }
+    EEPROM.update(eeprom::eManufacturerID, base_cv.ManufacturerID);
+    EEPROM.update(eeprom::eManufacturerVersionID, base_cv.ManufacturerVersionID);
+    EEPROM.update(eeprom::eConfiguration, base_cv.Configuration);
+
+    return true;
   }
 
   // -----------------------------------------------
@@ -233,34 +276,29 @@ namespace cal
   // -----------------------------------------------
   bool CalM::updateSignals()
   {
-    nvm_block_id_type unNvmIdx; // local index
-    auto base_nvm_it = aSignalBaseNvmIdx.begin(); // first index (per signal)
+    uint16 unEepIdx = eeprom::eSignalBase;
 
     for (auto it = signals.begin(); it < signals.end(); it++)
     {
-      unNvmIdx = *base_nvm_it;
-
       // byte 1: input
-      EEPROM.update(unNvmIdx, it->input.raw); unNvmIdx++;
+      EEPROM.update(unEepIdx, it->input.raw); unEepIdx++;
 
       // bytes 2 - 11: aspect and blinking
       for (auto aspect_it = it->aspects.begin(); aspect_it < it->aspects.end(); aspect_it++)
       {
-        EEPROM.update(unNvmIdx, aspect_it->aspect); unNvmIdx++;
-        EEPROM.update(unNvmIdx, aspect_it->blink); unNvmIdx++;
+        EEPROM.update(unEepIdx, aspect_it->aspect); unEepIdx++;
+        EEPROM.update(unEepIdx, aspect_it->blink); unEepIdx++;
       }
 
       // bytes 12 - 16: targets
       for (auto target_it = it->targets.begin(); target_it < it->targets.end(); target_it++)
       {
-        EEPROM.update(unNvmIdx, target_it->type); unNvmIdx++;
+        EEPROM.update(unEepIdx, target_it->type); unEepIdx++;
       }
 
       // bytes 17, 18: change over time and blink change over time
-      EEPROM.update(unNvmIdx, it->changeOverTime); unNvmIdx++;
-      EEPROM.update(unNvmIdx, it->blinkChangeOverTime);
-
-      base_nvm_it++;
+      EEPROM.update(unEepIdx, it->changeOverTime); unEepIdx++;
+      EEPROM.update(unEepIdx, it->blinkChangeOverTime); unEepIdx++;
     }
 
     return true;
@@ -271,35 +309,41 @@ namespace cal
   // -----------------------------------------------
   bool CalM::updateClassifiers()
   {
-    nvm_block_id_type unNvmIdx; // local index
-    auto base_nvm_it = aClassifierBaseNvmIdx.begin(); // first index
+    uint16 unEepIdx = eeprom::eClassifierBase;
 
     for (auto it = input_classifiers.classifiers.begin(); it < input_classifiers.classifiers.end(); it++)
     {
-      unNvmIdx = *base_nvm_it;
-
       // byte 1: pin
-      EEPROM.update(unNvmIdx, it->ucPin); unNvmIdx++;
+      EEPROM.update(unEepIdx, it->ucPin); unEepIdx++;
 
       // byte 2: debounce
-      EEPROM.update(unNvmIdx, it->limits.ucDebounce); unNvmIdx++;
+      EEPROM.update(unEepIdx, it->limits.ucDebounce); unEepIdx++;
 
       // bytes 3 - 7: lower limits
       for (auto limit_it = it->limits.aucLo.begin(); limit_it < it->limits.aucLo.end(); limit_it++)
       {
-        EEPROM.update(unNvmIdx, *limit_it); unNvmIdx++;
+        EEPROM.update(unEepIdx, *limit_it); unEepIdx++;
       }
 
       // bytes 8 - 12: upper limits
       for (auto limit_it = it->limits.aucHi.begin(); limit_it < it->limits.aucHi.end(); limit_it++)
       {
-        EEPROM.update(unNvmIdx, *limit_it); unNvmIdx++;
+        EEPROM.update(unEepIdx, *limit_it); unEepIdx++;
       }
-
-      base_nvm_it++;
     }
 
     return true;
+  }
+
+  // -----------------------------------------------
+  /// Initialize internal data structures and EEPROM values with default values
+  /// from ROM.    
+  // -----------------------------------------------
+  void CalM::initAll()
+  {
+    initBaseCV();
+    initSignals();
+    initClassifiers();
   }
 
   // -----------------------------------------------
@@ -307,10 +351,11 @@ namespace cal
   // -----------------------------------------------
   bool CalM::readAll()
   {
+    readBaseCV();
     readSignals();
     readClassifiers();
-
-    valid = isValid();
+    
+    return isValid();
   }
 
   // -----------------------------------------------
@@ -320,6 +365,7 @@ namespace cal
   // -----------------------------------------------
   bool CalM::update()
   {
+    updateBaseCV();
     updateSignals();
     updateClassifiers();
 
@@ -363,6 +409,16 @@ namespace cal
   }
 
   // -----------------------------------------------
+  /// Store data in RAM. Doesn't not store data in EEPROM (call update() for this).
+  /// Return true is successful, returns false otherwise.
+  // -----------------------------------------------
+  bool CalM::set_base_cv(const base_cv_cal_type& p)
+  {
+    base_cv = p;
+    return true;
+  }
+
+  // -----------------------------------------------
   /// Calculate bit field: for each port, set a bit to 1 if the port is used by a LED
   /// or clear the bit to 0 if the port is not used by a LED.
   // -----------------------------------------------
@@ -377,7 +433,7 @@ namespace cal
       {
         for (auto tgtit = it->targets.begin(); tgtit != it->targets.end(); tgtit++)
         {
-          if (tgtit->type == target_type::kOnboard)
+          if (tgtit->type == target_type::eOnboard)
           {
             // set idx-th bit to one
             leds.set(tgtit->idx);
@@ -392,10 +448,13 @@ namespace cal
   // -----------------------------------------------
   void CalM::init()
   {
-    if (readAll())
+    if (!readAll())
     {
-      calcLeds();
+      // invalid / never programmed: initialize EEPROM with default values
+      initAll();
     }
+
+    calcLeds();
   }
 
   // -----------------------------------------------

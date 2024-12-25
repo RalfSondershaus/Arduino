@@ -36,24 +36,36 @@ namespace cal
     signal_cal_type signals;
     input_classifier_cal_type input_classifiers;
     led_cal_type leds;
-    dcc_cal_type dcc;
-
-    bool valid;
+    base_cv_cal_type base_cv;
 
   protected:
     /// Calc data for leds from signals
     void calcLeds();
 
+    /// Initialize internal data structures and EEPROM values with default values
+    /// from ROM.    
+    void initAll();
+
     /// Load values from EEPROM
     bool readAll();
     void readSignals();
     void readClassifiers();
+    void readBaseCV();
 
     /// Save data to EEPROM if a value differs from the value already stored in the EEPROM
     bool updateSignals();
     bool updateClassifiers();
+    bool updateBaseCV();
 
-    /// Returns true if the EEPROM coding data are valid
+    /// Initialize internal data structures and EEPROM values with default values
+    /// from ROM.
+    void initSignals();
+    void initClassifiers();
+    void initBaseCV();
+
+    /// Returns true if the EEPROM coding data are valid.
+    /// That is, if 
+    /// - eeprom::eManufacturerID is not EEPROM initial value (FF)
     bool isValid();
 
     /// Returns checksum for all calibration data
@@ -67,16 +79,17 @@ namespace cal
     void cycle100();
 
     /// references to coding parameters
-    const signal_cal_type *           get_signal()             { return (valid) ? (&signals) : (nullptr); }
-    const input_classifier_cal_type * get_input_classifiers()  { return (valid) ? (&input_classifiers) : (nullptr); }
-    const led_cal_type *              get_leds()               { return (valid) ? (&leds) : (nullptr); }
-    const dcc_cal_type *              get_dcc()                { return (valid) ? (&dcc) : (nullptr); }
+    const signal_cal_type *           get_signal()             { return &signals; }
+    const input_classifier_cal_type * get_input_classifiers()  { return &input_classifiers; }
+    const led_cal_type *              get_leds()               { return &leds; }
+    const base_cv_cal_type *          get_base_cv()            { return &base_cv; }
 
     /// Save data to RAM. Doesn't not store data in EEPROM (call update() for this).
     /// Return true is successful, returns false otherwise.
     bool set_signal(uint8 ucSignalId, const signal_type& values);
     bool set_classifier(uint8 ucClassifierId, const input_classifier_single_type& values);
-
+    bool set_base_cv(const base_cv_cal_type& p);
+    
     /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
     /// Validate the data after write.
     /// Returns true if successful, returns false otherwise.

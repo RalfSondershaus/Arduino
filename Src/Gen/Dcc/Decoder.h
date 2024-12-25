@@ -107,13 +107,16 @@ namespace dcc
       using FilterType = dcc::Filter<PacketType>;
       using FilterPointerType = util::ptr<const FilterType>;
       using size_type = typename PacketFifoType::size_type;
+      using config_type = typename PacketType::config_type;
 
       uint32 packetCnt;
 
     protected:
       PacketFifoType packetFifo;
       FilterPointerType filterPtr;
+      config_type packetConfig;
       bool bOverflow;
+
       /// Returns true if the packet passes a filter. Returns false otherwise.
       /// Returns true if no filter has been assigned.
       bool filter(const PacketType& pkt) const
@@ -131,7 +134,10 @@ namespace dcc
     public:
       /// Default constructor
       FifoHandlerIfc() : bOverflow(false), packetCnt(0)
-      {}
+      {
+        packetConfig.Multifunction_ExtendedAddressing = false;
+        packetConfig.Accessory_OutputAddressMethod = false;
+      }
       /// Destructor
       ~FifoHandlerIfc() override = default;
 
@@ -142,7 +148,7 @@ namespace dcc
       {
         if (packetFifo.size() < packetFifo.MaxSize)
         {
-          pkt.decode();
+          pkt.decode(packetConfig);
           //hal::serial::print(pkt.refByte(0), HEX);
           //hal::serial::print(pkt.refByte(1), HEX);
           //hal::serial::print(pkt.refByte(2), HEX);
@@ -173,6 +179,11 @@ namespace dcc
       void clearOverflow() noexcept     { bOverflow = false; }
 
       void setFilter(const FilterType& filter) { filterPtr = &filter; }
+
+      void enableExtendedAddressing() noexcept { packetConfig.Multifunction_ExtendedAddressing = true; }
+      void disableExtendedAddressing() noexcept { packetConfig.Multifunction_ExtendedAddressing = false; }
+      void enableOutputAddressMethod() noexcept { packetConfig.Accessory_OutputAddressMethod = true; }
+      void disableOutputAddressMethod() noexcept { packetConfig.Accessory_OutputAddressMethod = false; }
     };
 
     using FifoHandlerIfcType = FifoHandlerIfc<kPacketsFifoSize>;
@@ -202,6 +213,23 @@ namespace dcc
     /// Enable the decoder to filter packets. 
     /// Only packets that pass the filter are stored in the FIFO buffer.
     void setFilter(const FilterType& filter) { fifoHandler.setFilter(filter); }
+
+    /// For Multi-function decoders: enable extended addressing
+    /// (and disable basic addressing).
+    /// Controlled with bit 5 of CV 29 (Configuration Variable).
+    void enableExtendedAddressing() noexcept { fifoHandler.enableExtendedAddressing(); }
+    /// For Multi-function decoders: disable extended addressing
+    /// (and enable basic addressing).
+    /// Controlled with bit 5 of CV 29 (Configuration Variable).
+    void disableExtendedAddressing() noexcept { fifoHandler.disableExtendedAddressing(); }
+    /// For Accessory decoders: endable output adressing method
+    /// (and disable decoder addressing).
+    /// Controlled with bit 6 of CV 29 (Configuration Variable).
+    void enableOutputAddressMethod() noexcept { fifoHandler.enableOutputAddressMethod(); }
+    /// For Accessory decoders: disable output adressing method
+    /// (and enable decoder addressing).
+    /// Controlled with bit 6 of CV 29 (Configuration Variable).
+    void disableOutputAddressMethod() noexcept { fifoHandler.disableOutputAddressMethod(); }
 
     /// Returns reference to the first packet in the FIFO buffer.
     const PacketType& front() const { return fifoHandler.front(); }

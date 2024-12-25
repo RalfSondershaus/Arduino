@@ -46,10 +46,14 @@ namespace rte
   constexpr cmd_type kInvalidCmd = platform::numeric_limits<cmd_type>::max_();
 
   /// The AD classified values (from buttons) are written into an array of this type
-  typedef util::array<cmd_type, cfg::kNrClassifiers> classified_values_array;
+  using classified_values_array = util::array<cmd_type, cfg::kNrClassifiers>;
+  using dcc_commands_arry = util::array<cmd_type, cfg::kNrDccAddresses>;
 
   /// The DCC values are written into an array of this type
-  typedef util::array<cmd_type, cfg::kNrDccAddresses> dcc_values_array;
+  /// Array index 0 corresponds to DCC address as defined by cal::dcc_type::address
+  /// Array index cfg::kNrDccAddresses-1 corresponds to DCC address as defined by 
+  /// cal::dcc_type::address + cfg::kNrDccAddresses - 1.
+  using dcc_values_array = util::array<cmd_type, cfg::kNrDccAddresses>;
 
   /// Target intensities for one signal
   typedef struct
@@ -59,8 +63,8 @@ namespace rte
   } signal_intensity_type;
 
   /// The target intensities are written into an array of this type
-  typedef util::array<intensity8_255, cfg::kNrOnboardTargets> onboard_target_array;
-  typedef util::array<intensity8_255, cfg::kNrExternalTargets> external_target_array;
+  using onboard_target_array = util::array<intensity8_255, cfg::kNrOnboardTargets>;
+  using external_target_array = util::array<intensity8_255, cfg::kNrExternalTargets>;
 
   /// @brief use the target_type of calibration
   using target_type = cal::target_type;
@@ -68,13 +72,17 @@ namespace rte
   // -----------------------------------------------------------------------------------
   /// SR interface for classified values
   // -----------------------------------------------------------------------------------
-  typedef rte::ifc_sr_array<classified_values_array> Ifc_ClassifiedValues;
+  using Ifc_ClassifiedValues = rte::ifc_sr_array<classified_values_array>;
 
+  using Ifc_DccCommands = rte::ifc_sr_array<dcc_commands_arry>;
   // -----------------------------------------------------------------------------------
   /// SR interface for onboard and external target duty cycles
   // -----------------------------------------------------------------------------------
-  typedef rte::ifc_sr_array<onboard_target_array> Ifc_OnboardTargetDutyCycles;
-  typedef rte::ifc_sr_array<external_target_array> Ifc_ExternalTargetDutyCycles;
+  using Ifc_OnboardTargetDutyCycles = rte::ifc_sr_array<onboard_target_array>;
+  using Ifc_ExternalTargetDutyCycles = rte::ifc_sr_array<external_target_array>;
+
+  /// SR interface for DCC address (calculated from calibration data)
+  using Ifc_Cal_DccAddress = rte::ifc_sr<uint16>;
 
   // -----------------------------------------------------------------------------------
   /// CS interface for calibration values
@@ -82,7 +90,7 @@ namespace rte
   typedef rte::ifc_cs<const cal::signal_cal_type *          , cal::CalM> Ifc_Cal_Signal;
   typedef rte::ifc_cs<const cal::input_classifier_cal_type *, cal::CalM> Ifc_Cal_InputClassifier;
   typedef rte::ifc_cs<const cal::led_cal_type *             , cal::CalM> Ifc_Cal_Led;
-  typedef rte::ifc_cs<const cal::dcc_cal_type *             , cal::CalM> Ifc_Cal_Dcc;
+  typedef rte::ifc_cs<const cal::base_cv_cal_type *         , cal::CalM> Ifc_Cal_Base_CV;
 
   // -----------------------------------------------------------------------------------
   /// CS interface for commands

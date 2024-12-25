@@ -22,24 +22,39 @@
 #define PRJ_DCC_DECODER_H_
 
 #include <Dcc/Decoder.h>
+#include <Dcc/Filter.h>
 #include <Rte/Rte_Type.h>
 #include <Cal/CalM_Type.h>
 
-class DccDecoder
+namespace signal
 {
-protected:
-  /// The decoder
-  dcc::Decoder decoder;
+  class DccDecoder
+  {
+  protected:
+    using PacketType = dcc::Decoder::PacketType;
+    using PassAddrFltr = dcc::PassAddressFilter<PacketType>;
+    
+    /// The decoder
+    dcc::Decoder decoder;
+    PassAddrFltr passFilter;
+    /// The address of the decoder. Calculated from coding data.
+    /// If the decoder supports a series of addresses, this variable stores
+    /// the first address.
+    uint16 address;
 
-  /// The interrupt pin
-  static constexpr uint8 kIntPin = 2U;
+    /// The interrupt pin
+    static constexpr uint8 kIntPin = 2U;
 
-  /// Returns true if pCal is valid. Returns false otherwise.
-  bool cal_valid(const cal::dcc_cal_type* pCal) { return pCal != nullptr; }
-public:
-  DccDecoder() = default;
+    void packet_received(const PacketType& pkt);
+  public:
+    DccDecoder() = default;
 
-  void init();
-  void cycle();
-};
+    /// Returns the DCC address of the decoder.
+    uint16 get_address() const noexcept { return address; }
+
+    void init();
+    void cycle();
+  };
+}
+
 #endif // PRJ_DCC_DECODER_H_

@@ -90,7 +90,7 @@ namespace signal
   {
     switch (tgt.type)
     {
-    case target_type::kOnboard:
+    case target_type::eOnboard:
     {
       if (ramps_onboard.check_boundary(tgt.idx))
       {
@@ -98,7 +98,7 @@ namespace signal
       }
     }
     break;
-    case target_type::kExternal:
+    case target_type::eExternal:
       break;
     default:
       break;
@@ -117,7 +117,7 @@ namespace signal
   {
     switch (tgt.type)
     {
-    case target_type::kOnboard:
+    case target_type::eOnboard:
     {
       if (ramps_onboard.check_boundary(tgt.idx))
       {
@@ -125,7 +125,7 @@ namespace signal
       }
     }
     break;
-    case target_type::kExternal:
+    case target_type::eExternal:
       break;
     default:
       break;
@@ -143,7 +143,7 @@ namespace signal
   {
     switch (tgt.type)
     {
-    case target_type::kOnboard:
+    case target_type::eOnboard:
     {
       if (ramps_onboard.check_boundary(tgt.idx))
       {
@@ -151,7 +151,7 @@ namespace signal
       }
     }
     break;
-    case target_type::kExternal:
+    case target_type::eExternal:
       break;
     default:
       break;

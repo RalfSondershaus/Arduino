@@ -3,7 +3,8 @@
 #
 
 # Files
-FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/InputClassifier \
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/DccDecoder      \
+            $(PATH_SRC_PRJ_PROJECT)/InputClassifier \
             $(PATH_SRC_PRJ_PROJECT)/InputCommand    \
             $(PATH_SRC_PRJ_PROJECT)/LedRouter       \
             $(PATH_SRC_PRJ_PROJECT)/Signal          \

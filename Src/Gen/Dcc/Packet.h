@@ -91,6 +91,14 @@ namespace dcc
 
     typedef enum { Init, Idle, MultiFunctionBroadcast, MultiFunction7, MultiFunction14, BasicAccessory, ExtendedAccessory, Unknown, Invalid } packet_type;
 
+    /// Defines configuration values that are relevant for decoding.
+    typedef struct
+    {
+      bool Accessory_OutputAddressMethod;     ///< Accessory decoders only: use Output Address Method to extract the address.
+                                              ///< Otherwise, the Decoder Address Method is used.
+      bool Multifunction_ExtendedAddressing;  ///< Multifunction decoders only: use Extended Addressing to extract the address.
+    } config_type;
+    
     /// Maximal number of bytes (template parameter)
     static constexpr int kMaxNrBytes = kMaxBytes;
 
@@ -185,8 +193,54 @@ namespace dcc
       return (tmp == *b);
     }
 
+    /// Returns the address of a basic accessory packet
+    address_type decodeBasicAccessoryAddress(const config_type& cfg) const noexcept
+    {
+      // {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
+      // The most significant bits of the 9 - bit address are bits 4 - 6 of the
+      // second data byte. By convention these bits(bits 4 - 6 of the second data byte)
+      // are in ones complement.
+      // Addresses are often extended with the 2 most significant bits of DDD
+      // so that the 9 bit address is extended to a 11 bit address
+      // (Accessory Output Address Method).
+      // For example, Fleischmann Profi Boss, magnetic devices.
+      // AAA AAAAAA = 1 and DD D = 00 0 means address 1
+      // AAA AAAAAA = 1 and DD D = 01 0 means address 2
+      // AAA AAAAAA = 1 and DD D = 10 0 means address 3
+      // AAA AAAAAA = 1 and DD D = 11 0 means address 4
+      // AAA AAAAAA = 2 and DD D = 00 0 means address 5
+      // ...
+      // AAA AAAAAA = 3 and DD D = 00 0 means address 9
+      // etc
+      address_type addr;
+
+      if (cfg.Accessory_OutputAddressMethod)
+      {
+        // output address method
+        addr = static_cast<address_type>(
+          (util::bits::stencil<uint8, address_type>( refByte(0), 0b00111111U)) |
+          (util::bits::stencil<uint8, address_type>(~refByte(1), 0b01110000U) << 2U)
+          );
+        // Two possible ways to calculate:
+        // addr--; addr = addr << 2 | baGetDAddr(); addr++;
+        //         addr = addr << 2 | baGetDAddr(); addr -= 3;
+        addr = static_cast<address_type>((addr << 2U) | baGetDAddr());
+        addr -= 3;
+      }
+      else
+      {
+        // decoder address method
+        addr = static_cast<address_type>(
+          (util::bits::stencil<uint8, address_type>( refByte(0), 0b00111111U)) |
+          (util::bits::stencil<uint8, address_type>(~refByte(1), 0b01110000U) << 2U)
+          );
+      }
+
+      return addr;
+    }
+
     /// Precondition: getNrBytes() > 2
-    packet_type decodeMultiFunctionOrAccessory()
+    packet_type decodeMultiFunctionOrAccessory(const config_type& cfg)
     {
       if (refByte(0) == kPrimaryAddressBroadCast)
       {
@@ -195,40 +249,17 @@ namespace dcc
       }
       else if (refByte(0) <= kPrimaryAddressMultiFunction7_Hi)
       {
-        // {preamble} 0 [ AAAAAAAA ] 0 {instruction-bytes} 0 EEEEEEEE 1
+        // {preamble} 0 [ 0AAAAAAA ] 0 {instruction-bytes} 0 EEEEEEEE 1
         type = MultiFunction7;
-        data.address = static_cast<uint16>(refByte(0));
+        data.address = static_cast<address_type>(refByte(0));
       }
       else if (refByte(0) <= kPrimaryAddressAccessory_Hi)
       {
         if (util::bits::test(refByte(1), 7))
         {
           // {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
-          // The most significant bits of the 9 - bit address are bits 4 - 6 of the
-          // second data byte. By convention these bits(bits 4 - 6 of the second data byte)
-          // are in ones complement.
-          // Addresses are often extended with the 2 most significant bits of DDD
-          // so that the 9 bit address is extended to a 11 bit address.
-          // For example, Fleischmann Profi Boss, magnetic devices.
-          // AAA AAAAAA = 1 and DD D = 00 0 means address 1
-          // AAA AAAAAA = 1 and DD D = 01 0 means address 2
-          // AAA AAAAAA = 1 and DD D = 10 0 means address 3
-          // AAA AAAAAA = 1 and DD D = 11 0 means address 4
-          // AAA AAAAAA = 2 and DD D = 00 0 means address 5
-          // ...
-          // AAA AAAAAA = 3 and DD D = 00 0 means address 9
-          // etc
           type = BasicAccessory;
-          address_type addr = static_cast<address_type>(
-            (util::bits::stencil<uint8, address_type>( refByte(0), 0b00111111U)) |
-            (util::bits::stencil<uint8, address_type>(~refByte(1), 0b01110000U) << 2U)
-            );
-          // Two possible ways to calculate:
-          // addr--; addr = addr << 2 | baGetDAddr(); addr++;
-          //         addr = addr << 2 | baGetDAddr(); addr -= 3;
-          addr = static_cast<address_type>((addr << 2U) | baGetDAddr());
-          addr -= 3;
-          data.address = addr;
+          data.address = decodeBasicAccessoryAddress(cfg);
         }
         else
         {
@@ -243,10 +274,9 @@ namespace dcc
       }
       else if (refByte(0) <= kPrimaryAddressMultiFunction14_Hi)
       {
-        // {preamble} 0 [ AAAAAAAA ] 0 {instruction-bytes} 0 EEEEEEEE 1 
         // {preamble} 0 [ 11AAAAAA ] 0 {instruction-bytes} 0 EEEEEEEE 1 
         // The first address byte contains 8 bits of address information.
-        // If the most significant bits of the address are "11"and the remaining bits are not �111111�,
+        // If the most significant bits of the address are "11"and the remaining bits are not 111111,
         // then a second address byte must immediately follow.
         // This second address byte will then contain an additional 8 bits of address data.
         // The most significant bit of two byte addresses is bit 5 of the first address byte. (bits #6 and 
@@ -265,6 +295,7 @@ namespace dcc
       else
       {
         type = Idle;
+        data.address = 255;
       }
 
       return static_cast<packet_type>(type);
@@ -281,7 +312,7 @@ namespace dcc
     /// the remaining bits are not �111111�, then a second address byte must immediately follow.
     /// This second address byte will then contain an additional 8 bits of address data.
     /// The most significant bit of two byte addresses is bit 5 of the first address byte. (bits #6 and #7 having the value of "1" in this case.
-    packet_type decode()
+    packet_type decode(const config_type& cfg)
     {
       type = Unknown;
 
@@ -291,13 +322,14 @@ namespace dcc
         if (refByte(0) == kPrimaryAddressIdle)
         {
           type = Idle;
+          data.address = 255;
         }
         // continue with non-idle packets. These packets must have three bytes at least.
         else if (getNrBytes() > 2)
         {
           if (testChecksum())
           {
-            type = static_cast<uint8>(decodeMultiFunctionOrAccessory());
+            type = static_cast<uint8>(decodeMultiFunctionOrAccessory(cfg));
           }
           else
           {

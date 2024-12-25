@@ -61,7 +61,7 @@ namespace util
     template<int NrClassifiers, int NrClasses>
     struct input_classifier_cal
     {
-      typedef input_classifier_single<NrClasses> input_classifier_single_type;
+      using input_classifier_single_type = input_classifier_single<NrClasses>;
       util::array<input_classifier_single_type, NrClassifiers> classifiers; ///< pin, debounce and limits
     };
   } // namespace cal
