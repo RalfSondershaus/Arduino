@@ -1,7 +1,7 @@
 /**
- * @file Signal/Com/SerDrv.h
+ * @file Signal/Com/ComDrv.h
  *
- * @brief 
+ * @brief Interface for communication drivers
  *
  * @copyright Copyright 2023 Ralf Sondershaus
  *
@@ -18,48 +18,33 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SERDRV_H_
-#define SERDRV_H_
+#ifndef COMDRV_H_
+#define COMDRV_H_
 
 #include <Std_Types.h>
-#include <Util/bitset.h>
+#include <Util/fix_queue.h>
+#include <Hal/Serial.h>
 
 namespace com
 {
-  
-  // For serial communication, Arduino uses a 16 byte buffer (for systems with RAM smaller 
-  // than 1 KB) or a 64 byte buffer (else).
-  // 
-  // 
   // -----------------------------------------------------------------------------------
-  /// 
   // -----------------------------------------------------------------------------------
-  class SerDrv
+  class SerComDrv
   {
   public:
     using size_type = size_t;
-    typedef const uint8* const_data_pointer;
-
-    /// Size of payload buffer
-    static constexpr size_t kMaxLenPayload = 256U;
-
-    static constexpr uint8 kModeAscii = 0;
-    static constexpr uint8 kModeSerTP = 1;
-
-    uint8 ucMode;
-
-  protected:
+    using base_type = uint8_t;
 
   public:
-    /// Construct.
-    SerDrv() = default;
+    SerComDrv() = default;
 
-    /// Initialization
-    void init();
-    /// Receive data from low level drivers and process them
-    void cycle();
+    /// Start serial communication
+    void begin(unsigned long baudrate) { hal::serial::begin(baudrate); }
+    /// Get the number of bytes (characters) available for reading from the serial port.
+    int available(void)             { return hal::serial::available(); }
+    /// The first byte of incoming serial data available (or -1 if no data is available).
+    int read(void) const noexcept   { return hal::serial::read(); }
   };
-
 } // namespace com
 
-#endif // SERDRV_H_
+#endif // COMDRV_H_
