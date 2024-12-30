@@ -467,15 +467,22 @@ namespace util
 
     ios_base::iostate state = ios_base::goodbit;
     util::streamsize gcount = 0;
-
     if (ok)
     {
+      util::streamsize width = st.width();
+
+      if (width <= 0)
+      {
+        width = platform::numeric_limits<util::streamsize>::max_();
+      }
+
       int_type n = st.rdbuf()->sgetc();
 
       const ctype_type& facet = util::use_facet<ctype_type>(st.getloc());
 
       while (   !traits_type::eq_int_type(n, traits_type::eof())
-             && !facet.isspace(traits_type::to_char_type(n)))
+             && !facet.isspace(traits_type::to_char_type(n))
+             && (gcount < width - 1))
       {
         *s++ = traits_type::to_char_type(n);
         gcount++;
@@ -500,12 +507,31 @@ namespace util
 
     st.setstate(state);
     *s = char_type(); // terminating 0
+    st.width(0); // cancel the effects of std::setw
     return st;
   }
   template<class Traits>
   basic_istream<char, Traits>& operator>>(basic_istream<char, Traits>& st, signed char* s);
   template<class Traits>
   basic_istream<char, Traits>& operator>>( basic_istream<char, Traits>& st, unsigned char* s );
+
+  // --------------------------------------------------------------------------
+  // IO manipulators.
+  struct Setw
+  {
+    int w;
+  };
+
+  inline Setw setw(int n)   { return { n }; }
+
+  /// Set width parameter of the stream.
+  template<typename CharT, typename Traits>
+  inline basic_istream<CharT, Traits>& operator>>(basic_istream<CharT, Traits>& st, Setw sw)
+  {
+    st.width(sw.w);
+    return st;
+  }
+
 } // namespace util
 
 #endif // UTIL_ISTREAM_H

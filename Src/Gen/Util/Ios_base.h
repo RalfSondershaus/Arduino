@@ -75,6 +75,7 @@ namespace util
     fmtflags my_fmtflags;
     iostate my_iostate;
     locale my_locale;
+    streamsize my_width;
 
     /// Only derived classes may construct std::ios_base.
     /// The internal state is undefined after the construction.
@@ -96,6 +97,11 @@ namespace util
     /// returns current formatting setting
     fmtflags flags() const { return my_fmtflags; }
 
+    /// Returns the current field width.
+    streamsize width() const { return my_width; }
+    /// Sets the field width to the given one. Returns the previous field width.
+    streamsize width(streamsize new_width) { streamsize old_width = width(); my_width = new_width; return old_width; }
+    
     /// Returns the current locale
     locale getloc() const { return my_locale; }
     /// Sets the locale and returns the previous locale

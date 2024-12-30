@@ -24,6 +24,7 @@
 #if CFG_TEST_WITH_STD == CFG_ON
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 #endif
 
 
@@ -1073,6 +1074,61 @@ TEST(Ut_Sstream, Formatted_input_char_array_spaces)
 #endif
 }
 
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_char_array_spaces_width)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+
+  istringstream_t stream(" abcd  ef  ");
+  char arr[4];
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> util::setw(3) >> arr;
+  EXPECT_EQ(strcmp(arr, "ab"), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  EXPECT_EQ(stream.width(), util::streamsize{ 0 });
+  stream >> util::setw(3) >> arr;
+  EXPECT_EQ(strcmp(arr, "cd"), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> arr;
+  EXPECT_EQ(strcmp(arr, "ef"), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> arr;
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), true);
+
+#if CFG_TEST_WITH_STD == CFG_ON
+  std::istringstream ss(" abcd  ef  ");
+  EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
+  ss >> std::setw(3) >> arr;
+  EXPECT_EQ(strcmp(arr, "ab"), 0);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> std::setw(3) >> arr;
+  EXPECT_EQ(strcmp(arr, "cd"), 0);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> arr;
+  EXPECT_EQ(strcmp(arr, "ef"), 0);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> arr;
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), true);
+#endif
+}
+
 void setUp(void)
 {
 }
@@ -1119,6 +1175,7 @@ bool test_loop(void)
   RUN_TEST(Formatted_input_char_spaces);
   RUN_TEST(Formatted_input_char_array);
   RUN_TEST(Formatted_input_char_array_spaces);
+  RUN_TEST(Formatted_input_char_array_spaces_width);
  
   (void) UNITY_END();
 
