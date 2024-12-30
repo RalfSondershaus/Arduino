@@ -66,14 +66,14 @@ namespace util
 
     /// Copies count characters from src to dest.
     /// Performs correctly even if the ranges[src, src + count) and [dest, dest + count) overlap
-    static char_type* move(char_type* dest, const char_type* src, size_t count) { return static_cast<char_type*>(memmove(dest, src, count * sizeof(char_type))); }
+    static char_type* move(char_type* dest, const char_type* src, size_t count) { return static_cast<char_type*>(::memmove(dest, src, count * sizeof(char_type))); }
 
     /// copies a character sequence
-    static char_type* copy(char_type* dest, const char_type* src, size_t count) { return static_cast<char_type*>(memcpy(dest, src, count * sizeof(char_type))); }
+    static char_type* copy(char_type* dest, const char_type* src, size_t count) { return static_cast<char_type*>(::memcpy(dest, src, count * sizeof(char_type))); }
 
     /// Compares the first count characters of the character strings s1 and s2. The comparison is done lexicographically.
     /// If count is zero, strings are considered equal.
-    static int compare(const char_type* s1, const char_type* s2, size_t count) { return strncmp(s1, s2, count); }
+    static int compare(const char_type* s1, const char_type* s2, size_t count) { return ::strncmp(s1, s2, count); }
 
     /// returns the length of a character sequence
     static size_t length(const char_type* s) { return strlen(s); }

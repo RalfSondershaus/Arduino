@@ -1,0 +1,12 @@
+# 
+# Project specific Makefile for unit test of class util::String_view with test framework Unity
+#
+
+# Files
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test
+
+# We need C++17 for std::string_view
+CFLAGS := $(CFLAGS)  \
+          -std=c++17
+
+-include $(PATH_TMP)/Test.d

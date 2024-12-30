@@ -24,6 +24,7 @@
                 "UnitTest/Gen/Util/Ut_Ramp",
                 "UnitTest/Gen/Util/Ut_Sstream",
                 "UnitTest/Gen/Util/Ut_String_Unity",
+                "UnitTest/Gen/Util/Ut_String_view",
                 "UnitTest/Gen/Util/Ut_Vector",
                 "UnitTest/Prj/Ut_Signal",
                 "UnitTest/Prj/Ut_Signal_LedRouter",

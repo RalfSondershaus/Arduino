@@ -159,6 +159,18 @@ namespace util
   }
 
   // ------------------------------------------------------------------------------
+  /// Exchanges the given values. Currently there is no specialization
+  /// (but can be added).
+  // ------------------------------------------------------------------------------
+  template<class T>
+  void swap(T& a, T& b)
+  {
+    T tmp = a;
+    a = b;
+    b = tmp;
+  }
+
+  // ------------------------------------------------------------------------------
   /// Returns s1 + s2 and limits the sum to max value of T
   // ------------------------------------------------------------------------------
   template<typename T>
