@@ -87,8 +87,8 @@ namespace util
     };
 
     /// check if stream is good() and skip white spaces. Returns good().
-    /// White spaces are detected by util::isspace(CharT c) instead of
-    /// std::use_facet.
+    /// White spaces are detected by util::use_facet<ctype_type>::isspace
+    /// (which might not be fully support locales yet).
     bool ipfx(bool noskip = false)
     {
       if (!this->good())
@@ -394,6 +394,118 @@ namespace util
 #endif
   };
 
+  // --------------------------------------------------------------------------
+  // Character input operations
+
+  /// Behaves as a FormattedInputFunction. 
+  /// After constructing and checking the sentry object, which may skip leading whitespace, 
+  /// extracts a character and stores it to ch. If no character is available, sets failbit 
+  /// (in addition to eofbit that is set as required of a FormattedInputFunction).
+  template<class CharT, class Traits>
+  basic_istream<CharT, Traits>& operator>>(basic_istream<CharT, Traits>& st, CharT& ch)
+  {
+    using basic_istream_type = basic_istream<CharT, Traits>;
+    using int_type = typename basic_istream_type::int_type;
+    using traits_type = typename basic_istream_type::traits_type;
+
+    const typename basic_istream_type::sentry ok(st);
+    if (ok)
+    {
+      // Read one character and advance the input sequence by one character afterwards
+      int_type n = st.rdbuf()->sbumpc();
+      if (traits_type::eq_int_type(n, traits_type::eof()))
+      {
+        st.setstate(ios_base::eofbit);
+      }
+      else
+      {
+        ch = traits_type::to_char_type(n);
+      }
+    }
+    else
+    {
+      st.setstate (ios_base::failbit | ios_base::eofbit);
+    }
+
+    return st;
+  }
+  // --------------------------------------------------------------------------
+  template<class Traits>
+  basic_istream<char, Traits>& operator>>(basic_istream<char, Traits>& st, signed char& ch)
+  { 
+    return (st >> reinterpret_cast<char&>(ch));
+  }
+  // --------------------------------------------------------------------------
+  template<class Traits>
+  basic_istream<char, Traits>& operator>>(basic_istream<char, Traits>& st, unsigned char& ch)
+  { 
+    return (st >> reinterpret_cast<char&>(ch));
+  }
+  
+  // --------------------------------------------------------------------------
+  /// Behaves as a FormattedInputFunction. After constructing and checking the sentry object, 
+  /// which may skip leading whitespace, extracts successive characters and stores them at 
+  /// successive locations of a character array whose first element is pointed to by s. 
+  /// The extraction stops if any of the following conditions is met:
+  /// - A whitespace character (as determined by the ctype<CharT> facet) is found. 
+  ///   The whitespace character is not extracted.
+  /// - End of file occurs in the input sequence (this also sets eofbit).
+  /// In either case, an additional null character value CharT() is stored at the end of the 
+  /// output. If no characters were extracted, sets failbit (the null character is still written, 
+  /// to the first position in the output). Finally, calls st.width(0) to cancel the effects 
+  /// of std::setw, if any.
+  template<class CharT, class Traits>
+  basic_istream<CharT, Traits>& operator>>(basic_istream<CharT, Traits>& st, CharT* s)
+  {
+    using char_type = CharT;
+    using basic_istream_type = basic_istream<CharT, Traits>;
+    using int_type = typename basic_istream_type::int_type;
+    using traits_type = typename basic_istream_type::traits_type;
+    using ctype_type = util::ctype<char_type>;
+
+    const typename basic_istream_type::sentry ok(st);
+
+    ios_base::iostate state = ios_base::goodbit;
+    util::streamsize gcount = 0;
+
+    if (ok)
+    {
+      int_type n = st.rdbuf()->sgetc();
+
+      const ctype_type& facet = util::use_facet<ctype_type>(st.getloc());
+
+      while (   !traits_type::eq_int_type(n, traits_type::eof())
+             && !facet.isspace(traits_type::to_char_type(n)))
+      {
+        *s++ = traits_type::to_char_type(n);
+        gcount++;
+        n = st.rdbuf()->snextc();
+      }
+
+      if (traits_type::eq_int_type(n, traits_type::eof()))
+      {
+        state |= ios_base::eofbit;
+      }
+    }
+    else
+    {
+      state |= ios_base::failbit | ios_base::eofbit;
+    }
+
+    // if no characters were extracted, sets failbit
+    if (gcount == 0)
+    {
+      state |= ios_base::failbit;
+    }
+
+    st.setstate(state);
+    *s = char_type(); // terminating 0
+    return st;
+  }
+  template<class Traits>
+  basic_istream<char, Traits>& operator>>(basic_istream<char, Traits>& st, signed char* s);
+  template<class Traits>
+  basic_istream<char, Traits>& operator>>( basic_istream<char, Traits>& st, unsigned char* s );
 } // namespace util
 
 #endif // UTIL_ISTREAM_H

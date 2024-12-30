@@ -907,6 +907,172 @@ TEST(Ut_Sstream, Formatted_input_sint16_neg_big)
 #endif
 }
 
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_char)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+
+  istringstream_t stream(" ab");
+  char ch;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> ch;
+  EXPECT_EQ(ch, 'a');
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> ch;
+  EXPECT_EQ(ch, 'b');
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> ch;
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), true);
+
+#if CFG_TEST_WITH_STD == CFG_ON
+  std::istringstream ss(" ab");
+  EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
+  ss >> ch;
+  EXPECT_EQ(ch, 'a');
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> ch;
+  EXPECT_EQ(ch, 'b');
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> ch;
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), true);
+#endif
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_char_spaces)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+
+  istringstream_t stream(" a  b  ");
+  char ch;
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> ch;
+  EXPECT_EQ(ch, 'a');
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> ch;
+  EXPECT_EQ(ch, 'b');
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> ch;
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), true);
+
+#if CFG_TEST_WITH_STD == CFG_ON
+  std::istringstream ss(" a  b  ");
+  EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
+  ss >> ch;
+  EXPECT_EQ(ch, 'a');
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> ch;
+  EXPECT_EQ(ch, 'b');
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> ch;
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), true);
+#endif
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_char_array)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+
+  istringstream_t stream(" ab");
+  char arr[4];
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> arr;
+  EXPECT_EQ(strcmp(arr, "ab"), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> arr;
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), true);
+
+#if CFG_TEST_WITH_STD == CFG_ON
+  std::istringstream ss(" ab");
+  EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
+  ss >> arr;
+  EXPECT_EQ(strcmp(arr, "ab"), 0);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> arr;
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), true);
+#endif
+}
+
+// -------------------------------------------------------------------------
+TEST(Ut_Sstream, Formatted_input_char_array_spaces)
+{
+  using istringstream_t = util::basic_istringstream<16, char>;
+
+  istringstream_t stream(" ab  cd  ");
+  char arr[4];
+
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  stream >> arr;
+  EXPECT_EQ(strcmp(arr, "ab"), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> arr;
+  EXPECT_EQ(strcmp(arr, "cd"), 0);
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), false);
+  EXPECT_EQ(stream.fail(), false);
+  stream >> arr;
+  EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
+  EXPECT_EQ(stream.eof(), true);
+  EXPECT_EQ(stream.fail(), true);
+
+#if CFG_TEST_WITH_STD == CFG_ON
+  std::istringstream ss(" ab  cd  ");
+  EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
+  ss >> arr;
+  EXPECT_EQ(strcmp(arr, "ab"), 0);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> arr;
+  EXPECT_EQ(strcmp(arr, "cd"), 0);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), false);
+  EXPECT_EQ(ss.fail(), false);
+  ss >> arr;
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
+  EXPECT_EQ(ss.eof(), true);
+  EXPECT_EQ(ss.fail(), true);
+#endif
+}
+
 void setUp(void)
 {
 }
@@ -949,6 +1115,10 @@ bool test_loop(void)
   RUN_TEST(Formatted_input_sint16_neg_hex_fail);
   RUN_TEST(Formatted_input_sint16_pos_big);
   RUN_TEST(Formatted_input_sint16_neg_big);
+  RUN_TEST(Formatted_input_char);
+  RUN_TEST(Formatted_input_char_spaces);
+  RUN_TEST(Formatted_input_char_array);
+  RUN_TEST(Formatted_input_char_array_spaces);
  
   (void) UNITY_END();
 
