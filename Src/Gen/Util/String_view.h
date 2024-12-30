@@ -377,6 +377,9 @@ namespace util
     constexpr size_type find_first_not_of(const_pointer s, size_type pos = 0) const               { return find_first_not_of(basic_string_view(s), pos); }
   };
 
+  /// Basic_string_view typedef name for char
+  using string_view = basic_string_view<char>;
+
 } // namespace util
 
 // ---------------------------------------------------
