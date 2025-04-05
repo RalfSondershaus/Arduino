@@ -8,13 +8,13 @@
 # Target MCU
 # ---------------------------------------------------
 ifeq ($(ARG_TARGET_ECU),mega)
-TARGET_MCU_FAMILY    = AVR
+TARGET_MCU_FAMILY    = avr
 TARGET_MCU_VARIANT   = mega
 TARGET_MCU_DEVICE    = atmega2560
 endif
 
 ifeq ($(ARG_TARGET_ECU),uno)
-TARGET_MCU_FAMILY    = AVR
+TARGET_MCU_FAMILY    = avr
 TARGET_MCU_VARIANT   = uno
 TARGET_MCU_DEVICE    = atmega328p
 endif
@@ -34,7 +34,7 @@ endif
 # ---------------------------------------------------
 # Target file extension
 # ---------------------------------------------------
-ifeq ($(TARGET_MCU_FAMILY),AVR)
+ifeq ($(TARGET_MCU_FAMILY),avr)
 TARGET_FILENAME_EXT := hex
 endif
 
