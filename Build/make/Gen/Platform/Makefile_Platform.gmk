@@ -111,17 +111,20 @@ endif
 # -Ofast Disregard strict standards compliance. -Ofast enables all -O3 optimizations. It also enables optimizations that are not valid for all standard-compliant programs.
 # -S    Stop after the stage of compilation proper; do not assemble. The output is in the form of an assembler code file for each non-assembler input file specified.
 #       By default, the assembler file name for a source file is made by replacing the suffix ‘.c’, ‘.i’, etc., with ‘.s’.
+# -std=gnu++17  GNU dialect of -std=c++17. This is the default for C++ code.
+# -std=c++17    The 2017 ISO C++ standard plus amendments.
 # -v    Print (on standard error output) the commands executed to run the stages of compilation.
 # --version Display the version number and copyrights of the invoked GCC.
 # -Wall This enables all the warnings about constructions that some users consider questionable, and that are easy to avoid (or modify to prevent the warning), even in conjunction with macros.
 # -fverbose-asm
 # ---------------------------------------------------
+# We need C++17 for std::string_view
 CFLAGS := $(CFLAGS)               \
         -c                        \
         -g                        \
         -Os                       \
         -w                        \
-        -std=gnu++11              \
+        -std=gnu++17              \
         -fpermissive              \
         -fno-exceptions           \
         -ffunction-sections       \
@@ -424,8 +427,10 @@ endif
 # --version Display the version number and copyrights of the invoked GCC.
 # -Wall This enables all the warnings about constructions that some users consider questionable, and that are easy to avoid (or modify to prevent the warning), even in conjunction with macros.
 # ---------------------------------------------------
-CFLAGS := $(CFLAGS)  \
-          -Wall      \
+# We need C++17 for std::string_view
+CFLAGS := $(CFLAGS)     \
+          -Wall         \
+          -std=gnu++17  \
           -MMD
 
 ifeq ($(ARG_BSW_TESTFRAMEWORK),unity)

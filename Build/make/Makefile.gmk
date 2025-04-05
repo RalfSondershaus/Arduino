@@ -141,11 +141,11 @@ PATH_OBJ                    = $(PATH_TMP)
 # ---------------------------------------------------
 # Tools
 # ---------------------------------------------------
-AVRGCC  = $(PATH_AVRGNU)/bin/avr-gcc
+AVRGCC  = avr-gcc
 GCC     = g++
-OBJCOPY = $(PATH_AVRGNU)/bin/avr-objcopy
-SIZE    = $(PATH_AVRGNU)/bin/avr-size
-AVRDUDE = $(PATH_AVRDUDE)/avrdude
+OBJCOPY = avr-objcopy
+SIZE    = avr-size
+AVRDUDE = avrdude
 CAT		= cat
 CL      = cl
 RM      = rm
