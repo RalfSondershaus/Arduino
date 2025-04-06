@@ -64,7 +64,7 @@ namespace util
     /// Compare p_left and p_right
     static int traits_compare(const_pointer p_left, size_type size_left, const_pointer p_right, size_type size_right)
     {
-      int ret = traits_type::compare(p_left, p_right, util::min(size_left, size_right));
+      int ret = traits_type::compare(p_left, p_right, util::min_(size_left, size_right));
 
       if (ret == 0U)
       {
@@ -92,7 +92,7 @@ namespace util
     {
       size_type size_pos = (pos <= size()) ? (size() - pos) : (0);
       size_type rcount = (count == npos) ? size() : count;
-      return util::min(rcount, size_pos);
+      return util::min_(rcount, size_pos);
     }
 
   public:
@@ -162,10 +162,10 @@ namespace util
     /// Modifiers
 
     /// Moves the start of the view forward by n characters.
-    constexpr void remove_prefix(size_type n) { n = util::min(size(), n); pStr += n; len -= n; }
+    constexpr void remove_prefix(size_type n) { n = util::min_(size(), n); pStr += n; len -= n; }
 
     /// Moves the end of the view back by n characters.
-    constexpr void remove_suffix(size_type n) { n = util::min(size(), n); len -= n; }
+    constexpr void remove_suffix(size_type n) { n = util::min_(size(), n); len -= n; }
 
     /// Exchanges the view with that of v.
     constexpr void swap(basic_string_view& v) noexcept 
@@ -197,7 +197,7 @@ namespace util
     /// Compares two character sequences.
     constexpr int compare(basic_string_view v) const noexcept
     {
-      int res = traits_type::compare(data(), v.data(), util::min(size(), v.size()));
+      int res = traits_type::compare(data(), v.data(), util::min_(size(), v.size()));
 
       if (res == 0)
       {
@@ -213,7 +213,7 @@ namespace util
     constexpr int compare(size_type pos1, size_type count1, const_pointer s ) const { return substr(pos1, count1).compare(basic_string_view(s)); }
     constexpr int compare(size_type pos1, size_type count1, const_pointer s, size_type count2) const { return substr(pos1, count1).compare(basic_string_view(s, count2)); }
 
-    constexpr bool starts_with(basic_string_view sv) const noexcept { return basic_string_view(data(), util::min(size(), sv.size())) == sv; }
+    constexpr bool starts_with(basic_string_view sv) const noexcept { return basic_string_view(data(), util::min_(size(), sv.size())) == sv; }
     constexpr bool starts_with(value_type ch) const noexcept        { return !empty() && traits_type::eq(front(), ch); }
     constexpr bool starts_with(const_pointer s) const               { return starts_with(basic_string_view(s)); }
 

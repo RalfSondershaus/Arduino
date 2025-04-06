@@ -14,7 +14,7 @@ namespace platform
   template<class T> class numeric_limits
   {
   public:
-    /// min and max. Postfix _ is required because of old compiler #defines (for example, avr gcc)
+    /// min and max. Postfix _ is required because of compiler #defines (for example, in Arduino.h)
     static constexpr T min_() noexcept {  }
     static constexpr T max_() noexcept {  }
   };

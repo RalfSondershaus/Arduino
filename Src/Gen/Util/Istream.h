@@ -69,8 +69,11 @@ namespace util
       basic_ios_type::init(sb);
     }
 
-    /// destruct
-    virtual ~basic_istream() = default;
+    /// Do not define (virtual) destructors
+    /// - Nothing to be deleted since dynamic memory allocation is not used
+    ///   and objects are destructed at shut down only (-> never).
+    /// - When using virtual destructors, AVR GCC throws 'undefined reference 
+    ///   to `operator delete(void*, unsigned int)'.
 
     /// nested class. The constructor prepares the formatted input functions and the
     /// unformatted input functions.

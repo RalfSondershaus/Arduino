@@ -23,6 +23,7 @@
 #ifndef ALGORITHM_H_
 #define ALGORITHM_H_
 
+#include <string.h> // memcpy
 #include <Std_Types.h>
 #include <Platform_Limits.h>
 
@@ -129,7 +130,8 @@ namespace util
   /// by dest. Both objects are reinterpreted as arrays of unsigned char.
   /// Returns dest.
   // ------------------------------------------------------------------------------
-  void* memcpy(void* dest, const void* src, size_t count);
+  using ::memcpy;
+  //void* memcpy(void* dest, const void* src, size_t count);
 
   template<typename T, typename... U>
   T make_number(U...);
@@ -142,18 +144,20 @@ namespace util
   
   // ------------------------------------------------------------------------------
   /// Returns the smaller value of the given values.
+  /// Postfix _ is required because of compiler #defines (for example, in Arduino.h).
   // ------------------------------------------------------------------------------
   template<class T>
-  const T& min(const T& a, const T& b) 
+  const T& min_(const T& a, const T& b) 
   { 
     return (a < b) ? a : b; 
   }
 
   // ------------------------------------------------------------------------------
   /// Returns the greater value of the given values.
+  /// Postfix _ is required because of compiler #defines (for example, in Arduino.h).
   // ------------------------------------------------------------------------------
   template<class T>
-  const T& max(const T& a, const T& b) 
+  const T& max_(const T& a, const T& b) 
   { 
     return (a > b) ? a : b; 
   }

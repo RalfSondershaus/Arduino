@@ -24,12 +24,19 @@
 #ifndef UTIL_CTYPE_H
 #define UTIL_CTYPE_H
 
-#include <Std_Types.h>
+#include <ctype.h>
 
 namespace util
 {
-  int isspace(int ch);
+  /// isalnum: 
+  /// - digits (0123456789)
+  /// - uppercase letters (ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+  /// - lowercase letters (abcdefghijklmnopqrstuvwxyz)
 
+  using ::isalnum;
+  using ::isalpha;
+  using ::isspace;
+  using ::iscntrl;
 } // namespace util
 
 #endif // UTIL_CTYPE_H

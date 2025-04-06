@@ -33,8 +33,13 @@ namespace rte
   public:
     /// Default constructor
     Runable() {}
-    /// Default destructor
-    virtual ~Runable() {}
+
+    /// Do not use destructors
+    /// - Nothing to be deleted since dynamic memory allocation is not used
+    ///   and objects are destructed at shut down only (-> never).
+    /// - When using virtual destructors, AVR GCC throws 'undefined reference 
+    ///   to `operator delete(void*, unsigned int)'.
+
     /// Main execution function
     virtual void run(void) = 0;
   };
@@ -60,6 +65,7 @@ namespace rte
   public:
     /// Constructor
     TRunable(class_type_reference o, member_func_type f) : obj(o), func(f) {}
+
     /// Main execution function
     virtual void run(void) override { CALL_MEMBER_FUNC(obj, func)(); }
   };

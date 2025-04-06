@@ -26,6 +26,7 @@
 
 namespace util
 {
+  #if 0
   // ------------------------------------------------------------------------------
   /// Copies count bytes from the object pointed to by src to the object pointed to 
   /// by dest. Both objects are reinterpreted as arrays of unsigned char.
@@ -44,4 +45,5 @@ namespace util
 
     return dest;
   }
+  #endif
 } // namespace util

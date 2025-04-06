@@ -29,9 +29,11 @@
 #include <Util/Algorithm.h>
 #include <Util/Math.h>
 #include <Util/Ios_Type.h> // streamoff
+#include <Util/ctype.h> // isspace
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 namespace util
 {
@@ -148,7 +150,7 @@ namespace util
     /// Compare p_left and p_right
     static int traits_compare(const_pointer p_left, size_type size_left, const_pointer p_right, size_type size_right)
     {
-      int ret = traits_type::compare(p_left, p_right, util::min(size_left, size_right));
+      int ret = traits_type::compare(p_left, p_right, util::min_(size_left, size_right));
 
       if (ret == 0U)
       {
@@ -196,7 +198,7 @@ namespace util
     basic_string& assign(size_t count, value_type ch)
     {
       // limit count to the available space
-      count = ::util::min(count, max_size());
+      count = ::util::min_(count, max_size());
       it_end = ::util::fill_n(begin(), count, ch);
       return *this;
     }
@@ -212,7 +214,7 @@ namespace util
     template<int Size2>
     basic_string& assign(const basic_string<Size2, value_type>& s)
     {
-      size_t count = ::util::min(s.size(), max_size());
+      size_t count = ::util::min_(s.size(), max_size());
       it_end = ::util::copy_n(s.begin(), count, begin());
       return *this;
     }
@@ -224,7 +226,7 @@ namespace util
       if (s != nullptr)
       {
         // limit count to the available space
-        count = util::min(count, max_size());
+        count = util::min_(count, max_size());
         auto it = begin();
         while (count > 0U)
         {
@@ -321,7 +323,7 @@ namespace util
     basic_string& append(size_t count, CharT ch)
     {
       // limit count to the available space
-      count = min(count, remaining_size());
+      count = util::min_(count, remaining_size());
       it_end = util::fill_n(end(), count, ch);
       return *this;
     }
@@ -330,7 +332,7 @@ namespace util
     template<int Size2>
     basic_string& append(const basic_string<Size2, CharT>& str)
     {
-      size_t count = util::min(str.size(), remaining_size());
+      size_t count = util::min_(str.size(), remaining_size());
       it_end = util::copy_n(str.begin(), count, end());
       return *this;
     }
@@ -343,8 +345,8 @@ namespace util
       {
         // do not copy elements past the last element of str
         // and do not copy elements past the last element of this
-        count = util::min(count, str.size() - pos);
-        count = util::min(count, remaining_size());
+        count = util::min_(count, str.size() - pos);
+        count = util::min_(count, remaining_size());
         it_end = util::copy_n(str.begin() + pos, count, end());
       }
       return *this;
@@ -356,7 +358,7 @@ namespace util
       if (s != nullptr)
       {
         // limit count to the available space
-        count = min(count, remaining_size());
+        count = util::min_(count, remaining_size());
         auto it = end();
         while (count > 0U)
         {
@@ -492,9 +494,6 @@ namespace util
     ERR_RANGE       ///< out of range
   } tStringError;
 
-  int isspace(int ch);
-  bool isnull(char ch);
-
   // ---------------------------------------------------
   /// Interprets a signed integer value in the string str.
   /// (optional) plus or minus sign
@@ -516,7 +515,7 @@ namespace util
     }
 
     // Skip leading whitespace
-    while (!isnull(*str) && isspace(*str))
+    while ((*str != 0) && isspace(*str))
     {
       str++;
     }
@@ -659,7 +658,7 @@ namespace util
     }
 
     // Skip leading whitespace
-    while (!isnull(*str) && isspace(*str))
+    while ((*str != 0) && isspace(*str))
     {
       str++;
     }
