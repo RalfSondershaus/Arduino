@@ -1,23 +1,42 @@
 /**
- * @file test.cpp
+ * @file Test.cpp
  *
  * @author Ralf Sondershaus
  *
- * Google Test for Gen/Util/String.h
+ * Unity Test for Gen/Util/String.h
  */
 
+#include <unity_adapt.h>
+
+#include <Util/Array.h>
 #include <Util/String.h>
-#include <gtest/gtest.h>
 #include <stdint.h>
-#include <array>
-#include <algorithm>
 
-std::streampos h;
+#define CFG_OFF    0
+#define CFG_ON     1
 
-// explicit template instantiation to verify that all functions are compiling
-template util::basic_string<16, char>;
+// CFG_OFF = don't run tests with std::; typically on the target (such as Arduino Mega)
+// CFG_ON = run tests with std::; typically on the host (such as Windows)
+#ifdef ARDUINO
+#define CFG_TEST_WITH_STD    CFG_OFF
+#else
+#define CFG_TEST_WITH_STD    CFG_ON
+#endif
 
-TEST(Ut_String, Construct_empty)
+#if CFG_TEST_WITH_STD == CFG_ON
+#include <sstream>
+#include <iostream>
+#include <iomanip>
+#endif
+
+
+#if CFG_TEST_WITH_STD == CFG_ON
+template<> void EXPECT_EQ<std::streampos>(std::streampos actual, std::streampos expected) { EXPECT_EQ<std::streamoff>(expected, actual); }
+template<> void EXPECT_EQ<std::string>(std::string actual, std::string expected) { TEST_ASSERT_EQUAL_STRING(expected.c_str(), actual.c_str()); }
+#endif
+
+// -------------------------------------------------------------------------
+void Ut_String_Construct_empty(void)
 {
   util::basic_string<16, char> str;
   EXPECT_EQ(str.empty(), true);
@@ -25,7 +44,8 @@ TEST(Ut_String, Construct_empty)
   EXPECT_EQ(str.empty(), true);
 }
 
-TEST(Ut_String, Construct_from_const_pointer)
+// -------------------------------------------------------------------------
+void Ut_String_Construct_from_const_pointer(void)
 {
   util::basic_string<16, char> str("hello");
   EXPECT_EQ(str.empty(), false);
@@ -34,21 +54,24 @@ TEST(Ut_String, Construct_from_const_pointer)
   EXPECT_EQ(str.empty(), false);
 }
 
-TEST(Ut_String, Construct_from_cost_pointer_empty)
+// -------------------------------------------------------------------------
+void Ut_String_Construct_from_cost_pointer_empty(void)
 {
   util::basic_string<16, char> str("");
   EXPECT_EQ(str.empty(), true);
   EXPECT_EQ(str.compare(""), 0);
 }
 
-TEST(Ut_String, Construct_from_char)
+// -------------------------------------------------------------------------
+void Ut_String_Construct_from_char(void)
 {
   util::basic_string<16, char> str('A');
   EXPECT_EQ(str.empty(), false);
   EXPECT_EQ(str.compare("A"), 0);
 }
 
-TEST(Ut_String, Assign_operator_string)
+// -------------------------------------------------------------------------
+void Ut_String_Assign_operator_string(void)
 {
   util::basic_string<16, char> strA('A');
   util::basic_string<16, char> strB('B');
@@ -65,7 +88,8 @@ TEST(Ut_String, Assign_operator_string)
   EXPECT_EQ(strB.compare("B"), 0);
 }
 
-TEST(Ut_String, Assign_operator_string_longer)
+// -------------------------------------------------------------------------
+void Ut_String_Assign_operator_string_longer(void)
 {
   util::basic_string<16, char> strA('A');
   util::basic_string<32, char> strB('B');
@@ -82,7 +106,8 @@ TEST(Ut_String, Assign_operator_string_longer)
   EXPECT_EQ(strB.compare("B"), 0);
 }
 
-TEST(Ut_String, Assign_operator_string_shorter)
+// -------------------------------------------------------------------------
+void Ut_String_Assign_operator_string_shorter(void)
 {
   util::basic_string<16, char> strA('A');
   util::basic_string<8, char> strB('B');
@@ -99,7 +124,8 @@ TEST(Ut_String, Assign_operator_string_shorter)
   EXPECT_EQ(strB.compare("B"), 0);
 }
 
-TEST(Ut_String, Assign_operator_string_4_string_8)
+// -------------------------------------------------------------------------
+void Ut_String_Assign_operator_string_4_string_8(void)
 {
   util::basic_string<4, char> strA("A");
   util::basic_string<8, char> strB("BCDEFGHI");
@@ -118,7 +144,8 @@ TEST(Ut_String, Assign_operator_string_4_string_8)
   EXPECT_EQ(strB.compare("BCDEFGHI"), 0);
 }
 
-TEST(Ut_String, Assign_operator_string_8_string_4)
+// -------------------------------------------------------------------------
+void Ut_String_Assign_operator_string_8_string_4(void)
 {
   util::basic_string<8, char> strA("ABCDEFGH");
   util::basic_string<4, char> strB("WXYZ");
@@ -137,7 +164,8 @@ TEST(Ut_String, Assign_operator_string_8_string_4)
   EXPECT_EQ(strB.compare("WXYZ"), 0);
 }
 
-TEST(Ut_String, Assign_operator_string_string_empty)
+// -------------------------------------------------------------------------
+void Ut_String_Assign_operator_string_string_empty(void)
 {
   util::basic_string<8, char> strA("ABCDEFGH");
   util::basic_string<4, char> strB("");
@@ -156,7 +184,8 @@ TEST(Ut_String, Assign_operator_string_string_empty)
   EXPECT_EQ(strB.compare(""), 0);
 }
 
-TEST(Ut_String, Assign_operator_string_empty_string)
+// -------------------------------------------------------------------------
+void Ut_String_Assign_operator_string_empty_string(void)
 {
   util::basic_string<4, char> strA("");
   util::basic_string<8, char> strB("ABCDEFGH");
@@ -175,7 +204,8 @@ TEST(Ut_String, Assign_operator_string_empty_string)
   EXPECT_EQ(strB.compare("ABCDEFGH"), 0);
 }
 
-TEST(Ut_String, Assign_operator_const_pointer)
+// -------------------------------------------------------------------------
+void Ut_String_Assign_operator_const_pointer(void)
 {
   util::basic_string<16, char> strA('A');
   EXPECT_EQ(strA.empty(), false);
@@ -185,7 +215,8 @@ TEST(Ut_String, Assign_operator_const_pointer)
   EXPECT_EQ(strA.compare("B"), 0);
 }
 
-TEST(Ut_String, Append_const_pointer)
+// -------------------------------------------------------------------------
+void Ut_String_Append_const_pointer(void)
 {
   util::basic_string<16, char> str;
 
@@ -196,7 +227,27 @@ TEST(Ut_String, Append_const_pointer)
   EXPECT_EQ(str.compare("hello"), 0);
 }
 
-TEST(Ut_String, Append_string)
+// -------------------------------------------------------------------------
+void Ut_String_Append_const_pointer_with_clear(void)
+{
+  util::basic_string<16, char> str;
+
+  EXPECT_EQ(str.empty(), true);
+
+  str.append("hello");
+  EXPECT_EQ(str.empty(), false);
+  EXPECT_EQ(str.compare("hello"), 0);
+  str.clear();
+  EXPECT_EQ(str.empty(), true);
+  EXPECT_EQ(str.size(), static_cast<util::size_t>(0));
+  EXPECT_EQ(str.max_size(), static_cast<util::size_t>(16));
+  str.append("abc");
+  EXPECT_EQ(str.empty(), false);
+  EXPECT_EQ(str.compare("abc"), 0);
+}
+
+// -------------------------------------------------------------------------
+void Ut_String_Append_string(void)
 {
   util::basic_string<16, char> strA;
   util::basic_string<16, char> strB("hello");
@@ -208,7 +259,8 @@ TEST(Ut_String, Append_string)
   EXPECT_EQ(strA.compare("hello"), 0);
 }
 
-TEST(Ut_String, Append_sub_string)
+// -------------------------------------------------------------------------
+void Ut_String_Append_sub_string(void)
 {
   util::basic_string<16, char> strA;
   util::basic_string<8, char> strB("hello");
@@ -235,7 +287,8 @@ TEST(Ut_String, Append_sub_string)
   EXPECT_EQ(strA.find("hell"), 12U);
 }
 
-TEST(Ut_String, Append_sub_const_pointer)
+// -------------------------------------------------------------------------
+void Ut_String_Append_sub_const_pointer(void)
 {
   util::basic_string<16, char> strA;
 
@@ -255,7 +308,31 @@ TEST(Ut_String, Append_sub_const_pointer)
   EXPECT_EQ(strA.find("hell"), 12U);
 }
 
-TEST(Ut_String, Find_const_pointer_pos_0)
+// -------------------------------------------------------------------------
+void Ut_String_operator_plus_equal_char_with_clear(void)
+{
+  util::basic_string<16, char> str;
+
+  EXPECT_EQ(str.empty(), true);
+
+  str += 'a';
+  EXPECT_EQ(str.empty(), false);
+  EXPECT_EQ(str.compare("a"), 0);
+  str += 'b';
+  EXPECT_EQ(str.empty(), false);
+  EXPECT_EQ(str.compare("ab"), 0);
+  str.clear();
+  EXPECT_EQ(str.empty(), true);
+  str += 'c';
+  EXPECT_EQ(str.empty(), false);
+  EXPECT_EQ(str.compare("c"), 0);
+  str += 'd';
+  EXPECT_EQ(str.empty(), false);
+  EXPECT_EQ(str.compare("cd"), 0);
+}
+
+// -------------------------------------------------------------------------
+void Ut_String_Find_const_pointer_pos_0(void)
 {
   util::basic_string<16, char> str("hallihallo");
 
@@ -263,7 +340,8 @@ TEST(Ut_String, Find_const_pointer_pos_0)
   EXPECT_EQ(str.find("hallo"), 5U);
 }
 
-TEST(Ut_String, Find_string_pos_0)
+// -------------------------------------------------------------------------
+void Ut_String_Find_string_pos_0(void)
 {
   util::basic_string<16, char> strA("hallihallo");
   util::basic_string<16, char> strB("hallo");
@@ -272,7 +350,8 @@ TEST(Ut_String, Find_string_pos_0)
   EXPECT_EQ(strA.find(strB), 5U);
 }
 
-TEST(Ut_String, Find_string_pos_0_negative)
+// -------------------------------------------------------------------------
+void Ut_String_Find_string_pos_0_negative(void)
 {
   using string = typename util::basic_string<16, char>;
   string strA("hallihall");
@@ -282,7 +361,8 @@ TEST(Ut_String, Find_string_pos_0_negative)
   EXPECT_EQ(strA.find(strB), string::npos);
 }
 
-TEST(Ut_String, Find_const_pointer_pos_n)
+// -------------------------------------------------------------------------
+void Ut_String_Find_const_pointer_pos_n(void)
 {
   util::basic_string<16, char> strA("hallihallo");
 
@@ -290,7 +370,8 @@ TEST(Ut_String, Find_const_pointer_pos_n)
   EXPECT_EQ(strA.find("hall", 1), 5U);
 }
 
-TEST(Ut_String, Find_string_pos_n)
+// -------------------------------------------------------------------------
+void Ut_String_Find_string_pos_n(void)
 {
   util::basic_string<16, char> strA("hallihallo");
   util::basic_string<16, char> strB("hall");
@@ -299,7 +380,8 @@ TEST(Ut_String, Find_string_pos_n)
   EXPECT_EQ(strA.find(strB, 1), 5U);
 }
 
-TEST(Ut_String, Find_string_pos_n_negative)
+// -------------------------------------------------------------------------
+void Ut_String_Find_string_pos_n_negative(void)
 {
   using string = typename util::basic_string<16, char>;
   string strA("hallihallo");
@@ -309,8 +391,9 @@ TEST(Ut_String, Find_string_pos_n_negative)
   EXPECT_EQ(strA.find(strB, strA.length() + 1), string::npos);
 }
 
+// -------------------------------------------------------------------------
 // find without restart
-TEST(Ut_String, Find_string_abcd_bc)
+void Ut_String_Find_string_abcd_bc(void)
 {
   using string = typename util::basic_string<16, char>;
   string strA("abcd");
@@ -321,8 +404,9 @@ TEST(Ut_String, Find_string_abcd_bc)
   EXPECT_EQ(strA.find(strB, nPos), 1U);
 }
 
+// -------------------------------------------------------------------------
 // find with restart
-TEST(Ut_String, Find_string_ababcd_bc)
+void Ut_String_Find_string_ababcd_bc(void)
 {
   using string = typename util::basic_string<16, char>;
   string strA("ababcd");
@@ -333,8 +417,9 @@ TEST(Ut_String, Find_string_ababcd_bc)
   EXPECT_EQ(strA.find(strB, nPos), 3U);
 }
 
+// -------------------------------------------------------------------------
 // find with deep restart
-TEST(Ut_String, Find_string_abbdbbcd_bc)
+void Ut_String_Find_string_abbdbbcd_bc(void)
 {
   using string = typename util::basic_string<16, char>;
   string strA("abbdbbcd");
@@ -345,8 +430,9 @@ TEST(Ut_String, Find_string_abbdbbcd_bc)
   EXPECT_EQ(strA.find(strB, nPos), 5U);
 }
 
+// -------------------------------------------------------------------------
 // find empty string
-TEST(Ut_String, Find_string_abcd_empty)
+void Ut_String_Find_string_abcd_empty(void)
 {
   using string = typename util::basic_string<16, char>;
   string strA("abcd");
@@ -357,8 +443,9 @@ TEST(Ut_String, Find_string_abcd_empty)
   EXPECT_EQ(strA.find(strB, nPos), 0U);
 }
 
+// -------------------------------------------------------------------------
 // find without restart
-TEST(Ut_String, Find_const_pointer_abcd_bc)
+void Ut_String_Find_const_pointer_abcd_bc(void)
 {
   using string = typename util::basic_string<16, char>;
   string strA("abcd");
@@ -369,8 +456,9 @@ TEST(Ut_String, Find_const_pointer_abcd_bc)
   EXPECT_EQ(strA.find(strB, nPos), 1U);
 }
 
+// -------------------------------------------------------------------------
 // find with restart
-TEST(Ut_String, Find_const_pointer_ababcd_bc)
+void Ut_String_Find_const_pointer_ababcd_bc(void)
 {
   using string = typename util::basic_string<16, char>;
   string strA("ababcd");
@@ -381,8 +469,9 @@ TEST(Ut_String, Find_const_pointer_ababcd_bc)
   EXPECT_EQ(strA.find(strB, nPos), 3U);
 }
 
+// -------------------------------------------------------------------------
 // find with deep restart
-TEST(Ut_String, Find_const_pointer_abbdbbcd_bc)
+void Ut_String_Find_const_pointer_abbdbbcd_bc(void)
 {
   using string = typename util::basic_string<16, char>;
   string strA("abbdbbcd");
@@ -393,8 +482,9 @@ TEST(Ut_String, Find_const_pointer_abbdbbcd_bc)
   EXPECT_EQ(strA.find(strB, nPos), 5U);
 }
 
+// -------------------------------------------------------------------------
 // find empty string
-TEST(Ut_String, Find_const_pointer_abcd_empty)
+void Ut_String_Find_const_pointer_abcd_empty(void)
 {
   using string = typename util::basic_string<16, char>;
   string strA("abcd");
@@ -405,8 +495,9 @@ TEST(Ut_String, Find_const_pointer_abcd_empty)
   EXPECT_EQ(strA.find(strB, nPos), 0U);
 }
 
+// -------------------------------------------------------------------------
 // find character
-TEST(Ut_String, Find_character)
+void Ut_String_Find_character(void)
 {
   using string = typename util::basic_string<16, char>;
   const string strA("abcdABCD");
@@ -417,7 +508,7 @@ TEST(Ut_String, Find_character)
     char c;
     util::size_t expPos;
   };
-  const std::array<Step, 6> steps = { {
+  const util::array<Step, 6> steps = { {
     { 'a', 0 },
     { 'b', 1 },
     { 'e', npos },
@@ -426,10 +517,14 @@ TEST(Ut_String, Find_character)
     { 'E', npos }
   } };
 
-  std::for_each(steps.begin(), steps.end(), [&](const Step& v) { EXPECT_EQ(strA.find(v.c), v.expPos); });
+  for (auto it = steps.begin(); it != steps.end(); it++) 
+  { 
+    EXPECT_EQ(strA.find(it->c), it->expPos); 
+  };
 }
 
-TEST(Ut_String, Compare_with_const_pointer)
+// -------------------------------------------------------------------------
+void Ut_String_Compare_with_const_pointer(void)
 {
   util::basic_string<16, char> str("hello");
   EXPECT_EQ(str.empty(), false);
@@ -440,7 +535,8 @@ TEST(Ut_String, Compare_with_const_pointer)
   EXPECT_EQ(str.empty(), false);
 }
 
-TEST(Ut_String, Compare_with_string)
+// -------------------------------------------------------------------------
+void Ut_String_Compare_with_string(void)
 {
   util::basic_string<16, char> strA("hello");
   util::basic_string<16, char> strB("hello");
@@ -452,7 +548,8 @@ TEST(Ut_String, Compare_with_string)
   EXPECT_EQ(strA.compare(strB), -1);
 }
 
-TEST(Ut_String, stoi_base0)
+// -------------------------------------------------------------------------
+void Ut_String_stoi_base0(void)
 {
   typedef struct
   {
@@ -481,7 +578,8 @@ TEST(Ut_String, stoi_base0)
     { "00", 0, 2U }, // octal base
     { "017", 8+7, 3U }, // octal base
   };
-  int i, n;
+  size_t i;
+  int n;
   size_t pos;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
@@ -492,7 +590,8 @@ TEST(Ut_String, stoi_base0)
   }
 }
 
-TEST(Ut_String, stoi_base10)
+// -------------------------------------------------------------------------
+void Ut_String_stoi_base10(void)
 {
   typedef struct
   {
@@ -514,7 +613,8 @@ TEST(Ut_String, stoi_base10)
     { "21474836470", 0, 0U },  // out of range for 32 bit architectures
     { "word with 1", 0, 0U }
   };
-  int i, n;
+  size_t i;
+  int n;
   size_t pos;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
@@ -525,7 +625,8 @@ TEST(Ut_String, stoi_base10)
   }
 }
 
-TEST(Ut_String, stoi_base16)
+// -------------------------------------------------------------------------
+void Ut_String_stoi_base16(void)
 {
   typedef struct
   {
@@ -550,8 +651,8 @@ TEST(Ut_String, stoi_base16)
     { "7FFFFFFFF", 0, 0U },         // out of range for 32 bit architectures
     { "word with 1", 0, 0U }
   };
-  int i, n;
-  size_t pos;
+  int n;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -561,7 +662,8 @@ TEST(Ut_String, stoi_base16)
   }
 }
 
-TEST(Ut_String, stoui_uint32_base16)
+// -------------------------------------------------------------------------
+void Ut_String_stoui_uint32_base16(void)
 {
   using basetype = uint32;
   typedef struct
@@ -583,9 +685,8 @@ TEST(Ut_String, stoui_uint32_base16)
     { "FFFFFFFF", UINT32_MAX, 8U },
     { "word with 1", 0U, 0U }
   };
-  int i;
   basetype n;
-  size_t pos;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -595,7 +696,8 @@ TEST(Ut_String, stoui_uint32_base16)
   }
 }
 
-TEST(Ut_String, stoui_uint16_base16)
+// -------------------------------------------------------------------------
+void Ut_String_stoui_uint16_base16(void)
 {
   using basetype = uint16;
   typedef struct
@@ -618,9 +720,8 @@ TEST(Ut_String, stoui_uint16_base16)
     { "FFFFFFFF", 0U, 0U },
     { "word with 1", 0U, 0U }
   };
-  int i;
   basetype n;
-  size_t pos;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -630,7 +731,8 @@ TEST(Ut_String, stoui_uint16_base16)
   }
 }
 
-TEST(Ut_String, stoui_uint8_base16)
+// -------------------------------------------------------------------------
+void Ut_String_stoui_uint8_base16(void)
 {
   using basetype = uint8;
   typedef struct
@@ -653,9 +755,8 @@ TEST(Ut_String, stoui_uint8_base16)
     { "FFFFFFFF", 0U, 0U },
     { "word with 1", 0U, 0U }
   };
-  int i;
   basetype n;
-  size_t pos;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -665,7 +766,8 @@ TEST(Ut_String, stoui_uint8_base16)
   }
 }
 
-TEST(Ut_String, stoui_uint32_base10)
+// -------------------------------------------------------------------------
+void Ut_String_stoui_uint32_base10(void)
 {
   using basetype = uint32;
   typedef struct
@@ -690,9 +792,8 @@ TEST(Ut_String, stoui_uint32_base10)
     { "4294967295", UINT32_MAX, 10U },
     { "word with 1", 0U, 0U }
   };
-  int i;
   basetype n;
-  size_t pos;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -702,7 +803,8 @@ TEST(Ut_String, stoui_uint32_base10)
   }
 }
 
-TEST(Ut_String, stoui_uint16_base10)
+// -------------------------------------------------------------------------
+void Ut_String_stoui_uint16_base10(void)
 {
   using basetype = uint16;
   typedef struct
@@ -727,9 +829,8 @@ TEST(Ut_String, stoui_uint16_base10)
     { "4294967295", 0U, 0U },
     { "word with 1", 0U, 0U }
   };
-  int i;
   basetype n;
-  size_t pos;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -739,7 +840,8 @@ TEST(Ut_String, stoui_uint16_base10)
   }
 }
 
-TEST(Ut_String, stoui_uint8_base10)
+// -------------------------------------------------------------------------
+void Ut_String_stoui_uint8_base10(void)
 {
   using basetype = uint8;
   typedef struct
@@ -764,9 +866,8 @@ TEST(Ut_String, stoui_uint8_base10)
     { "4294967295", 0U, 0U },
     { "word with 1", 0U, 0U }
   };
-  int i;
   basetype n;
-  size_t pos;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -776,7 +877,8 @@ TEST(Ut_String, stoui_uint8_base10)
   }
 }
 
-TEST(Ut_String, stoui_uint32_base0)
+// -------------------------------------------------------------------------
+void Ut_String_stoui_uint32_base0(void)
 {
   using basetype = uint32;
   typedef struct
@@ -805,9 +907,8 @@ TEST(Ut_String, stoui_uint32_base0)
     { "0177777", UINT16_MAX, 7U },
     { "037777777777", UINT32_MAX, 12U },
   };
-  int i;
   basetype n;
-  size_t pos;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -817,7 +918,8 @@ TEST(Ut_String, stoui_uint32_base0)
   }
 }
 
-TEST(Ut_String, stoui_uint16_base0)
+// -------------------------------------------------------------------------
+void Ut_String_stoui_uint16_base0(void)
 {
   using basetype = uint16;
   typedef struct
@@ -846,9 +948,8 @@ TEST(Ut_String, stoui_uint16_base0)
     { "0177777", UINT16_MAX, 7U },
     { "037777777777", 0U, 0U },
   };
-  int i;
   basetype n;
-  size_t pos;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -858,7 +959,8 @@ TEST(Ut_String, stoui_uint16_base0)
   }
 }
 
-TEST(Ut_String, stoui_uint8_base0)
+// -------------------------------------------------------------------------
+void Ut_String_stoui_uint8_base0(void)
 {
   using basetype = uint8;
   typedef struct
@@ -887,9 +989,8 @@ TEST(Ut_String, stoui_uint8_base0)
     { "0177777", 0U, 0U },
     { "037777777777", 0U, 0U },
   };
-  int i;
   basetype n;
-  size_t pos;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -899,7 +1000,8 @@ TEST(Ut_String, stoui_uint8_base0)
   }
 }
 
-TEST(Ut_String, stoui_uint8_base2)
+// -------------------------------------------------------------------------
+void Ut_String_stoui_uint8_base2(void)
 {
   using basetype = uint8;
   typedef struct
@@ -921,9 +1023,8 @@ TEST(Ut_String, stoui_uint8_base2)
     { "111111111",        0U, 0U },
     { "012111111",        1U, 2U },
   };
-  int i;
   basetype n;
-  size_t pos;
+  size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
@@ -931,4 +1032,75 @@ TEST(Ut_String, stoui_uint8_base2)
     EXPECT_EQ(n, aSteps[i].n);
     EXPECT_EQ(pos, aSteps[i].pos);
   }
+}
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+}
+
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
+{
+  UNITY_BEGIN();
+
+  RUN_TEST(Ut_String_Construct_empty);
+  RUN_TEST(Ut_String_Construct_from_const_pointer);
+  RUN_TEST(Ut_String_Construct_from_cost_pointer_empty);
+  RUN_TEST(Ut_String_Construct_from_char);
+  RUN_TEST(Ut_String_Assign_operator_string);
+  RUN_TEST(Ut_String_Assign_operator_string_longer);
+  RUN_TEST(Ut_String_Assign_operator_string_shorter);
+  RUN_TEST(Ut_String_Assign_operator_string_4_string_8);
+  RUN_TEST(Ut_String_Assign_operator_string_8_string_4);
+  RUN_TEST(Ut_String_Assign_operator_string_string_empty);
+  RUN_TEST(Ut_String_Assign_operator_string_empty_string);
+  RUN_TEST(Ut_String_Assign_operator_const_pointer);
+  RUN_TEST(Ut_String_Append_const_pointer);
+  RUN_TEST(Ut_String_Append_const_pointer_with_clear);
+  RUN_TEST(Ut_String_Append_string);
+  RUN_TEST(Ut_String_Append_sub_string);
+  RUN_TEST(Ut_String_Append_sub_const_pointer);
+  RUN_TEST(Ut_String_operator_plus_equal_char_with_clear);
+  RUN_TEST(Ut_String_Find_const_pointer_pos_0);
+  RUN_TEST(Ut_String_Find_string_pos_0);
+  RUN_TEST(Ut_String_Find_string_pos_0_negative);
+  RUN_TEST(Ut_String_Find_const_pointer_pos_n);
+  RUN_TEST(Ut_String_Find_string_pos_n);
+  RUN_TEST(Ut_String_Find_string_pos_n_negative);
+  RUN_TEST(Ut_String_Find_string_abcd_bc);
+  RUN_TEST(Ut_String_Find_string_ababcd_bc);
+  RUN_TEST(Ut_String_Find_string_abbdbbcd_bc);
+  RUN_TEST(Ut_String_Find_string_abcd_empty);
+  RUN_TEST(Ut_String_Find_const_pointer_abcd_bc);
+  RUN_TEST(Ut_String_Find_const_pointer_ababcd_bc);
+  RUN_TEST(Ut_String_Find_const_pointer_abbdbbcd_bc);
+  RUN_TEST(Ut_String_Find_const_pointer_abcd_empty);
+  RUN_TEST(Ut_String_Find_character);
+  RUN_TEST(Ut_String_Compare_with_const_pointer);
+  RUN_TEST(Ut_String_Compare_with_string);
+  RUN_TEST(Ut_String_stoi_base0);
+  RUN_TEST(Ut_String_stoi_base10);
+  RUN_TEST(Ut_String_stoi_base16);
+  RUN_TEST(Ut_String_stoui_uint32_base16);
+  RUN_TEST(Ut_String_stoui_uint16_base16);
+  RUN_TEST(Ut_String_stoui_uint8_base16);
+  RUN_TEST(Ut_String_stoui_uint32_base10);
+  RUN_TEST(Ut_String_stoui_uint16_base10);
+  RUN_TEST(Ut_String_stoui_uint8_base10);
+  RUN_TEST(Ut_String_stoui_uint32_base0);
+  RUN_TEST(Ut_String_stoui_uint16_base0);
+  RUN_TEST(Ut_String_stoui_uint8_base0);
+  RUN_TEST(Ut_String_stoui_uint8_base2);
+
+  (void) UNITY_END();
+
+   // Return false to stop program execution (relevant on Windows)
+  return false;
 }

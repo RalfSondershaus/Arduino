@@ -133,13 +133,18 @@ namespace dcc
 
     public:
       /// Default constructor
-      FifoHandlerIfc() : bOverflow(false), packetCnt(0)
+      FifoHandlerIfc() : packetCnt(0), bOverflow(false)
       {
         packetConfig.Multifunction_ExtendedAddressing = false;
         packetConfig.Accessory_OutputAddressMethod = false;
       }
-      /// Destructor
-      ~FifoHandlerIfc() override = default;
+
+      /// Do not define (virtual) destructors
+      /// - Nothing to be deleted since dynamic memory allocation is not used
+      ///   and objects are destructed at shut down only (-> never).
+      /// - When using virtual destructors, AVR GCC throws 'undefined reference 
+      ///   to `operator delete(void*, unsigned int)'.
+      ///   Non-virtual destructors don't throw this error.
 
       /// Decode the packet, apply the filter (if any) and (if filter is passed)
       /// store it in the packet FIFO.

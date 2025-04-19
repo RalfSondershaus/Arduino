@@ -34,16 +34,12 @@ constexpr uint16 kWhiteHi = (147 + 10);
 constexpr uint16 kAdMin = 0;
 constexpr uint16 kAdMax = 1023;
 
-constexpr uint8 kClassified = cal::input_type::kClassified;
-constexpr uint8 kOnboard = cal::target_type::kOnboard;
-constexpr uint8 kNone = cal::target_type::kNone;
-
-#define INPUT0 { kClassified, 0 }
-#define INPUT1 { kClassified, 1 }
-#define INPUT2 { kClassified, 2 }
-#define INPUT3 { kClassified, 3 }
-#define INPUT4 { kClassified, 4 }
-#define INPUT5 { kNone      , 0 }
+#define INPUT0 { cal::input_type::eClassified, 0 }
+#define INPUT1 { cal::input_type::eClassified, 1 }
+#define INPUT2 { cal::input_type::eClassified, 2 }
+#define INPUT3 { cal::input_type::eClassified, 3 }
+#define INPUT4 { cal::input_type::eClassified, 4 }
+#define INPUT5 { cal::input_type::eNone      , 0 }
 
 #define ASPECTS0 { { 0b00011000, 0b00000000 }, { 0b00000100, 0b00000000 }, { 0b00000110, 0b00000000 }, { 0b00011001, 0b00000000 }, { 0b00011111, 0b00000000 } }
 #define ASPECTS1 { { 0b00011000, 0b00000000 }, { 0b00000100, 0b00000000 }, { 0b00000110, 0b00000000 }, { 0b00011001, 0b00000000 }, { 0b00011111, 0b00000000 } }

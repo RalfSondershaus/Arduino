@@ -22,8 +22,7 @@
 
 #include <Cal/CalM.h>
 #include <Rte/Rte.h>
-#include <Arduino.h>
-#include <EEPROM.h>
+#include <Hal/EEPROM.h>
 
 #include <Cal/CalM_config.h>
 
@@ -107,7 +106,7 @@ namespace cal
   // -----------------------------------------------
   bool CalM::isValid()
   {
-    return EEPROM.read(eeprom::eManufacturerID) != eeprom::kInitial;
+    return hal::eeprom::read(eeprom::eManufacturerID) != eeprom::kInitial;
   }
 
   // -----------------------------------------------
@@ -180,16 +179,16 @@ namespace cal
   // -----------------------------------------------
   void CalM::readBaseCV()
   {
-    base_cv.AddressLSB = EEPROM.read(eeprom::eDecoderAddressLSB);
-    base_cv.AddressMSB = EEPROM.read(eeprom::eDecoderAddressMSB);
-    base_cv.AuxAct = EEPROM.read(eeprom::eAuxiliaryActivattion);
+    base_cv.AddressLSB = hal::eeprom::read(eeprom::eDecoderAddressLSB);
+    base_cv.AddressMSB = hal::eeprom::read(eeprom::eDecoderAddressMSB);
+    base_cv.AuxAct = hal::eeprom::read(eeprom::eAuxiliaryActivattion);
     for (int i = 0; i < 4; i++)
     {
-      base_cv.TimeOn[i] = EEPROM.read(eeprom::eTimeOnBase + i);
+      base_cv.TimeOn[i] = hal::eeprom::read(eeprom::eTimeOnBase + i);
     }
-    base_cv.ManufacturerID = EEPROM.read(eeprom::eManufacturerID);
-    base_cv.ManufacturerVersionID = EEPROM.read(eeprom::eManufacturerVersionID);
-    base_cv.Configuration = EEPROM.read(eeprom::eConfiguration);
+    base_cv.ManufacturerID = hal::eeprom::read(eeprom::eManufacturerID);
+    base_cv.ManufacturerVersionID = hal::eeprom::read(eeprom::eManufacturerVersionID);
+    base_cv.Configuration = hal::eeprom::read(eeprom::eConfiguration);
   }
 
   // -----------------------------------------------
@@ -202,24 +201,24 @@ namespace cal
     for (auto it = signals.begin(); it < signals.end(); it++)
     {
       // byte 1: input
-      it->input.raw = EEPROM.read(unEepIdx); unEepIdx++;
+      it->input.raw = hal::eeprom::read(unEepIdx); unEepIdx++;
 
       // bytes 2 - 11: aspect and blinking
       for (auto aspect_it = it->aspects.begin(); aspect_it < it->aspects.end(); aspect_it++)
       {
-        aspect_it->aspect = EEPROM.read(unEepIdx); unEepIdx++;
-        aspect_it->blink = EEPROM.read(unEepIdx); unEepIdx++;
+        aspect_it->aspect = hal::eeprom::read(unEepIdx); unEepIdx++;
+        aspect_it->blink = hal::eeprom::read(unEepIdx); unEepIdx++;
       }
 
       // bytes 12 - 16: targets
       for (auto target_it = it->targets.begin(); target_it < it->targets.end(); target_it++)
       {
-        target_it->type = EEPROM.read(unEepIdx); unEepIdx++;
+        target_it->type = hal::eeprom::read(unEepIdx); unEepIdx++;
       }
 
       // bytes 17, 18: change over time and blink change over time
-      it->changeOverTime = EEPROM.read(unEepIdx); unEepIdx++;
-      it->blinkChangeOverTime = EEPROM.read(unEepIdx);
+      it->changeOverTime = hal::eeprom::read(unEepIdx); unEepIdx++;
+      it->blinkChangeOverTime = hal::eeprom::read(unEepIdx);
     }
   }
 
@@ -233,21 +232,21 @@ namespace cal
     for (auto it = input_classifiers.classifiers.begin(); it < input_classifiers.classifiers.end(); it++)
     {
       // byte 1: pin
-      it->ucPin = EEPROM.read(unEepIdx); unEepIdx++;
+      it->ucPin = hal::eeprom::read(unEepIdx); unEepIdx++;
 
       // byte 2: debounce
-      it->limits.ucDebounce = EEPROM.read(unEepIdx); unEepIdx++;
+      it->limits.ucDebounce = hal::eeprom::read(unEepIdx); unEepIdx++;
 
       // bytes 3 - 7: lower limits
       for (auto limit_it = it->limits.aucLo.begin(); limit_it < it->limits.aucLo.end(); limit_it++)
       {
-        *limit_it = EEPROM.read(unEepIdx); unEepIdx++;
+        *limit_it = hal::eeprom::read(unEepIdx); unEepIdx++;
       }
 
       // bytes 8 - 12: upper limits
       for (auto limit_it = it->limits.aucHi.begin(); limit_it < it->limits.aucHi.end(); limit_it++)
       {
-        *limit_it = EEPROM.read(unEepIdx); unEepIdx++;
+        *limit_it = hal::eeprom::read(unEepIdx); unEepIdx++;
       }
     }
   }
@@ -257,16 +256,16 @@ namespace cal
   // -----------------------------------------------
   bool CalM::updateBaseCV()
   {
-    EEPROM.update(eeprom::eDecoderAddressLSB, base_cv.AddressLSB);
-    EEPROM.update(eeprom::eDecoderAddressMSB, base_cv.AddressMSB);
-    EEPROM.update(eeprom::eAuxiliaryActivattion, base_cv.AuxAct);
+    hal::eeprom::update(eeprom::eDecoderAddressLSB, base_cv.AddressLSB);
+    hal::eeprom::update(eeprom::eDecoderAddressMSB, base_cv.AddressMSB);
+    hal::eeprom::update(eeprom::eAuxiliaryActivattion, base_cv.AuxAct);
     for (int i = 0; i < 4; i++)
     {
-      EEPROM.update(eeprom::eTimeOnBase + i, base_cv.TimeOn[i]);
+      hal::eeprom::update(eeprom::eTimeOnBase + i, base_cv.TimeOn[i]);
     }
-    EEPROM.update(eeprom::eManufacturerID, base_cv.ManufacturerID);
-    EEPROM.update(eeprom::eManufacturerVersionID, base_cv.ManufacturerVersionID);
-    EEPROM.update(eeprom::eConfiguration, base_cv.Configuration);
+    hal::eeprom::update(eeprom::eManufacturerID, base_cv.ManufacturerID);
+    hal::eeprom::update(eeprom::eManufacturerVersionID, base_cv.ManufacturerVersionID);
+    hal::eeprom::update(eeprom::eConfiguration, base_cv.Configuration);
 
     return true;
   }
@@ -281,24 +280,24 @@ namespace cal
     for (auto it = signals.begin(); it < signals.end(); it++)
     {
       // byte 1: input
-      EEPROM.update(unEepIdx, it->input.raw); unEepIdx++;
+      hal::eeprom::update(unEepIdx, it->input.raw); unEepIdx++;
 
       // bytes 2 - 11: aspect and blinking
       for (auto aspect_it = it->aspects.begin(); aspect_it < it->aspects.end(); aspect_it++)
       {
-        EEPROM.update(unEepIdx, aspect_it->aspect); unEepIdx++;
-        EEPROM.update(unEepIdx, aspect_it->blink); unEepIdx++;
+        hal::eeprom::update(unEepIdx, aspect_it->aspect); unEepIdx++;
+        hal::eeprom::update(unEepIdx, aspect_it->blink); unEepIdx++;
       }
 
       // bytes 12 - 16: targets
       for (auto target_it = it->targets.begin(); target_it < it->targets.end(); target_it++)
       {
-        EEPROM.update(unEepIdx, target_it->type); unEepIdx++;
+        hal::eeprom::update(unEepIdx, target_it->type); unEepIdx++;
       }
 
       // bytes 17, 18: change over time and blink change over time
-      EEPROM.update(unEepIdx, it->changeOverTime); unEepIdx++;
-      EEPROM.update(unEepIdx, it->blinkChangeOverTime); unEepIdx++;
+      hal::eeprom::update(unEepIdx, it->changeOverTime); unEepIdx++;
+      hal::eeprom::update(unEepIdx, it->blinkChangeOverTime); unEepIdx++;
     }
 
     return true;
@@ -314,21 +313,21 @@ namespace cal
     for (auto it = input_classifiers.classifiers.begin(); it < input_classifiers.classifiers.end(); it++)
     {
       // byte 1: pin
-      EEPROM.update(unEepIdx, it->ucPin); unEepIdx++;
+      hal::eeprom::update(unEepIdx, it->ucPin); unEepIdx++;
 
       // byte 2: debounce
-      EEPROM.update(unEepIdx, it->limits.ucDebounce); unEepIdx++;
+      hal::eeprom::update(unEepIdx, it->limits.ucDebounce); unEepIdx++;
 
       // bytes 3 - 7: lower limits
       for (auto limit_it = it->limits.aucLo.begin(); limit_it < it->limits.aucLo.end(); limit_it++)
       {
-        EEPROM.update(unEepIdx, *limit_it); unEepIdx++;
+        hal::eeprom::update(unEepIdx, *limit_it); unEepIdx++;
       }
 
       // bytes 8 - 12: upper limits
       for (auto limit_it = it->limits.aucHi.begin(); limit_it < it->limits.aucHi.end(); limit_it++)
       {
-        EEPROM.update(unEepIdx, *limit_it); unEepIdx++;
+        hal::eeprom::update(unEepIdx, *limit_it); unEepIdx++;
       }
     }
 
@@ -374,48 +373,77 @@ namespace cal
   }
 
   // -----------------------------------------------
-  /// Store data in RAM. Doesn't not store data in EEPROM (call update() for this).
-  /// Return true is successful, returns false otherwise.
+  /// Server function: Store data in RAM. If doUpdate is true, stores data
+  /// in EEPROM. Otherwise, call update() for this.
+  /// Return OK is successful, returns NOK otherwise.
   // -----------------------------------------------
-  bool CalM::set_signal(uint8 ucSignalId, const signal_type& values)
+  rte::ret_type CalM::set_signal(uint8 ucSignalId, const signal_type& values, bool doUpdate)
   {
-    bool bRet = false;
+    rte::ret_type ret = rte::ret_type::NOK;
 
     if (signals.check_boundary(ucSignalId))
     {
       util::memcpy(&signals.at(ucSignalId), &values, sizeof(signal_type));
       calcLeds();
-      bRet = true;
+      if (doUpdate)
+      {
+        ret = updateSignals() ? rte::ret_type::OK : rte::ret_type::NOK;
+      }
+      else
+      {
+        ret = rte::ret_type::OK;
+      }
     }
 
-    return bRet;
+    return ret;
   }
   
   // -----------------------------------------------
-  /// Store data in RAM. Doesn't not store data in EEPROM (call update() for this).
-  /// Return true is successful, returns false otherwise.
+  /// Server function: Store data in RAM. If doUpdate is true, stores data
+  /// in EEPROM. Otherwise, call update() for this.
+  /// Return OK is successful, returns NOK otherwise.
   // -----------------------------------------------
-  bool CalM::set_classifier(uint8 ucClassifierId, const input_classifier_single_type& values)
+  rte::ret_type CalM::set_classifier(uint8 ucClassifierId, const input_classifier_single_type& values, bool doUpdate)
   {
-    bool bRet = false;
+    rte::ret_type ret = rte::ret_type::NOK;
 
     if (input_classifiers.classifiers.check_boundary(ucClassifierId))
     {
       util::memcpy(&input_classifiers.classifiers.at(ucClassifierId), &values, sizeof(input_classifier_single_type));
-      bRet = true;
+      if (doUpdate)
+      {
+        ret = updateClassifiers() ? rte::ret_type::OK : rte::ret_type::NOK;
+      }
+      else
+      {
+        ret = rte::ret_type::OK;
+      }
     }
 
-    return bRet;
+    return ret;
   }
 
   // -----------------------------------------------
-  /// Store data in RAM. Doesn't not store data in EEPROM (call update() for this).
-  /// Return true is successful, returns false otherwise.
+  /// Server function: Store data in RAM. If doUpdate is true, stores data
+  /// in EEPROM. Otherwise, call update() for this.
+  /// Return OK is successful, returns NOK otherwise.
   // -----------------------------------------------
-  bool CalM::set_base_cv(const base_cv_cal_type& p)
+  rte::ret_type CalM::set_base_cv(const base_cv_cal_type& p, bool doUpdate)
   {
+    rte::ret_type ret;
+
     base_cv = p;
-    return true;
+
+    if (doUpdate)
+    {
+      ret = updateBaseCV() ? rte::ret_type::OK : rte::ret_type::NOK;
+    }
+    else
+    {
+      ret = rte::ret_type::OK;
+    }
+    
+    return ret;
   }
 
   // -----------------------------------------------

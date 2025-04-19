@@ -84,13 +84,13 @@ static void test_ramp(const int cycleTime, const T startIntensity, const T endIn
       {
         expectedCur = endIntensity;
       }
-      expectedCur = util::min(endIntensity, expectedCur);
+      expectedCur = util::min_(endIntensity, expectedCur);
     }
     else
     {
       // expectedCur -= curInc
       util::math::sub_underflow_sat<ramp_base_type>(expectedCur, curInc, &expectedCur);
-      expectedCur = util::max(endIntensity, expectedCur);
+      expectedCur = util::max_(endIntensity, expectedCur);
     }
     const ramp_base_type cur = myRamp.step();
     if (doLog)
@@ -375,7 +375,7 @@ TEST(Ut_Ramp, do_ramp_16bit_10_0x0_0x8000_0x0100_set_and_step)
     {
       expectedCur = endIntensity;
     }
-    expectedCur = util::min(endIntensity, expectedCur);
+    expectedCur = util::min_(endIntensity, expectedCur);
 
     myRamp.init_from_slope(endIntensity, slope, cycleTime);
     const ramp_base_type cur = myRamp.step();

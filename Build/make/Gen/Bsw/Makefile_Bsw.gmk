@@ -50,6 +50,7 @@ FILES_BSW :=  $(FILES_BSW)                             \
 C_INCLUDES_BSW := -I$(PATH_SRC_ARDUINO_CORE)                    \
                   -I$(PATH_SRC_ARDUINO_LIBRARIES)/EEPROM/src    \
                   -I$(PATH_SRC_GEN)/Os/Arduino/$(ARG_COMPILER)  \
+                  -I$(PATH_SRC_GEN)/Hal/Arduino/EEPROM          \
                   -I$(PATH_SRC_GEN)/Hal/Arduino/Gpio            \
                   -I$(PATH_SRC_GEN)/Hal/Arduino/Serial          \
                   -I$(PATH_SRC_GEN)/Hal/Arduino/Timer           \
@@ -75,6 +76,7 @@ FILES_BSW :=  $(FILES_BSW)                    \
               $(PATH_SRC_WIN_CORE)/WinArduino
 
 C_INCLUDES_BSW := -I$(PATH_SRC_WIN_CORE)            \
+                  -I$(PATH_SRC_GEN)/Hal/Win/EEPROM  \
                   -I$(PATH_SRC_GEN)/Hal/Win/Gpio    \
                   -I$(PATH_SRC_GEN)/Hal/Win/Timer
 

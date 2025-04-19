@@ -25,6 +25,7 @@
 
 #include <Std_Types.h>
 #include <Cal/CalM_Type.h>
+#include <Rte/Rte_Type.h>
 
 namespace cal
 {
@@ -84,11 +85,12 @@ namespace cal
     const led_cal_type *              get_leds()               { return &leds; }
     const base_cv_cal_type *          get_base_cv()            { return &base_cv; }
 
-    /// Save data to RAM. Doesn't not store data in EEPROM (call update() for this).
-    /// Return true is successful, returns false otherwise.
-    bool set_signal(uint8 ucSignalId, const signal_type& values);
-    bool set_classifier(uint8 ucClassifierId, const input_classifier_single_type& values);
-    bool set_base_cv(const base_cv_cal_type& p);
+    /// Server function: Store data in RAM. If doUpdate is true, stores data
+    /// in EEPROM. Otherwise, call update() for this.
+    /// Return OK is successful, returns NOK otherwise.
+    rte::ret_type set_signal(uint8 ucSignalId, const signal_type& values, bool doUpdate = false);
+    rte::ret_type set_classifier(uint8 ucClassifierId, const input_classifier_single_type& values, bool doUpdate = false);
+    rte::ret_type set_base_cv(const base_cv_cal_type& p, bool doUpdate = false);
     
     /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
     /// Validate the data after write.

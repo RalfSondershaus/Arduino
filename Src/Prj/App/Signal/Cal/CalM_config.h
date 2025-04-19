@@ -20,7 +20,11 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
+#ifndef CALM_CONFIG_H_
+#define CALM_CONFIG_H_
+
 #include <Cfg_Prj.h> // number of signals
+#include <Cal/CalM_Type.h>
 
 using classifier_type = cal::input_classifier_type::classifier_type;
 
@@ -70,6 +74,15 @@ namespace cal
       eManufacturerCVStructureID  = 32,
       eSignalBase                 = 33,                        ///< EEPROM base address and kSignalLenNvm (18) bytes per signal
       eClassifierBase             = eSignalBase + kSignalsLen  ///< EEPROM base address and kInputClassifierLenNvm (12) bytes per classifier
+    };
+
+    enum
+    {
+      eSignalInput = 0,
+      eSignalAspectBase = 1,
+      eSignalTargetBase = 11,
+      eSignalChangeOverTime = 16,
+      eSignalChangeOverTimeForBlinking = 17
     };
   }
 
@@ -194,3 +207,5 @@ namespace cal
                           .ManufacturerID = cal::kManufacturerID,                \
                           .AddressMSB = cal::kAddressMSB,                        \
                           .Configuration = cal::kConfiguration
+
+#endif // CALM_CONFIG_H_

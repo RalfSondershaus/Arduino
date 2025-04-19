@@ -45,7 +45,13 @@ namespace dcc
       typedef This::PacketType PacketType;
       /// Construct and destruct
       HandlerIfc() {}
-      virtual ~HandlerIfc() {}
+
+      /// Do not define (virtual) destructors
+      /// - Nothing to be deleted since dynamic memory allocation is not used
+      ///   and objects are destructed at shut down only (-> never).
+      /// - When using virtual destructors, AVR GCC throws 'undefined reference 
+      ///   to `operator delete(void*, unsigned int)'.
+
       /// If a new packet is available, this function is called
       /// The parameter pkt is not const to enable the handler to
       /// modify the received packet, e.g. to call decode() for

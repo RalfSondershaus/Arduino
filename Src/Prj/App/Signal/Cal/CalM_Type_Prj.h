@@ -99,7 +99,7 @@ namespace cal
   } signal_type;
 
   /// Calibration data type for each signal
-  typedef util::array<signal_type, cfg::kNrSignals> signal_cal_type;
+  using signal_cal_type = util::array<signal_type, cfg::kNrSignals>;
 
   /// Calibration data for DccDecoder
   typedef struct

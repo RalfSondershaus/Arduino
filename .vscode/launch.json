@@ -1,6 +1,51 @@
 {
     "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "UnitTestProjectName",
+            "type": "pickString",
+            "description": "Select project name",
+            "default": "Ut_String",
+            "options": [ 
+                "UnitTest/Gen/Util/Ut_Fix_Deque",
+                "UnitTest/Gen/Util/Ut_Fix_Queue",
+                "UnitTest/Gen/Util/Ut_Packet",
+                "UnitTest/Gen/Util/Ut_PacketExtractor",
+                "UnitTest/Gen/Util/Ut_Ramp",
+                "UnitTest/Gen/Util/Ut_Sstream",
+                "Ut_String",
+                "UnitTest/Gen/Util/Ut_String_view",
+                "UnitTest/Gen/Util/Ut_Vector",
+            ]
+        }
+    ],
     "configurations": [
+        {
+            "name": "Debug UnitTest",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\Build\\bin\\${input:UnitTestProjectName}.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}\\Build\\bin",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Users\\Papi\\W\\tools\\MinGW\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build UnitTest Win gcc"
+        },
         {
             "name": "Debug Ut_String_Unity",
             "type": "cppdbg",
@@ -136,6 +181,32 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}\\Build\\bin\\Ut_String_view.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}\\Build\\bin",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Users\\Papi\\W\\tools\\MinGW\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build UnitTest Win gcc"
+        },
+        {
+            "name": "Debug Ut_Signal_Com",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\Build\\bin\\Ut_Signal_Com.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}\\Build\\bin",

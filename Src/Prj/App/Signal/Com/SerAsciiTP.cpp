@@ -19,6 +19,8 @@
  */
 
 #include <Com/SerAsciiTP.h>
+#include <Hal/EEPROM.h>
+#include <Util/ctype.h>
 
 namespace com
 {
@@ -26,6 +28,7 @@ namespace com
   void SerAsciiTP::init()
   {}
 
+  // SET SIGNAL 0 ASPECTS 11000 00000 00100 00000 00110 00000 11001 00000 11111 00000
   /// Receive data from low level drivers and process them
   void SerAsciiTP::cycle()
   {
@@ -33,18 +36,34 @@ namespace com
     {
       bool cntrlFound = false;
 
-      while (driver->available() && (telegram_rawdata.size() < telegram_rawdata.max_size()))
+      while (driver->available())
       {
         int b = driver->read();
-
-        if (iscntrl(b))
+        if (util::iscntrl(b))
         {
           cntrlFound = true;
           break;
         }
+        else if (!bOverflow)
+        {
+          if (telegram_rawdata.size() < telegram_rawdata.max_size())
+          {
+            if (util::isalnum(b) || util::isspace(b))
+            {
+              telegram_rawdata += string_type::traits_type::to_char_type(b);
+            }
+          }
+          else
+          {
+            bOverflow = true;
+            hal::serial::print("ERR: message too long: ");
+            hal::serial::println(telegram_rawdata.c_str());
+            break;
+          }
+        }
         else
         {
-          telegram_rawdata += (telegram_base_type) b;
+          // skip characters until cntrl is found
         }
       }
 
@@ -53,21 +72,24 @@ namespace com
         if (!bOverflow)
         {
           notify();
+          hal::serial::println(telegram_rawdata.c_str());
         }
         else
         {
           bOverflow = false;
         }
+        telegram_rawdata.clear();
       }
-      else
-      {
-        // Check for messages that are longer than our buffer, and discard them
-        if (telegram_rawdata.size() >= telegram_rawdata.max_size())
-        {
-          telegram_rawdata.clear();
-          bOverflow = true;
-        }
-      }
+    }
+  }
+
+  /// Transmit a character string to the serial port and append a backslash.
+  void SerAsciiTP::transmitTelegram(const string_type& telegram)
+  {
+    if (driver)
+    {
+      driver->write(telegram.c_str());
+      driver->write("\r\n");
     }
   }
 

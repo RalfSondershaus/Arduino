@@ -53,10 +53,10 @@ namespace com
   protected:
     /// The communication driver, can be null, data are fetched from this driver
     util::ptr<SerComDrv> driver;
+
+    /// Help to discard messages that are longer than kMaxLenTelegram
     bool bOverflow;
-    /// Returns true if ch is a control character.
-    /// TODO Utilize util::iscntrl
-    bool iscntrl(int ch) { return ch == '\n'; }
+
   public:
     /// Construct.
     SerAsciiTP() = default;
@@ -66,6 +66,10 @@ namespace com
     SerAsciiTP(SerComDrv& drv) : driver(&drv), bOverflow(false)
     {}
 
+    /// @brief Attach a serial driver to this TP
+    /// @param drv The communication driver that shall be used to fetch data
+    void setDriver(SerComDrv& drv) { driver = &drv; }
+
     /// Initialization
     void init();
     /// Receive data from low level drivers and process them
@@ -73,6 +77,9 @@ namespace com
 
     /// Returns a reference to the telegram raw data.
     const string_type& getTelegram() const noexcept { return telegram_rawdata; }
+
+    /// Transmit a character string to the serial port and append a backslash.
+    void transmitTelegram(const string_type& telegram);
   };
 
 } // namespace com

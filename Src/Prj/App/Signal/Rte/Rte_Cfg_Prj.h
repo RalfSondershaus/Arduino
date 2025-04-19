@@ -30,11 +30,13 @@
 #include <Signal.h>
 #include <Dcc/Decoder.h>
 #include <Cal/CalM.h>
+#include <Com/ComR.h>
 
 RTE_DEF_START
 
 RTE_DEF_OBJ_START
-RTE_DEF_OBJ(cal::CalM, calib_mgr)
+RTE_DEF_OBJ(cal::CalM, calm)
+RTE_DEF_OBJ(com::ComR, comr)
 RTE_DEF_OBJ(signal::DccDecoder, dcc_decoder)
 RTE_DEF_OBJ(signal::InputClassifier, input_classifier)
 RTE_DEF_OBJ(signal::LedRouter, led_router)
@@ -44,7 +46,8 @@ RTE_DEF_OBJ(cdd::CddLed, cddled)
 RTE_DEF_OBJ_END
 
 RTE_DEF_INIT_RUNABLE_START
-RTE_DEF_INIT_RUNABLE(cal::CalM, calib_mgr, init)
+RTE_DEF_INIT_RUNABLE(cal::CalM, calm, init)
+RTE_DEF_INIT_RUNABLE(com::ComR, comr, init)
 RTE_DEF_INIT_RUNABLE(signal::DccDecoder, dcc_decoder, init)
 RTE_DEF_INIT_RUNABLE(signal::InputClassifier, input_classifier, init)
 RTE_DEF_INIT_RUNABLE(signal::SignalHandler, signal_handler, init)
@@ -56,7 +59,8 @@ RTE_DEF_CYCLIC_RUNABLE(signal::InputClassifier, input_classifier, cycle   , 0  ,
 RTE_DEF_CYCLIC_RUNABLE(signal::DccDecoder     , dcc_decoder     , cycle   , 100, 10000)
 RTE_DEF_CYCLIC_RUNABLE(signal::SignalHandler  , signal_handler  , cycle   , 200, 10000)
 RTE_DEF_CYCLIC_RUNABLE(signal::LedRouter      , led_router      , cycle   , 300, 10000)
-RTE_DEF_CYCLIC_RUNABLE(cal::CalM              , calib_mgr       , cycle100, 500, 100000)
+RTE_DEF_CYCLIC_RUNABLE(cal::CalM              , calm            , cycle100, 500, 100000)
+RTE_DEF_CYCLIC_RUNABLE(com::ComR              , comr            , cycle   , 100, 10000)
 RTE_DEF_CYCLIC_RUNABLE_END
 
 RTE_DEF_PORT_SR_START
@@ -68,10 +72,11 @@ RTE_DEF_PORT_SR_CONTAINER(rte::Ifc_ExternalTargetDutyCycles, ifc_external_target
 RTE_DEF_PORT_SR_END
 
 RTE_DEF_PORT_CS_START
-RTE_DEF_PORT_CS(Ifc_Cal_Signal         , ifc_cal_signal          , calib_mgr, &cal::CalM::get_signal)
-RTE_DEF_PORT_CS(Ifc_Cal_InputClassifier, ifc_cal_input_classifier, calib_mgr, &cal::CalM::get_input_classifiers)
-RTE_DEF_PORT_CS(Ifc_Cal_Led            , ifc_cal_leds            , calib_mgr, &cal::CalM::get_leds)
-RTE_DEF_PORT_CS(Ifc_Cal_Base_CV        , ifc_cal_base_cv         , calib_mgr, &cal::CalM::get_base_cv)
+RTE_DEF_PORT_CS(Ifc_Cal_Signal         , ifc_cal_signal          , calm, &cal::CalM::get_signal)
+RTE_DEF_PORT_CS(Ifc_Cal_InputClassifier, ifc_cal_input_classifier, calm, &cal::CalM::get_input_classifiers)
+RTE_DEF_PORT_CS(Ifc_Cal_Led            , ifc_cal_leds            , calm, &cal::CalM::get_leds)
+RTE_DEF_PORT_CS(Ifc_Cal_Base_CV        , ifc_cal_base_cv         , calm, &cal::CalM::get_base_cv)
+RTE_DEF_PORT_CS(Ifc_Cal_Set_Signal     , ifc_cal_set_signal      , calm, &cal::CalM::set_signal)
 RTE_DEF_PORT_CS(Ifc_Rte_GetCommand             , ifc_rte_get_cmd                , input_command, &signal::InputCommand::getCmd)
 RTE_DEF_PORT_CS(Ifc_Rte_LedSetIntensityAndSpeed, ifc_rte_set_intensity_and_speed, led_router, &signal::LedRouter::setIntensityAndSpeed)
 RTE_DEF_PORT_CS(Ifc_Rte_LedSetIntensity        , ifc_rte_set_intensity          , led_router, &signal::LedRouter::setIntensity)

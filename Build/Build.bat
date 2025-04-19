@@ -33,6 +33,10 @@ if "%3" == "gcc" (
     call ".\Build\gccvars.bat"
 )
 
+set PATH_TOOLS=./../../Tools
+set PATH_AVRGNU=%PATH_TOOLS%/avr8-gnu-toolchain/3.7.0.1796/bin
+set PATH=%PATH%;%PATH_AVRGNU%
+
 :: make -k (or --keep-going)
 ::   Continue as much as possible after an error. While the target that failed, 
 ::   and those that depend on it, cannot be remade, the other prerequisites of 

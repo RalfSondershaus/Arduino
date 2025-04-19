@@ -44,6 +44,10 @@ namespace com
     int available(void)             { return hal::serial::available(); }
     /// The first byte of incoming serial data available (or -1 if no data is available).
     int read(void) const noexcept   { return hal::serial::read(); }
+    
+    /// Write a character string to the serial port
+    int write(const char* p)        { return hal::serial::print(p); }
+
   };
 } // namespace com
 

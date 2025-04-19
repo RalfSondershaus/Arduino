@@ -41,11 +41,31 @@ namespace hal
     }
     
     /// Start serial communication
-    void begin(unsigned long baudrate)  { stubs::baudrate = baudrate; }
+    inline void begin(unsigned long baudrate)  { stubs::baudrate = baudrate; }
     /// Get the number of bytes (characters) available for reading from the serial port.
-    int available(void)                 { return stubs::available; }
+    inline int available(void)                 { return stubs::available; }
     /// The first byte of incoming serial data available (or -1 if no data is available).
-    int read(void)                      { return stubs::read; }
+    inline int read(void)                      { return stubs::read; }
+
+    /// Print functions
+    inline size_t print(const char *p)                       { return 0; }
+    inline size_t print(char c)                              { return 0; }
+    inline size_t print(unsigned char uc, int base = 10)     { return 0; }
+    inline size_t print(int n, int base = 10)                { return 0; }
+    inline size_t print(unsigned int un, int base = 10)      { return 0; }
+    inline size_t print(long n, int base = 10)               { return 0; }
+    inline size_t print(unsigned long un, int base = 10)     { return 0; }
+    inline size_t print(double d, int digits = 2)            { return 0; }
+
+    inline size_t println(const char *p)                       { return 0; }
+    inline size_t println(char c)                              { return 0; }
+    inline size_t println(unsigned char uc, int base = 10)     { return 0; }
+    inline size_t println(int n, int base = 10)                { return 0; }
+    inline size_t println(unsigned int un, int base = 10)      { return 0; }
+    inline size_t println(long n, int base = 10)               { return 0; }
+    inline size_t println(unsigned long un, int base = 10)     { return 0; }
+    inline size_t println(double d, int digits = 2)            { return 0; }
+    inline size_t println()                                    { return 0; }
   }
 } // namespace com
 

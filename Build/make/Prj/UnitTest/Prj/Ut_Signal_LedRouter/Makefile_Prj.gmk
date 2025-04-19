@@ -15,5 +15,6 @@ FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                \
 # Includes
 C_INCLUDES_PRJ := $(C_INCLUDES_PRJ)                     \
                   -I$(PATH_SRC_PRJ)/App/Signal          \
+                  -I$(PATH_SRC_HAL)/Stub/EEPROM         \
                   -I$(PATH_SRC_HAL)/Stub/Gpio           \
                   -I$(PATH_SRC_HAL)/Stub/Timer

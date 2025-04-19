@@ -10,6 +10,10 @@ FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/DccDecoder      \
             $(PATH_SRC_PRJ_PROJECT)/Signal          \
             $(PATH_SRC_PRJ_PROJECT)/SignalMain      \
             $(PATH_SRC_PRJ_PROJECT)/Cal/CalM        \
+            $(PATH_SRC_PRJ_PROJECT)/Com/AsciiCom    \
+            $(PATH_SRC_PRJ_PROJECT)/Com/ComR        \
+            $(PATH_SRC_PRJ_PROJECT)/Com/SerAsciiTP  \
             $(PATH_SRC_GEN)/Util/Algorithm          \
+            $(PATH_SRC_GEN)/Util/Locale             \
             $(PATH_SRC_GEN)/Dcc/Decoder             \
             $(PATH_SRC_GEN)/Rte/Rte

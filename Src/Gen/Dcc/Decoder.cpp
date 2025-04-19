@@ -57,7 +57,7 @@ namespace dcc
     }
     else
     {
-      dt = util::min<unsigned long>(kTimeDeltaLastValid, dt);
+      dt = util::min_<unsigned long>(kTimeDeltaLastValid, dt);
     }
     return static_cast<time_diff_deque::value_type>(dt);
   }
@@ -88,7 +88,7 @@ namespace dcc
       // second call or beyond
       time_diff_deque& currentDeque = TimeDiffDeque[DoubleBufferIdx];
       // for debugging
-      TimeDiffDequeMaxSize = util::max<uint16>(TimeDiffDequeMaxSize, currentDeque.size());
+      TimeDiffDequeMaxSize = util::max_<uint16>(TimeDiffDequeMaxSize, currentDeque.size());
       if (currentDeque.size() < currentDeque.max_size())
       {
         ulTimeDiff = ulTimeStamp - ulTimeStampPrev;

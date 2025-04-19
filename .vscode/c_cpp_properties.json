@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/Src/Gen/**",
                 "${workspaceFolder}/Src/Gen/Test/unity/src",
-                "${workspaceFolder}/Src/Gen/Test/stubs/Arduino",
+                "${workspaceFolder}/Src/Gen/Bsw/Arduino/avr/**",
+                "${workspaceFolder}/../../tools/avr8-gnu-toolchain/3.7.0.1796/avr/include/**",
                 "${workspaceFolder}/Src/Prj/App/Signal",
                 "${workspaceFolder}/Src/Prj/App/Signal/**"
             ],
