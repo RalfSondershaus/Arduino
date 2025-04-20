@@ -92,7 +92,8 @@ namespace rte
   using Ifc_Cal_Led             = rte::ifc_cs<const cal::led_cal_type *             , cal::CalM>;
   using Ifc_Cal_Base_CV         = rte::ifc_cs<const cal::base_cv_cal_type *         , cal::CalM>;
 
-  using Ifc_Cal_Set_Signal      = rte::ifc_cs<ret_type, cal::CalM, uint8, const cal::signal_type&, bool>;
+  using Ifc_Cal_Set_Signal          = rte::ifc_cs<ret_type, cal::CalM, uint8, const cal::signal_type&, bool>;
+  using Ifc_Cal_Set_InputClassifier = rte::ifc_cs<ret_type, cal::CalM, uint8, const cal::input_classifier_single_type&, bool>;
 
   // -----------------------------------------------------------------------------------
   /// CS interface for commands

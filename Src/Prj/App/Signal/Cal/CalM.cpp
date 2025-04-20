@@ -168,7 +168,7 @@ namespace cal
     const auto it_begin = input_classifiers.classifiers.begin();
     for (auto it = it_begin; it < input_classifiers.classifiers.end(); it++)
     {
-      set_classifier(it - it_begin, *it);
+      set_input_classifier(it - it_begin, *it);
     }
 
     (void)updateClassifiers();
@@ -403,7 +403,7 @@ namespace cal
   /// in EEPROM. Otherwise, call update() for this.
   /// Return OK is successful, returns NOK otherwise.
   // -----------------------------------------------
-  rte::ret_type CalM::set_classifier(uint8 ucClassifierId, const input_classifier_single_type& values, bool doUpdate)
+  rte::ret_type CalM::set_input_classifier(uint8 ucClassifierId, const input_classifier_single_type& values, bool doUpdate)
   {
     rte::ret_type ret = rte::ret_type::NOK;
 

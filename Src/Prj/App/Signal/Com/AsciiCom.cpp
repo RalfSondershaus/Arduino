@@ -44,6 +44,9 @@ namespace com
       eINV_SIGNAL_TARGETS,
       eINV_SIGNAL_INPUT,
       eINV_SIGNAL_CHANGEOVERTIME,
+      eINV_CLASSIFIER_PIN,
+      eINV_CLASSIFIER_LIMITS,
+      eINV_CLASSIFIER_DEBOUNCE,
       eERR_UNKNOWN
     } tRetType;
 
@@ -61,6 +64,9 @@ namespace com
       "ERR: Unknown signal targets",          // eINV_SIGNAL_TARGETS
       "ERR: Unknown signal input",            // eINV_SIGNAL_INPUT
       "ERR: Unknown signal change over time", // eINV_SIGNAL_CHANGEOVERTIME
+      "ERR: Unknown classifier pin",          // eINV_CLASSIFIER_PIN
+      "ERR: Unknown classifier limits",       // eINV_CLASSIFIER_LIMITS
+      "ERR: Unknown classifier debounce",     // eINV_CLASSIFIER_DEBOUNCE
       "ERR: unknown error"                    // has to be the last element
     };
 
@@ -68,6 +74,8 @@ namespace com
 
   static tRetType process_set_signal(stringstream_type& st, string_type& response);
   static tRetType process_get_signal(stringstream_type& st, string_type& response);
+  static tRetType process_set_classifier(stringstream_type& st, string_type& response);
+  static tRetType process_get_classifier(stringstream_type& st, string_type& response);
 
   static int process_set_signal_aspects(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_blinks(stringstream_type& st, cal::signal_type& cal_sig);
@@ -81,6 +89,14 @@ namespace com
   static tRetType process_get_signal_input(stringstream_type& st, cal::signal_type& cal_sig, string_type& response);
   static tRetType process_get_signal_cot(stringstream_type& st, cal::signal_type& cal_sig, string_type& response);
  
+  static int process_set_classifier_pin(stringstream_type& st, cal::input_classifier_single_type& cal_cls);
+  static int process_set_classifier_limits(stringstream_type& st, cal::input_classifier_single_type& cal_cls);
+  static int process_set_classifier_debounce(stringstream_type& st, cal::input_classifier_single_type& cal_cls);
+
+  static tRetType process_get_classifier_pin(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
+  static tRetType process_get_classifier_limits(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
+  static tRetType process_get_classifier_debounce(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
+
   typedef tRetType (*func_type)(stringstream_type& st, string_type& response);
 
   typedef struct 
@@ -93,10 +109,12 @@ namespace com
   /// Max length of a token (how many characters)
   static constexpr util::streamsize kMaxLenToken = 16;
 
-  const util::array<tCommands, 2> commands =
+  const util::array<tCommands, 4> commands =
   { {
     { "SET_SIGNAL", process_set_signal },
-    { "GET_SIGNAL", process_get_signal }
+    { "GET_SIGNAL", process_get_signal },
+    { "SET_CLASSIFIER", process_set_classifier },
+    { "GET_CLASSIFIER", process_get_classifier }
   } };
 
   // -----------------------------------------------------------------------------------
@@ -556,6 +574,231 @@ namespace com
     response.append(tmp);
     response.append(" ");
     util::to_string(cal_sig.blinkChangeOverTime, tmp);
+    response.append(tmp);
+
+    return eOK;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <SET_CLASSIFIER> id [PIN, LIMITS, DEBOUNCE] ...
+  ///
+  /// Response:  OK
+  ///
+  /// @return eOK
+  // -----------------------------------------------------------------------------------
+  static tRetType process_set_classifier(stringstream_type& st, string_type& response)
+  {
+    uint16 id;
+    char tmp[kMaxLenToken];
+    tRetType ret;
+
+    st >> id;
+    const cal::input_classifier_cal_type * pCalCls = rte::ifc_cal_input_classifier::call();
+    if ((pCalCls != nullptr) && (pCalCls->classifiers.check_boundary(id)))
+    {
+      cal::input_classifier_single_type cal_cls = pCalCls->classifiers.at(id);
+      st >> util::setw(kMaxLenToken) >> tmp;
+      if (util::string_view{tmp}.compare("PIN") == 0)
+      {
+        ret = (process_set_classifier_pin(st, cal_cls) > 0) ? eOK : eINV_CLASSIFIER_PIN;
+      }
+      else if (util::string_view{tmp}.compare("LIMITS") == 0)
+      {
+        ret = (process_set_classifier_limits(st, cal_cls) > 0) ? eOK : eINV_CLASSIFIER_LIMITS;
+      }
+      else if (util::string_view{tmp}.compare("DEBOUNCE") == 0)
+      {
+        ret = (process_set_classifier_debounce(st, cal_cls) > 0) ? eOK : eINV_CLASSIFIER_DEBOUNCE;
+      }
+      else
+      {
+        ret = eINV_SIGNAL_CMD;
+      }
+
+      if (ret == eOK)
+      {
+        ret = (rte::ifc_cal_set_input_classifier::call(id, cal_cls, true) == rte::ret_type::OK) ? eOK : eERR_EEPROM;
+      }
+    }
+    else
+    {
+      ret = eINV_SIGNAL_ID;
+    }
+    return ret;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <SET_CLASSIFIER id PIN> pin
+  ///
+  /// @return 0 (failure) or 1 (ok)
+  // -----------------------------------------------------------------------------------
+  static int process_set_classifier_pin(stringstream_type& st, cal::input_classifier_single_type& cal_cls)
+  {
+    int ret = 0;
+    uint16 val;
+
+    st >> val;
+    // Do not check for eof() since eof() is true after extracting the last element
+    // (and if the last element doesn't have trailing white spaces).
+    if (!st.fail())
+    {
+      cal_cls.ucPin = static_cast<uint16>(util::min_(static_cast<uint16>(platform::numeric_limits<uint8>::max_()), val));
+      ret = 1;
+    }
+
+    return ret;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <SET_CLASSIFIER id LIMITS> slot-id min max
+  ///
+  /// @return 0 (failure) or 1 (ok)
+  // -----------------------------------------------------------------------------------
+  static int process_set_classifier_limits(stringstream_type& st, cal::input_classifier_single_type& cal_cls)
+  {
+    int ret = 0;
+    uint16 slot_id;
+    uint16 val_min;
+    uint16 val_max;
+
+    st >> slot_id;
+    // Do not check for eof() since eof() is true after extracting the last element
+    // (and if the last element doesn't have trailing white spaces).
+    if (!st.fail() && cal_cls.limits.aucLo.check_boundary(slot_id))
+    {
+      st >> val_min >> val_max;
+      if (!st.fail())
+      {
+        cal_cls.limits.aucLo[slot_id] = static_cast<uint16>(util::min_(static_cast<uint16>(platform::numeric_limits<uint8>::max_()), val_min));
+        cal_cls.limits.aucHi[slot_id] = static_cast<uint16>(util::min_(static_cast<uint16>(platform::numeric_limits<uint8>::max_()), val_max));
+        ret = 1;
+      }
+    }
+
+    return ret;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <SET_CLASSIFIER id DEBOUNCE> time
+  ///
+  /// @return 0 (failure) or 1 (ok)
+  // -----------------------------------------------------------------------------------
+  static int process_set_classifier_debounce(stringstream_type& st, cal::input_classifier_single_type& cal_cls)
+  {
+    int ret = 0;
+    uint16 val;
+
+    st >> val;
+    // Do not check for eof() since eof() is true after extracting the last element
+    // (and if the last element doesn't have trailing white spaces).
+    if (!st.fail())
+    {
+      cal_cls.limits.ucDebounce = static_cast<uint16>(util::min_(static_cast<uint16>(platform::numeric_limits<uint8>::max_()), val));
+      ret = 1;
+    }
+
+    return ret;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <GET_CLASSIFIER> id [PIN, LIMITS, DEBOUNCE]
+  ///
+  /// @return eOK
+  // -----------------------------------------------------------------------------------
+  static tRetType process_get_classifier(stringstream_type& st, string_type& response)
+  {
+    uint16 id;
+    char tmp[kMaxLenToken];
+    tRetType ret;
+
+    st >> id;
+    const cal::input_classifier_cal_type * pCalCls = rte::ifc_cal_input_classifier::call();
+    if ((pCalCls != nullptr) && (pCalCls->classifiers.check_boundary(id)))
+    {
+      cal::input_classifier_single_type cal_cls = pCalCls->classifiers.at(id);
+      st >> util::setw(kMaxLenToken) >> tmp;
+      if (util::string_view{tmp}.compare("PIN") == 0)
+      {
+        ret = process_get_classifier_pin(st, cal_cls, response);
+      }
+      else if (util::string_view{tmp}.compare("LIMITS") == 0)
+      {
+        ret = process_get_classifier_limits(st, cal_cls, response);
+      }
+      else if (util::string_view{tmp}.compare("DEBOUNCE") == 0)
+      {
+        ret = process_get_classifier_debounce(st, cal_cls, response);
+      }
+      else
+      {
+        ret = eINV_SIGNAL_CMD;
+      }
+    }
+    else
+    {
+      ret = eINV_SIGNAL_ID;
+    }
+    return ret;
+
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <GET_CLASSIFIER id PIN> pin
+  ///
+  /// @return eOK
+  // -----------------------------------------------------------------------------------
+  static tRetType process_get_classifier_pin(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response)
+  {
+    util::basic_string<3, char_type> tmp;
+
+    util::to_string(cal_cls.ucPin, tmp);
+    response.append(tmp);
+
+    return eOK;
+  }
+  
+  // -----------------------------------------------------------------------------------
+  /// <GET_CLASSIFIER id LIMITS> slot_id
+  ///
+  /// @return eOK, eINV_CLASSIFIER_DEBOUNCE
+  // -----------------------------------------------------------------------------------
+  static tRetType process_get_classifier_limits(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response)
+  {
+    util::basic_string<3, char_type> tmp;
+    tRetType ret;
+    uint16 slot_id;
+
+    st >> slot_id;
+    // Do not check for eof() since eof() is true after extracting the last element
+    // (and if the last element doesn't have trailing white spaces).
+    if (!st.fail() && cal_cls.limits.aucLo.check_boundary(slot_id))
+    {
+      util::to_string(cal_cls.limits.aucLo[slot_id], tmp);
+      response.append(tmp);
+      response.append(" ");
+      util::to_string(cal_cls.limits.aucHi[slot_id], tmp);
+      response.append(tmp);
+      ret = eOK;
+    }
+    else
+    {
+      ret = eINV_CLASSIFIER_DEBOUNCE;
+    }
+
+    return ret;
+
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <GET_CLASSIFIER id LIMITS> slot_id
+  ///
+  /// @return eOK, eINV_CLASSIFIER_DEBOUNCE
+  // -----------------------------------------------------------------------------------
+  static tRetType process_get_classifier_debounce(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response)
+  {
+    util::basic_string<3, char_type> tmp;
+
+    util::to_string(cal_cls.limits.ucDebounce, tmp);
     response.append(tmp);
 
     return eOK;

@@ -89,7 +89,7 @@ namespace cal
     /// in EEPROM. Otherwise, call update() for this.
     /// Return OK is successful, returns NOK otherwise.
     rte::ret_type set_signal(uint8 ucSignalId, const signal_type& values, bool doUpdate = false);
-    rte::ret_type set_classifier(uint8 ucClassifierId, const input_classifier_single_type& values, bool doUpdate = false);
+    rte::ret_type set_input_classifier(uint8 ucClassifierId, const input_classifier_single_type& values, bool doUpdate = false);
     rte::ret_type set_base_cv(const base_cv_cal_type& p, bool doUpdate = false);
     
     /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
