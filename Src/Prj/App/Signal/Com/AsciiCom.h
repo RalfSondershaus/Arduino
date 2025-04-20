@@ -62,46 +62,12 @@ namespace com
     using string_type = SerAsciiTP::string_type;
     using size_type = string_type::size_type;
 
-    /// Return values of process() function family
-    typedef enum
-    {
-      eOK = 0,                    ///< OK
-      eINV_CMD,                   ///< Command invalid (or unknown)
-      eERR_EEPROM,                ///< EEPROM update failure
-      eINV_SIGNAL_ID,             ///< SIGNAL ID invalid
-      eINV_SIGNAL_CMD,
-      eINV_SIGNAL_ASPECTS,
-      eINV_SIGNAL_BLINKS,
-      eINV_SIGNAL_TARGETS,
-      eINV_SIGNAL_INPUT,
-      eINV_SIGNAL_CHANGEOVERTIME,
-      eERR_UNKNOWN
-    } tRetType;
-
-    /// For each tRetType, an error description that is transmitted after
-    /// processing the command.
-    static constexpr const string_type::value_type* aRetTypeStrings[] = 
-    {
-      "OK",                                   // eOK
-      "ERR: Invalid command",                 // eINV_CMD
-      "ERR: EEPROM failure",                  // eERR_EEPROM
-      "ERR: Signal id invalid",               // eINV_SIGNAL_ID
-      "ERR: Unknown signal sub command",      // eINV_SIGNAL_CMD
-      "ERR: Unknown signal aspects",          // eINV_SIGNAL_ASPECTS
-      "ERR: Unknown signal blinks",           // eINV_SIGNAL_BLINKS
-      "ERR: Unknown signal targets",          // eINV_SIGNAL_TARGETS
-      "ERR: Unknown signal input",            // eINV_SIGNAL_INPUT
-      "ERR: Unknown signal change over time", // eINV_SIGNAL_CHANGEOVERTIME
-      "ERR: unknown error"                    // has to be the last element
-    };
 
   protected:
     /// Currently, just one observer is supported
     util::ptr<SerAsciiTP> asciiTP;
-    string_type response;
+    string_type telegram_response;
 
-    //int process_set(stringstream_type& st);
-    
   public:
     AsciiCom() = default;
 
@@ -109,7 +75,7 @@ namespace com
 
     void listenTo(SerAsciiTP& tp) { asciiTP = &tp; tp.attach(*this); }
 
-    tRetType process(const string_type& telegram);
+    void process(const string_type& telegram, string_type& response);
   };
 } // namespace com
 

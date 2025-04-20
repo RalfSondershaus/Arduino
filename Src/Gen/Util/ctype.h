@@ -37,6 +37,7 @@ namespace util
   using ::isalpha;
   using ::isspace;
   using ::iscntrl;
+  using ::ispunct; // !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
 } // namespace util
 
 #endif // UTIL_CTYPE_H

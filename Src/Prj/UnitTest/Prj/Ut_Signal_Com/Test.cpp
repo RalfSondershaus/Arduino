@@ -26,15 +26,64 @@
 #include <Cal/CalM_config.h>
 #include <Hal/EEPROM.h>
 
+using AsciiCom = com::AsciiCom;
+using string_type = AsciiCom::string_type;
+
+template<> void EXPECT_EQ<string_type>(string_type actual, string_type expected) { TEST_ASSERT_EQUAL_STRING(expected.c_str(), actual.c_str()); }
+
 //-------------------------------------------------------------------------
-TEST(Ut_Signal_Com, AsciiCom_process_set_signal_Aspects_1)
+TEST(Ut_Signal_Com, AsciiCom_process_set_get_signal_Aspects_1)
+{
+
+  AsciiCom asciiCom;
+  string_type telegram = "SET_SIGNAL 0 ASPECTS 11000 00100 00110 11001 11111";
+  string_type response;
+  asciiCom.process(telegram, response);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase    ], static_cast<uint8>(0b11000));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 2], static_cast<uint8>(0b00100));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 4], static_cast<uint8>(0b00110));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 6], static_cast<uint8>(0b11001));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 8], static_cast<uint8>(0b11111));
+  EXPECT_EQ(response, string_type("OK"));
+
+  telegram = "GET_SIGNAL 0 ASPECTS";
+  asciiCom.process(telegram, response);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase    ], static_cast<uint8>(0b11000));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 2], static_cast<uint8>(0b00100));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 4], static_cast<uint8>(0b00110));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 6], static_cast<uint8>(0b11001));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 8], static_cast<uint8>(0b11111));
+  EXPECT_EQ(response, string_type("OK 11000 00100 00110 11001 11111 "));
+  
+  telegram = "SET_SIGNAL 0 ASPECTS 10000 01000 00100 00010 00001";
+  asciiCom.process(telegram, response);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase    ], static_cast<uint8>(0b10000));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 2], static_cast<uint8>(0b01000));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 4], static_cast<uint8>(0b00100));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 6], static_cast<uint8>(0b00010));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 8], static_cast<uint8>(0b00001));
+  EXPECT_EQ(response, string_type("OK"));
+
+  telegram = "GET_SIGNAL 0 ASPECTS";
+  asciiCom.process(telegram, response);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase    ], static_cast<uint8>(0b10000));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 2], static_cast<uint8>(0b01000));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 4], static_cast<uint8>(0b00100));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 6], static_cast<uint8>(0b00010));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 8], static_cast<uint8>(0b00001));
+  EXPECT_EQ(response, string_type("OK 10000 01000 00100 00010 00001 "));
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Signal_Com, AsciiCom_process_get_signal_Aspects_1)
 {
   using AsciiCom = com::AsciiCom;
   using string_type = AsciiCom::string_type;
 
   AsciiCom asciiCom;
-  const string_type telegram = "SET SIGNAL 0 ASPECTS 11000 00000";
-  asciiCom.process(telegram);
+  const string_type telegram = "SET_SIGNAL 0 ASPECTS 11000 00100";
+  string_type response;
+  asciiCom.process(telegram, response);
   EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase    ], static_cast<uint8>(0b11000));
   EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalBase + cal::eeprom::eSignalAspectBase + 1], static_cast<uint8>(0b00000));
 }
@@ -55,7 +104,7 @@ bool test_loop(void)
 {
   UNITY_BEGIN();
 
-  RUN_TEST(AsciiCom_process_set_signal_Aspects_1);
+  RUN_TEST(AsciiCom_process_set_get_signal_Aspects_1);
 
   UNITY_END();
 

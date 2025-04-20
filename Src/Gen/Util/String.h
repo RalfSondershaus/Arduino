@@ -824,6 +824,17 @@ namespace util
 
     return v;
   }
+
+  // ---------------------------------------------------
+  /// Converts a signed integer to a string
+  // ---------------------------------------------------
+  template<int Size, class CharT>
+  void to_string(int value, util::basic_string<Size, CharT>& str)
+  {
+    int base = 10;
+    str = ::itoa(value, str.begin(), base);
+  }
+
 } // namespace util
 
 // ---------------------------------------------------

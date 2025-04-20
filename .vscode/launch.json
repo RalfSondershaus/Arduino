@@ -14,6 +14,7 @@
                 "UnitTest/Gen/Util/Ut_Ramp",
                 "UnitTest/Gen/Util/Ut_Sstream",
                 "Ut_String",
+                "Ut_Signal_Com",
                 "UnitTest/Gen/Util/Ut_String_view",
                 "UnitTest/Gen/Util/Ut_Vector",
             ]

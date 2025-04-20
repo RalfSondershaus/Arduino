@@ -48,7 +48,7 @@ namespace com
         {
           if (telegram_rawdata.size() < telegram_rawdata.max_size())
           {
-            if (util::isalnum(b) || util::isspace(b))
+            if (util::isalnum(b) || util::isspace(b) || util::ispunct(b))
             {
               telegram_rawdata += string_type::traits_type::to_char_type(b);
             }
