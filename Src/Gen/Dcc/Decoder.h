@@ -251,7 +251,7 @@ namespace dcc
     size_t fifoSize() const noexcept { return fifoHandler.size(); }
 
     /// Returns statistics for internal time stamp buffer
-    uint16 isrGetStats(IsrStats& stat) const noexcept;
+    void isrGetStats(IsrStats& stat) const noexcept;
     bool isrOverflow() const noexcept;
 
     /// For debugging: get number of interrupts called since system start.

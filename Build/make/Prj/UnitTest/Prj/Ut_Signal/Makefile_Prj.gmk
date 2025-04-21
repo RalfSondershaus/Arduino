@@ -4,17 +4,29 @@
 
 # Files
 FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                \
-            $(PATH_SRC_PRJ_PROJECT)/CalM                \
+            $(PATH_SRC_PRJ)/App/Signal/DccDecoder       \
             $(PATH_SRC_PRJ)/App/Signal/InputClassifier  \
             $(PATH_SRC_PRJ)/App/Signal/InputCommand     \
             $(PATH_SRC_PRJ)/App/Signal/LedRouter        \
             $(PATH_SRC_PRJ)/App/Signal/Signal           \
+            $(PATH_SRC_PRJ)/App/Signal/Cal/CalM         \
+            $(PATH_SRC_PRJ)/App/Signal/Com/ComR         \
+            $(PATH_SRC_PRJ)/App/Signal/Com/AsciiCom     \
+            $(PATH_SRC_PRJ)/App/Signal/Com/SerAsciiTP   \
+            $(PATH_SRC_GEN)/Dcc/Decoder                 \
             $(PATH_SRC_GEN)/Rte/Rte                     \
+            $(PATH_SRC_GEN)/Util/Locale                 \
+            $(PATH_SRC_HAL)/Stub/Eeprom/Hal/EEPROM      \
             $(PATH_SRC_HAL)/Stub/Gpio/Hal/Gpio          \
+            $(PATH_SRC_HAL)/Stub/Interrupt/Hal/Interrupt \
+            $(PATH_SRC_HAL)/Stub/Serial/Hal/Serial      \
             $(PATH_SRC_HAL)/Stub/Timer/Hal/Timer
 
 # Includes
-C_INCLUDES_PRJ := $(C_INCLUDES_PRJ)             \
-                  -I$(PATH_SRC_PRJ)/App/Signal  \
-                  -I$(PATH_SRC_HAL)/Stub/Gpio   \
+C_INCLUDES_PRJ := $(C_INCLUDES_PRJ)                \
+                  -I$(PATH_SRC_PRJ)/App/Signal     \
+                  -I$(PATH_SRC_HAL)/Stub/Eeprom    \
+                  -I$(PATH_SRC_HAL)/Stub/Interrupt \
+                  -I$(PATH_SRC_HAL)/Stub/Serial    \
+                  -I$(PATH_SRC_HAL)/Stub/Gpio      \
                   -I$(PATH_SRC_HAL)/Stub/Timer

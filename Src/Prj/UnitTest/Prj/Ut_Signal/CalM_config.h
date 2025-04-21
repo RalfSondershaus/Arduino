@@ -20,91 +20,192 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
+#ifndef CALM_CONFIG_H_
+#define CALM_CONFIG_H_
+
+#include <Cfg_Prj.h> // number of signals
+#include <Cal/CalM_Type.h>
+
 using classifier_type = cal::input_classifier_type::classifier_type;
 
-constexpr uint8  kAdDebounce = 5; ///< [10 ms] Debounce time
-constexpr uint16 kGreenLo = (605 - 10);
-constexpr uint16 kGreenHi = (605 + 10);
-constexpr uint16 kYellowLo = (399 - 10);
-constexpr uint16 kYellowHi = (399 + 10);
-constexpr uint16 kRedLo = (192 - 10);
-constexpr uint16 kRedHi = (192 + 10);
-constexpr uint16 kWhiteLo = (147 - 10);
-constexpr uint16 kWhiteHi = (147 + 10);
-constexpr uint16 kAdMin = 0;
-constexpr uint16 kAdMax = 1023;
+namespace cal
+{
+  namespace cv
+  {
+    /// @brief CV indices
+    enum
+    {
+      eDecoderAddressLSB          = 1,
+      eAuxiliaryActivattion       = 2,
+      eTimeOnBase                 = 3,
+      eManufacturerVersionID      = 7,
+      eManufacturerID             = 8,
+      eDecoderAddressMSB          = 9,
+      eConfiguration              = 29,
+      eManufacturerCVStructureID  = 33,
+      eSignalBase                 = 512,  ///< CV index for the first signal
+      eClassifierBase             = 656   ///< CV index for the first classifiers
+    };
+  }
 
-#define INPUT0 { cal::input_type::eClassified, 0 }
-#define INPUT1 { cal::input_type::eClassified, 1 }
-#define INPUT2 { cal::input_type::eClassified, 2 }
-#define INPUT3 { cal::input_type::eClassified, 3 }
-#define INPUT4 { cal::input_type::eClassified, 4 }
-#define INPUT5 { cal::input_type::eNone      , 0 }
+  namespace eeprom
+  {
+    /// 18 bytes per signal, starting at base address cv::eSignalBase (512)
+    constexpr uint16 kSignalLen = 18;
+    /// 12 bytes per classifier starting at base address cv::eClassifierBase (656)
+    constexpr uint16 kInputClassifierLen = 12;
+    /// Size of coding data for all signals depends on number of signals 
+    /// and size of coding data for a single signal.
+    constexpr uint16 kSignalsLen = kSignalLen*cfg::kNrSignals;
+
+    // Depends on hardware platform, values below for MEGA
+    /// EEPROM indices.
+    /// @note MEGA: max 4 KB
+    /// @note NANO: max 1 KB
+    enum
+    {
+      eDecoderAddressLSB          = 0,
+      eAuxiliaryActivattion       = 1,
+      eTimeOnBase                 = 2,
+      eManufacturerVersionID      = 6,
+      eManufacturerID             = 7,
+      eDecoderAddressMSB          = 8,
+      eConfiguration              = 28,
+      eManufacturerCVStructureID  = 32,
+      eSignalBase                 = 33,                        ///< EEPROM base address and kSignalLenNvm (18) bytes per signal
+      eClassifierBase             = eSignalBase + kSignalsLen  ///< EEPROM base address and kInputClassifierLenNvm (12) bytes per classifier
+    };
+
+    enum
+    {
+      eSignalInput = 0,
+      eSignalAspectBase = 1,
+      eSignalTargetBase = 11,
+      eSignalChangeOverTime = 16,
+      eSignalChangeOverTimeForBlinking = 17
+    };
+  }
+
+  constexpr uint8  kAdDebounce = 5; ///< [10 ms] Debounce time
+  constexpr uint16 kGreenLo = (605 - 10);
+  constexpr uint16 kGreenHi = (605 + 10);
+  constexpr uint16 kYellowLo = (399 - 10);
+  constexpr uint16 kYellowHi = (399 + 10);
+  constexpr uint16 kRedLo = (192 - 10);
+  constexpr uint16 kRedHi = (192 + 10);
+  constexpr uint16 kWhiteLo = (147 - 10);
+  constexpr uint16 kWhiteHi = (147 + 10);
+  constexpr uint16 kAdMin = 0;
+  constexpr uint16 kAdMax = 1023;
+
+  namespace configuration
+  {
+    namespace bitmask
+    {
+      constexpr uint8 kDecoderType      = 0b00100000;
+      constexpr uint8 kAddressingMethod = 0b01000000;
+      constexpr uint8 kAccessoryDecoder = 0b10000000;
+    }
+    constexpr uint8 kDecoderType_BasicAccessory     = 0b00000000;
+    constexpr uint8 kDecoderType_ExtendedAccessory  = 0b00100000;
+    constexpr uint8 kAddressingMethod_Decoder       = 0b00000000;
+    constexpr uint8 kAddressingMethod_OutputAddress = 0b01000000;
+    constexpr uint8 kAccessoryDecoder               = 0b00000000;
+    constexpr uint8 kMultifunctionDecoder           = 0b10000000;
+  }
+
+  constexpr uint8 kAddressLSB = 2;                /* Accessory Output Address 1 */
+  constexpr uint8 kAuxAct = 0;
+  constexpr uint8 kTimeOn = 0;
+  constexpr uint8 kManufacturerVersionID = 0x01;  /* v0.1 */
+  constexpr uint8 kManufacturerID = 'S';
+  constexpr uint8 kAddressMSB = 0;
+  constexpr uint8 kConfiguration =  configuration::kDecoderType_BasicAccessory 
+                                  | configuration::kAddressingMethod_OutputAddress
+                                  | configuration::kAccessoryDecoder;
+
+  constexpr uint8 kChangeOverTime       = 10;
+  constexpr uint8 kChangeOverTimeBlink  = 0;
+
+  constexpr uint8 kClassifierPin0 = 10;
+  constexpr uint8 kClassifierPin1 = 11;
+  constexpr uint8 kClassifierPin2 = 12;
+  constexpr uint8 kClassifierPin3 = 13;
+  constexpr uint8 kClassifierPin4 = 14;
+  constexpr uint8 kClassifierPin5 = 10;
+}
+
+#define INPUT0 { cal::input_type::eNone, 0 }
+#define INPUT1 { cal::input_type::eNone, 1 }
+#define INPUT2 { cal::input_type::eNone, 2 }
+#define INPUT3 { cal::input_type::eNone, 3 }
+#define INPUT4 { cal::input_type::eNone, 4 }
+#define INPUT5 { cal::input_type::eNone, 0 }
 
 #define ASPECTS0 { { 0b00011000, 0b00000000 }, { 0b00000100, 0b00000000 }, { 0b00000110, 0b00000000 }, { 0b00011001, 0b00000000 }, { 0b00011111, 0b00000000 } }
 #define ASPECTS1 { { 0b00011000, 0b00000000 }, { 0b00000100, 0b00000000 }, { 0b00000110, 0b00000000 }, { 0b00011001, 0b00000000 }, { 0b00011111, 0b00000000 } }
 #define ASPECTS2 { { 0b00011000, 0b00000000 }, { 0b00000100, 0b00000000 }, { 0b00000110, 0b00000000 }, { 0b00011001, 0b00000000 }, { 0b00011111, 0b00000000 } }
 #define ASPECTS3 { { 0b00011000, 0b00000000 }, { 0b00000100, 0b00000000 }, { 0b00000110, 0b00000000 }, { 0b00011001, 0b00000000 }, { 0b00011111, 0b00000000 } }
 #define ASPECTS4 { { 0b00000010, 0b00000000 }, { 0b00000001, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00011111, 0b00000000 } }
-#define ASPECTS5 { { 0b00000000, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00011111, 0b00000000 } }
+#define ASPECTS5 { { 0b00011000, 0b00000000 }, { 0b00000100, 0b00000000 }, { 0b00000110, 0b00000000 }, { 0b00011001, 0b00000000 }, { 0b00011111, 0b00000000 } }
 
-#define TARGET0 { { kOnboard, 13 }, { kOnboard, 12 }, { kOnboard, 11 }, { kOnboard, 10 }, { kOnboard,  9 } }
-#define TARGET1 { { kOnboard,  8 }, { kOnboard,  7 }, { kOnboard,  6 }, { kOnboard,  5 }, { kOnboard,  4 } }
-#define TARGET2 { { kOnboard, 18 }, { kOnboard, 17 }, { kOnboard, 16 }, { kOnboard, 15 }, { kOnboard, 14 } }
-#define TARGET3 { { kOnboard, 23 }, { kOnboard, 22 }, { kOnboard, 21 }, { kOnboard, 20 }, { kOnboard, 19 } }
-#define TARGET4 { { kNone   ,  0 }, { kNone   ,  0 }, { kNone   ,  0 }, { kOnboard, 28 }, { kOnboard, 27 } }
-#define TARGET5 { { kNone   ,  0 }, { kNone   ,  0 }, { kNone   ,  0 }, { kNone   ,  0 }, { kNone   ,  0 } }
-
-#define CHANGEOVERTIME       10
-#define CHANGEOVERBLINKTIME  0
+#define TARGET0 { { cal::target_type::eNone, 14 }, { cal::target_type::eNone, 12 }, { cal::target_type::eNone, 11 }, { cal::target_type::eNone, 10 }, { cal::target_type::eNone,  9 } }
+#define TARGET1 { { cal::target_type::eNone,  8 }, { cal::target_type::eNone,  7 }, { cal::target_type::eNone,  6 }, { cal::target_type::eNone,  5 }, { cal::target_type::eNone,  4 } }
+#define TARGET2 { { cal::target_type::eNone, 18 }, { cal::target_type::eNone, 17 }, { cal::target_type::eNone, 16 }, { cal::target_type::eNone, 15 }, { cal::target_type::eNone, 14 } }
+#define TARGET3 { { cal::target_type::eNone, 23 }, { cal::target_type::eNone, 22 }, { cal::target_type::eNone, 21 }, { cal::target_type::eNone, 20 }, { cal::target_type::eNone, 19 } }
+#define TARGET4 { { cal::target_type::eNone,  0 }, { cal::target_type::eNone,  0 }, { cal::target_type::eNone,  0 }, { cal::target_type::eNone, 28 }, { cal::target_type::eNone, 27 } }
+#define TARGET5 { { cal::target_type::eNone, 30 }, { cal::target_type::eNone, 31 }, { cal::target_type::eNone, 32 }, { cal::target_type::eNone, 33 }, { cal::target_type::eNone, 34 } }
 
 #define CAL_SIGNAL_ARRAY \
 { \
-  { INPUT0, { ASPECTS0 }, { TARGET0 }, CHANGEOVERTIME, CHANGEOVERBLINKTIME }, \
-  { INPUT1, { ASPECTS1 }, { TARGET1 }, CHANGEOVERTIME, CHANGEOVERBLINKTIME }, \
-  { INPUT2, { ASPECTS2 }, { TARGET2 }, CHANGEOVERTIME, CHANGEOVERBLINKTIME }, \
-  { INPUT3, { ASPECTS3 }, { TARGET3 }, CHANGEOVERTIME, CHANGEOVERBLINKTIME }, \
-  { INPUT4, { ASPECTS4 }, { TARGET4 }, CHANGEOVERTIME, CHANGEOVERBLINKTIME }, \
-  { INPUT5, { ASPECTS5 }, { TARGET5 }, CHANGEOVERTIME, CHANGEOVERBLINKTIME }, \
+  { INPUT0, { ASPECTS0 }, { TARGET0 }, cal::kChangeOverTime, cal::kChangeOverTimeBlink }, \
+  { INPUT1, { ASPECTS1 }, { TARGET1 }, cal::kChangeOverTime, cal::kChangeOverTimeBlink }, \
+  { INPUT2, { ASPECTS2 }, { TARGET2 }, cal::kChangeOverTime, cal::kChangeOverTimeBlink }, \
+  { INPUT3, { ASPECTS3 }, { TARGET3 }, cal::kChangeOverTime, cal::kChangeOverTimeBlink }, \
+  { INPUT4, { ASPECTS4 }, { TARGET4 }, cal::kChangeOverTime, cal::kChangeOverTimeBlink }, \
+  { INPUT5, { ASPECTS5 }, { TARGET5 }, cal::kChangeOverTime, cal::kChangeOverTimeBlink }, \
 }
 
 #define V2P(v) classifier_type::convertInput(v)
 
-#define CLASSIFIER_LO0 { V2P(kRedLo), V2P(kGreenLo), V2P(kYellowLo), V2P(kWhiteLo), V2P(kAdMax) }
-#define CLASSIFIER_LO1 { V2P(kRedLo), V2P(kGreenLo), V2P(kYellowLo), V2P(kWhiteLo), V2P(kAdMax) }
-#define CLASSIFIER_LO2 { V2P(kRedLo), V2P(kGreenLo), V2P(kYellowLo), V2P(kWhiteLo), V2P(kAdMax) }
-#define CLASSIFIER_LO3 { V2P(kRedLo), V2P(kGreenLo), V2P(kYellowLo), V2P(kWhiteLo), V2P(kAdMax) }
-#define CLASSIFIER_LO4 { V2P(kRedLo), V2P(kGreenLo), V2P(kAdMax   ), V2P(kAdMax  ), V2P(kAdMax) }
-#define CLASSIFIER_LO5 { V2P(kAdMax), V2P(kAdMax  ), V2P(kAdMax   ), V2P(kAdMax  ), V2P(kAdMax) }
+#define CLASSIFIER_LO0 { V2P(cal::kRedLo), V2P(cal::kGreenLo), V2P(cal::kYellowLo), V2P(cal::kWhiteLo), V2P(cal::kAdMax) }
+#define CLASSIFIER_LO1 { V2P(cal::kRedLo), V2P(cal::kGreenLo), V2P(cal::kYellowLo), V2P(cal::kWhiteLo), V2P(cal::kAdMax) }
+#define CLASSIFIER_LO2 { V2P(cal::kRedLo), V2P(cal::kGreenLo), V2P(cal::kYellowLo), V2P(cal::kWhiteLo), V2P(cal::kAdMax) }
+#define CLASSIFIER_LO3 { V2P(cal::kRedLo), V2P(cal::kGreenLo), V2P(cal::kYellowLo), V2P(cal::kWhiteLo), V2P(cal::kAdMax) }
+#define CLASSIFIER_LO4 { V2P(cal::kRedLo), V2P(cal::kGreenLo), V2P(cal::kAdMax   ), V2P(cal::kAdMax  ), V2P(cal::kAdMax) }
+#define CLASSIFIER_LO5 { V2P(cal::kAdMax), V2P(cal::kAdMax  ), V2P(cal::kAdMax   ), V2P(cal::kAdMax  ), V2P(cal::kAdMax) }
 
-#define CLASSIFIER_HI0 { V2P(kRedHi), V2P(kGreenHi), V2P(kYellowHi), V2P(kWhiteHi), V2P(kAdMin) }
-#define CLASSIFIER_HI1 { V2P(kRedHi), V2P(kGreenHi), V2P(kYellowHi), V2P(kWhiteHi), V2P(kAdMin) }
-#define CLASSIFIER_HI2 { V2P(kRedHi), V2P(kGreenHi), V2P(kYellowHi), V2P(kWhiteHi), V2P(kAdMin) }
-#define CLASSIFIER_HI3 { V2P(kRedHi), V2P(kGreenHi), V2P(kYellowHi), V2P(kWhiteHi), V2P(kAdMin) }
-#define CLASSIFIER_HI4 { V2P(kRedHi), V2P(kGreenHi), V2P(kAdMin   ), V2P(kAdMin  ), V2P(kAdMin) }
-#define CLASSIFIER_HI5 { V2P(kAdMin), V2P(kAdMin  ), V2P(kAdMin   ), V2P(kAdMin  ), V2P(kAdMin) }
+#define CLASSIFIER_HI0 { V2P(cal::kRedHi), V2P(cal::kGreenHi), V2P(cal::kYellowHi), V2P(cal::kWhiteHi), V2P(cal::kAdMin) }
+#define CLASSIFIER_HI1 { V2P(cal::kRedHi), V2P(cal::kGreenHi), V2P(cal::kYellowHi), V2P(cal::kWhiteHi), V2P(cal::kAdMin) }
+#define CLASSIFIER_HI2 { V2P(cal::kRedHi), V2P(cal::kGreenHi), V2P(cal::kYellowHi), V2P(cal::kWhiteHi), V2P(cal::kAdMin) }
+#define CLASSIFIER_HI3 { V2P(cal::kRedHi), V2P(cal::kGreenHi), V2P(cal::kYellowHi), V2P(cal::kWhiteHi), V2P(cal::kAdMin) }
+#define CLASSIFIER_HI4 { V2P(cal::kRedHi), V2P(cal::kGreenHi), V2P(cal::kAdMin   ), V2P(cal::kAdMin  ), V2P(cal::kAdMin) }
+#define CLASSIFIER_HI5 { V2P(cal::kAdMin), V2P(cal::kAdMin  ), V2P(cal::kAdMin   ), V2P(cal::kAdMin  ), V2P(cal::kAdMin) }
 
-#define CLASSIFIER_DEBOUNCE kAdDebounce
+#define LIMITS0 { kAdDebounce, { CLASSIFIER_LO0 }, {CLASSIFIER_HI0 } }
+#define LIMITS1 { kAdDebounce, { CLASSIFIER_LO1 }, {CLASSIFIER_HI1 } }
+#define LIMITS2 { kAdDebounce, { CLASSIFIER_LO2 }, {CLASSIFIER_HI2 } }
+#define LIMITS3 { kAdDebounce, { CLASSIFIER_LO3 }, {CLASSIFIER_HI3 } }
+#define LIMITS4 { kAdDebounce, { CLASSIFIER_LO4 }, {CLASSIFIER_HI4 } }
+#define LIMITS5 { kAdDebounce, { CLASSIFIER_LO5 }, {CLASSIFIER_HI5 } }
 
-#define LIMITS0 { CLASSIFIER_DEBOUNCE, { CLASSIFIER_LO0 }, {CLASSIFIER_HI0 } }
-#define LIMITS1 { CLASSIFIER_DEBOUNCE, { CLASSIFIER_LO1 }, {CLASSIFIER_HI1 } }
-#define LIMITS2 { CLASSIFIER_DEBOUNCE, { CLASSIFIER_LO2 }, {CLASSIFIER_HI2 } }
-#define LIMITS3 { CLASSIFIER_DEBOUNCE, { CLASSIFIER_LO3 }, {CLASSIFIER_HI3 } }
-#define LIMITS4 { CLASSIFIER_DEBOUNCE, { CLASSIFIER_LO4 }, {CLASSIFIER_HI4 } }
-#define LIMITS5 { CLASSIFIER_DEBOUNCE, { CLASSIFIER_LO5 }, {CLASSIFIER_HI5 } }
-
-#define CLASSIFIER_PIN0 10
-#define CLASSIFIER_PIN1 11
-#define CLASSIFIER_PIN2 12
-#define CLASSIFIER_PIN3 13
-#define CLASSIFIER_PIN4 14
-#define CLASSIFIER_PIN5 10
-
-#define CLASSIFIER_SINGLE0 { CLASSIFIER_PIN0, LIMITS0 }
-#define CLASSIFIER_SINGLE1 { CLASSIFIER_PIN1, LIMITS1 }
-#define CLASSIFIER_SINGLE2 { CLASSIFIER_PIN2, LIMITS2 }
-#define CLASSIFIER_SINGLE3 { CLASSIFIER_PIN3, LIMITS3 }
-#define CLASSIFIER_SINGLE4 { CLASSIFIER_PIN4, LIMITS4 }
-#define CLASSIFIER_SINGLE5 { CLASSIFIER_PIN5, LIMITS5 }
+#define CLASSIFIER_SINGLE0 { cal::kClassifierPin0, LIMITS0 }
+#define CLASSIFIER_SINGLE1 { cal::kClassifierPin1, LIMITS1 }
+#define CLASSIFIER_SINGLE2 { cal::kClassifierPin2, LIMITS2 }
+#define CLASSIFIER_SINGLE3 { cal::kClassifierPin3, LIMITS3 }
+#define CLASSIFIER_SINGLE4 { cal::kClassifierPin4, LIMITS4 }
+#define CLASSIFIER_SINGLE5 { cal::kClassifierPin5, LIMITS5 }
 
 #define CAL_INPUT_CLASSIFIER_CFG { { CLASSIFIER_SINGLE0 , CLASSIFIER_SINGLE1, CLASSIFIER_SINGLE2, CLASSIFIER_SINGLE3, CLASSIFIER_SINGLE4, CLASSIFIER_SINGLE5 } }
+
+#define CAL_LEDS_CFG { }
+
+#define CAL_BASE_CV_CFG   .AddressLSB = cal::kAddressLSB,                        \
+                          .AuxAct = cal::kAuxAct,                                \
+                          .TimeOn = { cal::kTimeOn, cal::kTimeOn, cal::kTimeOn, cal::kTimeOn }, \
+                          .ManufacturerVersionID = cal::kManufacturerVersionID,  \
+                          .ManufacturerID = cal::kManufacturerID,                \
+                          .AddressMSB = cal::kAddressMSB,                        \
+                          .Configuration = cal::kConfiguration
+
+#endif // CALM_CONFIG_H_

@@ -14,7 +14,8 @@
 #include <Dcc/Decoder.h>
 #include <Util/Algorithm.h> // max
 #include <Util/Fix_Queue.h>
-#include <Arduino.h>
+#include <Hal/Timer.h>
+#include <Hal/Interrupt.h>
 #include <OS_Type.h>  // SuspendAllInterrupts, ResumeAllInterrupts, ISR macros
 
 namespace dcc
@@ -67,11 +68,14 @@ namespace dcc
   /// 0 ... 254 -> 0 ... 254
   static inline unsigned long delimitTimeDelta(time_diff_deque::value_type dt)
   {
+    unsigned long ret = dt;
+
     if (dt == kTimeDeltaInvalid)
     {
-      dt = Decoder::BitExtractorConstantsType::getPartTimeLongMax() + 1;
+      ret = Decoder::BitExtractorConstantsType::getPartTimeLongMax() + 1;
     }
-    return dt;
+
+    return ret;
   }
   // ---------------------------------------------------
   /// Interrupt service routine: a falling or rising edge has triggered this interrupt.
@@ -80,7 +84,7 @@ namespace dcc
   ISR(ISR_Dcc)
   {
     static unsigned long ulTimeStampPrev = 0;
-    unsigned long ulTimeStamp = micros();
+    unsigned long ulTimeStamp = hal::micros();
     unsigned long ulTimeDiff;
 
     if (ulTimeStampPrev > 0u)
@@ -105,7 +109,7 @@ namespace dcc
     ul_ISR_Dcc_Count++;
   }
 
-  uint16 Decoder::isrGetStats(IsrStats& stat) const noexcept
+  void Decoder::isrGetStats(IsrStats& stat) const noexcept
   {
     SuspendAllInterrupts();
     stat.curSize = static_cast<uint16>(TimeDiffDeque[DoubleBufferIdx].size());
@@ -123,7 +127,7 @@ namespace dcc
   // ---------------------------------------------------
   void Decoder::init(uint8 ucIntPin)
   {
-    attachInterrupt(digitalPinToInterrupt(ucIntPin), ISR_Dcc, CHANGE);
+    hal::attachInterrupt(digitalPinToInterrupt(ucIntPin), ISR_Dcc, CHANGE);
   }
 
   // ---------------------------------------------------

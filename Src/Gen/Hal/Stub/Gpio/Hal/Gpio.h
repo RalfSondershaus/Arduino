@@ -38,6 +38,13 @@
 
 #include <Util/Array.h>
 
+// TODO Check if these #defines can be used from WinArduino.h
+#define INPUT 0x0
+#define OUTPUT 0x1
+
+#define HIGH 0x1
+#define LOW  0x0
+
 namespace hal
 {
     namespace stubs
