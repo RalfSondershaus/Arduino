@@ -1,6 +1,7 @@
 /Doc/
 /Build/Tmp/
 /Build/Bin/
+/Build/Doc/
 /Src/Gen/Arduino/avr/bootloaders/
 /Src/Gen/Arduino/avr/firmwares/
 /Src/Gen/Arduino/avr/libraries/
