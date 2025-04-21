@@ -46,8 +46,10 @@ RTE_DEF_PORT_SR_START
 RTE_DEF_PORT_SR_END
 
 RTE_DEF_PORT_CS_START
-RTE_DEF_PORT_CS(Ifc_Cal_Signal         , ifc_cal_signal          , calm, &cal::CalM::get_signal)
-RTE_DEF_PORT_CS(Ifc_Cal_Set_Signal     , ifc_cal_set_signal      , calm, &cal::CalM::set_signal)
+RTE_DEF_PORT_CS(Ifc_Cal_Signal             , ifc_cal_signal              , calm, &cal::CalM::get_signal)
+RTE_DEF_PORT_CS(Ifc_Cal_InputClassifier    , ifc_cal_input_classifier    , calm, &cal::CalM::get_input_classifiers)
+RTE_DEF_PORT_CS(Ifc_Cal_Set_Signal         , ifc_cal_set_signal          , calm, &cal::CalM::set_signal)
+RTE_DEF_PORT_CS(Ifc_Cal_Set_InputClassifier, ifc_cal_set_input_classifier, calm, &cal::CalM::set_input_classifier)
 RTE_DEF_PORT_CS_END
 
 RTE_DEF_END
