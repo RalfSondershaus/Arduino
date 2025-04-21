@@ -62,8 +62,6 @@ namespace cal
 
   namespace eeprom
   {
-    static constexpr uint8 kInitial = 0xFF;
-
     namespace default_values
     {
       static const signal_cal_type signals{ CAL_SIGNAL_ARRAY };
@@ -106,7 +104,7 @@ namespace cal
   // -----------------------------------------------
   bool CalM::isValid()
   {
-    return hal::eeprom::read(eeprom::eManufacturerID) != eeprom::kInitial;
+    return hal::eeprom::read(eeprom::eManufacturerID) != hal::eeprom::kInitial;
   }
 
   // -----------------------------------------------
@@ -150,8 +148,8 @@ namespace cal
   // -----------------------------------------------
   void CalM::initSignals()
   {
-    const auto it_begin = signals.begin();
-    for (auto it = it_begin; it < signals.end(); it++)
+    const auto it_begin = eeprom::default_values::signals.begin();
+    for (auto it = it_begin; it < eeprom::default_values::signals.end(); it++)
     {
       set_signal(it - it_begin, *it);
     }
@@ -165,8 +163,8 @@ namespace cal
   // -----------------------------------------------
   void CalM::initClassifiers()
   {
-    const auto it_begin = input_classifiers.classifiers.begin();
-    for (auto it = it_begin; it < input_classifiers.classifiers.end(); it++)
+    const auto it_begin = eeprom::default_values::input_classifiers.classifiers.begin();
+    for (auto it = it_begin; it < eeprom::default_values::input_classifiers.classifiers.end(); it++)
     {
       set_input_classifier(it - it_begin, *it);
     }
@@ -218,7 +216,7 @@ namespace cal
 
       // bytes 17, 18: change over time and blink change over time
       it->changeOverTime = hal::eeprom::read(unEepIdx); unEepIdx++;
-      it->blinkChangeOverTime = hal::eeprom::read(unEepIdx);
+      it->blinkChangeOverTime = hal::eeprom::read(unEepIdx); unEepIdx++;
     }
   }
 

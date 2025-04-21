@@ -39,9 +39,14 @@ namespace hal
 {
     namespace eeprom
     {
+        static constexpr uint8 kInitial = 0xFF;
+        
         namespace stubs
         {
-            constexpr int kMaxElements = 256;
+            // NANO: 1 KB, MEGA: 4 KB
+            // Shall not exceed number of used EEPROM bytes.
+            // For example, unit test for Signal uses cal::eeprom::eSizeOfData number of bytes
+            constexpr int kMaxElements = 256; 
             extern uint8 elements[kMaxElements];
         }
 

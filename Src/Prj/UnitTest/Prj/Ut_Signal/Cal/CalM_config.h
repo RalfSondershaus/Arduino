@@ -57,6 +57,9 @@ namespace cal
     /// Size of coding data for all signals depends on number of signals 
     /// and size of coding data for a single signal.
     constexpr uint16 kSignalsLen = kSignalLen*cfg::kNrSignals;
+    /// Size of coding data for all classifiers depends on number of classifiers
+    /// and size of coding data for a single classifier.
+    constexpr uint16 kClassifierLen = kInputClassifierLen*cfg::kNrClassifiers;
 
     // Depends on hardware platform, values below for MEGA
     /// EEPROM indices.
@@ -72,8 +75,9 @@ namespace cal
       eDecoderAddressMSB          = 8,
       eConfiguration              = 28,
       eManufacturerCVStructureID  = 32,
-      eSignalBase                 = 33,                        ///< EEPROM base address and kSignalLenNvm (18) bytes per signal
-      eClassifierBase             = eSignalBase + kSignalsLen  ///< EEPROM base address and kInputClassifierLenNvm (12) bytes per classifier
+      eSignalBase                 = 33,                              ///< EEPROM base address and kSignalLen (18) bytes per signal
+      eClassifierBase             = eSignalBase + kSignalsLen,       ///< EEPROM base address and kInputClassifierLen (12) bytes per classifier
+      eSizeOfData                 = eClassifierBase + kClassifierLen ///< One past last element = number of bytes in EEPROM
     };
 
     enum
@@ -135,7 +139,7 @@ namespace cal
   constexpr uint8 kClassifierPin5 = 10;
 }
 
-#define INPUT0 { cal::input_type::eNone, 0 }
+#define INPUT0 { cal::input_type::eClassified, 0 }
 #define INPUT1 { cal::input_type::eNone, 1 }
 #define INPUT2 { cal::input_type::eNone, 2 }
 #define INPUT3 { cal::input_type::eNone, 3 }
@@ -149,7 +153,7 @@ namespace cal
 #define ASPECTS4 { { 0b00000010, 0b00000000 }, { 0b00000001, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00011111, 0b00000000 } }
 #define ASPECTS5 { { 0b00011000, 0b00000000 }, { 0b00000100, 0b00000000 }, { 0b00000110, 0b00000000 }, { 0b00011001, 0b00000000 }, { 0b00011111, 0b00000000 } }
 
-#define TARGET0 { { cal::target_type::eNone, 14 }, { cal::target_type::eNone, 12 }, { cal::target_type::eNone, 11 }, { cal::target_type::eNone, 10 }, { cal::target_type::eNone,  9 } }
+#define TARGET0 { { cal::target_type::eOnboard, 14 }, { cal::target_type::eOnboard, 12 }, { cal::target_type::eOnboard, 11 }, { cal::target_type::eOnboard, 10 }, { cal::target_type::eOnboard,  9 } }
 #define TARGET1 { { cal::target_type::eNone,  8 }, { cal::target_type::eNone,  7 }, { cal::target_type::eNone,  6 }, { cal::target_type::eNone,  5 }, { cal::target_type::eNone,  4 } }
 #define TARGET2 { { cal::target_type::eNone, 18 }, { cal::target_type::eNone, 17 }, { cal::target_type::eNone, 16 }, { cal::target_type::eNone, 15 }, { cal::target_type::eNone, 14 } }
 #define TARGET3 { { cal::target_type::eNone, 23 }, { cal::target_type::eNone, 22 }, { cal::target_type::eNone, 21 }, { cal::target_type::eNone, 20 }, { cal::target_type::eNone, 19 } }

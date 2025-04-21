@@ -57,6 +57,9 @@ namespace cal
     /// Size of coding data for all signals depends on number of signals 
     /// and size of coding data for a single signal.
     constexpr uint16 kSignalsLen = kSignalLen*cfg::kNrSignals;
+    /// Size of coding data for all classifiers depends on number of classifiers
+    /// and size of coding data for a single classifier.
+    constexpr uint16 kClassifierLen = kInputClassifierLen*cfg::kNrClassifiers;
 
     // Depends on hardware platform, values below for MEGA
     /// EEPROM indices.
@@ -72,8 +75,9 @@ namespace cal
       eDecoderAddressMSB          = 8,
       eConfiguration              = 28,
       eManufacturerCVStructureID  = 32,
-      eSignalBase                 = 33,                        ///< EEPROM base address and kSignalLenNvm (18) bytes per signal
-      eClassifierBase             = eSignalBase + kSignalsLen  ///< EEPROM base address and kInputClassifierLenNvm (12) bytes per classifier
+      eSignalBase                 = 33,                              ///< EEPROM base address and kSignalLen (18) bytes per signal
+      eClassifierBase             = eSignalBase + kSignalsLen,       ///< EEPROM base address and kInputClassifierLen (12) bytes per classifier
+      eSizeOfData                 = eClassifierBase + kClassifierLen ///< One past last element = number of bytes in EEPROM
     };
 
     enum

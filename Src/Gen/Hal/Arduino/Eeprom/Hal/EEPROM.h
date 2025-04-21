@@ -40,6 +40,8 @@ namespace hal
 {
     namespace eeprom
     {
+        static constexpr uint8 kInitial = 0xFF;
+        
         inline uint8 read(int idx)              { return EEPROM.read(idx); }
         inline void write(int idx, uint8 val)   { EEPROM.write(idx, val); }
         inline void update(int idx, uint8 val)  { EEPROM.update(idx, val); }

@@ -37,6 +37,8 @@ namespace hal
 {
     namespace eeprom
     {
+        static constexpr uint8 kInitial = 0xFF;
+        
         namespace stubs
         {
             constexpr int kMaxElements = 1024;

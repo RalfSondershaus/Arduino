@@ -21,8 +21,9 @@
 #include <unity_adapt.h>
 #include <Test/Logger.h>
 #include <Cal/CalM.h>
-#include <Hal/Timer.h>
+#include <Hal/EEPROM.h>
 #include <Hal/Gpio.h>
+#include <Hal/Timer.h>
 #include <Rte/Rte.h>
 #include <InputClassifier.h>
 #include <Util/Array.h>
@@ -33,7 +34,7 @@
 
 #define PRINT_RTE     0
 
-#include "CalM_config.h"
+#include <Cal/CalM_config.h>
 
 typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> input_classifier_type;
 
@@ -177,6 +178,9 @@ TEST(Ut_Signal, Default_Green_Red)
   cal::input_type in;
   size_t nStep;
   constexpr int kSignalId = 0;
+
+  // CalM shall initialize EEPROM from ROM.
+  hal::eeprom::write(cal::eeprom::eManufacturerID, hal::eeprom::kInitial);
 
   log.start("Default_Green_Red.txt");
 
