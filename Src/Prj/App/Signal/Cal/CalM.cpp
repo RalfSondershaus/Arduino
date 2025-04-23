@@ -23,6 +23,7 @@
 #include <Cal/CalM.h>
 #include <Rte/Rte.h>
 #include <Hal/EEPROM.h>
+#include <Util/Tracer.h>
 
 #include <Cal/CalM_config.h>
 
@@ -59,6 +60,8 @@ namespace cal
   // 274 - 285	Classifier 3
   // 286 - 297	Classifier 4
   // 298 - 309	Classifier 5     72 bytes for 6 classifiers
+
+  static util::tracer<32, 4> trc;
 
   namespace eeprom
   {
@@ -211,7 +214,9 @@ namespace cal
       // bytes 12 - 16: targets
       for (auto target_it = it->targets.begin(); target_it < it->targets.end(); target_it++)
       {
-        target_it->type = hal::eeprom::read(unEepIdx); unEepIdx++;
+        uint8 val = hal::eeprom::read(unEepIdx); unEepIdx++;
+        target_it->type = util::bits::extract(val, 0, 2);
+        target_it->idx  = util::bits::extract(val, 2, 6);
       }
 
       // bytes 17, 18: change over time and blink change over time
@@ -290,7 +295,8 @@ namespace cal
       // bytes 12 - 16: targets
       for (auto target_it = it->targets.begin(); target_it < it->targets.end(); target_it++)
       {
-        hal::eeprom::update(unEepIdx, target_it->type); unEepIdx++;
+        uint8 val = (target_it->idx << 2) | target_it->type;
+        hal::eeprom::update(unEepIdx, val); unEepIdx++;
       }
 
       // bytes 17, 18: change over time and blink change over time
@@ -338,9 +344,11 @@ namespace cal
   // -----------------------------------------------
   void CalM::initAll()
   {
+    trc.trace("initAll begin");
     initBaseCV();
     initSignals();
     initClassifiers();
+    trc.trace("readAll end");
   }
 
   // -----------------------------------------------
@@ -348,10 +356,11 @@ namespace cal
   // -----------------------------------------------
   bool CalM::readAll()
   {
+    trc.trace("readAll");
+
     readBaseCV();
     readSignals();
     readClassifiers();
-    
     return isValid();
   }
 
@@ -474,6 +483,7 @@ namespace cal
   // -----------------------------------------------
   void CalM::init()
   {
+    trc.trace("init begin");
     if (!readAll())
     {
       // invalid / never programmed: initialize EEPROM with default values
@@ -481,6 +491,7 @@ namespace cal
     }
 
     calcLeds();
+    trc.trace("init end");
   }
 
   // -----------------------------------------------
@@ -488,6 +499,12 @@ namespace cal
   // -----------------------------------------------
   void CalM::cycle100()
   {
+    static int cnt;
+    cnt++;
+    if (cnt == 20)
+    {
+      trc.flush();
+    }
   }
 
 } // namespace cal

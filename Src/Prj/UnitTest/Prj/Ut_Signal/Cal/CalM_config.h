@@ -131,12 +131,12 @@ namespace cal
   constexpr uint8 kChangeOverTime       = 10;
   constexpr uint8 kChangeOverTimeBlink  = 0;
 
-  constexpr uint8 kClassifierPin0 = 10;
-  constexpr uint8 kClassifierPin1 = 11;
-  constexpr uint8 kClassifierPin2 = 12;
-  constexpr uint8 kClassifierPin3 = 13;
-  constexpr uint8 kClassifierPin4 = 14;
-  constexpr uint8 kClassifierPin5 = 10;
+  constexpr uint8 kClassifierPin0 = 54;
+  constexpr uint8 kClassifierPin1 = 55;
+  constexpr uint8 kClassifierPin2 = 56;
+  constexpr uint8 kClassifierPin3 = 57;
+  constexpr uint8 kClassifierPin4 = 58;
+  constexpr uint8 kClassifierPin5 = 59;
 }
 
 #define INPUT0 { cal::input_type::eClassified, 0 }

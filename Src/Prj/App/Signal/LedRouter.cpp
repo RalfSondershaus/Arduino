@@ -21,9 +21,13 @@
 #include <Rte/Rte.h>
 #include <Util/Algorithm.h>
 #include <LedRouter.h>
+#include <Hal/Serial.h>
+#include <Util/Logger.h>
 
 namespace signal
 {
+  static util::logger log;
+
   // --------------------------------------------------------------------------------------------
   /// Gamma correction
   /// 
@@ -67,14 +71,20 @@ namespace signal
   {
     rte::Ifc_OnboardTargetDutyCycles::size_type pos = static_cast<rte::Ifc_OnboardTargetDutyCycles::size_type>(0);
 
+    log.begin("LedRouter");
     for (auto it = ramps_onboard.begin(); it != ramps_onboard.end(); it++)
     {
       const intensity16_type intensity16{ it->step() };
       const intensity8_255_type intensity{ rte::convert<intensity8_255_type, intensity16_type>(intensity16) };
       const intensity8_255_type pwm{ aunIntensity2Pwm[intensity] };
       rte::ifc_onboard_target_duty_cycles::writeElement(pos, pwm);
+      if (pos == 8) 
+      {
+        log << " pos=" << pos << " tgt=" << it->get_tgt() << " cur=" << it->get_cur();
+      }
       pos++;
     }
+    log.end();
   }
 
   // -----------------------------------------------------------------------------------
@@ -95,6 +105,10 @@ namespace signal
       if (ramps_onboard.check_boundary(tgt.idx))
       {
         ramps_onboard[tgt.idx].init_from_slope(intensity, slope, kCycleTime);
+      }
+      if (tgt.idx == 8)
+      {
+        hal::serial::println(intensity);
       }
     }
     break;
@@ -164,6 +178,7 @@ namespace signal
   // -----------------------------------------------------------------------------------
   void LedRouter::init()
   {
+    log.start(1000);
     for (auto it = ramps_onboard.begin(); it != ramps_onboard.end(); it++)
     {
       it->clear();

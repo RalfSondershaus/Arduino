@@ -72,7 +72,8 @@
         "sstream": "cpp",
         "stdexcept": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "ios": "cpp"
     },
     "ceedlingExplorer.shellPath": "cmd",
     "ceedlingExplorer.projectPath": "W:\\repos\\Arduino\\Test\\Arduino",

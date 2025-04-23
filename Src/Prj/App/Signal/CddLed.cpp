@@ -22,10 +22,13 @@
 #include <CddLed.h>
 // A CDD can include Arduino.h
 #include <Arduino.h>
+#include <Hal/Serial.h>
+#include <Util/Logger.h>
 
 namespace cdd
 {
 
+  static util::logger log;
   // -----------------------------------------------------------------------------------
   /// Write from RTE to pins
   // -----------------------------------------------------------------------------------
@@ -34,11 +37,12 @@ namespace cdd
     using size_type = rte::Ifc_OnboardTargetDutyCycles::size_type;
 
     size_type pos;
-    rte::intensity8_t u8Int;
+    rte::intensity8_255 u8Int;
     const cal::led_cal_type * pCalLeds = rte::ifc_cal_leds::call();
 
     if (pCalLeds != nullptr)
     {
+      log.begin("CddLed");
       //for (auto it = rte::ifc_onboard_target_intensities::begin(); it != rte::ifc_onboard_target_intensities::end(); it++)
       for (pos = 0U; pos < rte::ifc_onboard_target_duty_cycles::size(); pos++)
       {
@@ -47,16 +51,18 @@ namespace cdd
         {
           (void)rte::ifc_onboard_target_duty_cycles::readElement(pos, u8Int);
           pinMode(pos, OUTPUT);
+          log << " pos=" << pos << " int=" << u8Int;
           if (digitalPinHasPWM(pos))
           {
             analogWrite(pos, static_cast<int>(u8Int));
           }
           else
           {
-            digitalWrite(pos, (u8Int > static_cast<rte::intensity8_t>(0U)) ? HIGH : LOW);
+            digitalWrite(pos, (u8Int > static_cast<rte::intensity8_255>(0U)) ? HIGH : LOW);
           }
         }
       }
+      log.end();
     }
   }
 
@@ -65,6 +71,7 @@ namespace cdd
   // -----------------------------------------------------------------------------------
   void CddLed::init()
   {
+    log.start(1000);
   }
 
   // -----------------------------------------------------------------------------------

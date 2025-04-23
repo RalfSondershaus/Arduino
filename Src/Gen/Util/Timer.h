@@ -116,6 +116,9 @@ namespace util
     /// Get time since start() + ulTime in [ms]
     time_type getTimeSince(void) const { return getCurrentTime() - ulTimer; }
 
+    /// Increment timer with time ulTime [us], return new timer value in [us]
+    time_type increment(const time_type ulTime) noexcept { ulTimer += ulTime; return ulTimer; }
+    
     /// Return true if timer is elapsed; false otherwise
     /// millis() >= ulTimer: positive result: highest bit is 0
     /// millis() <  ulTimer: negative result: highest bit is 1

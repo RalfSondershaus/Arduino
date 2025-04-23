@@ -25,6 +25,8 @@
 #include <Util/String_view.h>
 #include <Rte/Rte.h>
 
+extern signal::InputClassifier rte::input_classifier;
+
 namespace com
 {
   using char_type = AsciiCom::char_type;
@@ -44,9 +46,11 @@ namespace com
       eINV_SIGNAL_TARGETS,
       eINV_SIGNAL_INPUT,
       eINV_SIGNAL_CHANGEOVERTIME,
+      eINV_CLASSIFIER_CMD,
       eINV_CLASSIFIER_PIN,
       eINV_CLASSIFIER_LIMITS,
       eINV_CLASSIFIER_DEBOUNCE,
+      eINV_MONITOR_START,
       eERR_UNKNOWN
     } tRetType;
 
@@ -64,9 +68,11 @@ namespace com
       "ERR: Unknown signal targets",          // eINV_SIGNAL_TARGETS
       "ERR: Unknown signal input",            // eINV_SIGNAL_INPUT
       "ERR: Unknown signal change over time", // eINV_SIGNAL_CHANGEOVERTIME
-      "ERR: Unknown classifier pin",          // eINV_CLASSIFIER_PIN
-      "ERR: Unknown classifier limits",       // eINV_CLASSIFIER_LIMITS
+      "ERR: Unknown classifier sub command GET_CLASSIFIER id [LIMITS slot-id,PIN,DEBOUNCE]",  // eINV_CLASSIFIER_CMD
+      "ERR: Unknown classifier pin GET_CLASSIFIER id PIN",                            // eINV_CLASSIFIER_PIN
+      "ERR: Unknown classifier limits GET_CLASSIFIER id LIMITS slot_id",              // eINV_CLASSIFIER_LIMITS
       "ERR: Unknown classifier debounce",     // eINV_CLASSIFIER_DEBOUNCE
+      "ERR: Unknown monitor start MONITOR_START [classifier id]",           // eINV_MONITOR_START
       "ERR: unknown error"                    // has to be the last element
     };
 
@@ -76,6 +82,8 @@ namespace com
   static tRetType process_get_signal(stringstream_type& st, string_type& response);
   static tRetType process_set_classifier(stringstream_type& st, string_type& response);
   static tRetType process_get_classifier(stringstream_type& st, string_type& response);
+  static tRetType process_monitor_start(stringstream_type& st, string_type& response);
+  static tRetType process_monitor_stop(stringstream_type& st, string_type& response);
 
   static int process_set_signal_aspects(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_blinks(stringstream_type& st, cal::signal_type& cal_sig);
@@ -97,6 +105,8 @@ namespace com
   static tRetType process_get_classifier_limits(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
   static tRetType process_get_classifier_debounce(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
 
+  static int monitorClassified = -1;
+
   typedef tRetType (*func_type)(stringstream_type& st, string_type& response);
 
   typedef struct 
@@ -109,12 +119,15 @@ namespace com
   /// Max length of a token (how many characters)
   static constexpr util::streamsize kMaxLenToken = 16;
 
-  const util::array<tCommands, 4> commands =
+  // Max Length of strings: kMaxLenToken
+  const util::array<tCommands, 6> commands =
   { {
     { "SET_SIGNAL", process_set_signal },
     { "GET_SIGNAL", process_get_signal },
     { "SET_CLASSIFIER", process_set_classifier },
-    { "GET_CLASSIFIER", process_get_classifier }
+    { "GET_CLASSIFIER", process_get_classifier },
+    { "MONITOR_START", process_monitor_start },
+    { "MONITOR_STOP", process_monitor_stop }
   } };
 
   // -----------------------------------------------------------------------------------
@@ -170,6 +183,60 @@ namespace com
     {
       response += " ";
       response += sub_response;
+    }
+  }
+
+  // -----------------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------------
+  void AsciiCom::cycle()
+  {
+    static uint8 ucCnt = 0;
+    util::basic_string<4, char_type> str;
+    if (asciiTP)
+    {
+      ucCnt++;
+      if (ucCnt == 100)
+      {
+        if (rte::ifc_ad_values::boundaryCheck(monitorClassified))
+        {
+          telegram_response.clear();
+          uint16 tmp;
+          uint8 cls;
+          rte::intensity8_255 intensity;
+          rte::ifc_ad_values::readElement(monitorClassified, tmp);
+          rte::ifc_classified_values::readElement(monitorClassified, cls);
+          util::to_string(static_cast<int>(tmp), str);
+          telegram_response.append(str);
+          util::to_string(static_cast<int>(cls), str);
+          telegram_response.append(" ");
+          telegram_response.append(str);
+          rte::ifc_onboard_target_duty_cycles::readElement(12, intensity);
+          util::to_string(static_cast<int>(intensity.v), str);
+          telegram_response.append(" ");
+          telegram_response.append(str);
+          rte::ifc_onboard_target_duty_cycles::readElement(11, intensity);
+          util::to_string(static_cast<int>(intensity.v), str);
+          telegram_response.append(" ");
+          telegram_response.append(str);
+          rte::ifc_onboard_target_duty_cycles::readElement(10, intensity);
+          util::to_string(static_cast<int>(intensity.v), str);
+          telegram_response.append(" ");
+          telegram_response.append(str);
+          rte::ifc_onboard_target_duty_cycles::readElement(9, intensity);
+          util::to_string(static_cast<int>(intensity.v), str);
+          telegram_response.append(" ");
+          telegram_response.append(str);
+          rte::ifc_onboard_target_duty_cycles::readElement(8, intensity);
+          util::to_string(static_cast<int>(intensity.v), str);
+          telegram_response.append(" ");
+          telegram_response.append(str);
+          if (telegram_response.size() > 0)
+          {
+            asciiTP->transmitTelegram(telegram_response);
+          }
+        }
+        ucCnt = 0;
+      }
     }
   }
 
@@ -293,7 +360,7 @@ namespace com
     // (and if the last element doesn't have trailing white spaces).
     while (!st.fail() && cal_sig.targets.check_boundary(idx))
     {
-      if (util::string_view{tmp}.compare("ONBOARD") == 0)
+      if (util::string_view{tmp}.compare("ONB") >= 0)
       {
         sig_tgt.type = cal::target_type::eOnboard;
         if (val < cfg::kNrOnboardTargets)
@@ -307,7 +374,7 @@ namespace com
           break;
         }
       }
-      else if (util::string_view{tmp}.compare("EXTERN") == 0)
+      else if (util::string_view{tmp}.compare("EXT") >= 0)
       {
         sig_tgt.type = cal::target_type::eExternal;
         if (val < cfg::kNrExternalTargets)
@@ -394,7 +461,7 @@ namespace com
     // (and if the last element doesn't have trailing white spaces).
     if (!st.fail() && (val < cfg::kNrClassifiers))
     {
-      if (util::string_view{tmp}.compare("CLASSIFIED") == 0)
+      if (util::string_view{tmp}.compare("CLASS") >= 0)
       {
         cal_sig.input.bits.type = cal::input_type::eClassified;
         cal_sig.input.bits.idx = val;
@@ -760,7 +827,7 @@ namespace com
   // -----------------------------------------------------------------------------------
   /// <GET_CLASSIFIER id LIMITS> slot_id
   ///
-  /// @return eOK, eINV_CLASSIFIER_DEBOUNCE
+  /// @return eOK, eINV_CLASSIFIER_LIMITS
   // -----------------------------------------------------------------------------------
   static tRetType process_get_classifier_limits(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response)
   {
@@ -782,7 +849,7 @@ namespace com
     }
     else
     {
-      ret = eINV_CLASSIFIER_DEBOUNCE;
+      ret = eINV_CLASSIFIER_LIMITS;
     }
 
     return ret;
@@ -802,6 +869,67 @@ namespace com
     response.append(tmp);
 
     return eOK;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <MONITOR_START> classifier classifier-id
+  ///
+  /// @return eOK
+  // -----------------------------------------------------------------------------------
+  static tRetType process_monitor_start(stringstream_type& st, string_type& response)
+  {
+    char tmp[kMaxLenToken];
+    tRetType ret;
+    st >> tmp;
+    if (!st.fail())
+    {
+      if (util::string_view{tmp}.compare("classifier") == 0)
+      {
+        uint16 idx;
+        st >> idx;
+        if (!st.fail())
+        {
+          monitorClassified = static_cast<int>(idx);
+          ret = eOK;
+        }
+        else
+        {
+          ret = eINV_MONITOR_START;
+        }
+      }
+      else
+      {
+        ret = eINV_MONITOR_START;
+      }
+    }
+    else
+    {
+      ret = eINV_MONITOR_START;
+    }
+    return ret;
+  }
+  static tRetType process_monitor_stop(stringstream_type& st, string_type& response)
+  {
+    char tmp[kMaxLenToken];
+    tRetType ret;
+    st >> tmp;
+    if (!st.fail())
+    {
+      if (util::string_view{tmp}.compare("classifier") == 0)
+      {
+        monitorClassified = -1;
+        ret = eOK;
+      }
+      else
+      {
+        ret = eINV_MONITOR_START;
+      }
+    }
+    else
+    {
+      ret = eINV_MONITOR_START;
+    }
+    return ret;
   }
 
 } // namespace com

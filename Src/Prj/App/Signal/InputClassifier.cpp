@@ -42,5 +42,6 @@ namespace signal
     classifiers.run();
 
     rte::ifc_classified_values::write(classifiers.classified_values());
+    rte::ifc_ad_values::write(classifiers.ad_values());
   }
 }

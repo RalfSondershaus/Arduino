@@ -74,7 +74,7 @@ namespace com
           if (telegram_rawdata.size() > 0)
           {
             notify();
-            hal::serial::println(telegram_rawdata.c_str());
+            //hal::serial::println(telegram_rawdata.c_str());
           }
         }
         else

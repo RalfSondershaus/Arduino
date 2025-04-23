@@ -76,6 +76,8 @@ namespace com
     void listenTo(SerAsciiTP& tp) { asciiTP = &tp; tp.attach(*this); }
 
     void process(const string_type& telegram, string_type& response);
+
+    void cycle();
   };
 } // namespace com
 

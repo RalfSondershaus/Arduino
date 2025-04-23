@@ -189,6 +189,7 @@ namespace signal
       }
       if (toggleLedPin(kBlinkLedPeriodValid_ms))
       {
+        #if 0
         hal::serial::print("[");
         hal::serial::print(hal::micros());
         hal::serial::print("]");
@@ -196,6 +197,7 @@ namespace signal
         hal::serial::print(decoder.getNrInterrupts());
         hal::serial::print(" packets=");
         hal::serial::println(decoder.getPacketCount());
+        #endif
       }
     }
     else

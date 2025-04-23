@@ -47,6 +47,7 @@ namespace rte
 
   /// The AD classified values (from buttons) are written into an array of this type
   using classified_values_array = util::array<cmd_type, cfg::kNrClassifiers>;
+  using ad_values_array = util::array<uint16, cfg::kNrClassifiers>;
   using dcc_commands_arry = util::array<cmd_type, cfg::kNrDccAddresses>;
 
   /// The DCC values are written into an array of this type
@@ -54,13 +55,6 @@ namespace rte
   /// Array index cfg::kNrDccAddresses-1 corresponds to DCC address as defined by 
   /// cal::dcc_type::address + cfg::kNrDccAddresses - 1.
   using dcc_values_array = util::array<cmd_type, cfg::kNrDccAddresses>;
-
-  /// Target intensities for one signal
-  typedef struct
-  {
-    util::array<intensity8, cfg::kNrSignalTargets> intensities;
-    uint8 changeOverTime; ///< [10 ms] dim time if aspect changes
-  } signal_intensity_type;
 
   /// The target intensities are written into an array of this type
   using onboard_target_array = util::array<intensity8_255, cfg::kNrOnboardTargets>;
@@ -73,6 +67,7 @@ namespace rte
   /// SR interface for classified values
   // -----------------------------------------------------------------------------------
   using Ifc_ClassifiedValues = rte::ifc_sr_array<classified_values_array>;
+  using Ifc_ADValues = rte::ifc_sr_array<ad_values_array>;
 
   using Ifc_DccCommands = rte::ifc_sr_array<dcc_commands_arry>;
   // -----------------------------------------------------------------------------------

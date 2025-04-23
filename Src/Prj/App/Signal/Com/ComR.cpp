@@ -46,6 +46,7 @@ namespace com
   void ComR::cycle()
   {
     mySerAsciiTP.cycle();
+    myAsciiCom.cycle();
   }
 
 } // namespace com

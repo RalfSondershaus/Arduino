@@ -398,6 +398,26 @@ namespace util
       return *this;
     }
 
+    /// Non-standard functions, TBD shall be replaced by ostringstream
+    basic_string& append(int val)
+    {
+      char s[10];
+      const int base = 10;
+      return append(::itoa(val, s, base));
+    }
+    basic_string& append(uint8 val)
+    {
+      return append(static_cast<int>(val));
+    }
+    basic_string& append(uint16 val)
+    {
+      return append(static_cast<int>(val));
+    }
+    basic_string& append(uint32 val)
+    {
+      return append(static_cast<int>(val));
+    }
+
     /// Appends string str, character ch, or a null-terminated character string
     template<int Size2>
     basic_string& operator+=(const basic_string<Size2, CharT>& str) { return append(str); }

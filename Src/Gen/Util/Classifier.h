@@ -218,6 +218,7 @@ namespace util
 
     /// The classified values are arranged in an util::array
     typedef util::array<uint8, NrClassifiers> classified_values_array_type;
+    typedef util::array<uint16, NrClassifiers> ad_values_array_type;
 
     /// The invalid index, type is uint8
     static constexpr uint8 kInvalidIndex = classifier_type::kInvalidIndex;
@@ -231,6 +232,8 @@ namespace util
     classifier_array_type classifiers;
     /// Array of classified values (output)
     classified_values_array_type classifiedValues;
+    /// Array of last AD values (for debugging)
+    ad_values_array_type adValues;
     /// The configuration
     cal_const_pointer pCfg;
   public:
@@ -272,6 +275,8 @@ namespace util
     /// Returns classified values. No range check on i.
     const class_type classified_value(int i) const { return classifiedValues[i]; }
     const classified_values_array_type& classified_values() const noexcept { return classifiedValues; }
+    /// Returns AD values.
+    const ad_values_array_type& ad_values() const noexcept { return adValues; }
 
     /// Initialization at system start
     void init(void) noexcept
@@ -286,12 +291,14 @@ namespace util
         int nAdc;
         int nClass;
         auto it_cls = classifiedValues.begin();
+        auto it_adc = adValues.begin();
         auto it_cfg = pCfg->classifiers.begin();
         for (auto it = classifiers.begin(); it != classifiers.end(); it++)
         {
           nAdc = get_ADC((it_cfg++)->ucPin);
           nClass = it->classify_debounce(static_cast<input_type>(nAdc));
           (*it_cls++) = static_cast<uint8>(nClass);
+          (*it_adc++) = static_cast<uint16>(nAdc);
         }
       }
     }
