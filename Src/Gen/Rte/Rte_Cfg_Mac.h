@@ -424,3 +424,31 @@
 #define RTE_DEF_PORT_CS_START
 #define RTE_DEF_PORT_CS_END
 #endif
+
+// 16.3.2 The # operator [cpp.stringize]
+//
+// A character string literal is a string-literal with no prefix. 
+// If, in the replacement list, a parameter is immediately preceded by a # preprocessing token, 
+// both are replaced by a single character string literal preprocessing token that contains the
+// spelling of the preprocessing token sequence for the corresponding argument
+#ifdef RTE_DEF_MODE_PORT_ARRAY
+#define RTE_DEF_OBJ_START
+#define RTE_DEF_OBJ_END
+#define RTE_DEF_OBJ(cls, obj)
+#define RTE_DEF_INIT_RUNABLE_START
+#define RTE_DEF_INIT_RUNABLE(cls, obj, func)
+#define RTE_DEF_INIT_RUNABLE_END
+#define RTE_DEF_CYCLIC_RUNABLE_START
+#define RTE_DEF_CYCLIC_RUNABLE(cls, obj, func, time_off, time_cyc)
+#define RTE_DEF_CYCLIC_RUNABLE_END
+#define RTE_DEF_EVENT_RUNABLE_START
+#define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
+#define RTE_DEF_EVENT_RUNABLE_END
+#define RTE_DEF_PORT_SR(cls,port)            { port::obj.data(), #port },
+#define RTE_DEF_PORT_SR_CONTAINER(cls,port)  { port::obj.data(), #port },
+#define RTE_DEF_PORT_SR_START     port_data_t aPorts[] = {
+#define RTE_DEF_PORT_SR_END       };
+#define RTE_DEF_PORT_CS(cls,port,srvobj,func)
+#define RTE_DEF_PORT_CS_START
+#define RTE_DEF_PORT_CS_END
+#endif

@@ -23,7 +23,6 @@
 #include <Cal/CalM.h>
 #include <Rte/Rte.h>
 #include <Hal/EEPROM.h>
-#include <Util/Tracer.h>
 
 #include <Cal/CalM_config.h>
 
@@ -60,8 +59,6 @@ namespace cal
   // 274 - 285	Classifier 3
   // 286 - 297	Classifier 4
   // 298 - 309	Classifier 5     72 bytes for 6 classifiers
-
-  static util::tracer<32, 4> trc;
 
   namespace eeprom
   {
@@ -344,11 +341,9 @@ namespace cal
   // -----------------------------------------------
   void CalM::initAll()
   {
-    trc.trace("initAll begin");
     initBaseCV();
     initSignals();
     initClassifiers();
-    trc.trace("readAll end");
   }
 
   // -----------------------------------------------
@@ -356,8 +351,6 @@ namespace cal
   // -----------------------------------------------
   bool CalM::readAll()
   {
-    trc.trace("readAll");
-
     readBaseCV();
     readSignals();
     readClassifiers();
@@ -483,7 +476,6 @@ namespace cal
   // -----------------------------------------------
   void CalM::init()
   {
-    trc.trace("init begin");
     if (!readAll())
     {
       // invalid / never programmed: initialize EEPROM with default values
@@ -491,7 +483,6 @@ namespace cal
     }
 
     calcLeds();
-    trc.trace("init end");
   }
 
   // -----------------------------------------------
@@ -499,12 +490,6 @@ namespace cal
   // -----------------------------------------------
   void CalM::cycle100()
   {
-    static int cnt;
-    cnt++;
-    if (cnt == 20)
-    {
-      trc.flush();
-    }
   }
 
 } // namespace cal

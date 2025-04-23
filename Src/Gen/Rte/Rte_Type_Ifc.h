@@ -53,6 +53,8 @@ namespace rte
     typedef T data_type;
     typedef ifc_sr<data_type> This;
     using ret_type = typename Base::ret_type ;
+    using pointer = data_type*;
+    using const_pointer = const data_type*;
   
   protected:
     data_type mData;
@@ -61,6 +63,9 @@ namespace rte
     /// Read and write data. Default implementation uses operator=. 
     ret_type read (      data_type& t) const { t = mData; return Base::OK; }
     ret_type write(const data_type& t)       { mData = t; return Base::OK; }
+    /// Returns a pointer to the data element
+    pointer data() { return &mData; }
+    const_pointer data() const { return &mData; }
   };
 
   // ----------------------------------------------------------
@@ -78,6 +83,8 @@ namespace rte
     using value_type = typename array_type::value_type;
     using size_type = typename array_type::size_type;
     using ret_type = typename Base::ret_type;
+    using pointer = typename array_type::pointer;
+    using const_pointer = typename array_type::const_pointer;
 
   protected:
     array_type mData;
@@ -126,6 +133,9 @@ namespace rte
     size_type size() const { return mData.size(); }
     /// Returns true if pos is a valid index (is within boundaries)
     bool boundaryCheck(size_type pos) const { return pos < size(); }
+    /// Returns a pointer to the underlying array
+    pointer data() { return mData.data(); }
+    const_pointer data() const { return mData.data(); }
   };
 
   // ----------------------------------------------------------
@@ -197,6 +207,11 @@ namespace rte
   };
 #endif
 
+  typedef struct 
+  {
+    void * pData;
+    const char * szName;
+  } port_data_t;
 } // namespace rte
 
 #endif // RTE_TYPE_IFC_H__

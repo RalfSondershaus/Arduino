@@ -22,6 +22,7 @@
 
 #include <Util/Array.h>
 #include <Util/bitset.h>
+#include <Util/String_view.h>
 #include <Util/Timer.h>
 #include <Rte/Rte.h>
 #include <Rte/Rte_Type_Ifc.h>
@@ -98,6 +99,11 @@ namespace rte
 #include <Rte/Rte_Cfg_Mac.h>
 #include <Rte/Rte_Cfg_Prj.h>
 #undef RTE_DEF_MODE_PORT
+
+#define RTE_DEF_MODE_PORT_ARRAY
+#include <Rte/Rte_Cfg_Mac.h>
+#include <Rte/Rte_Cfg_Prj.h>
+#undef RTE_DEF_MODE_PORT_ARRAY
 
 namespace rte
 {
@@ -176,4 +182,40 @@ namespace rte
     //  aEvents.set(ulEventId, true);
     //}
   }
+
+  size_t getNrPorts()
+  {
+    return sizeof(aPorts) / sizeof(port_data_t);
+  }
+
+  port_data_t * getPortData(size_t idx)
+  {
+    port_data_t * pRet;
+    if (idx < getNrPorts())
+    {
+      pRet = &aPorts[idx];
+    }
+    else
+    {
+      pRet = nullptr;
+    }
+    return pRet;
+  }
+
+  port_data_t * getPortData(const char * portName)
+  {
+    size_t idx;
+    port_data_t * p = nullptr;
+    for (idx = 0; idx < getNrPorts(); idx++)
+    {
+      if (util::string_view{aPorts[idx].szName}.compare(portName) == 0)
+      {
+        p = &aPorts[idx];
+        break;
+      }
+    }
+    return p;
+  }
+
+
 } // namespace rte

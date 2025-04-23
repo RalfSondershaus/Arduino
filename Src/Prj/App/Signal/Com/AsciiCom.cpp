@@ -82,8 +82,11 @@ namespace com
   static tRetType process_get_signal(stringstream_type& st, string_type& response);
   static tRetType process_set_classifier(stringstream_type& st, string_type& response);
   static tRetType process_get_classifier(stringstream_type& st, string_type& response);
+  static tRetType process_monitor_list(stringstream_type& st, string_type& response);
   static tRetType process_monitor_start(stringstream_type& st, string_type& response);
   static tRetType process_monitor_stop(stringstream_type& st, string_type& response);
+  static bool output_monitor_list(string_type& response);
+  static bool output_port_data(const rte::port_data_t * pPortData, string_type& response);
 
   static int process_set_signal_aspects(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_blinks(stringstream_type& st, cal::signal_type& cal_sig);
@@ -106,6 +109,8 @@ namespace com
   static tRetType process_get_classifier_debounce(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
 
   static int monitorClassified = -1;
+  static bool doOutputPortList = false;
+  static rte::port_data_t * pPortData = nullptr;
 
   typedef tRetType (*func_type)(stringstream_type& st, string_type& response);
 
@@ -120,14 +125,15 @@ namespace com
   static constexpr util::streamsize kMaxLenToken = 16;
 
   // Max Length of strings: kMaxLenToken
-  const util::array<tCommands, 6> commands =
+  const util::array<tCommands, 7> commands =
   { {
     { "SET_SIGNAL", process_set_signal },
     { "GET_SIGNAL", process_get_signal },
     { "SET_CLASSIFIER", process_set_classifier },
     { "GET_CLASSIFIER", process_get_classifier },
-    { "MONITOR_START", process_monitor_start },
-    { "MONITOR_STOP", process_monitor_stop }
+    { "MON_LIST", process_monitor_list },
+    { "MON_START", process_monitor_start },
+    { "MON_STOP", process_monitor_stop }
   } };
 
   // -----------------------------------------------------------------------------------
@@ -190,6 +196,23 @@ namespace com
   // -----------------------------------------------------------------------------------
   void AsciiCom::cycle()
   {
+    if (asciiTP)
+    {
+      if (doOutputPortList)
+      {
+        doOutputPortList = output_monitor_list(telegram_response);
+        asciiTP->transmitTelegram(telegram_response);
+      }
+
+      if (pPortData)
+      {
+        if (output_port_data(pPortData, telegram_response))
+        {
+          asciiTP->transmitTelegram(telegram_response);
+        }
+      }
+    }
+    #if 0
     static uint8 ucCnt = 0;
     util::basic_string<4, char_type> str;
     if (asciiTP)
@@ -238,6 +261,7 @@ namespace com
         ucCnt = 0;
       }
     }
+    #endif
   }
 
   // -----------------------------------------------------------------------------------
@@ -872,30 +896,94 @@ namespace com
   }
 
   // -----------------------------------------------------------------------------------
-  /// <MONITOR_START> classifier classifier-id
+  /// <MON_LIST>
+  ///
+  /// @return eOK
+  // -----------------------------------------------------------------------------------
+  static tRetType process_monitor_list(stringstream_type& st, string_type& response)
+  {
+    response.append("number of ports=");
+    response.append(rte::getNrPorts());
+    doOutputPortList = true;
+    return eOK;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <MON_LIST>
+  ///
+  /// @return eOK
+  // -----------------------------------------------------------------------------------
+  static bool output_monitor_list(string_type& response)
+  {
+    static size_t outputPortListIdx = 0;
+    bool ret;
+
+    if (outputPortListIdx < rte::getNrPorts())
+    {
+      response.clear();
+      response.append(outputPortListIdx);
+      response.append(" : ");
+      response.append(rte::getPortData(outputPortListIdx)->szName);
+      outputPortListIdx++;
+    }
+    if (outputPortListIdx < rte::getNrPorts())
+    {
+      ret = true;
+    }
+    else
+    {
+      outputPortListIdx = 0;
+      ret = false;
+    }
+    return ret;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <MON_LIST>
+  ///
+  /// @return eOK
+  // -----------------------------------------------------------------------------------
+  static bool output_port_data(const rte::port_data_t * pPD, string_type& response)
+  {
+    static size_t cnt = 0;
+    bool ret;
+
+    cnt++;
+
+    if (cnt > 100)
+    {
+      cnt = 0;
+      response.clear();
+      response.append(pPD->szName);
+      response.append(":");
+      response.append(static_cast<uint16*>(pPD->pData)[0]);
+      ret = true;
+    }
+    else
+    {
+      ret = false;
+    }
+    return ret;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <MON_START> cycle-time ifc-name
   ///
   /// @return eOK
   // -----------------------------------------------------------------------------------
   static tRetType process_monitor_start(stringstream_type& st, string_type& response)
   {
-    char tmp[kMaxLenToken];
+    char ifc_name[kMaxLenToken];
+    uint16 unCycleTime;
     tRetType ret;
-    st >> tmp;
+    st >> unCycleTime >> ifc_name;
     if (!st.fail())
     {
-      if (util::string_view{tmp}.compare("classifier") == 0)
+      pPortData = rte::getPortData(ifc_name);
+      if (pPortData)
       {
-        uint16 idx;
-        st >> idx;
-        if (!st.fail())
-        {
-          monitorClassified = static_cast<int>(idx);
-          ret = eOK;
-        }
-        else
-        {
-          ret = eINV_MONITOR_START;
-        }
+        response.append(pPortData->szName);
+        ret = eOK;
       }
       else
       {
@@ -910,26 +998,8 @@ namespace com
   }
   static tRetType process_monitor_stop(stringstream_type& st, string_type& response)
   {
-    char tmp[kMaxLenToken];
-    tRetType ret;
-    st >> tmp;
-    if (!st.fail())
-    {
-      if (util::string_view{tmp}.compare("classifier") == 0)
-      {
-        monitorClassified = -1;
-        ret = eOK;
-      }
-      else
-      {
-        ret = eINV_MONITOR_START;
-      }
-    }
-    else
-    {
-      ret = eINV_MONITOR_START;
-    }
-    return ret;
+    pPortData = nullptr;
+    return eOK;
   }
 
 } // namespace com

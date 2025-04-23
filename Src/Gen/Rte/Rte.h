@@ -42,6 +42,10 @@ namespace rte
   void stop();
   void exec();
   void setEvent(uint32 ulEventId);
+
+  size_t getNrPorts();
+  port_data_t * getPortData(size_t idx);
+  port_data_t * getPortData(const char * portName);
 } // namespace rte
 
 #endif // RTE_H_
