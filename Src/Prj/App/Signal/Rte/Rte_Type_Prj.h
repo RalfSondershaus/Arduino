@@ -90,6 +90,8 @@ namespace rte
   using Ifc_Cal_Set_Signal          = rte::ifc_cs<ret_type, cal::CalM, uint8, const cal::signal_type&, bool>;
   using Ifc_Cal_Set_InputClassifier = rte::ifc_cs<ret_type, cal::CalM, uint8, const cal::input_classifier_single_type&, bool>;
 
+  using Ifc_Cal_Init_All            = rte::ifc_cs<ret_type, cal::CalM, void>;
+
   // -----------------------------------------------------------------------------------
   /// CS interface for commands
   // -----------------------------------------------------------------------------------

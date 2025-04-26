@@ -444,8 +444,8 @@
 #define RTE_DEF_EVENT_RUNABLE_START
 #define RTE_DEF_EVENT_RUNABLE(eventname, cls, obj, func)
 #define RTE_DEF_EVENT_RUNABLE_END
-#define RTE_DEF_PORT_SR(cls,port)            { port::obj.data(), #port },
-#define RTE_DEF_PORT_SR_CONTAINER(cls,port)  { port::obj.data(), #port },
+#define RTE_DEF_PORT_SR(cls,port)            { port::obj.data(), #port, port::obj.size(), sizeof(cls::data_type) },
+#define RTE_DEF_PORT_SR_CONTAINER(cls,port)  { port::obj.data(), #port, port::obj.size(), sizeof(cls::value_type) },
 #define RTE_DEF_PORT_SR_START     port_data_t aPorts[] = {
 #define RTE_DEF_PORT_SR_END       };
 #define RTE_DEF_PORT_CS(cls,port,srvobj,func)

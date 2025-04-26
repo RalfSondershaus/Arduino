@@ -21,10 +21,11 @@
 #include "InputClassifier.h"
 #include "Cfg_Prj.h"
 #include <Rte/Rte.h>
+// #include <Util/Logger.h>
 
 namespace signal
 {
-  
+  // static util::logger log;
   // -----------------------------------------------------------------------------------
   /// Init at system start
   // -----------------------------------------------------------------------------------
@@ -32,6 +33,7 @@ namespace signal
   {
     const cal::input_classifier_cal_type * pCal = rte::ifc_cal_input_classifier::call();
     classifiers.set_config(pCal);
+    // log.start(1000);
   }
 
   // -----------------------------------------------------------------------------------
@@ -43,5 +45,18 @@ namespace signal
 
     rte::ifc_classified_values::write(classifiers.classified_values());
     rte::ifc_ad_values::write(classifiers.ad_values());
+    // log.begin("AD Values ");
+    // auto aADValues = classifiers.ad_values();
+    // for (auto it = aADValues.begin(); it != aADValues.end(); it++)
+    // {
+    //   log << " " << *it;
+    // }
+    // log << " - ";
+    // auto aCLValues = classifiers.classified_values();
+    // for (auto it = aCLValues.begin(); it != aCLValues.end(); it++)
+    // {
+    //   log << " " << static_cast<int>(*it);
+    // }
+    // log.end();
   }
 }

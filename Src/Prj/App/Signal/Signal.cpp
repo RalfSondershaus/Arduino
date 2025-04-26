@@ -20,12 +20,12 @@
 
 #include <Rte/Rte.h>
 #include <Util/bitset.h>
-#include <Util/Logger.h>
+//#include <Util/Logger.h>
 #include <Signal.h>
 
 namespace signal
 {
-  static util::logger log;
+  //static util::logger log;
   // -----------------------------------------------------------------------------------
   /// Initialize to default values of default constructor
   // -----------------------------------------------------------------------------------
@@ -58,6 +58,8 @@ namespace signal
 
     cmd_type cmd = rte::ifc_rte_get_cmd::call(cal_getInput(pCal));
 
+    //log << "cmd=" << cmd;
+    
     // switch on RED if a valid command hasn't been received since system start.
     if ((cmd == rte::kInvalidCmd) && (isInitialState(aspect_tgt)))
     {
@@ -114,12 +116,12 @@ namespace signal
         // speed [(0x0000 ... 0x8000) / ms]
         // calculate speed for ramp from 0x0000 (0%) to 0x8000 (100%) within dimtime
         const speed16_ms_type speed = rte::kIntensity16_100 / scale_10ms_1ms(dimtime);
-        log << " tgt=" << cal_getTarget(pCal, pos).idx << " int=" << intensity;
+        //log << " (" << cal_getTarget(pCal, pos).idx << ": " << intensity << ")";
         rte::ifc_rte_set_intensity_and_speed::call(cal_getTarget(pCal, pos), intensity, speed);
       }
       else
       {
-        log << " tgt=" << cal_getTarget(pCal, pos).idx << " int=" << intensity;
+        //log << " (" << cal_getTarget(pCal, pos).idx << ": " << intensity << ")";
         rte::ifc_rte_set_intensity::call(cal_getTarget(pCal, pos), intensity);
       }
     }
@@ -132,7 +134,7 @@ namespace signal
   // -----------------------------------------------------------------------------------
   void SignalHandler::init()
   {
-    log.start(1000);
+    //log.start(1000);
 
     for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
     {
@@ -151,10 +153,10 @@ namespace signal
       auto calit = pCal->begin();
       for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
       {
-        if (sigit == signals.begin()) log.begin("Signal");
+        //if (sigit == signals.begin()) log.begin("Signal");
         sigit->exec(calit);
         calit++;
-        if (sigit == signals.begin()) log.end();
+        //if (sigit == signals.begin()) log.end();
       }
     }
   }

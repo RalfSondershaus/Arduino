@@ -79,18 +79,21 @@ namespace cal
     /// Runable 100 ms
     void cycle100();
 
-    /// references to coding parameters
+    /// Server functions: read access to coding parameters
     const signal_cal_type *           get_signal()             { return &signals; }
     const input_classifier_cal_type * get_input_classifiers()  { return &input_classifiers; }
     const led_cal_type *              get_leds()               { return &leds; }
     const base_cv_cal_type *          get_base_cv()            { return &base_cv; }
 
-    /// Server function: Store data in RAM. If doUpdate is true, stores data
+    /// Server functions: Store data in RAM. If doUpdate is true, stores data
     /// in EEPROM. Otherwise, call update() for this.
     /// Return OK is successful, returns NOK otherwise.
     rte::ret_type set_signal(uint8 ucSignalId, const signal_type& values, bool doUpdate = false);
     rte::ret_type set_input_classifier(uint8 ucClassifierId, const input_classifier_single_type& values, bool doUpdate = false);
     rte::ret_type set_base_cv(const base_cv_cal_type& p, bool doUpdate = false);
+    
+    /// Server function: initialize EEPROM with ROM default values
+    rte::ret_type init_all();
     
     /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
     /// Validate the data after write.

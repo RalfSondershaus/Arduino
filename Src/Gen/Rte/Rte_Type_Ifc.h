@@ -52,6 +52,7 @@ namespace rte
     typedef ifc_base Base;
     typedef T data_type;
     typedef ifc_sr<data_type> This;
+    using size_type = size_t;
     using ret_type = typename Base::ret_type ;
     using pointer = data_type*;
     using const_pointer = const data_type*;
@@ -63,6 +64,8 @@ namespace rte
     /// Read and write data. Default implementation uses operator=. 
     ret_type read (      data_type& t) const { t = mData; return Base::OK; }
     ret_type write(const data_type& t)       { mData = t; return Base::OK; }
+    /// size
+    size_type size() const { return 1; }
     /// Returns a pointer to the data element
     pointer data() { return &mData; }
     const_pointer data() const { return &mData; }
@@ -171,7 +174,7 @@ namespace rte
     /// Server function
     ret_type call(Args... args) { return CALL_MEMBER_FUNC(obj, func)(args...); }
   };
-#if 0
+
   // ----------------------------------------------------------
   /// Client Server interface. Partial specialization for the important use case of a
   /// member function without parameters.
@@ -205,12 +208,20 @@ namespace rte
     /// Server function
     ret_type call() { return CALL_MEMBER_FUNC(obj, func)(); }
   };
-#endif
 
+  // ----------------------------------------------------------
+  /// Make RTE ports (interfaces) available for diagnosis.
+  // ----------------------------------------------------------
   typedef struct 
   {
+    /// Pointer to the data or first element of the array
     void * pData;
+    /// Name of the port (interface)
     const char * szName;
+    /// Number of elements in pData (>= 1)
+    const size_t size;
+    /// size of data element
+    const size_t size_of_element;
   } port_data_t;
 } // namespace rte
 

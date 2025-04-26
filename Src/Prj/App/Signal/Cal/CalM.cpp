@@ -447,6 +447,15 @@ namespace cal
   }
 
   // -----------------------------------------------
+  /// Server function: initialize EEPROM with ROM default values
+  // -----------------------------------------------
+  rte::ret_type CalM::init_all()
+  {
+    initAll();
+    return rte::ret_type::OK;
+  }
+
+  // -----------------------------------------------
   /// Calculate bit field: for each port, set a bit to 1 if the port is used by a LED
   /// or clear the bit to 0 if the port is not used by a LED.
   // -----------------------------------------------

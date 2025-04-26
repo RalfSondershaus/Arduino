@@ -398,24 +398,29 @@ namespace util
       return *this;
     }
 
-    /// Non-standard functions, TBD shall be replaced by ostringstream
-    basic_string& append(int val)
+    /// Non-standard functions, TBD shall be replaced by ostringstream.
+    /// TBD for unsigned long and uint32
+    basic_string& appendn(int val)
     {
       char s[10];
       const int base = 10;
       return append(::itoa(val, s, base));
     }
-    basic_string& append(uint8 val)
+    basic_string& appendn(uint8 val)
     {
-      return append(static_cast<int>(val));
+      return appendn(static_cast<int>(val));
     }
-    basic_string& append(uint16 val)
+    basic_string& appendn(uint16 val)
     {
-      return append(static_cast<int>(val));
+      char s[10];
+      const int base = 10;
+      return append(::utoa(val, s, base));
     }
-    basic_string& append(uint32 val)
+    basic_string& appendn(uint32 val)
     {
-      return append(static_cast<int>(val));
+      char s[10];
+      const int base = 10;
+      return append(::ultoa(val, s, base));
     }
 
     /// Appends string str, character ch, or a null-terminated character string

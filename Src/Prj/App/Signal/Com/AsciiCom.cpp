@@ -23,6 +23,7 @@
 #include <Com/AsciiCom.h>
 #include <Util/Sstream.h>
 #include <Util/String_view.h>
+#include <Util/Timer.h>
 #include <Rte/Rte.h>
 
 extern signal::InputClassifier rte::input_classifier;
@@ -33,6 +34,14 @@ namespace com
   using string_type = AsciiCom::string_type; // string of size 64
   using stringstream_type = util::basic_istringstream<SerAsciiTP::kMaxLenTelegram, char_type>;
 
+  /// To monitor a RTE port
+  typedef struct
+  {
+    const rte::port_data_t * pPortData;   ///< Pointer to the RTE data
+    util::MilliTimer timer;               ///< Timer for next output
+    uint16 unCycleTime;                   ///< [ms] Cycle time for output
+  } port_t;
+  
     /// Return values of process() function family
     typedef enum
     {
@@ -50,7 +59,8 @@ namespace com
       eINV_CLASSIFIER_PIN,
       eINV_CLASSIFIER_LIMITS,
       eINV_CLASSIFIER_DEBOUNCE,
-      eINV_MONITOR_START,
+      eINV_MONITOR_START_PARAM,
+      eINV_MONITOR_START_IFC_NAME,
       eERR_UNKNOWN
     } tRetType;
 
@@ -68,11 +78,12 @@ namespace com
       "ERR: Unknown signal targets",          // eINV_SIGNAL_TARGETS
       "ERR: Unknown signal input",            // eINV_SIGNAL_INPUT
       "ERR: Unknown signal change over time", // eINV_SIGNAL_CHANGEOVERTIME
-      "ERR: Unknown classifier sub command GET_CLASSIFIER id [LIMITS slot-id,PIN,DEBOUNCE]",  // eINV_CLASSIFIER_CMD
-      "ERR: Unknown classifier pin GET_CLASSIFIER id PIN",                            // eINV_CLASSIFIER_PIN
-      "ERR: Unknown classifier limits GET_CLASSIFIER id LIMITS slot_id",              // eINV_CLASSIFIER_LIMITS
+      "ERR: Unknown classifier sub command: GET_CLASSIFIER id [LIMITS slot-id,PIN,DEBOUNCE]",  // eINV_CLASSIFIER_CMD
+      "ERR: Unknown classifier pin: GET_CLASSIFIER id PIN",                            // eINV_CLASSIFIER_PIN
+      "ERR: Unknown classifier limits: GET_CLASSIFIER id LIMITS slot_id",              // eINV_CLASSIFIER_LIMITS
       "ERR: Unknown classifier debounce",     // eINV_CLASSIFIER_DEBOUNCE
-      "ERR: Unknown monitor start MONITOR_START [classifier id]",           // eINV_MONITOR_START
+      "ERR: Unknown monitor start parameter: MONITOR_START cycle-time ifc-name",       // eINV_MONITOR_START_PARAM
+      "ERR: Unknown monitor start interface name: MONITOR_START cycle-time ifc-name",  // eINV_MONITOR_START_IFC_NAME
       "ERR: unknown error"                    // has to be the last element
     };
 
@@ -85,8 +96,10 @@ namespace com
   static tRetType process_monitor_list(stringstream_type& st, string_type& response);
   static tRetType process_monitor_start(stringstream_type& st, string_type& response);
   static tRetType process_monitor_stop(stringstream_type& st, string_type& response);
+  static tRetType process_init(stringstream_type& st, string_type& response);
+
   static bool output_monitor_list(string_type& response);
-  static bool output_port_data(const rte::port_data_t * pPortData, string_type& response);
+  static bool output_port_data(port_t& pm, string_type& response);
 
   static int process_set_signal_aspects(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_blinks(stringstream_type& st, cal::signal_type& cal_sig);
@@ -110,7 +123,7 @@ namespace com
 
   static int monitorClassified = -1;
   static bool doOutputPortList = false;
-  static rte::port_data_t * pPortData = nullptr;
+  static port_t portMonitor;
 
   typedef tRetType (*func_type)(stringstream_type& st, string_type& response);
 
@@ -125,7 +138,7 @@ namespace com
   static constexpr util::streamsize kMaxLenToken = 16;
 
   // Max Length of strings: kMaxLenToken
-  const util::array<tCommands, 7> commands =
+  const util::array<tCommands, 8> commands =
   { {
     { "SET_SIGNAL", process_set_signal },
     { "GET_SIGNAL", process_get_signal },
@@ -133,7 +146,9 @@ namespace com
     { "GET_CLASSIFIER", process_get_classifier },
     { "MON_LIST", process_monitor_list },
     { "MON_START", process_monitor_start },
-    { "MON_STOP", process_monitor_stop }
+    { "MON_STOP", process_monitor_stop },
+    { "INIT", process_init }
+
   } };
 
   // -----------------------------------------------------------------------------------
@@ -204,9 +219,9 @@ namespace com
         asciiTP->transmitTelegram(telegram_response);
       }
 
-      if (pPortData)
+      if (portMonitor.pPortData)
       {
-        if (output_port_data(pPortData, telegram_response))
+        if (output_port_data(portMonitor, telegram_response))
         {
           asciiTP->transmitTelegram(telegram_response);
         }
@@ -903,7 +918,7 @@ namespace com
   static tRetType process_monitor_list(stringstream_type& st, string_type& response)
   {
     response.append("number of ports=");
-    response.append(rte::getNrPorts());
+    response.appendn(rte::getNrPorts());
     doOutputPortList = true;
     return eOK;
   }
@@ -921,7 +936,7 @@ namespace com
     if (outputPortListIdx < rte::getNrPorts())
     {
       response.clear();
-      response.append(outputPortListIdx);
+      response.appendn(outputPortListIdx);
       response.append(" : ");
       response.append(rte::getPortData(outputPortListIdx)->szName);
       outputPortListIdx++;
@@ -943,20 +958,28 @@ namespace com
   ///
   /// @return eOK
   // -----------------------------------------------------------------------------------
-  static bool output_port_data(const rte::port_data_t * pPD, string_type& response)
+  static bool output_port_data(port_t& pm, string_type& response)
   {
-    static size_t cnt = 0;
     bool ret;
+    size_t i;
 
-    cnt++;
-
-    if (cnt > 100)
+    if (pm.timer.timeout())
     {
-      cnt = 0;
+      pm.timer.increment(portMonitor.unCycleTime);
       response.clear();
-      response.append(pPD->szName);
+      response.append("[").appendn(hal::micros()).append("] ");
+      response.append(pm.pPortData->szName);
       response.append(":");
-      response.append(static_cast<uint16*>(pPD->pData)[0]);
+      for (i = 0; i < portMonitor.pPortData->size; i++)
+      {
+        switch (portMonitor.pPortData->size_of_element)
+        {
+          case 1: response.append(" ").appendn(static_cast<uint8*>(pm.pPortData->pData)[i]); break;
+          case 2: response.append(" ").appendn(static_cast<uint16*>(pm.pPortData->pData)[i]); break;
+          case 3: response.append(" ").appendn(static_cast<uint32*>(pm.pPortData->pData)[i]); break;
+          default: response.append("unknown size type ").appendn(portMonitor.pPortData->size_of_element); break;
+        }
+      }
       ret = true;
     }
     else
@@ -969,37 +992,52 @@ namespace com
   // -----------------------------------------------------------------------------------
   /// <MON_START> cycle-time ifc-name
   ///
-  /// @return eOK
+  /// @return eOK, eINV_MONITOR_START_IFC_NAME, eINV_MONITOR_START_PARAM
   // -----------------------------------------------------------------------------------
   static tRetType process_monitor_start(stringstream_type& st, string_type& response)
   {
-    char ifc_name[kMaxLenToken];
+    char ifc_name[32];
     uint16 unCycleTime;
     tRetType ret;
     st >> unCycleTime >> ifc_name;
     if (!st.fail())
     {
-      pPortData = rte::getPortData(ifc_name);
+      const rte::port_data_t * pPortData = rte::getPortData(ifc_name);
       if (pPortData)
       {
         response.append(pPortData->szName);
+        portMonitor.pPortData = pPortData;
+        portMonitor.unCycleTime = unCycleTime;
+        portMonitor.timer.start(unCycleTime);
         ret = eOK;
       }
       else
       {
-        ret = eINV_MONITOR_START;
+        ret = eINV_MONITOR_START_IFC_NAME;
       }
     }
     else
     {
-      ret = eINV_MONITOR_START;
+      ret = eINV_MONITOR_START_PARAM;
     }
     return ret;
   }
+
+  // -----------------------------------------------------------------------------------
+  /// Stop the monitor
+  // -----------------------------------------------------------------------------------
   static tRetType process_monitor_stop(stringstream_type& st, string_type& response)
   {
-    pPortData = nullptr;
+    portMonitor.pPortData = nullptr;
     return eOK;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// Write default values to NVM
+  // -----------------------------------------------------------------------------------
+  static tRetType process_init(stringstream_type& st, string_type& response)
+  {
+    return (rte::ifc_cal_init_all::call() == rte::ret_type::OK) ? eOK : eERR_EEPROM;
   }
 
 } // namespace com

@@ -81,6 +81,7 @@ RTE_DEF_PORT_CS(Ifc_Cal_Led                , ifc_cal_leds                , calm,
 RTE_DEF_PORT_CS(Ifc_Cal_Base_CV            , ifc_cal_base_cv             , calm, &cal::CalM::get_base_cv)
 RTE_DEF_PORT_CS(Ifc_Cal_Set_Signal         , ifc_cal_set_signal          , calm, &cal::CalM::set_signal)
 RTE_DEF_PORT_CS(Ifc_Cal_Set_InputClassifier, ifc_cal_set_input_classifier, calm, &cal::CalM::set_input_classifier)
+RTE_DEF_PORT_CS(Ifc_Cal_Init_All           , ifc_cal_init_all            , calm, &cal::CalM::init_all)
 RTE_DEF_PORT_CS(Ifc_Rte_GetCommand             , ifc_rte_get_cmd                , input_command, &signal::InputCommand::getCmd)
 RTE_DEF_PORT_CS(Ifc_Rte_LedSetIntensityAndSpeed, ifc_rte_set_intensity_and_speed, led_router, &signal::LedRouter::setIntensityAndSpeed)
 RTE_DEF_PORT_CS(Ifc_Rte_LedSetIntensity        , ifc_rte_set_intensity          , led_router, &signal::LedRouter::setIntensity)
