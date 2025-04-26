@@ -75,6 +75,9 @@
 #ifdef RTE_DEF_PORT_SR_START
 #undef RTE_DEF_PORT_SR_START
 #endif
+#ifdef RTE_DEF_PORT_SR_END
+#undef RTE_DEF_PORT_SR_END
+#endif
 #ifdef RTE_DEF_PORT_CS_END
 #undef RTE_DEF_PORT_CS_END
 #endif

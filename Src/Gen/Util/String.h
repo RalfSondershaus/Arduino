@@ -206,7 +206,10 @@ namespace util
     /// Replaces the contents with a copy of s. Equivalent to *this = str;
     basic_string& assign(const basic_string& s)
     {
-      it_end = ::util::copy_n(s.begin(), s.size(), begin());
+      if (s.begin() != begin())
+      {
+        it_end = ::util::copy_n(s.begin(), s.size(), begin());
+      }
       return *this;
     }
 
@@ -396,31 +399,6 @@ namespace util
         *it_end++ = *first++;
       }
       return *this;
-    }
-
-    /// Non-standard functions, TBD shall be replaced by ostringstream.
-    /// TBD for unsigned long and uint32
-    basic_string& appendn(int val)
-    {
-      char s[10];
-      const int base = 10;
-      return append(::itoa(val, s, base));
-    }
-    basic_string& appendn(uint8 val)
-    {
-      return appendn(static_cast<int>(val));
-    }
-    basic_string& appendn(uint16 val)
-    {
-      char s[10];
-      const int base = 10;
-      return append(::utoa(val, s, base));
-    }
-    basic_string& appendn(uint32 val)
-    {
-      char s[10];
-      const int base = 10;
-      return append(::ultoa(val, s, base));
     }
 
     /// Appends string str, character ch, or a null-terminated character string
@@ -851,13 +829,128 @@ namespace util
   }
 
   // ---------------------------------------------------
-  /// Converts a signed integer to a string
+  /// Converts an unsigned integer to a string of type char.
+  /// The wchar version (to_wstring) is not implemented.
+  /// Returns the string (str).
+  /// 32 bit max 10 digits: 4.294.967.295
   // ---------------------------------------------------
-  template<int Size, class CharT>
-  void to_string(int value, util::basic_string<Size, CharT>& str)
+  template<int Size>
+  basic_string<Size, char>& to_string(uint32 value, basic_string<Size, char>& str)
   {
-    int base = 10;
-    str = ::itoa(value, str.begin(), base);
+    str.clear();
+    if (value == 0)
+    {
+      str = "0";
+    }
+    else
+    {
+      char buffer[11]; // Enough to store uint32 and the null terminator
+      int index = 0;
+
+      while (value > 0) 
+      {
+        buffer[index++] = '0' + (value % 10);
+        value /= 10;
+      }
+
+      // Reverse the buffer to get the correct string representation
+      for (int i = index - 1; i >= 0; --i) 
+      {
+        str += buffer[i];
+      }
+    }
+    return str;
+  }
+
+  // ---------------------------------------------------
+  /// Converts a signed integer to a string of type char.
+  /// The wchar version (to_wstring) is not implemented.
+  /// Returns the string (str).
+  // ---------------------------------------------------
+  template<int Size>
+  basic_string<Size, char>& to_string(uint16 value, basic_string<Size, char>& str)
+  {
+    return to_string(static_cast<uint32>(value), str);
+  }
+
+  // ---------------------------------------------------
+  /// Converts a signed integer to a string of type char.
+  /// The wchar version (to_wstring) is not implemented.
+  /// Returns the string (str).
+  // ---------------------------------------------------
+  template<int Size>
+  basic_string<Size, char>& to_string(uint8 value, basic_string<Size, char>& str)
+  {
+    return to_string(static_cast<uint32>(value), str);
+  }
+
+  // ---------------------------------------------------
+  /// Converts a signed integer to a string of type char.
+  /// The wchar version (to_wstring) is not implemented.
+  /// Returns the string (str).
+  /// 32 bit signed has max 11 digits (with sign): -2.147.483.648 ... 2.147.483.647
+  // ---------------------------------------------------
+  template<int Size>
+  basic_string<Size, char>& to_string(sint32 value, basic_string<Size, char>& str)
+  {
+    if (value == 0)
+    {
+      str += "0";
+    }
+    else
+    {
+      char buffer[12]; // Enough to store uint32 and the null terminator
+      int index = 0;
+      bool isNegative = false;
+
+      if (value < 0)
+      {
+        isNegative = true;
+        value = -value;
+      }
+
+      while (value > 0) 
+      {
+        buffer[index++] = '0' + (value % 10);
+        value /= 10;
+      }
+
+      if (isNegative)
+      {
+        buffer[index++] = '-';
+      }
+
+      // Reverse the buffer to get the correct string representation
+      for (int i = index - 1; i >= 0; --i) 
+      {
+        str += buffer[i];
+      }
+    }
+    return str;
+  }
+
+  // ---------------------------------------------------
+  /// Converts a signed integer to a string of type char.
+  /// The wchar version (to_wstring) is not implemented.
+  /// Returns the string (str).
+  /// 32 bit signed has max 11 digits (with sign): -2.147.483.648 ... 2.147.483.647
+  // ---------------------------------------------------
+  template<int Size>
+  basic_string<Size, char>& to_string(sint16 value, basic_string<Size, char>& str)
+  {
+    return to_string(static_cast<sint32>(value), str);
+  }
+
+  // ---------------------------------------------------
+  /// Converts a signed integer to a string of type char.
+  /// The wchar version (to_wstring) is not implemented.
+  /// Returns the string (str).
+  /// 32 bit signed has max 11 digits (with sign): -2.147.483.648 ... 2.147.483.647
+  // ---------------------------------------------------
+  template<int Size>
+  basic_string<Size, char>& to_string(sint8 value, basic_string<Size, char>& str)
+  {
+    return to_string(static_cast<sint32>(value), str);
   }
 
 } // namespace util

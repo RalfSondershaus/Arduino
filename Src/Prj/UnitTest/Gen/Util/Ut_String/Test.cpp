@@ -1034,6 +1034,33 @@ void Ut_String_stoui_uint8_base2(void)
   }
 }
 
+// -------------------------------------------------------------------------
+void Ut_String_to_string_uint8(void)
+{
+  using basetype = uint8;
+  typedef struct
+  {
+    const basetype n;
+    const util::basic_string<16, char> exp_str;
+  } tStep;
+  static const tStep aSteps[] =
+  {
+    {   0,   "0"},
+    {   1,   "1"},
+    {  20,  "20"},
+    { 100, "100"},
+    { 255, "255"},
+  };
+  size_t i;
+
+  for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
+  {
+    util::basic_string<16, char> s;
+    s = util::to_string(aSteps[i].n, s);
+    EXPECT_EQ(s.compare(aSteps[i].exp_str), 0);
+  }
+}
+
 void setUp(void)
 {
 }
@@ -1098,6 +1125,7 @@ bool test_loop(void)
   RUN_TEST(Ut_String_stoui_uint16_base0);
   RUN_TEST(Ut_String_stoui_uint8_base0);
   RUN_TEST(Ut_String_stoui_uint8_base2);
+  RUN_TEST(Ut_String_to_string_uint8);
 
   (void) UNITY_END();
 

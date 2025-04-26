@@ -21,7 +21,11 @@
 #include <Rte/Rte.h>
 #include <CddLed.h>
 // A CDD can include Arduino.h
+#ifdef ARDUINO
 #include <Arduino.h>
+#else
+#include <WinArduino.h>
+#endif
 #include <Hal/Serial.h>
 #include <Util/Logger.h>
 

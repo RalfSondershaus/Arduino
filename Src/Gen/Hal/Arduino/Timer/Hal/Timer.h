@@ -39,12 +39,13 @@
 #ifndef HAL_TIMER_H
 #define HAL_TIMER_H
 
+#include <Std_Types.h>
 #include <Arduino.h>
 
 namespace hal
 {
-    inline unsigned long millis() { return ::millis(); }
-    inline unsigned long micros() { return ::micros(); }
+    inline uint32 millis() { return ::millis(); }
+    inline uint32 micros() { return ::micros(); }
 }
 
 #endif // HAL_TIMER_H

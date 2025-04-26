@@ -30,7 +30,7 @@ namespace hal
 {
     namespace stubs
     {
-        unsigned long micros;
-        unsigned long millis;
+        uint32 micros;
+        uint32 millis;
     }
 }

@@ -40,13 +40,16 @@ int analogRead(uint8_t);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t, int);
 
-unsigned long millis(void);
-unsigned long micros(void);
+uint32 millis(void);
+uint32 micros(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
 
 void attachInterrupt(uint8_t, void (*)(void), int mode);
 void detachInterrupt(uint8_t);
+
+// MEGA version
+#define digitalPinHasPWM(p)         (((p) >= 2 && (p) <= 13) || ((p) >= 44 && (p)<= 46))
 
 void setup(void);
 bool loop(void);

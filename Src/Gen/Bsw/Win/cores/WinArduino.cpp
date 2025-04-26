@@ -72,7 +72,7 @@ void analogWrite(uint8_t ucPin, int nVal)
 // ------------------------------------------------------------------
 /// [ms] Return time
 // ------------------------------------------------------------------
-unsigned long millis()
+uint32 millis()
 {
   return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
@@ -80,7 +80,7 @@ unsigned long millis()
 // ------------------------------------------------------------------
 /// [us] Return time
 // ------------------------------------------------------------------
-unsigned long micros()
+uint32 micros()
 {
   return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }

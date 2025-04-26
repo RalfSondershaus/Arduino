@@ -39,16 +39,18 @@
 #ifndef HAL_TIMER_H
 #define HAL_TIMER_H
 
+#include <Std_Types.h>
+
 namespace hal
 {
     namespace stubs
     {
-        extern unsigned long micros;
-        extern unsigned long millis;
+        extern uint32 micros;
+        extern uint32 millis;
     }
 
-    inline unsigned long millis() { return stubs::millis; }
-    inline unsigned long micros() { return stubs::micros; }
+    inline uint32 millis() { return stubs::millis; }
+    inline uint32 micros() { return stubs::micros; }
 }
 
 #endif // HAL_TIMER_H

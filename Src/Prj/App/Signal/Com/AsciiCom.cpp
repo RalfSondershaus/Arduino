@@ -26,7 +26,7 @@
 #include <Util/Timer.h>
 #include <Rte/Rte.h>
 
-extern signal::InputClassifier rte::input_classifier;
+//extern signal::InputClassifier rte::input_classifier;
 
 namespace com
 {
@@ -121,7 +121,6 @@ namespace com
   static tRetType process_get_classifier_limits(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
   static tRetType process_get_classifier_debounce(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
 
-  static int monitorClassified = -1;
   static bool doOutputPortList = false;
   static port_t portMonitor;
 
@@ -917,8 +916,9 @@ namespace com
   // -----------------------------------------------------------------------------------
   static tRetType process_monitor_list(stringstream_type& st, string_type& response)
   {
-    response.append("number of ports=");
-    response.appendn(rte::getNrPorts());
+    util::basic_string<4, char> tmp;
+    util::to_string(rte::getNrPorts(), tmp);
+    response.append("number of ports=").append(tmp);
     doOutputPortList = true;
     return eOK;
   }
@@ -931,12 +931,14 @@ namespace com
   static bool output_monitor_list(string_type& response)
   {
     static size_t outputPortListIdx = 0;
+    util::basic_string<4, char> tmp;
     bool ret;
 
     if (outputPortListIdx < rte::getNrPorts())
     {
+      util::to_string(outputPortListIdx, tmp);
       response.clear();
-      response.appendn(outputPortListIdx);
+      response.append(tmp);
       response.append(" : ");
       response.append(rte::getPortData(outputPortListIdx)->szName);
       outputPortListIdx++;
@@ -962,23 +964,26 @@ namespace com
   {
     bool ret;
     size_t i;
+    util::basic_string<11,char> tmp;
 
     if (pm.timer.timeout())
     {
       pm.timer.increment(portMonitor.unCycleTime);
       response.clear();
-      response.append("[").appendn(hal::micros()).append("] ");
+      util::to_string(hal::micros(), tmp);
+      response.append("[").append(tmp).append("] ");
       response.append(pm.pPortData->szName);
       response.append(":");
       for (i = 0; i < portMonitor.pPortData->size; i++)
       {
         switch (portMonitor.pPortData->size_of_element)
         {
-          case 1: response.append(" ").appendn(static_cast<uint8*>(pm.pPortData->pData)[i]); break;
-          case 2: response.append(" ").appendn(static_cast<uint16*>(pm.pPortData->pData)[i]); break;
-          case 3: response.append(" ").appendn(static_cast<uint32*>(pm.pPortData->pData)[i]); break;
-          default: response.append("unknown size type ").appendn(portMonitor.pPortData->size_of_element); break;
+          case 1: util::to_string(static_cast<uint8*>(pm.pPortData->pData)[i], tmp); break;
+          case 2: util::to_string(static_cast<uint16*>(pm.pPortData->pData)[i], tmp); break;
+          case 3: util::to_string(static_cast<uint32*>(pm.pPortData->pData)[i], tmp); break;
+          default: util::to_string(portMonitor.pPortData->size_of_element, tmp); break;
         }
+        response.append(" ").append(tmp);
       }
       ret = true;
     }
