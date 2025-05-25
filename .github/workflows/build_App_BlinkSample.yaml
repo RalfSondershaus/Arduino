@@ -29,3 +29,10 @@ jobs:
 
       - name: Run Build Script
         run: ./Build/build.sh App/BlinkSample mega avr_gcc arduino none all
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-output
+          path: Build/Bin/
+
