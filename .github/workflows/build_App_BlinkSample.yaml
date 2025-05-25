@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Dependencies
         run: |
@@ -31,7 +31,8 @@ jobs:
         run: ./Build/build.sh App/BlinkSample mega avr_gcc arduino none all
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
+        uses: actions/download-artifact@v4
         with:
           name: build-output
           path: Build/Bin/
