@@ -153,6 +153,12 @@ RMDIR   = del
 MKDIR   = mkdir
 SED     = sed
 AWK     = awk
+GIT     = git
+
+# ---------------------------------------------------
+# This file contains the git short hash
+# ---------------------------------------------------
+GIT_VERSION_FILE = $(PATH_SRC_PRJ_PROJECT)/GitVersion.h
 
 # ---------------------------------------------------
 # Clear source files and compiler flags.
@@ -285,7 +291,7 @@ endif
 # Implicit rules are not used, instead pattern rules with %.c are used, see below
 .SUFFIXES:
 
-all: PrintIncludePaths PrintCompiler Directories $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
+all: PrintIncludePaths PrintCompiler Directories GenerateGitVersion $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
 
 rebuild: clean all
 
@@ -322,6 +328,13 @@ ifeq ($(wildcard $(PATH_BIN)/*),)
 	@echo +++++ creating folder $(PATH_BIN)
 	@-$(MKDIR) $(PATH_BIN)
 endif
+
+.PHONY: GenerateGitVersion
+GenerateGitVersion:
+	@echo +++++ generating git short hash
+	@echo "// Automatically generated" > $(GIT_VERSION_FILE)
+	@echo -n "#define GIT_SHORT_HASH 0x" >> $(GIT_VERSION_FILE)
+	@-$(GIT) rev-parse --short HEAD    >> $(GIT_VERSION_FILE)	
 
 run: $(TARGET_FILENAME_BASE).$(TARGET_FILENAME_EXT)
 	@echo ++++++ Running ++++++

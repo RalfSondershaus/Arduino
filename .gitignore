@@ -12,6 +12,7 @@
 /Src/Prj/_Test/
 *_DEPRECATED*
 /.vs/
+/**/GitVersion.h
 Tmp/Arduino.log
 Build/link.bat
 Install.txt
