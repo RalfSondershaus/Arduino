@@ -1,4 +1,4 @@
-name: Build AVR Project App/BlinkSample
+name: Build AVR Project App/Signal
 
 on:
   push:
@@ -27,8 +27,8 @@ jobs:
       - name: Navigate to Repository
         run: cd arduino
 
-      - name: Run Build Script App/BlinkSample
-        run: ./Build/build.sh App/BlinkSample mega avr_gcc arduino none rebuild
+      - name: Run Build Script App/Signal
+        run: ./Build/build.sh App/Signal mega avr_gcc arduino none rebuild
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
