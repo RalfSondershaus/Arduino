@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Build.sh
 # $1  Project name, e.g. BlinkSample
 # $2  Target platform, supported: mega,uno,win32,win64
