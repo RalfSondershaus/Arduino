@@ -19,16 +19,18 @@ TARGET_MCU_VARIANT   = uno
 TARGET_MCU_DEVICE    = atmega328p
 endif
 
+# Remark: the values are case-sensitive at Linux systems.
+#         Folders are named with lowercase letters, so use lowercase letters here.
 ifeq ($(ARG_TARGET_ECU),win32)
-TARGET_MCU_FAMILY    = X86
-TARGET_MCU_VARIANT   = X86
-TARGET_MCU_DEVICE    = X86
+TARGET_MCU_FAMILY    = x86
+TARGET_MCU_VARIANT   = x86
+TARGET_MCU_DEVICE    = x86
 endif
 
 ifeq ($(ARG_TARGET_ECU),win64)
-TARGET_MCU_FAMILY    = X64
-TARGET_MCU_VARIANT   = X64
-TARGET_MCU_DEVICE    = X64
+TARGET_MCU_FAMILY    = x64
+TARGET_MCU_VARIANT   = x64
+TARGET_MCU_DEVICE    = x64
 endif
 
 # ---------------------------------------------------
@@ -38,11 +40,11 @@ ifeq ($(TARGET_MCU_FAMILY),avr)
 TARGET_FILENAME_EXT := hex
 endif
 
-ifeq ($(TARGET_MCU_FAMILY),X86)
+ifeq ($(TARGET_MCU_FAMILY),x86)
 TARGET_FILENAME_EXT := exe
 endif
 
-ifeq ($(TARGET_MCU_FAMILY),X64)
+ifeq ($(TARGET_MCU_FAMILY),x64)
 TARGET_FILENAME_EXT := exe
 endif
 
@@ -229,8 +231,8 @@ AVRDUDE_FLAGS = -C$(PATH_AVRDUDE)/avrdude.conf      \
 # MSVC (Microsoft)
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Supported platforms with MSVC (Microsoft):
-#   X86 and msvc
-#   X64 and msvc
+#   x86 and msvc
+#   x64 and msvc
 # ---------------------------------------------------
 else ifeq ($(ARG_COMPILER),msvc)
 CC := $(CL)
@@ -249,12 +251,12 @@ C_INCLUDES_COMPILER =
 # ---------------------------------------------------
 # Add compiler #defines for the target.
 # ---------------------------------------------------
-ifeq ($(TARGET_MCU_FAMILY),X86)
+ifeq ($(TARGET_MCU_FAMILY),x86)
 C_DEFINES := $(C_DEFINES) \
              -D "WIN32"
 
 else
-$(error ------ Invalid build command line parameter TARGET_MCU_FAMILY $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: X86) ------
+$(error ------ Invalid build command line parameter TARGET_MCU_FAMILY $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: x86) ------
 endif
 
 # ---------------------------------------------------
@@ -352,7 +354,7 @@ CCVERSIONFLAGS :=
 #           To override this default, set /PDB and specify a different file name.
 # /PDB:(Use Program Database)   A user-specified name for the program database (PDB) that the linker creates. It replaces the default name.
 # ---------------------------------------------------
-ifeq ($(TARGET_MCU_FAMILY),X86)
+ifeq ($(TARGET_MCU_FAMILY),x86)
 LFLAGS := $(LFLAGS)          \
           -link              \
           -NOLOGO            \
@@ -360,7 +362,7 @@ LFLAGS := $(LFLAGS)          \
           -DEBUG             \
           -SUBSYSTEM:CONSOLE
 else
-$(error ------ Invalid build command line parameter TARGET_MCU_FAMILY $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: X86) ------
+$(error ------ Invalid build command line parameter TARGET_MCU_FAMILY $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: x86) ------
 endif
 
 # ---------------------------------------------------
@@ -394,7 +396,7 @@ C_INCLUDES_COMPILER =
 # ---------------------------------------------------
 # Add compiler #defines for the target.
 # ---------------------------------------------------
-ifeq ($(TARGET_MCU_FAMILY),X86)
+ifeq ($(TARGET_MCU_FAMILY),x86)
 C_DEFINES := $(C_DEFINES)  \
              -D WIN32      \
              -D _DEBUG     \
@@ -402,7 +404,7 @@ C_DEFINES := $(C_DEFINES)  \
              -D _UNICODE   \
              -D UNICODE
 else
-$(error ------ Invalid build command line parameter ARG_TARGET_ECU $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: X86) ------
+$(error ------ Invalid build command line parameter ARG_TARGET_ECU $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: x86) ------
 endif
 
 # ---------------------------------------------------
@@ -449,7 +451,7 @@ CCVERSIONFLAGS := --version
 # See also https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html.
 # See also https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
 # ---------------------------------------------------
-ifeq ($(TARGET_MCU_FAMILY),X86)
+ifeq ($(TARGET_MCU_FAMILY),x86)
 LFLAGS := $(LFLAGS)
 
 ifeq ($(ARG_BSW_TESTFRAMEWORK),unity)
@@ -459,7 +461,7 @@ LFLAGS := $(LFLAGS) \
 endif
 
 else
-$(error ------ Invalid build command line parameter TARGET_MCU_FAMILY $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: X86) ------
+$(error ------ Invalid build command line parameter TARGET_MCU_FAMILY $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: x86) ------
 endif
 
 # ---------------------------------------------------

@@ -24,7 +24,7 @@
 #ifndef UNITY_ADAPT_H
 #define UNITY_ADAPT_H
 
-#include <Unity.h>
+#include <unity.h>
 #include <Std_Types.h>
 #include <Util/Ios_Type.h>
 //#include <iostream>
