@@ -25,7 +25,7 @@ jobs:
         run: git clone https://github.com/RalfSondershaus/Arduino arduino
 
       - name: Navigate to Repository
-        run: cd arduino; pwd; ll; ll Build
+        run: cd arduino
 
       - name: Run Build Script
         run: ./Build/build.sh App/BlinkSample mega avr_gcc arduino none all
