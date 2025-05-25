@@ -22,7 +22,7 @@
 #define COMDRV_H_
 
 #include <Std_Types.h>
-#include <Util/fix_queue.h>
+#include <Util/Fix_Queue.h>
 #include <Hal/Serial.h>
 
 namespace com
