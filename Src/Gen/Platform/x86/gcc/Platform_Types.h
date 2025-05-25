@@ -22,6 +22,7 @@
 // Standard library headers
 #include <cstdint>
 #include <cstddef> // size_t, ptrdiff_t
+#include <sys/types.h> // ssize_t
 
 /*
    integer types
@@ -48,7 +49,7 @@ typedef float float32;
 typedef double float64;
 
 /* POSIX types */
-typedef sint32 ssize_t;
+//typedef sint32 ssize_t;
 
 /* CPU_TYPE */
 #define CPU_TYPE_8 8
