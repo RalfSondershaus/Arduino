@@ -27,7 +27,57 @@ jobs:
       - name: Navigate to Repository
         run: cd arduino
 
+      - name: Run Build Script UnitTest/Gen/Util/Ut_Algorithm
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Algorithm win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Algorithm win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Util/Ut_Array
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Array win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Array win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Util/Ut_Bitset
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Bitset win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Bitset win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Util/Ut_Fix_Deque
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Fix_Deque win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Fix_Deque win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Util/Ut_Fix_Queue
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Fix_Queue win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Fix_Queue win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Util/Ut_InputClassifier
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_InputClassifier win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_InputClassifier win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Util/Ut_Ramp
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Ramp win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Ramp win32 gcc win unity run
+
       - name: Run Build Script UnitTest/Gen/Util/Ut_String
         run: |
           ./Build/build.sh UnitTest/Gen/Util/Ut_String win32 gcc win unity rebuild
           ./Build/build.sh UnitTest/Gen/Util/Ut_String win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Util/Ut_Sstream
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Sstream win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Sstream win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Util/Ut_String_view
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_InputClassifier win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_InputClassifier win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Util/Ut_Vector
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Vector win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Vector win32 gcc win unity run
