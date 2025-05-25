@@ -1,0 +1,31 @@
+name: Build AVR Project
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git make gcc-avr avr-libc
+
+      - name: Clone Repository
+        run: git clone https://github.com/RalfSondershaus/Arduino arduino
+
+      - name: Navigate to Repository
+        run: cd arduino
+
+      - name: Run Build Script
+        run: ./Build/build.sh App/BlinkSample mega avr_gcc arduino none all
