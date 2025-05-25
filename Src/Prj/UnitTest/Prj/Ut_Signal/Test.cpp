@@ -216,6 +216,94 @@ TEST(Ut_Signal, Default_Green_Red)
   log.stop();
 }
 
+// ------------------------------------------------------------------------------------------------
+/// Test if aspects and dim ramps are ok for
+/// - Commands from classifiers
+/// - Start with default (init) aspect
+/// - Switch to green
+/// - Switch to red
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_Signal, Default_All)
+{
+  typedef util::array<uint8, cfg::kNrSignalTargets> signal_target_array;
+  using size_type = signal_target_array::size_type;
+  using time_type = input_classifier_type::classifier_type::time_type;
+  using cmd_type = rte::cmd_type;
+
+  Logger log;
+
+  typedef struct
+  {
+    time_type ms; // [ms] current time
+    int nPin;      // input pin for AD value
+    int nAdc;     // current AD value for pin
+    cmd_type cmd; // expected value: command on RTE
+    signal_target_array au8Curs; // expected value: target onboard duty cycles
+  } step_type;
+
+  const step_type aSteps[] =
+  {
+      {   0,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
+    , {  10,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  2,   2,   2,   0,   0 } }
+    , {  20,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  3,   3,   3,   0,   0 } }
+    , {  30,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  5,   5,   5,   0,   0 } }
+    , {  40,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  9,   9,   9,   0,   0 } }
+    , {  50,  cal::kClassifierPin0,             0, rte::kInvalidCmd, { 16,  16,  16,   0,   0 } }
+    , {  60,  cal::kClassifierPin0,             0, rte::kInvalidCmd, { 27,  27,  27,   0,   0 } }
+    , {  70,  cal::kClassifierPin0,             0, rte::kInvalidCmd, { 48,  48,  48,   0,   0 } }
+    , {  80,  cal::kClassifierPin0,             0, rte::kInvalidCmd, { 82,  82,  82,   0,   0 } }
+    , {  90,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {145, 145, 145,   0,   0 } }
+    , { 100,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {250, 250, 250,   0,   0 } }
+  };
+
+  input_classifier_type classifiers;
+  cal::input_type in;
+  size_t nStep;
+  constexpr int kSignalId = 0;
+  constexpr int kClassifierId = 0;
+  // CalM shall initialize EEPROM from ROM.
+  hal::eeprom::write(cal::eeprom::eManufacturerID, hal::eeprom::kInitial);
+
+  log.start("Default_All.txt");
+
+  hal::stubs::analogRead[aSteps[0].nPin] = aSteps[0].nAdc;
+  hal::stubs::millis = aSteps[0].ms;
+  hal::stubs::micros = 1000U * hal::stubs::millis;
+  rte::start();
+
+  const cal::input_classifier_cal_type * pCalCls = rte::ifc_cal_input_classifier::call();
+  cal::input_classifier_single_type cal_cls = pCalCls->classifiers.at(kClassifierId);
+  cal_cls.limits.aucLo.at(4) = 0;
+  cal_cls.limits.aucHi.at(4) = 255;
+  rte::ifc_cal_set_input_classifier::call(kClassifierId, cal_cls, true);
+
+  in.bits.type = cal::input_type::eClassified;
+  in.bits.idx = 0;
+
+  for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
+  {
+    hal::stubs::analogRead[aSteps[nStep].nPin] = aSteps[nStep].nAdc;
+    hal::stubs::millis = aSteps[nStep].ms;
+    hal::stubs::micros = 1000U * hal::stubs::millis;
+    rte::exec();
+    printRte();
+    rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
+    log << std::setw(3) << (int)cmd << " ";
+    EXPECT_EQ(cmd, aSteps[nStep].cmd);
+    for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
+    {
+      rte::intensity8_255 pwm;
+      rte::Ifc_OnboardTargetDutyCycles::size_type pos = static_cast<rte::Ifc_OnboardTargetDutyCycles::size_type>(rte::calm.signals[kSignalId].targets[i].idx);
+      rte::ifc_onboard_target_duty_cycles::readElement(pos, pwm);
+      log << std::setw(3) << (int)pwm << ", ";
+      EXPECT_EQ((uint8)pwm, aSteps[nStep].au8Curs[i]);
+    }
+    log << std::endl;
+  }
+
+  log.stop();
+}
+
 void setUp(void)
 {
   cleanRte();
@@ -234,6 +322,7 @@ bool test_loop(void)
   UNITY_BEGIN();
 
   RUN_TEST(Default_Green_Red);
+  RUN_TEST(Default_All);
 
   (void) UNITY_END();
 

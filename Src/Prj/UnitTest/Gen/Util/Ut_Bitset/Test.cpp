@@ -7,7 +7,7 @@
  */
 
 #include <Util/bitset.h>
-#include <gtest/gtest.h>
+#include <unity_adapt.h>
 
 TEST(Ut_Bitset, bitset_uint32_32_set)
 {
@@ -346,4 +346,37 @@ TEST(Ut_Bitset, bitset_uint8_64_set_reset)
     EXPECT_EQ(mybits.test(i), false);
     EXPECT_EQ(mybits[i], false);
   }
+}
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+}
+
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
+{
+  UNITY_BEGIN();
+
+  RUN_TEST(bitset_uint32_32_set);
+  RUN_TEST(bitset_uint32_32_set_reset);
+  RUN_TEST(bitset_uint16_16_set);
+  RUN_TEST(bitset_uint16_16_set_reset);
+  RUN_TEST(bitset_uint8_8_set);
+  RUN_TEST(bitset_uint8_8_set_reset);
+  RUN_TEST(bitset_uint32_64_set);
+  RUN_TEST(bitset_uint32_64_set_reset);
+  RUN_TEST(bitset_uint8_64_set);
+  RUN_TEST(bitset_uint8_64_set_reset);
+
+  (void) UNITY_END();
+
+  // Return false to stop program execution (relevant on Windows)
+  return false;
 }

@@ -7,7 +7,7 @@
  */
 
 #include <Util/Classifier.h>
-#include <gtest/gtest.h>
+#include <unity_adapt.h>
 
 static unsigned long Arduino_Stub_MicrosReturnValue;
 static unsigned long Arduino_Stub_MillisReturnValue;
@@ -199,4 +199,29 @@ TEST(Ut_InputClassifier, Test_3_Classifiers_5_Classes)
       EXPECT_EQ(classifier.classified_value(i), aSteps[nStep].aucCls[i]);
     }
   }
+}
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+}
+
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
+{
+  UNITY_BEGIN();
+
+  RUN_TEST(Test_1_Classifier_5_Classes);
+  RUN_TEST(Test_3_Classifiers_5_Classes);
+
+  (void) UNITY_END();
+
+  // Return false to stop program execution (relevant on Windows)
+  return false;
 }

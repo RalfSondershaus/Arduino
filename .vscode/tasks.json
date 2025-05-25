@@ -17,8 +17,12 @@
             "description": "Select project name",
             "default": "UnitTest/Gen/Util/Ut_Sstream",
             "options": [ 
+                "UnitTest/Gen/Util/Ut_Algorithm",
+                "UnitTest/Gen/Util/Ut_Array",
+                "UnitTest/Gen/Util/Ut_Bitset",
                 "UnitTest/Gen/Util/Ut_Fix_Deque",
                 "UnitTest/Gen/Util/Ut_Fix_Queue",
+                "UnitTest/Gen/Util/Ut_InputClassifier",
                 "UnitTest/Gen/Util/Ut_Packet",
                 "UnitTest/Gen/Util/Ut_PacketExtractor",
                 "UnitTest/Gen/Util/Ut_Ramp",

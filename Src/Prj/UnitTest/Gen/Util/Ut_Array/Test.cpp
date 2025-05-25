@@ -7,7 +7,7 @@
  */
 
 #include <Util/Array.h>
-#include <gtest/gtest.h>
+#include <unity_adapt.h>
 
 typedef typename util::array<int, 5>::size_type size_type;
 
@@ -140,4 +140,34 @@ TEST(Ut_Array, array_copy_assignment)
     EXPECT_EQ(*it, 10);
   }
 
+}
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+}
+
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
+{
+  UNITY_BEGIN();
+
+  RUN_TEST(array_uninit_begin_end);
+  RUN_TEST(array_at);
+  RUN_TEST(array_front);
+  RUN_TEST(array_back);
+  RUN_TEST(array_fill);
+  RUN_TEST(array_copy_constructor);
+  RUN_TEST(array_copy_assignment);
+
+  (void) UNITY_END();
+
+  // Return false to stop program execution (relevant on Windows)
+  return false;
 }

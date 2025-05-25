@@ -60,6 +60,8 @@ void EXPECT_EQ<bool, bool>(bool actual, bool expected)
 
 // Remark: [C++11 standard, 3.9.1 Fundamental types] "Plain char, signed char, and unsigned char are three distinct types."
 
+// EXPECT_EQ<uint64,uint32> is needed to size_t definition on Linux vs size_t definition on Win to avoid casts of 1U in EXPECT_EQ(strA.length(), 1U)
+
 template<> void EXPECT_EQ<char, char>(char actual, char expected)        { TEST_ASSERT_EQUAL_CHAR(expected, actual); }
 template<> void EXPECT_EQ<sint8,sint8>(sint8 actual, sint8 expected)     { TEST_ASSERT_EQUAL_INT8(expected, actual); }
 template<> void EXPECT_EQ<sint16,sint16>(sint16 actual, sint16 expected)  { TEST_ASSERT_EQUAL_INT16(expected, actual); }
