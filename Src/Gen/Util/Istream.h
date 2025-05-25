@@ -27,7 +27,7 @@
 #include <Std_Types.h>
 #include <Platform_Limits.h>
 #include <Util/Locale_Fwd.h>    // util::num_get
-#include <Util/Basic_Ios.h>     // util::basic_ios, util::ios_base
+#include <Util/Basic_ios.h>     // util::basic_ios, util::ios_base
 #include <Util/Iterator.h>      // util::char_traits
 #include <Util/Locale_facets.h> // util::num_get
 #include <Util/StreamBuf.h>     // util::basic_streambuf
