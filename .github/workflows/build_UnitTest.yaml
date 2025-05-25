@@ -28,4 +28,6 @@ jobs:
         run: cd arduino
 
       - name: Run Build Script UnitTest/Gen/Util/Ut_String
-        run: ./Build/build.sh UnitTest/Gen/Util/Ut_String win32 gcc win unity run
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_String win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_String win32 gcc win unity run
