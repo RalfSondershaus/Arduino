@@ -32,6 +32,11 @@
 #include <Cal/CalM.h>
 #include <Com/ComR.h>
 
+// This macro is used to configure the RTE to add features for RTE monitoring
+#ifndef RTE_CFG_PORT_SR_AVAILABLE
+#define RTE_CFG_PORT_SR_AVAILABLE
+#endif
+
 RTE_DEF_START
 
 RTE_DEF_OBJ_START

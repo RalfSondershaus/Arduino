@@ -43,6 +43,12 @@ namespace rte
   void exec();
   void setEvent(uint32 ulEventId);
 
+  // These functions return non-zero values if the RTE is configured
+  // with RTE_CFG_PORT_SR_AVAILABLE, e.g. add to Rte_cfg_Prj.h:
+  //   #ifndef RTE_CFG_PORT_SR_AVAILABLE
+  //   #define RTE_CFG_PORT_SR_AVAILABLE
+  //   #endif
+
   size_t getNrPorts();
   port_data_t * getPortData(size_t idx);
   port_data_t * getPortData(const char * portName);

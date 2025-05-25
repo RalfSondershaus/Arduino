@@ -100,10 +100,13 @@ namespace rte
 #include <Rte/Rte_Cfg_Prj.h>
 #undef RTE_DEF_MODE_PORT
 
+#ifdef RTE_CFG_PORT_SR_AVAILABLE
+// Just in case this feature is active, define the port array
 #define RTE_DEF_MODE_PORT_ARRAY
 #include <Rte/Rte_Cfg_Mac.h>
 #include <Rte/Rte_Cfg_Prj.h>
 #undef RTE_DEF_MODE_PORT_ARRAY
+#endif
 
 namespace rte
 {
@@ -185,17 +188,23 @@ namespace rte
 
   size_t getNrPorts()
   {
+  #ifdef RTE_CFG_PORT_SR_AVAILABLE
     return sizeof(aPorts) / sizeof(port_data_t);
+  #else
+    return 0;
+  #endif
   }
 
   port_data_t * getPortData(size_t idx)
   {
     port_data_t * pRet;
+  #ifdef RTE_CFG_PORT_SR_AVAILABLE
     if (idx < getNrPorts())
     {
       pRet = &aPorts[idx];
     }
     else
+  #endif
     {
       pRet = nullptr;
     }
@@ -204,8 +213,9 @@ namespace rte
 
   port_data_t * getPortData(const char * portName)
   {
-    size_t idx;
     port_data_t * p = nullptr;
+  #ifdef RTE_CFG_PORT_SR_AVAILABLE
+    size_t idx;
     for (idx = 0; idx < getNrPorts(); idx++)
     {
       if (util::string_view{aPorts[idx].szName}.compare(portName) == 0)
@@ -214,6 +224,7 @@ namespace rte
         break;
       }
     }
+  #endif
     return p;
   }
 
