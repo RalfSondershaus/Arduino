@@ -37,6 +37,11 @@ jobs:
           ./Build/build.sh UnitTest/Gen/Util/Ut_Array win32 gcc win unity rebuild
           ./Build/build.sh UnitTest/Gen/Util/Ut_Array win32 gcc win unity run
 
+      - name: Run Build Script UnitTest/Gen/Util/Ut_Bitset
+        run: |
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Bitset win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_Bitset win32 gcc win unity run
+
       - name: Run Build Script UnitTest/Gen/Util/Ut_Fix_Deque
         run: |
           ./Build/build.sh UnitTest/Gen/Util/Ut_Fix_Deque win32 gcc win unity rebuild

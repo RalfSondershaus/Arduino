@@ -76,16 +76,22 @@ namespace util
   } // namespace bits
 
   // --------------------------------------------------------------------
-  /// base class
+  /// base class for util::bitset.
+  ///
+  /// Stores NWORDS words of type W.
   // --------------------------------------------------------------------
   template<typename W, size_t NWORDS>
   struct bitset_base
   {
-    typedef W tWord;
+    using tWord = W;
+    using This = bitset_base<W, NWORDS>;
 
     tWord aWords[NWORDS];
 
-    constexpr bitset_base() noexcept : aWords() {}
+    static constexpr size_t kNrWords = NWORDS;
+
+    /// Construct
+    constexpr bitset_base() noexcept = default;
     constexpr bitset_base(tWord v) noexcept : aWords{ v } {}
 
     static constexpr size_t bits_per_char() noexcept { return 8U; }
@@ -95,6 +101,41 @@ namespace util
     template<size_t NBITS>
     static constexpr tWord hiword_nr_bits() noexcept { return static_cast<tWord>(NWORDS * bits_per_word() - NBITS); }
 
+    /// Helper struct for all() and set() which need to know
+    /// the number of bits.
+    /// @tparam NBITS Number of bits the bitfield.
+    template<size_t NBITS>
+    struct bits_helper_struct
+    {
+      static constexpr tWord hiword_nr_bits() noexcept { return static_cast<tWord>(NWORDS * bits_per_word() - NBITS); }
+      /// @brief Returns true if all bits are 1, and false otherwise
+      /// @param bitset Reference to the bitset
+      /// @return true or false
+      static bool all(const This& bitset) noexcept
+      {
+        for (size_t i = 0; i < NWORDS - 1; i++)
+        {
+          if (bitset.ref_word(i) != bits::all_one<tWord>())
+          {
+            return false;
+          }
+        }
+        return (bitset.hiword() == (bits::all_one<tWord>() >> hiword_nr_bits()));
+      }
+
+      /// @brief Sets all bits of bitset to 1.
+      /// @param bitset Reference to the bitset
+      static void set(This& bitset) noexcept
+      { 
+        for (size_t i = 0; i < NWORDS - 1; i++)
+        {
+          bitset.ref_word(i) = bits::all_one<tWord>();
+        }
+        bitset.hiword() |= bits::all_one<tWord>() >> hiword_nr_bits(); 
+      }
+    };
+
+    /// References to single words
           tWord& ref_word(size_t pos) noexcept { return aWords[which_word(pos)]; }
     const tWord& ref_word(size_t pos) const noexcept { return aWords[which_word(pos)]; }
           tWord  get_word(size_t pos) const noexcept { return aWords[which_word(pos)]; }
@@ -106,7 +147,7 @@ namespace util
     {
       for (size_t i = 0; i < NWORDS - 1; i++)
       {
-        if (aWords[i] != bits::all_one<tWord>())
+        if (ref_word(i) != bits::all_one<tWord>())
         {
           return false;
         }
@@ -131,7 +172,7 @@ namespace util
     { 
       for (size_t i = 0; i < NWORDS - 1; i++)
       {
-        aWords[i] = bits::all_one<tWord>();
+        ref_word(i) = bits::all_one<tWord>();
       }
       hiword() |= bits::all_one<tWord>() >> hiword_nr_bits<NBITS>(); 
     }
@@ -213,7 +254,10 @@ namespace util
   template<typename W>
   struct bitset_base<W, 0U>
   {
-    typedef W tWord;
+    static constexpr size_t kNrWords = 0;
+
+    using tWord = W;
+    using This = bitset_base<W, kNrWords>;
 
     tWord w;
 
@@ -225,6 +269,22 @@ namespace util
     static constexpr size_t which_bit(size_t pos) noexcept { return pos; }
     template<size_t NBITS>
     static constexpr tWord hiword_nr_bits() noexcept { return static_cast<tWord>(0); }
+
+    /// Helper struct for all() and set() which need to know
+    /// the number of bits.
+    /// @tparam NBITS Number of bits the bitfield.
+    template<size_t NBITS>
+    struct bits_helper_struct
+    {
+      /// @brief Returns true.
+      /// @param bitset Reference to the bitset
+      /// @return true
+      static bool all(const This& bitset) noexcept { (void) bitset; return true; }
+
+      /// @brief Empty function because there is no bit.
+      /// @param bitset Reference to the bitset
+      static void set(const This& bitset) noexcept { (void) bitset; }
+    };
 
     constexpr tWord& ref_word(size_t pos) noexcept { (void)pos; return w; }
     constexpr tWord  get_word(size_t pos) const noexcept { (void)pos; return static_cast<tWord>(0); }
@@ -253,7 +313,10 @@ namespace util
   template<typename W>
   struct bitset_base<W, 1U>
   {
-    typedef W tWord;
+    static constexpr size_t kNrWords = 1;
+
+    using tWord = W;
+    using This = bitset_base<W, kNrWords>;
 
     tWord w;
 
@@ -266,18 +329,44 @@ namespace util
     template<size_t NBITS>
     static constexpr tWord hiword_nr_bits() noexcept { return static_cast<tWord>(bits_per_word() - NBITS); }
 
+    /// Helper struct for all() and set() which need to know
+    /// the number of bits.
+    /// @tparam NBITS Number of bits the bitfield.
+    template<size_t NBITS>
+    struct bits_helper_struct
+    {
+      static constexpr tWord hiword_nr_bits() noexcept { return static_cast<tWord>(kNrWords * bits_per_word() - NBITS); }
+      /// @brief Returns true if all bits are 1, and false otherwise
+      /// @param bitset Reference to the bitset
+      /// @return true or false
+      static bool all(const This& bitset) noexcept
+      {
+        return bitset.hiword() == (bits::all_one<tWord>() >> hiword_nr_bits());
+      }
+
+      /// @brief Sets all bits of bitset to 1.
+      /// @param bitset Reference to the bitset
+      static void set(This& bitset) noexcept
+      { 
+        bitset.hiword() = bits::all_one<tWord>() >> hiword_nr_bits(); 
+      }
+    };
+
     constexpr tWord& ref_word(size_t pos) noexcept { (void)pos; return w; }
     constexpr tWord  get_word(size_t pos) const noexcept { (void)pos; return w; }
               tWord& hiword() noexcept { return w; }
     constexpr tWord  hiword() const noexcept { return w; }
 
     template<size_t NBITS>
-    bool all() const noexcept { return w == (bits::all_one<tWord>() >> hiword_nr_bits<NBITS>()); }
+    bool all() const noexcept { return hiword() == (bits::all_one<tWord>() >> hiword_nr_bits<NBITS>()); }
     bool any() const noexcept { return w != bits::all_zero<tWord>(); }
     bool none() const noexcept { return !any(); }
 
     template<size_t NBITS>
-    void set() noexcept { w = bits::all_one<tWord>() >> hiword_nr_bits<NBITS>(); }
+    void set() noexcept 
+    { 
+      hiword() = bits::all_one<tWord>() >> hiword_nr_bits<NBITS>(); 
+    }
     void set(size_t pos, bool value = true) noexcept 
     { 
       if (pos < bits_per_word())
@@ -327,10 +416,13 @@ namespace util
   template<typename W, size_t NBITS>
   class bitset : private bitset_base<W, bits::nr_words<W>(NBITS)>
   {
-    typedef bitset_base<W, bits::nr_words<W>(NBITS)> Base;
+    using Base = bitset_base<W, bits::nr_words<W>(NBITS)>;
+    using bits_helper = typename Base::template bits_helper_struct<NBITS>;
+
   public:
     typedef typename Base::tWord tWord;
     typedef bitset<W, NBITS> This;
+    static constexpr size_t kNrBits = NBITS;
   public:
     /// Default constructor. Constructs a bitset with all bits set to zero.
     constexpr bitset() : Base() {}
@@ -344,22 +436,16 @@ namespace util
     bool test(size_t pos) const { return this->operator[](pos); }
 
     /// Checks if all bits are set to true
-#ifdef _MSC_VER
-    bool all() const noexcept { return Base::all<NBITS>(); }
-#else
-    bool all() const noexcept { return Base::all(); }
-#endif
+    //bool all() const noexcept { return bits_helper::all(*this); }
+    bool all() const noexcept { return Base::template all<NBITS>(); }
     /// Checks if any bits are set to true
     bool any() const noexcept { return Base::any(); }
     /// Checks if none of the bits are set to true
     bool none() const noexcept { return Base::none(); }
 
     /// Sets all bits to true or sets one bit to specified value
-#ifdef _MSC_VER
-    This& set() noexcept { Base::set<NBITS>(); return *this; }
-#else
-    This& set() noexcept { Base::set(); return *this; }
-#endif
+    //This& set() noexcept { bits_helper::set(*this); return *this; }
+    This& set() noexcept { Base::template set<NBITS>(); return *this; }
     This& set(size_t pos, bool value = true) { Base::set(pos, value); return *this; }
 
     /// Sets bits to false
