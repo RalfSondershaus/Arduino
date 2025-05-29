@@ -238,7 +238,7 @@ TEST(Ut_Sstream, Unformatted_input_get_char_pointer_available_too_small)
   EXPECT_EQ(ss.good(), false);
   EXPECT_EQ(!ss, false);
   EXPECT_EQ((bool)ss, true);
-  EXPECT_EQ(ss.gcount(), 5);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 5 });
 #endif
 }
 
@@ -266,7 +266,7 @@ TEST(Ut_Sstream, Unformatted_input_get_char_pointer_empty_stream)
   EXPECT_EQ(std::string{ s }, std::string{ "" });
   EXPECT_EQ(ss.eof(), true);
   EXPECT_EQ(ss.fail(), true);
-  EXPECT_EQ(ss.gcount(), 0);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
 #endif
 }
 
@@ -348,42 +348,42 @@ TEST(Ut_Sstream, Unformatted_input_getline_char_pointer_delimiter_spaces)
   // SET
   ss.getline(s, kNrChars, delimSpace);
   EXPECT_EQ(std::string{ s }, std::string{ "SET" });
-  EXPECT_EQ(ss.gcount(), 4);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 4 });
   // CAL
   ss.getline(s, kNrChars, delimSpace);
   EXPECT_EQ(std::string{s}.compare(std::string{"CAL"}), 0);
-  EXPECT_EQ(ss.gcount(), 4);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 4 });
   // SIGNAL 0 <space>
   ss.getline(s, kNrChars, delimSpace);
   EXPECT_EQ(std::string{s}.compare(std::string{"SIGNAL"}), 0);
-  EXPECT_EQ(ss.gcount(), 7);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 7 });
   ss >> un;
   EXPECT_EQ(un, uint16{ 0U });
-  EXPECT_EQ(ss.gcount(), 7);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 7 });
   EXPECT_EQ(ss.eof(), false);
   EXPECT_EQ(ss.fail(), false);
   ss.getline(s, kNrChars, delimSpace);
   EXPECT_EQ(std::string{s}.compare(std::string{""}), 0);
-  EXPECT_EQ(ss.gcount(), 1);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 1 });
   // ASPECT 1 <space>
   ss.getline(s, kNrChars, delimSpace);
   EXPECT_EQ(std::string{s}.compare(std::string{"ASPECT"}), 0);
-  EXPECT_EQ(ss.gcount(), 7);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 7 });
   ss >> un;
   EXPECT_EQ(un, uint16{ 1U });
-  EXPECT_EQ(ss.gcount(), 7);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 7 });
   EXPECT_EQ(ss.eof(), false);
   EXPECT_EQ(ss.fail(), false);
   ss.getline(s, kNrChars, delimSpace);
   EXPECT_EQ(std::string{s}.compare(std::string{""}), 0);
-  EXPECT_EQ(ss.gcount(), 1);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 1 });
   // ASPECT 11000
   ss.getline(s, kNrChars, delimSpace);
   EXPECT_EQ(std::string{s}.compare(std::string{"ASPECT"}), 0);
-  EXPECT_EQ(ss.gcount(), 7);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 7 });
   ss.getline(s, kNrChars, delimSpace);
   EXPECT_EQ(std::string{s}.compare(std::string{"11000"}), 0);
-  EXPECT_EQ(ss.gcount(), 5);
+  EXPECT_EQ(ss.gcount(), std::streamsize{ 5 });
   EXPECT_EQ(ss.eof(), true);
 #endif
 }
