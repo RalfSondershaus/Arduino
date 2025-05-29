@@ -9,17 +9,6 @@
 #include <Util/Classifier.h>
 #include <unity_adapt.h>
 
-static unsigned long Arduino_Stub_MicrosReturnValue;
-static unsigned long Arduino_Stub_MillisReturnValue;
-static int Arduino_Stub_AnalogReadReturnValue[255];
-
-/// Return current time [us]
-unsigned long micros() { return Arduino_Stub_MicrosReturnValue; }
-/// Return current time [ms]
-unsigned long millis() { return Arduino_Stub_MillisReturnValue; }
-/// read analog input
-int analogRead(int pin) { return Arduino_Stub_AnalogReadReturnValue[pin]; }
-
 // ------------------------------------------------------------------------------
 /// Test a configuration with 1 classifier with 5 classes.
 /// Use mid values, and min and max values per class.
@@ -106,14 +95,14 @@ TEST(Ut_InputClassifier, Test_1_Classifier_5_Classes)
     , {44 * 50,1023, input_classifier_type::kInvalidIndex }
     , {45 * 50,1023, 4 }
   };
-  int nStep;
+  size_t nStep;
   
   classifier.set_config(&cfg);
 
   for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
   {
-    Arduino_Stub_AnalogReadReturnValue[pin] = aSteps[nStep].nAdc;
-    Arduino_Stub_MillisReturnValue = aSteps[nStep].ms;
+    hal::stubs::analogRead[pin] = aSteps[nStep].nAdc;
+    hal::stubs::millis = aSteps[nStep].ms;
     classifier.run(); 
     EXPECT_EQ(classifier.classified_value(0), aSteps[nStep].ucCls);
   }
@@ -185,7 +174,7 @@ TEST(Ut_InputClassifier, Test_3_Classifiers_5_Classes)
     , { 350, { 230, 230, 230 }, { input_classifier_type::kInvalidIndex, input_classifier_type::kInvalidIndex, input_classifier_type::kInvalidIndex } }
     , { 400, { 230, 230, 230 }, { 2                                   , 1                                   , 0                                    } }
   };
-  int nStep;
+  size_t nStep;
 
   classifier.set_config(&cfg);
 
@@ -193,8 +182,8 @@ TEST(Ut_InputClassifier, Test_3_Classifiers_5_Classes)
   {
     for (int i = 0; i < 3; i++)
     {
-      Arduino_Stub_AnalogReadReturnValue[pins[i]] = aSteps[nStep].anAdc[i];
-      Arduino_Stub_MillisReturnValue = aSteps[nStep].ms;
+      hal::stubs::analogRead[pins[i]] = aSteps[nStep].anAdc[i];
+      hal::stubs::millis = aSteps[nStep].ms;
       classifier.run();
       EXPECT_EQ(classifier.classified_value(i), aSteps[nStep].aucCls[i]);
     }
