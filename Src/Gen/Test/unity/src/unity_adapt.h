@@ -29,7 +29,8 @@
 #include <Util/Ios_Type.h>
 //#include <iostream>
 
-/// @brief Introduce Google Test like expect macros
+/// @brief Introduce Google Test like expect macros. The basic implementation
+///        ie empty and reports "FAIL: Expected FALSE Was TRUE".
 /// @tparam T Type to be checked such as uint8, int, size_t
 /// @param actual current value
 /// @param expected expected value
@@ -60,7 +61,7 @@ void EXPECT_EQ<bool, bool>(bool actual, bool expected)
 
 // Remark: [C++11 standard, 3.9.1 Fundamental types] "Plain char, signed char, and unsigned char are three distinct types."
 
-// EXPECT_EQ<uint64,uint32> is needed to size_t definition on Linux vs size_t definition on Win to avoid casts of 1U in EXPECT_EQ(strA.length(), 1U)
+// EXPECT_EQ<uint64,uint32> is needed for size_t definition on Linux vs size_t definition on Win to avoid casts of 1U in EXPECT_EQ(strA.length(), 1U)
 
 template<> void EXPECT_EQ<char, char>(char actual, char expected)        { TEST_ASSERT_EQUAL_CHAR(expected, actual); }
 template<> void EXPECT_EQ<sint8,sint8>(sint8 actual, sint8 expected)     { TEST_ASSERT_EQUAL_INT8(expected, actual); }
@@ -72,7 +73,7 @@ template<> void EXPECT_EQ<uint16,uint16>(uint16 actual, uint16 expected)  { TEST
 template<> void EXPECT_EQ<uint32,uint32>(uint32 actual, uint32 expected)  { TEST_ASSERT_EQUAL_UINT32(expected, actual); }
 template<> void EXPECT_EQ<uint64,uint64>(uint64 actual, uint64 expected)  { TEST_ASSERT_EQUAL_UINT64(expected, actual); }
 template<> void EXPECT_EQ<uint64,uint32>(uint64 actual, uint32 expected)  { TEST_ASSERT_EQUAL_UINT64(static_cast<uint64>(expected), actual); }
-template<> void EXPECT_EQ<util::streampos>(util::streampos actual, util::streampos expected) { EXPECT_EQ<util::streamoff>(expected, actual); }
+template<> void EXPECT_EQ<util::streampos,util::streampos>(util::streampos actual, util::streampos expected) { EXPECT_EQ<util::streamoff,util::streamoff>(expected, actual); }
 
 /// Declares a test function
 #define TEST(group, test_fct)       void test_fct(void)

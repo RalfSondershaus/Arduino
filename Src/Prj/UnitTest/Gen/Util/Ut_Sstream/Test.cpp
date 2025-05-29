@@ -6,8 +6,9 @@
  * Google Test for Gen/Util/Sstream.h
  */
 
-#include <unity_adapt.h>
 #include <stdint.h>
+
+#include <unity_adapt.h>
 #include <Util/Sstream.h>
 
 #define CFG_OFF    0
@@ -29,8 +30,8 @@
 
 
 #if CFG_TEST_WITH_STD == CFG_ON
-template<> void EXPECT_EQ<std::streampos>(std::streampos actual, std::streampos expected) { EXPECT_EQ<std::streamoff>(expected, actual); }
-template<> void EXPECT_EQ<std::string>(std::string actual, std::string expected) { TEST_ASSERT_EQUAL_STRING(expected.c_str(), actual.c_str()); }
+template<> void EXPECT_EQ<std::streampos,std::streampos>(std::streampos actual, std::streampos expected) { EXPECT_EQ<std::streamoff,std::streamoff>(expected, actual); }
+template<> void EXPECT_EQ<std::string,std::string>(std::string actual, std::string expected) { TEST_ASSERT_EQUAL_STRING(expected.c_str(), actual.c_str()); }
 #endif
 
 // -------------------------------------------------------------------------
@@ -40,7 +41,7 @@ TEST(Ut_Sstream, Construct_empty)
   using string_t = istringstream_t::string_type;
 
   istringstream_t stream;
-
+  
   EXPECT_EQ(stream.str().compare(string_t{ "" }), 0);
   EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
 

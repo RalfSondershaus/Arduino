@@ -4,7 +4,6 @@
 
 # Files
 FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test    \
-            $(PATH_SRC_GEN)/Util/String     \
             $(PATH_SRC_GEN)/Util/Locale
 
 # Add header file to dependency list of object files
@@ -16,6 +15,8 @@ $(PATH_OBJ)/Test.$(OBJ_FILENAME_EXT): $(PATH_SRC_GEN)/Util/Locale_facets.h \
                                       $(PATH_SRC_GEN)/Util/Ios_base.h      \
                                       $(PATH_SRC_GEN)/Util/Basic_ios.h     \
                                       $(PATH_SRC_GEN)/Util/Ios_Fwd.h
-                                      
+
+# Build with Unity 64-bit Support
+# Required for std::streampos and std::streamoff on Win and Linux
 CFLAGS := $(CFLAGS) \
-          -DUNITY_SUPPORT_64
+         -DUNITY_SUPPORT_64
