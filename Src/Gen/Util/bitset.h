@@ -86,9 +86,9 @@ namespace util
     using tWord = W;
     using This = bitset_base<W, NWORDS>;
 
-    tWord aWords[NWORDS];
-
     static constexpr size_t kNrWords = NWORDS;
+
+    tWord aWords[NWORDS];
 
     /// Construct
     constexpr bitset_base() noexcept = default;
@@ -136,6 +136,7 @@ namespace util
     };
 
     /// References to single words
+    /// @param pos bit position
           tWord& ref_word(size_t pos) noexcept { return aWords[which_word(pos)]; }
     const tWord& ref_word(size_t pos) const noexcept { return aWords[which_word(pos)]; }
           tWord  get_word(size_t pos) const noexcept { return aWords[which_word(pos)]; }
@@ -147,7 +148,7 @@ namespace util
     {
       for (size_t i = 0; i < NWORDS - 1; i++)
       {
-        if (ref_word(i) != bits::all_one<tWord>())
+        if (aWords[i] != bits::all_one<tWord>())
         {
           return false;
         }
@@ -172,7 +173,7 @@ namespace util
     { 
       for (size_t i = 0; i < NWORDS - 1; i++)
       {
-        ref_word(i) = bits::all_one<tWord>();
+        aWords[i] = bits::all_one<tWord>();
       }
       hiword() |= bits::all_one<tWord>() >> hiword_nr_bits<NBITS>(); 
     }
@@ -416,12 +417,12 @@ namespace util
   template<typename W, size_t NBITS>
   class bitset : private bitset_base<W, bits::nr_words<W>(NBITS)>
   {
+  public:
     using Base = bitset_base<W, bits::nr_words<W>(NBITS)>;
     using bits_helper = typename Base::template bits_helper_struct<NBITS>;
+    using tWord = typename Base::tWord;
+    using This = bitset<W, NBITS>;
 
-  public:
-    typedef typename Base::tWord tWord;
-    typedef bitset<W, NBITS> This;
     static constexpr size_t kNrBits = NBITS;
   public:
     /// Default constructor. Constructs a bitset with all bits set to zero.
