@@ -1006,9 +1006,11 @@ TEST(Ut_Sstream, Formatted_input_char_array)
   char arr[4];
 
   std::cout << sizeof(util::streamsize) << std::endl;
-  //EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
+  std::cout << stream.tellg() << std::endl;
+  EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
   stream >> arr;
-  //EXPECT_EQ(strcmp(arr, "ab"), 0);
+  std::cout << strcmp(arr, "ab") << std::endl;
+  EXPECT_EQ(strcmp(arr, "ab"), 0);
   //EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
   EXPECT_EQ(stream.eof(), true);
   EXPECT_EQ(stream.fail(), false);
@@ -1018,14 +1020,19 @@ TEST(Ut_Sstream, Formatted_input_char_array)
   EXPECT_EQ(stream.fail(), true);
 
 #if CFG_TEST_WITH_STD == CFG_ON
+  std::cout << sizeof(std::streamsize) << std::endl;
   std::istringstream ss(" ab");
+  std::cout << ss.tellg() << std::endl;
   EXPECT_EQ(ss.tellg(), std::streampos{ 0 });
   ss >> arr;
+  std::cout << strcmp(arr, "ab") << std::endl;
   EXPECT_EQ(strcmp(arr, "ab"), 0);
+  std::cout << ss.gcount() << std::endl;
   EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
   EXPECT_EQ(ss.eof(), true);
   EXPECT_EQ(ss.fail(), false);
   ss >> arr;
+  std::cout << ss.gcount() << std::endl;
   EXPECT_EQ(ss.gcount(), std::streamsize{ 0 });
   EXPECT_EQ(ss.eof(), true);
   EXPECT_EQ(ss.fail(), true);
