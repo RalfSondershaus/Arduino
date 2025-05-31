@@ -82,3 +82,8 @@ jobs:
         run: |
           ./Build/build.sh UnitTest/Gen/Util/Ut_Vector win32 gcc win unity rebuild
           ./Build/build.sh UnitTest/Gen/Util/Ut_Vector win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Prj/Ut_Signal
+        run: |
+          ./Build/build.sh UnitTest/Prj/Ut_Signal win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Prj/Ut_Signal win32 gcc win unity run

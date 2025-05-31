@@ -244,16 +244,31 @@ TEST(Ut_Signal, Default_All)
   const step_type aSteps[] =
   {
       {   0,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
-    , {  10,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  2,   2,   2,   0,   0 } }
-    , {  20,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  3,   3,   3,   0,   0 } }
-    , {  30,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  5,   5,   5,   0,   0 } }
-    , {  40,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  9,   9,   9,   0,   0 } }
-    , {  50,  cal::kClassifierPin0,             0, rte::kInvalidCmd, { 16,  16,  16,   0,   0 } }
-    , {  60,  cal::kClassifierPin0,             0, rte::kInvalidCmd, { 27,  27,  27,   0,   0 } }
-    , {  70,  cal::kClassifierPin0,             0, rte::kInvalidCmd, { 48,  48,  48,   0,   0 } }
-    , {  80,  cal::kClassifierPin0,             0, rte::kInvalidCmd, { 82,  82,  82,   0,   0 } }
-    , {  90,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {145, 145, 145,   0,   0 } }
-    , { 100,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {250, 250, 250,   0,   0 } }
+    , {  10,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
+    , {  20,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
+    , {  30,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
+    , {  40,  cal::kClassifierPin0,             0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
+    , {  50,  cal::kClassifierPin0,             0,                4, {  5,   5,   0,   0,   0 } }
+    , {  60,  cal::kClassifierPin0,             0,                4, {  3,   3,   0,   0,   0 } }
+    , {  70,  cal::kClassifierPin0,             0,                4, {  2,   2,   0,   0,   0 } }
+    , {  80,  cal::kClassifierPin0,             0,                4, {  0,   0,   0,   0,   0 } }
+    , {  90,  cal::kClassifierPin0,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 100,  cal::kClassifierPin0,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 110,  cal::kClassifierPin0,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 120,  cal::kClassifierPin0,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 130,  cal::kClassifierPin0,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 140,  cal::kClassifierPin0,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 150,  cal::kClassifierPin0,             0,                4, {  2,   2,   2,   2,   2 } }
+    , { 160,  cal::kClassifierPin0,             0,                4, {  3,   3,   3,   3,   3 } }
+    , { 170,  cal::kClassifierPin0,             0,                4, {  5,   5,   5,   5,   5 } }
+    , { 180,  cal::kClassifierPin0,             0,                4, {  9,   9,   9,   9,   9 } }
+    , { 190,  cal::kClassifierPin0,             0,                4, { 16,  16,  16,  16,  16 } }
+    , { 200,  cal::kClassifierPin0,             0,                4, { 27,  27,  27,  27,  27 } }
+    , { 210,  cal::kClassifierPin0,             0,                4, { 48,  48,  48,  48,  48 } }
+    , { 220,  cal::kClassifierPin0,             0,                4, { 82,  82,  82,  82,  82 } }
+    , { 230,  cal::kClassifierPin0,             0,                4, {145, 145, 145, 145, 145 } }
+    , { 240,  cal::kClassifierPin0,             0,                4, {250, 250, 250, 250, 250 } }
+    , { 250,  cal::kClassifierPin0,             0,                4, {255, 255, 255, 255, 255 } }
   };
 
   input_classifier_type classifiers;
@@ -269,16 +284,19 @@ TEST(Ut_Signal, Default_All)
   hal::stubs::analogRead[aSteps[0].nPin] = aSteps[0].nAdc;
   hal::stubs::millis = aSteps[0].ms;
   hal::stubs::micros = 1000U * hal::stubs::millis;
+  // CalM initializes EEPROM with ROM values
   rte::start();
 
+  // Manipulate calibration data for classifier kClassifierId (0)
   const cal::input_classifier_cal_type * pCalCls = rte::ifc_cal_input_classifier::call();
   cal::input_classifier_single_type cal_cls = pCalCls->classifiers.at(kClassifierId);
   cal_cls.limits.aucLo.at(4) = 0;
   cal_cls.limits.aucHi.at(4) = 255;
   rte::ifc_cal_set_input_classifier::call(kClassifierId, cal_cls, true);
 
+  // Prepare RTE call to get command for kClassifierId
   in.bits.type = cal::input_type::eClassified;
-  in.bits.idx = 0;
+  in.bits.idx = kClassifierId;
 
   for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
   {
@@ -287,13 +305,16 @@ TEST(Ut_Signal, Default_All)
     hal::stubs::micros = 1000U * hal::stubs::millis;
     rte::exec();
     printRte();
+    // Get command for kClassifierId
     rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
+      // Get pins for current signal target
       rte::intensity8_255 pwm;
       rte::Ifc_OnboardTargetDutyCycles::size_type pos = static_cast<rte::Ifc_OnboardTargetDutyCycles::size_type>(rte::calm.signals[kSignalId].targets[i].idx);
+      // Read PWM for that pin
       rte::ifc_onboard_target_duty_cycles::readElement(pos, pwm);
       log << std::setw(3) << (int)pwm << ", ";
       EXPECT_EQ((uint8)pwm, aSteps[nStep].au8Curs[i]);
