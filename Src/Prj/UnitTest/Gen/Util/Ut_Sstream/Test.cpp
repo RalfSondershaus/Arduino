@@ -1009,6 +1009,7 @@ TEST(Ut_Sstream, Formatted_input_char_array)
   std::cout << stream.tellg() << std::endl;
   EXPECT_EQ(stream.tellg(), util::streampos{ 0 });
   stream >> arr;
+  std::cout << arr << std::endl;
   std::cout << strcmp(arr, "ab") << std::endl;
   EXPECT_EQ(strcmp(arr, "ab"), 0);
   //EXPECT_EQ(stream.gcount(), util::streamsize{ 0 });
