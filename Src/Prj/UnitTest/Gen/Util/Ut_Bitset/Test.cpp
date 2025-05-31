@@ -8,6 +8,7 @@
 
 #include <Util/bitset.h>
 #include <unity_adapt.h>
+#include <iostream>
 
 TEST(Ut_Bitset, bitset_uint32_32_set)
 {
@@ -330,17 +331,21 @@ TEST(Ut_Bitset, bitset_uint8_64_set_reset)
   EXPECT_EQ(mybits.all(), true);
   EXPECT_EQ(mybits.none(), false);
 
+  std::cout << "none: " << mybits.none() << std::endl;
   for (size_t i = 0; i < nbits; i++)
   {
+    std::cout << i << ": " << mybits.test(i) << " " << mybits[i] << std::endl;
     EXPECT_EQ(mybits.test(i), true);
     EXPECT_EQ(mybits[i], true);
   }
 
   (void)mybits.reset();
+  std::cout << "any: " << mybits.any() << std::endl;
   EXPECT_EQ(mybits.any(), false);
   EXPECT_EQ(mybits.all(), false);
   EXPECT_EQ(mybits.none(), true);
 
+  std::cout << mybits.none() << std::endl;
   for (size_t i = 0; i < nbits; i++)
   {
     EXPECT_EQ(mybits.test(i), false);
