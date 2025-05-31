@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - fix_Ut_Sstream_Formatted_input_char_array
   pull_request:
     branches:
       - master
