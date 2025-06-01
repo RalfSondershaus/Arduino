@@ -45,6 +45,7 @@ Note: The maximal length of a message is 64 characters.
 | `SET_SIGNAL id TARGETS [(ONBOARD, ONB, EXTERN, EXT) pin]+` | Sets up to `NrSignalTargets` target ports for a signal. EXTERN (EXT) are currently not supported. `pin` is the Arduino pin number. | `SET_SIGNAL 0 TARGETS ONB 13 ONB 12 ONB 11 ONB 10 ONB 9` Set 5 targets for signal 0: pins 13, 12, 11, 10, and 9. |
 | `SET_SIGNAL id INPUT CLASSIFIED id` | Sets input type: type is classifier with ID `id`. | `SET_SIGNAL 0 INPUT CLASSIFIED 0`<br>Assigns classifier 0 to signal 0. |
 | `SET_SIGNAL id COT t1 t2` |  Sets change-over times (`t1` and `t2` use [10 ms]). | `SET_SIGNAL 0 COT 10 20`<br> set change over time of signal 0 to 100 ms and blink change over time to 200 ms. |
+ | `SET_SIGNAL id DB_AUSFAHRSIGNAL PIN pin CLASS cls-id` | Sets a signal as a DB Ausfahrsignal. Pins:<br>- `pin` = LED 1 <span style="color: red;">red</span><br>- `pin+1` = LED 2 <span style="color:red;">red</span><br>- `pin+2` = LED 3 <span style="color: green;">green</span><br>- `pin+3` = LED 4 <span style="color: yellow;">yellow</span><br>- `pin+4` = LED 5 white<br>`cls-id` is the classifier ID for the signal. The DB Ausfahrsignal is a special signal type that uses 5 LEDs and a classifier to control it. | `SET_SIGNAL 0 DB_AUSFAHRSIGNAL PIN 10 CLASS 1`<br>Sets signal 0 as a DB Ausfahrsignal with pin 10 for LED 1 red and classifier ID 1. |
 
 #### GET_SIGNAL
 

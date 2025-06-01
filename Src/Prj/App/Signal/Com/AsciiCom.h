@@ -15,6 +15,7 @@
  * - SET_SIGNAL 0 TARGETS ONBOARD pin ONBOARD pin ONB pin
  * - SET_SIGNAL 0 INPUT CLASSIFIED 1
  * - SET_SIGNAL 0 COT 10 20
+ * - SET_SIGNAL 0 DB_AUSFAHRSIGNAL PIN pin CLASS classifier_id
  * - GET_SIGNAL 0 ASPECTS
  * - GET_SIGNAL 0 TARGETS
  * - SET_CLASSIFIER 1 PIN 5
@@ -75,6 +76,13 @@ namespace com
    * | `SET_SIGNAL id TARGETS [(ONBOARD, ONB, EXTERN, EXT) pin]+` | Sets up to `NrSignalTargets` target ports for a signal. EXTERN (EXT) are currently not supported. `pin` is the Arduino pin number. | `SET_SIGNAL 0 TARGETS ONB 13 ONB 12 ONB 11 ONB 10 ONB 9`<br>Set 5 targets for signal 0: pins 13, 12, 11, 10, and 9. |
    * | `SET_SIGNAL id INPUT CLASSIFIED id` | Sets input type: type is classifier with ID `id`. | `SET_SIGNAL 0 INPUT CLASSIFIED 0`<br>Assigns classifier 0 to signal 0. |
    * | `SET_SIGNAL id COT t1 t2` | Sets change-over times (`t1` and `t2` use [10 ms]). | `SET_SIGNAL 0 COT 10 20`<br>Set change over time of signal 0 to 100 ms and blink change over time to 200 ms. |
+   * | `SET_SIGNAL id DB_AUSFAHRSIGNAL PIN pin CLASS cls-id` | Sets a signal as a DB Ausfahrsignal. Pins:<br>
+   *    - `pin` = LED 1 red<br> 
+   *    - `pin+1` = LED 2 red<br> 
+   *    - `pin+2` = LED 3 green<br> 
+   *    - `pin+3` = LED 4 yellow<br> 
+   *    - `pin+4` = LED 5 white<br>
+   *    `cls-id` is the classifier ID for the signal. The DB Ausfahrsignal is a special signal type that uses 5 LEDs and a classifier to determine its state. | `SET_SIGNAL 0 DB_AUSFAHRSIGNAL PIN 10 CLASS 1`<br>Sets signal 0 as a DB Ausfahrsignal with pin 10 for LED 1 red and classifier ID 1. |
    *
    * @note
    * - `[aspect]+` and `[blink]+` refer to sequences of bits, each representing the state of an aspect or blink for the signal.
