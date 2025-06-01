@@ -56,43 +56,60 @@
 namespace com
 {
 
-  // -----------------------------------------------------------------------------------
-  /// Receives telegrams and processes them:
-  ///
-  /// SET_SIGNAL group:
-  /// \code
-  /// SET_SIGNAL id ASPECTS [aspect]+                          Set the aspects for a signal. 
-  ///                                                          [aspects]+ can include up to five aspects. 
-  ///                                                          If fewer than five aspects are provided, only the specified aspects are updated; the remaining aspects will stay unchanged
-  /// SET_SIGNAL id BLINKS  [blink]+                           set (5) bits for blink (e.g. 00000)
-  /// SET_SIGNAL id TARGETS [(ONBOARD,ONB,EXTERN, EXT) pin]+   set (5) target ports for signal id
-  /// SET_SIGNAL id INPUT CLASSIFIED id                        set input: type is classifier with ID id
-  /// SET_SIGNAL id COT t1 t2                                  set change over times
-  /// \endcode
-  ///
-  /// id is the signal ID, which is a number from 0 to 63.
-  /// aspect is a bit value, blink is a bit value, pin is a pin number (0-31).
-  /// The target ports can be ONBOARD, ONB, EXTERN, or EXT, followed by a pin number.
-  /// The change over times are two values in [10 ms].
-  ///  
-  /// Examples:
-  /// \code
-  /// SET_SIGNAL 0 ASPECTS 11000 00100 00110 11001 11111      sets aspects for signal 0
-  /// SET_SIGNAL 0 BLINKS  00000 00000 00000 00000 00000      sets blinks for signal 0
-  /// SET_SIGNAL 0 TARGETS ONBOARD pin ONBOARD pin ONB pin    sets target ports for signal 0
-  /// SET_SIGNAL 0 INPUT CLASSIFIED 1                         sets input for signal 0 to classifier with ID 1
-  /// SET_SIGNAL 0 COT 10 20                                  sets change over times for signal 0 to 100 ms and 200 ms
-  /// \endcode
-  ///
-  /// \code
-  /// GET_SIGNAL id ASPECTS                         returns all (5) aspects for signal id
-  ///
-  /// GET_SIGNAL 0 ASPECT                           
-  /// GET_SIGNAL 0 TARGET                           returns all (5) target ports for signal 0
-  ///
-  /// SET_CLASSIFIER id [PIN, LIMITS, DEBOUNCE] ...
-  /// \code
-  // -----------------------------------------------------------------------------------
+  /**
+   * Receives and processes ASCII telegrams for signal control.
+   * 
+   * This class listens to a SerAsciiTP instance and processes incoming telegrams
+   * related to signal configuration and status queries. It supports commands for
+   * setting and getting signal aspects, blinks, targets, input classification,
+   * and change-over times, as well as configuring classifiers.
+   * 
+   * @section set_signal SET_SIGNAL Command Reference
+   *
+   * The `SET_SIGNAL` command is used to configure various aspects of a signal, such as its aspects, blink states, target pins, input classification, and change-over times.
+   *
+   * | Command | Description | Example Usage |
+   * |---------|-------------|--------------|
+   * | `SET_SIGNAL id ASPECTS [aspect]+` | Set the aspects for a signal. `[aspect]+` can include up to `kNrSignalAspects` aspects. If fewer than `kNrSignalAspects` aspects are provided, only the specified aspects are updated; the remaining aspects will stay unchanged. A `1` means that the corresponding LED is on, `0` means off. The order of the bits corresponds to the order of the pins, see `SET_SIGNAL id TARGETS`. | `SET_SIGNAL 0 ASPECTS 11000 00100 00110 11001 11111`<br>Sets aspects for signal 0. With respect to the example of `SET_SIGNAL id TARGETS` below, `11000`, the left-most `1` corresponds to pin 13, the right-most `0` to pin 9. |
+   * | `SET_SIGNAL id BLINKS [blink]+` | Set blink for a signal. `[blink]+` can include up to `kNrSignalAspects` blinks, so a blink per aspect. If fewer than `kNrSignalAspects` blinks are provided, only the specified blinks are updated; the remaining blinks will stay unchanged. A `1` means that the corresponding LED starts to blink, `0` means LED on without blink. | `SET_SIGNAL 0 BLINKS 00000 00000 00000 00000 00000`<br>Signal 0 doesn't blink. |
+   * | `SET_SIGNAL id TARGETS [(ONBOARD, ONB, EXTERN, EXT) pin]+` | Sets up to `NrSignalTargets` target ports for a signal. EXTERN (EXT) are currently not supported. `pin` is the Arduino pin number. | `SET_SIGNAL 0 TARGETS ONB 13 ONB 12 ONB 11 ONB 10 ONB 9`<br>Set 5 targets for signal 0: pins 13, 12, 11, 10, and 9. |
+   * | `SET_SIGNAL id INPUT CLASSIFIED id` | Sets input type: type is classifier with ID `id`. | `SET_SIGNAL 0 INPUT CLASSIFIED 0`<br>Assigns classifier 0 to signal 0. |
+   * | `SET_SIGNAL id COT t1 t2` | Sets change-over times (`t1` and `t2` use [10 ms]). | `SET_SIGNAL 0 COT 10 20`<br>Set change over time of signal 0 to 100 ms and blink change over time to 200 ms. |
+   *
+   * @note
+   * - `[aspect]+` and `[blink]+` refer to sequences of bits, each representing the state of an aspect or blink for the signal.
+   * - The order of bits in aspects and blinks corresponds to the order of the pins defined in the TARGETS command.
+   * - Change-over times are specified in units of 10 ms.
+   * 
+    * @section GET_SIGNAL GET_SIGNAL Commands
+    * @brief Commands to retrieve signal configuration and status.
+    *
+    * | Command | Description | Example Usage |
+    * |---------|-------------|--------------|
+    * | `GET_SIGNAL id ASPECTS` | Returns all `kNrSignalAspects` aspects for a signal. | `GET_SIGNAL 0 ASPECTS` |
+    * | `GET_SIGNAL id BLINKS` | Returns all `kNrSignalAspects` blinks for a signal. | `GET_SIGNAL 0 BLINKS` |
+    * | `GET_SIGNAL id TARGETS` | Returns all `kNrSignalTargets` target ports for the given signal id. | `GET_SIGNAL 0 TARGETS` |
+    * | `GET_SIGNAL id INPUT` | Returns the classifier and classifier ID. | `GET_SIGNAL 0 INPUT` |
+    * | `GET_SIGNAL id COT` | Returns change over time [10 ms] and blink change over time [10 ms]. | `GET_SIGNAL 0 COT` |
+    *
+    * @section SET_CLASSIFIER SET_CLASSIFIER Commands
+    * @brief Commands to configure classifier parameters.
+    *
+    * | Command | Description | Example Usage |
+    * |---------|-------------|--------------|
+    * | `SET_CLASSIFIER id PIN pin` | Sets the Arduino analog input pin (ADC). | `SET_CLASSIFIER 0 PIN 56` |
+    * | `SET_CLASSIFIER id LIMITS slot-id min max` | Sets the AD limits for the given slot of the classifier. A classifier supports `kNrClassifierClasses` classes. `min` and `max` are given in raw values. The AD values are `4*min` and `4*max`. | `SET_CLASSIFIER 0 LIMITS 1 85 102` |
+    * | `SET_CLASSIFIER id DEBOUNCE t1` | Sets debounce time [10 ms] for a classifier. | `SET_CLASSIFIER 0 DEBOUNCE 5` |
+    *
+    * @section GET_CLASSIFIER GET_CLASSIFIER Commands
+    * @brief Commands to retrieve classifier configuration.
+    *
+    * | Command | Description | Example Usage |
+    * |---------|-------------|--------------|
+    * | `GET_CLASSIFIER id PIN` | Gets the Arduino analog input pin (ADC). | `GET_CLASSIFIER 0 PIN` |
+    * | `GET_CLASSIFIER id LIMITS` | Gets the AD limits for the given slot of the classifier. A classifier supports `kNrClassifierClasses` classes. `min` and `max` are given in raw values. The AD values are `4*min` and `4*max`. | `GET_CLASSIFIER 0 LIMITS` |
+    * | `GET_CLASSIFIER id DEBOUNCE` | Gets debounce time [10 ms] for a classifier. | `GET_CLASSIFIER 0 DEBOUNCE` |
+    */
   class AsciiCom : public Observer
   {
   public:
@@ -102,19 +119,69 @@ namespace com
 
 
   protected:
-    /// Currently, just one observer is supported
+    /**
+     * @brief Smart pointer to a SerAsciiTP object.
+     *
+     * Currently, just one observer is supported, so this pointer
+     * is used to listen to the SerAsciiTP instance for incoming telegrams.
+     */
     util::ptr<SerAsciiTP> asciiTP;
+    /**
+     * @brief Stores the response telegram as a string.
+     *
+     * This variable holds the response message received or to be sent
+     * in ASCII communication. The type string_type is an alias
+     * for util::basic_string class.
+     * @note The length of this string is limited to kMaxLenTelegram.
+     * @see SerAsciiTP::kMaxLenTelegram
+     */
     string_type telegram_response;
 
   public:
+    /**
+     * @brief Default constructor for the AsciiCom class.
+     *
+     * Initializes a new instance of the AsciiCom class with default values.
+     */
     AsciiCom() = default;
 
+    /**
+     * @brief Processes data for the ASCII communication interface.
+     *
+     * This method is called by AsciiTP to notify this observer of new data.
+     *
+     * @note This function overrides a virtual method from the base class.
+     */
     void update() override;
 
+    /**
+     * @brief Attaches this object as a listener to the specified SerAsciiTP instance.
+     *
+     * This method sets the internal pointer to the provided SerAsciiTP object and
+     * registers this object as an observer by calling the attach method on the SerAsciiTP instance.
+     *
+     * @param tp Reference to the SerAsciiTP object to listen to.
+     */
     void listenTo(SerAsciiTP& tp) { asciiTP = &tp; tp.attach(*this); }
 
+    /**
+     * @brief Processes the given telegram and generates a response.
+     *
+     * This function takes an input telegram, performs the necessary processing,
+     * and writes the result to the response parameter.
+     *
+     * @param telegram The input string containing the telegram to be processed.
+     * @param response Reference to a string where the generated response will be stored.
+     */
     void process(const string_type& telegram, string_type& response);
 
+    /**
+     * @brief Executes a single processing cycle for the ASCII communication interface.
+     *
+     * This method should be called periodically to handle communication tasks such as
+     * receiving, parsing, and transmitting ASCII-formatted data. Typical actions performed
+     * during the cycle include transmitting RTE monitoring values or outputting long lists.
+     */
     void cycle();
   };
 } // namespace com
