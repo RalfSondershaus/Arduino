@@ -24,3 +24,6 @@ Debug/ConsoleApplication1.pdb
 Src/Gen/Test/googletest-main/googletest/src/gtest-all.ii
 Src/Gen/Test/googletest-main/googletest/src/gtest-all.s
 Src/Gen/Test/googletest-main/googletest/src/output.txt
+Default_All.txt
+Default_Green_Red.txt
+do_ramp_16bit_10_0x0_0x8000_0x0100_set_and_step.txt
