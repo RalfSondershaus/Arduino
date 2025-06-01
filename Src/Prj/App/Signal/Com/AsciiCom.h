@@ -82,7 +82,7 @@ namespace com
    *    - `pin+2` = LED 3 green<br> 
    *    - `pin+3` = LED 4 yellow<br> 
    *    - `pin+4` = LED 5 white<br>
-   *    `cls-id` is the classifier ID for the signal. The DB Ausfahrsignal is a special signal type that uses 5 LEDs and a classifier to determine its state. | `SET_SIGNAL 0 DB_AUSFAHRSIGNAL PIN 10 CLASS 1`<br>Sets signal 0 as a DB Ausfahrsignal with pin 10 for LED 1 red and classifier ID 1. |
+   *    `cls-id` is the classifier ID for the signal. The DB Ausfahrsignal is a special signal type that uses 5 LEDs and a classifier to control it. | `SET_SIGNAL 0 DB_AUSFAHRSIGNAL PIN 10 CLASS 1`<br>Sets signal 0 as a DB Ausfahrsignal with pin 10 for LED 1 red and classifier ID 1. |
    *
    * @note
    * - `[aspect]+` and `[blink]+` refer to sequences of bits, each representing the state of an aspect or blink for the signal.
