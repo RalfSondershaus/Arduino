@@ -1,12 +1,10 @@
 # Build.sh
-# $1  Project name, e.g. BlinkSample
+# $1  Project name, e.g. App/BlinkSample
 # $2  Target platform, supported: mega,uno,win32,win64
 # $3  Compiler, supported: avrgcc, msvc
 # $4  Base software, supported: arduino, win, none
-# $4  test framework, supported: googletest, unity, none
+# $5  test framework, supported: googletest, unity, none
 # $6  Command, e.g. all, clean
-
-@echo off
 
 # make -k (or --keep-going)
 #   Continue as much as possible after an error. While the target that failed, 
