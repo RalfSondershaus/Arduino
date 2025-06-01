@@ -8,6 +8,9 @@ RUN apt-get update && \
 # Install make
 RUN apt-get install -y make
 
+# Install GCC
+RUN apt-get install -y gcc g++
+
 # Install AVR GCC
 RUN apt-get install -y gcc-avr avr-libc
 
@@ -28,6 +31,6 @@ WORKDIR /app/arduino
 
 # Make it
 # CMD ["make", "-s", "-f", "./Build/make/Makefile.gmk", "ARG_PROJECT=App/BlinkSample", "ARG_TARGET_ECU=mega", "ARG_COMPILER=avr_gcc", "ARG_BSW=arduino", "ARG_BSW_TESTFRAMEWORK=none", "all"]
-CMD ["./Build/build_with_pull.sh", "App/BlinkSample", "mega", "avr_gcc", "arduino", "none", "all"]
+# CMD ["./Build/build_with_pull.sh", "App/BlinkSample", "mega", "avr_gcc", "arduino", "none", "all"]
 # CMD ["git", "pull"]
 
