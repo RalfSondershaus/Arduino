@@ -28,6 +28,10 @@ Each signal is controlled by a DCC command. This is experimental.
     Build/build.sh App/Signal mega avr_gcc arduino none run
     ```
 
+## Configuration
+
+You can configure the application with a serial monitor.
+
 ## Folder Structure
 
 - `Src/Prj/App/Signal/` - Main application source code
