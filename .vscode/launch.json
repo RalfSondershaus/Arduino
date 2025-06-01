@@ -13,6 +13,7 @@
                 "UnitTest/Gen/Util/Ut_PacketExtractor",
                 "UnitTest/Gen/Util/Ut_Ramp",
                 "UnitTest/Gen/Util/Ut_Sstream",
+                "Ut_Bitset",
                 "Ut_String",
                 "Ut_Signal_Com",
                 "Ut_Signal",
