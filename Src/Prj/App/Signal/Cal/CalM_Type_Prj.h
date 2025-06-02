@@ -58,6 +58,8 @@ namespace cal
       eExternal = 2
     };
 
+    explicit operator uint8() const { return static_cast<uint8>((idx << (8U - cfg::kCalTgtNrBits)) | type); }
+
     uint8 type : (8U - cfg::kCalTgtNrBits); ///< type of target such as eNone, eOnboard, eExternal
     uint8 idx  : (cfg::kCalTgtNrBits);      ///< output pin number
   } target_type;
