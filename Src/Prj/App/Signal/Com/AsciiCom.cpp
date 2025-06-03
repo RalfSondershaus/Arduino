@@ -26,13 +26,44 @@
 #include <Util/Timer.h>
 #include <Rte/Rte.h>
 
-//extern signal::InputClassifier rte::input_classifier;
-
 namespace com
 {
   using char_type = AsciiCom::char_type;
   using string_type = AsciiCom::string_type; // string of size 64
   using stringstream_type = util::basic_istringstream<SerAsciiTP::kMaxLenTelegram, char_type>;
+
+  enum tPreconfiguredSignalEnum
+  {
+    eDB_AUSFAHRSIGNAL = 0,      /**< 0: DB_AUSFAHRSIGNAL  */
+    eDB_BLOCKSIGNAL,            /**< 1: DB_BLOCKSIGNAL    */
+    eMAX_PRECONF_SIGNALS        /**< 2: number of preconfigured signals */
+  };
+
+  #define INPUT0 { cal::input_type::eNone, 0 }
+  #define INPUT1 { cal::input_type::eNone, 1 }
+
+  #define ASPECTS0 { { 0b00011000, 0b00000000 }, { 0b00000100, 0b00000000 }, { 0b00000110, 0b00000000 }, { 0b00011001, 0b00000000 }, { 0b00011111, 0b00000000 } }
+  #define ASPECTS1 { { 0b00000010, 0b00000000 }, { 0b00000001, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00000011, 0b00000000 } }
+
+  #define NR_TARGETS0   5
+  #define NR_TARGETS1   2
+
+  #define TARGET0 { { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 } }
+  #define TARGET1 { { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 } }
+
+  #define COT0          10
+  #define COT1          10
+  #define COT_BLINK0     0
+  #define COT_BLINK1     0
+
+  #define PRECONFIGURED_SIGNALS_ARRAY \
+  { \
+    { INPUT0, { ASPECTS0 }, { TARGET0 }, COT0, COT_BLINK0 }, \
+    { INPUT1, { ASPECTS1 }, { TARGET1 }, COT1, COT_BLINK1 }  \
+  }
+
+  static const util::array<cal::signal_type, eMAX_PRECONF_SIGNALS> preconfiguredSignals{ PRECONFIGURED_SIGNALS_ARRAY };
+  static const util::array<size_t, eMAX_PRECONF_SIGNALS> preconfiguredSignalsNrTargets = { NR_TARGETS0, NR_TARGETS1 }; // Number of targets for DB_AUSFAHRSIGNAL
 
   /// To monitor a RTE port
   typedef struct
@@ -40,52 +71,58 @@ namespace com
     const rte::port_data_t * pPortData;   ///< Pointer to the RTE data
     util::MilliTimer timer;               ///< Timer for next output
     uint16 unCycleTime;                   ///< [ms] Cycle time for output
+    uint16 unFirstIdx;                    ///< For array types: index of the first element
+    uint16 unNrIdx;                       ///< For array types: number of elements to be transmitted
   } port_t;
   
-    /// Return values of process() function family
-    typedef enum
-    {
-      eOK = 0,                    ///< OK
-      eINV_CMD,                   ///< Command invalid (or unknown)
-      eERR_EEPROM,                ///< EEPROM update failure
-      eINV_SIGNAL_ID,             ///< SIGNAL ID invalid
-      eINV_SIGNAL_CMD,
-      eINV_SIGNAL_ASPECTS,
-      eINV_SIGNAL_BLINKS,
-      eINV_SIGNAL_TARGETS,
-      eINV_SIGNAL_INPUT,
-      eINV_SIGNAL_CHANGEOVERTIME,
-      eINV_CLASSIFIER_CMD,
-      eINV_CLASSIFIER_PIN,
-      eINV_CLASSIFIER_LIMITS,
-      eINV_CLASSIFIER_DEBOUNCE,
-      eINV_MONITOR_START_PARAM,
-      eINV_MONITOR_START_IFC_NAME,
-      eERR_UNKNOWN
-    } tRetType;
+  /// Return values of process() function family
+  typedef enum
+  {
+    eOK = 0,                    ///< OK
+    eINV_CMD,                   ///< Command invalid (or unknown)
+    eERR_EEPROM,                ///< EEPROM update failure
+    eINV_SIGNAL_ID,             ///< SIGNAL ID invalid
+    eINV_SIGNAL_CMD,
+    eINV_SIGNAL_ASPECTS,
+    eINV_SIGNAL_BLINKS,
+    eINV_SIGNAL_TARGETS,
+    eINV_SIGNAL_INPUT,
+    eINV_SIGNAL_CHANGEOVERTIME,
+    eINV_SIGNAL_DB_AUSFAHRSIGNAL,
+    eINV_SIGNAL_DB_BLOCKSIGNAL,
+    eINV_CLASSIFIER_CMD,
+    eINV_CLASSIFIER_PIN,
+    eINV_CLASSIFIER_LIMITS,
+    eINV_CLASSIFIER_DEBOUNCE,
+    eINV_MONITOR_START_PARAM,
+    eINV_MONITOR_START_IFC_NAME,
+    eERR_UNKNOWN
+  } tRetType;
 
-    /// For each tRetType, an error description that is transmitted after
-    /// processing the command.
-    static constexpr const string_type::value_type* aRetTypeStrings[] = 
-    {
-      "OK",                                   // eOK
-      "ERR: Invalid command",                 // eINV_CMD
-      "ERR: EEPROM failure",                  // eERR_EEPROM
-      "ERR: Signal id invalid",               // eINV_SIGNAL_ID
-      "ERR: Unknown signal sub command",      // eINV_SIGNAL_CMD
-      "ERR: Unknown signal aspects",          // eINV_SIGNAL_ASPECTS
-      "ERR: Unknown signal blinks",           // eINV_SIGNAL_BLINKS
-      "ERR: Unknown signal targets",          // eINV_SIGNAL_TARGETS
-      "ERR: Unknown signal input",            // eINV_SIGNAL_INPUT
-      "ERR: Unknown signal change over time", // eINV_SIGNAL_CHANGEOVERTIME
-      "ERR: Unknown classifier sub command: GET_CLASSIFIER id [LIMITS slot-id,PIN,DEBOUNCE]",  // eINV_CLASSIFIER_CMD
-      "ERR: Unknown classifier pin: GET_CLASSIFIER id PIN",                            // eINV_CLASSIFIER_PIN
-      "ERR: Unknown classifier limits: GET_CLASSIFIER id LIMITS slot_id",              // eINV_CLASSIFIER_LIMITS
-      "ERR: Unknown classifier debounce",     // eINV_CLASSIFIER_DEBOUNCE
-      "ERR: Unknown monitor start parameter: MONITOR_START cycle-time ifc-name",       // eINV_MONITOR_START_PARAM
-      "ERR: Unknown monitor start interface name: MONITOR_START cycle-time ifc-name",  // eINV_MONITOR_START_IFC_NAME
-      "ERR: unknown error"                    // has to be the last element
-    };
+  /// For each tRetType, an error description that is transmitted after
+  /// processing the command.
+  static constexpr const string_type::value_type* aRetTypeStrings[] = 
+  {
+    "OK",                                   // eOK
+    "ERR: Invalid command",                 // eINV_CMD
+    "ERR: EEPROM failure",                  // eERR_EEPROM
+    "ERR: Signal id invalid",               // eINV_SIGNAL_ID
+    "ERR: Unknown signal sub command",      // eINV_SIGNAL_CMD
+    "ERR: Unknown signal aspects",          // eINV_SIGNAL_ASPECTS
+    "ERR: Unknown signal blinks",           // eINV_SIGNAL_BLINKS
+    "ERR: Unknown signal targets",          // eINV_SIGNAL_TARGETS
+    "ERR: Unknown signal input",            // eINV_SIGNAL_INPUT
+    "ERR: Unknown signal change over time", // eINV_SIGNAL_CHANGEOVERTIME
+    "ERR: Unknown signal DB Ausfahrsignal", // eINV_SIGNAL_DB_AUSFAHRSIGNAL
+    "ERR: Unknown signal DB Blocksignal",   // eINV_SIGNAL_DB_BLOCKSIGNAL
+    "ERR: Unknown classifier sub command: GET_CLASSIFIER id [LIMITS slot-id,PIN,DEBOUNCE]",  // eINV_CLASSIFIER_CMD
+    "ERR: Unknown classifier pin: GET_CLASSIFIER id PIN",                            // eINV_CLASSIFIER_PIN
+    "ERR: Unknown classifier limits: GET_CLASSIFIER id LIMITS slot_id",              // eINV_CLASSIFIER_LIMITS
+    "ERR: Unknown classifier debounce",     // eINV_CLASSIFIER_DEBOUNCE
+    "ERR: Unknown monitor start parameter: MONITOR_START cycle-time ifc-name",       // eINV_MONITOR_START_PARAM
+    "ERR: Unknown monitor start interface name: MONITOR_START cycle-time ifc-name",  // eINV_MONITOR_START_IFC_NAME
+    "ERR: unknown error"                    // has to be the last element
+  };
 
   static uint8 convertStrToU8(util::string_view sv);
 
@@ -106,7 +143,8 @@ namespace com
   static int process_set_signal_targets(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_input(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_cot(stringstream_type& st, cal::signal_type& cal_sig);
- 
+  static int process_set_signal_preconfigured_signal(stringstream_type& st, cal::signal_type& cal_sig, tPreconfiguredSignalEnum signalId);
+
   static tRetType process_get_signal_aspects(stringstream_type& st, cal::signal_type& cal_sig, string_type& response);
   static tRetType process_get_signal_blinks(stringstream_type& st, cal::signal_type& cal_sig, string_type& response);
   static tRetType process_get_signal_targets(stringstream_type& st, cal::signal_type& cal_sig, string_type& response);
@@ -134,7 +172,7 @@ namespace com
   } tCommands;
 
   /// Max length of a token (how many characters)
-  static constexpr util::streamsize kMaxLenToken = 16;
+  static constexpr util::streamsize kMaxLenToken = 20;
 
   // Max Length of strings: kMaxLenToken
   const util::array<tCommands, 8> commands =
@@ -363,11 +401,19 @@ namespace com
       {
         ret = (process_set_signal_cot(st, cal_sig) > 0) ? eOK : eINV_SIGNAL_CHANGEOVERTIME;
       }
+      else if (util::string_view{tmp}.compare("DB_AUSFAHRSIGNAL") == 0)
+      {
+        ret = (process_set_signal_preconfigured_signal(st, cal_sig, eDB_AUSFAHRSIGNAL) > 0) ? eOK : eINV_SIGNAL_DB_AUSFAHRSIGNAL;
+      }
+      else if (util::string_view{tmp}.compare("DB_BLOCKSIGNAL") == 0)
+      {
+        ret = (process_set_signal_preconfigured_signal(st, cal_sig, eDB_BLOCKSIGNAL) > 0) ? eOK : eINV_SIGNAL_DB_BLOCKSIGNAL;
+      }
       else
       {
+        response.append(tmp);
         ret = eINV_SIGNAL_CMD;
       }
-
       if (ret == eOK)
       {
         ret = (rte::ifc_cal_set_signal::call(id, cal_sig, true) == rte::ret_type::OK) ? eOK : eERR_EEPROM;
@@ -484,7 +530,7 @@ namespace com
   }
 
   // -----------------------------------------------------------------------------------
-  /// <SET_SIGNAL id INPUT> CLASSIFIED id
+  /// <SET_SIGNAL id INPUT> (CLASS,CLASSIFIED) id
   ///
   /// @return 1: success, 0: no success
   // -----------------------------------------------------------------------------------
@@ -528,6 +574,70 @@ namespace com
       cal_sig.blinkChangeOverTime = t2;
       idx++;
     }
+    return idx;
+  }
+
+  // -----------------------------------------------------------------------------------
+  /// <SET SIGNAL id DB_AUSFAHRSIGNAL> (ONB,EXT) pin CLASS cls-id
+  ///
+  /// @return 1: success, 0: no success
+  // -----------------------------------------------------------------------------------
+  static int process_set_signal_preconfigured_signal(stringstream_type& st, cal::signal_type& cal_sig, tPreconfiguredSignalEnum signalId)
+  {
+    char tmp[kMaxLenToken]; // ONB or EXT or CLASS
+    uint16 val;             // pin or cls-id
+    size_t idx = 0;         // count the pins
+    const size_t nrTargets = preconfiguredSignalsNrTargets[static_cast<int>(signalId)];
+
+    // Copy everything. If something fails, cal_sig is not used.
+    // Targets and input are overwritten in the next steps.
+    cal_sig = preconfiguredSignals[static_cast<int>(signalId)];
+
+    // (1) (ONB,EXT) pin ...
+    st >> util::setw(kMaxLenToken) >> tmp >> val;
+    // Do not check for eof() since eof() is true after extracting the last element
+    // (and if the last element doesn't have trailing white spaces).
+    if (!st.fail())
+    {
+      if (util::string_view{tmp}.compare("ONB") >= 0)
+      {
+        if (val + nrTargets < static_cast<size_t>(cfg::kNrOnboardTargets))
+        {
+          for (idx = 0; idx < nrTargets; idx++)
+          {
+            cal_sig.targets[idx].type = cal::target_type::eOnboard;
+            // cast is safe due to previous if statement
+            cal_sig.targets[idx].idx = static_cast<uint8>(val + idx);
+          }
+        }
+        // else failure, idx is 0
+      }
+      else if (util::string_view{tmp}.compare("EXT") >= 0)
+      {
+        if (val + nrTargets < static_cast<size_t>(cfg::kNrExternalTargets))
+        {
+          for (idx = 0; idx < nrTargets; idx++)
+          {
+            cal_sig.targets[idx].type = cal::target_type::eExternal;
+            // cast is safe due to previous if statement
+            cal_sig.targets[idx].idx = static_cast<uint8>(val + idx);
+          }
+        }
+        // else failure, idx is 0
+      }
+      else
+      {
+        // failure, idx is 0
+      }
+
+      // (2) ... CLASS cls-id
+      if (process_set_signal_input(st, cal_sig) == 0)
+      {
+        // failure, stop, return error
+        idx = 0;
+      }
+    }
+
     return idx;
   }
 
@@ -926,7 +1036,7 @@ namespace com
   // -----------------------------------------------------------------------------------
   /// <MON_LIST>
   ///
-  /// @return eOK
+  /// @return true (continue to next list element) or false (stop, end of list)
   // -----------------------------------------------------------------------------------
   static bool output_monitor_list(string_type& response)
   {
@@ -974,13 +1084,13 @@ namespace com
       response.append("[").append(tmp).append("] ");
       response.append(pm.pPortData->szName);
       response.append(":");
-      for (i = 0; i < portMonitor.pPortData->size; i++)
+      for (i = portMonitor.unFirstIdx; i < portMonitor.unFirstIdx + portMonitor.unNrIdx; i++)
       {
         switch (portMonitor.pPortData->size_of_element)
         {
-          case 1: util::to_string(static_cast<uint8*>(pm.pPortData->pData)[i], tmp); break;
-          case 2: util::to_string(static_cast<uint16*>(pm.pPortData->pData)[i], tmp); break;
-          case 3: util::to_string(static_cast<uint32*>(pm.pPortData->pData)[i], tmp); break;
+          case sizeof(uint8 ): util::to_string(static_cast<uint8*>(pm.pPortData->pData)[i], tmp); break;
+          case sizeof(uint16): util::to_string(static_cast<uint16*>(pm.pPortData->pData)[i], tmp); break;
+          case sizeof(uint32): util::to_string(static_cast<uint32*>(pm.pPortData->pData)[i], tmp); break;
           default: util::to_string(portMonitor.pPortData->size_of_element, tmp); break;
         }
         response.append(" ").append(tmp);
@@ -995,7 +1105,7 @@ namespace com
   }
 
   // -----------------------------------------------------------------------------------
-  /// <MON_START> cycle-time ifc-name
+  /// <MON_START> cycle-time ifc-name [first-idx nr-idx]
   ///
   /// @return eOK, eINV_MONITOR_START_IFC_NAME, eINV_MONITOR_START_PARAM
   // -----------------------------------------------------------------------------------
@@ -1003,6 +1113,8 @@ namespace com
   {
     char ifc_name[32];
     uint16 unCycleTime;
+    uint16 unFirstIdx;
+    uint16 unNrIdx;
     tRetType ret;
     st >> unCycleTime >> ifc_name;
     if (!st.fail())
@@ -1014,6 +1126,22 @@ namespace com
         portMonitor.pPortData = pPortData;
         portMonitor.unCycleTime = unCycleTime;
         portMonitor.timer.start(unCycleTime);
+        portMonitor.unFirstIdx = 0;
+        portMonitor.unNrIdx = pPortData->size;
+        st >> unFirstIdx;
+        if (!st.fail() && (unFirstIdx < pPortData->size))
+        {
+          portMonitor.unFirstIdx = unFirstIdx;
+          st >> unNrIdx;
+          if (!st.fail() && (unFirstIdx + unNrIdx < pPortData->size))
+          {
+            portMonitor.unNrIdx = unNrIdx;
+          }
+          else
+          {
+            portMonitor.unNrIdx = pPortData->size - unFirstIdx;
+          }
+        }
         ret = eOK;
       }
       else

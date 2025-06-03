@@ -76,13 +76,17 @@ namespace com
    * | `SET_SIGNAL id TARGETS [(ONBOARD, ONB, EXTERN, EXT) pin]+` | Sets up to `NrSignalTargets` target ports for a signal. EXTERN (EXT) are currently not supported. `pin` is the Arduino pin number. | `SET_SIGNAL 0 TARGETS ONB 13 ONB 12 ONB 11 ONB 10 ONB 9`<br>Set 5 targets for signal 0: pins 13, 12, 11, 10, and 9. |
    * | `SET_SIGNAL id INPUT CLASSIFIED id` | Sets input type: type is classifier with ID `id`. | `SET_SIGNAL 0 INPUT CLASSIFIED 0`<br>Assigns classifier 0 to signal 0. |
    * | `SET_SIGNAL id COT t1 t2` | Sets change-over times (`t1` and `t2` use [10 ms]). | `SET_SIGNAL 0 COT 10 20`<br>Set change over time of signal 0 to 100 ms and blink change over time to 200 ms. |
-   * | `SET_SIGNAL id DB_AUSFAHRSIGNAL PIN pin CLASS cls-id` | Sets a signal as a DB Ausfahrsignal. Pins:<br>
+   * | `SET_SIGNAL id DB_AUSFAHRSIGNAL (ONB,EXT) pin CLASS cls-id` | Sets a signal as a DB Ausfahrsignal. Pins:<br>
    *    - `pin` = LED 1 red<br> 
    *    - `pin+1` = LED 2 red<br> 
    *    - `pin+2` = LED 3 green<br> 
    *    - `pin+3` = LED 4 yellow<br> 
    *    - `pin+4` = LED 5 white<br>
    *    `cls-id` is the classifier ID for the signal. The DB Ausfahrsignal is a special signal type that uses 5 LEDs and a classifier to control it. | `SET_SIGNAL 0 DB_AUSFAHRSIGNAL PIN 10 CLASS 1`<br>Sets signal 0 as a DB Ausfahrsignal with pin 10 for LED 1 red and classifier ID 1. |
+   * | `SET_SIGNAL id DB_BLOCKSIGNAL (ONB,EXT) pin CLASS cls-id` | Sets a signal as a DB Blocksignal. Pins:<br>
+   *    - `pin` = LED 1 red<br> 
+   *    - `pin+1` = LED 2 green<br> 
+   *    `cls-id` is the classifier ID for the signal. The DB Ausfahrsignal is a special signal type that uses 2 LEDs and a classifier to control it. | `SET_SIGNAL 0 DB_BLOCKSIGNAL PIN 10 CLASS 2`<br>Sets signal 0 as a DB Ausfahrsignal with pin 10 for LED 1 red and classifier ID 2. |
    *
    * @note
    * - `[aspect]+` and `[blink]+` refer to sequences of bits, each representing the state of an aspect or blink for the signal.
@@ -117,6 +121,16 @@ namespace com
     * | `GET_CLASSIFIER id PIN` | Gets the Arduino analog input pin (ADC). | `GET_CLASSIFIER 0 PIN` |
     * | `GET_CLASSIFIER id LIMITS` | Gets the AD limits for the given slot of the classifier. A classifier supports `kNrClassifierClasses` classes. `min` and `max` are given in raw values. The AD values are `4*min` and `4*max`. | `GET_CLASSIFIER 0 LIMITS` |
     * | `GET_CLASSIFIER id DEBOUNCE` | Gets debounce time [10 ms] for a classifier. | `GET_CLASSIFIER 0 DEBOUNCE` |
+    * 
+    * @section MONITOR
+    * @brief Commands to monitor RTE
+    * 
+    * | Command | Description | Example Usage |
+    * |---------|-------------|--------------|
+    * | `MON_LIST` | Print available RTE ports (`ifc-name`) via serial interface. | `MON_LIST` |
+    * | `MON_START cycle-time ifc-name [id-first id-nr]` | Start to print current values of `ifc-name`. Currently, just one RTE port can be printed at one time. Cycle time is `cycle-time` [ms]. `id-first` and `id-nr` are optional and define the span of an array that is to be transmitted [`id-first`, `id-first + id-nr`]. | `MON_START 100 ifc_ad_values`<br>read AD values of the classifiers. |
+    * | `MON_STOP` | Stop to print RTE port. | `MON_STOP` |
+    * 
     */
   class AsciiCom : public Observer
   {

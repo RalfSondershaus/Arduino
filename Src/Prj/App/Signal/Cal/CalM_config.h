@@ -82,7 +82,7 @@ namespace cal
 
     enum
     {
-      eSignalInput = 0,
+      eSignalInputBase = 0,
       eSignalAspectBase = 1,
       eSignalTargetBase = 11,
       eSignalChangeOverTime = 16,
