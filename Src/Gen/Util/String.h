@@ -829,6 +829,49 @@ namespace util
   }
 
   // ---------------------------------------------------
+  /// @brief Converts an unsigned 64-bit integer to a string of type char.
+  /// 
+  /// Converts the given unsigned 64-bit integer value to its decimal string representation
+  /// and stores the result in the provided @p str object. The resulting string will not have leading zeros.
+  /// The function clears the string before writing the result. If the value is zero, the string will be "0".
+  /// The wchar version (to_wstring) is not implemented.
+  /// 
+  /// @tparam Size The maximum size of the string buffer.
+  /// @param value The unsigned 64-bit integer value to convert.
+  /// @param str   The string object to store the result. Must be a util::basic_string<Size, char>.
+  /// @return Reference to the resulting string object containing the converted value.
+  /// 
+  /// @note The maximum number of digits for a 64-bit unsigned integer is 20 (e.g., 18446744073709551615).
+  // ---------------------------------------------------
+  template<int Size>
+  basic_string<Size, char>& to_string(uint64 value, basic_string<Size, char>& str)
+  {
+    str.clear();
+    if (value == 0)
+    {
+      str = "0";
+    }
+    else
+    {
+      char buffer[21]; // Enough to store uint64 and the null terminator
+      int index = 0;
+
+      while (value > 0) 
+      {
+        buffer[index++] = '0' + (value % 10);
+        value /= 10;
+      }
+
+      // Reverse the buffer to get the correct string representation
+      for (int i = index - 1; i >= 0; --i) 
+      {
+        str += buffer[i];
+      }
+    }
+    return str;
+  }
+
+  // ---------------------------------------------------
   /// Converts an unsigned integer to a string of type char.
   /// The wchar version (to_wstring) is not implemented.
   /// Returns the string (str).

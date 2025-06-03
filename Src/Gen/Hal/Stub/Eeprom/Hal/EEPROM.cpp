@@ -19,7 +19,7 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#include <Hal/Eeprom.h>
+#include <Hal/EEPROM.h>
 
 namespace hal
 {

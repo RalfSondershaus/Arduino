@@ -84,7 +84,9 @@ namespace util
 
     logger& operator<<(uint8 val)  { if (isPrint) { hal::serial::print(static_cast<int>(val)); } return *this; }
     logger& operator<<(uint16 val) { if (isPrint) { hal::serial::print(val); } return *this; }
-    logger& operator<<(uint32 val) { if (isPrint) { hal::serial::print(static_cast<int>(val)); } return *this; }
+    logger& operator<<(uint32 val) { if (isPrint) { hal::serial::print(static_cast<unsigned long>(val)); } return *this; }
+    // TODO check how to print 64 bit values
+    logger& operator<<(uint64 val) { if (isPrint) { hal::serial::print(static_cast<unsigned long>(val)); } return *this; }
     logger& operator<<(const char * val) { if (isPrint) { hal::serial::print(val); } return *this; }
     logger& operator<<(int val)    { if (isPrint) { hal::serial::print(val); } return *this; }
     template<int Size, class CharT>
