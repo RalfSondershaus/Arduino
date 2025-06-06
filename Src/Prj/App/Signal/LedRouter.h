@@ -81,8 +81,16 @@ namespace signal
     /// @brief construct
     LedRouter() {}
 
-    /// Runables
+    // Runables
+    /// @brief Init runable
+    /// @note Average run time 109 usec @ATmega2560 @16 MHz with -Os
+    /// @note Average run time 97 usec @ATmega2560 @16 MHz with -O3
     void init();
+    /// @brief Cyclic runable
+    /// @note Average run time 567 usec if one of 54 ramps is active @ATmega2560 @16 MHz with -Os
+    /// @note Average run time 552 usec if one of 54 ramps is active @ATmega2560 @16 MHz with -O3
+    /// @note Average run time 630 usec if one of 54 ramps is active @ATmega2560 @16 MHz with -Os
+    /// @note Average run time 625 usec if one of 54 ramps is active @ATmega2560 @16 MHz with -Os
     void cycle();
 
     /// Server function: Set the target intensity for the given output target port. Use a dim ramp with given slope to

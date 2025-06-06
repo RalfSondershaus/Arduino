@@ -97,10 +97,6 @@ namespace signal
       {
         ramps_onboard[tgt.idx].init_from_slope(intensity, slope, kCycleTime);
       }
-      if (tgt.idx == 8)
-      {
-        hal::serial::println(intensity);
-      }
     }
     break;
     case target_type::eExternal:

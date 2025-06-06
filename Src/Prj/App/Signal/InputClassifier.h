@@ -48,8 +48,12 @@ namespace signal
     /// Construct
     InputClassifier() {}
 
-    /// Runables
+    // Runables
+    /// @brief Init runable
+    /// @note Average run time 10 usec @ATmega2560 @16 MHz
     void init();
+    /// @brief Cyclic runable
+    /// @note Average run time 85 usec @ATmega2560 @16 MHz
     void cycle();
   };
 } // namespace signal
