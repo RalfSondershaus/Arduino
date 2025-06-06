@@ -31,6 +31,7 @@
                 "UnitTest/Gen/Util/Ut_String_view",
                 "UnitTest/Gen/Util/Ut_Vector",
                 "UnitTest/Prj/Ut_Signal",
+                "UnitTest/Prj/Ut_Signal_Performance",
                 "UnitTest/Prj/Ut_Signal_LedRouter",
                 "UnitTest/Prj/Ut_Signal_Com",
             ]
