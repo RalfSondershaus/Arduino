@@ -77,9 +77,12 @@ namespace dcc
 
     return ret;
   }
+
   // ---------------------------------------------------
   /// Interrupt service routine: a falling or rising edge has triggered this interrupt.
   /// Write the time difference into the FIFO buffer.
+  /// @note Average run time 27 usec @ATmega2560 @16 MHz with gcc -Os
+  /// @note Average run time 14 usec @ATmega2560 @16 MHz with gcc -O3
   // ---------------------------------------------------
   ISR(ISR_Dcc)
   {
