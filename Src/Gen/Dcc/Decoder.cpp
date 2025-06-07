@@ -21,62 +21,29 @@
 namespace dcc
 {
   /// buffer size. Consider 60 interrupts / 1.5 ms = 180 / 4.5 ms ~ 200 / 5 ms ~ 400 / 10 ms
-  static constexpr uint16 kTimeBufferSize = 400U;
-
+  static constexpr uint16 kBitStreamSize = 400U;
+  using bit_extractor_constants = BitExtractorConstants<>;
   /// A FIFO (queue) is used to exchange data between ISR and dcc::Decoder.
-  /// Arduino's implementation of micros() returns an unsigned long, so we use unsigned long here instead of uint32 or a similar type.
-  using time_diff_deque = util::fix_deque<uint8, kTimeBufferSize>;
-
-  static constexpr time_diff_deque::value_type kTimeDeltaInvalid = platform::numeric_limits<time_diff_deque::value_type>::max_();
-  static constexpr time_diff_deque::value_type kTimeDeltaLastValid = platform::numeric_limits<time_diff_deque::value_type>::max_() - 1;
+  using bit_stream_type = BitStream<kBitStreamSize>;
+  using bit_extractor_type = BitExtractor<bit_extractor_constants, bit_stream_type>;
 
   /// Share data between ISR and DccDecoder::loop
-  /// The buffers for time deltas
-  static time_diff_deque TimeDiffDeque[2];
+  /// The buffers for bits are double-buffered to allow
+  /// the ISR to write into one buffer while the main loop reads from the other.
+  /// The double buffering is implemented with a static index.
+  /// The index is toggled in the ISR and in the main loop.
+  static bit_stream_type bit_streams[2];
   
-  /// Selects TimeDiffDeque 0 or 1.
-  static uint8 DoubleBufferIdx;
-  
-  static uint16 TimeDiffDequeMaxSize = 0;
+  static bit_extractor_type bitExtr(&bit_streams[0]); ///< The bit extractor that processes the timing intervals and generates bits
 
+  /// Selects bit_streams by index.
+  static uint8 ucDoubleBufferIdx;
+
+  
   /// For debugging: the number of interrupt ISR_Dcc calls (can overflow)
+  static uint16 unBitStreamMaxSize = 0;
   uint32 ul_ISR_Dcc_Count;
   uint32 ul_Fetch_Count;
-
-  /// Encode dt into time_diff_deque::value_type:
-  /// If dt is greater than maximum value for long intervals (e.g. 10000),
-  /// dt is set to the maximal value that can be represented by time_diff_deque::value_type.
-  /// Otherwise, dt is limited to the maximal value - 1.
-  /// For time_diff_deque::value_type = uint8:
-  /// dt  > 10000 -> 255
-  /// dt <= 10000 -> dt but with dt > 254 -> 254
-  static inline time_diff_deque::value_type limitTimeDelta(unsigned long dt)
-  {
-    if (dt > Decoder::BitExtractorConstantsType::getPartTimeLongMax())
-    {
-      dt = kTimeDeltaInvalid;
-    }
-    else
-    {
-      dt = util::min_<unsigned long>(kTimeDeltaLastValid, dt);
-    }
-    return static_cast<time_diff_deque::value_type>(dt);
-  }
-
-  /// For time_diff_deque::value_type = uint8:
-  /// 255 -> 10001
-  /// 0 ... 254 -> 0 ... 254
-  static inline unsigned long delimitTimeDelta(time_diff_deque::value_type dt)
-  {
-    unsigned long ret = dt;
-
-    if (dt == kTimeDeltaInvalid)
-    {
-      ret = Decoder::BitExtractorConstantsType::getPartTimeLongMax() + 1;
-    }
-
-    return ret;
-  }
 
   // ---------------------------------------------------
   /// Interrupt service routine: a falling or rising edge has triggered this interrupt.
@@ -86,27 +53,34 @@ namespace dcc
   // ---------------------------------------------------
   ISR(ISR_Dcc)
   {
-    static unsigned long ulTimeStampPrev = 0;
-    unsigned long ulTimeStamp = hal::micros();
-    unsigned long ulTimeDiff;
+    static bool bFirstCall = true;
+    static unsigned long prev = 0;
+    const unsigned long now = hal::micros();
+    unsigned long dt;
 
-    if (ulTimeStampPrev > 0u)
+    if (bFirstCall)
+    {
+      // first call
+      bFirstCall = false;
+    }
+    else
     {
       // second call or beyond
-      time_diff_deque& currentDeque = TimeDiffDeque[DoubleBufferIdx];
+
+      // This is the time delta in microseconds
+      // Note: ULONG_MAX is the maximum value for an unsigned long, which is 4294967295 on most platforms.
+      // This calculation handles the wrap-around case correctly.
+      const unsigned long dt = (now >= prev) ? 
+                               (now - prev) : 
+                               (now + (platform::numeric_limits<unsigned long>::max_() - prev) + 1UL);
+      // execute the state machine with the time delta
+      // push 0, 1, or invalid into the underlying bit stream
+      bitExtr.execute(dt); 
+
       // for debugging
-      TimeDiffDequeMaxSize = util::max_<uint16>(TimeDiffDequeMaxSize, currentDeque.size());
-      if (currentDeque.size() < currentDeque.max_size())
-      {
-        ulTimeDiff = ulTimeStamp - ulTimeStampPrev;
-        currentDeque.push_back(limitTimeDelta(ulTimeDiff));
-      }
-      else
-      {
-        // TBD
-      }
+      unBitStreamMaxSize = util::max_<uint16>(unBitStreamMaxSize, bitExtr.refBitStream().size());
     }
-    ulTimeStampPrev = ulTimeStamp;
+    prev = now;
 
     // for debugging
     ul_ISR_Dcc_Count++;
@@ -115,14 +89,14 @@ namespace dcc
   void Decoder::isrGetStats(IsrStats& stat) const noexcept
   {
     SuspendAllInterrupts();
-    stat.curSize = static_cast<uint16>(TimeDiffDeque[DoubleBufferIdx].size());
-    stat.maxSize = TimeDiffDequeMaxSize;
+    stat.curSize = static_cast<uint16>(bitExtr.refBitStream().size());
+    stat.maxSize = unBitStreamMaxSize;
     ResumeAllInterrupts();
   }
 
   bool Decoder::isrOverflow() const noexcept
   {
-    return TimeDiffDequeMaxSize >= TimeDiffDeque[0].max_size();
+    return unBitStreamMaxSize >= bitExtr.refBitStream().max_size();
   }
 
   // ---------------------------------------------------
@@ -138,17 +112,24 @@ namespace dcc
   // ---------------------------------------------------
   void Decoder::fetch()
   {
-    time_diff_deque& oldDeque = TimeDiffDeque[DoubleBufferIdx];
-
+    bit_stream_type& bs = bitExtr.refBitStream();
     SuspendAllInterrupts();
-    DoubleBufferIdx = (DoubleBufferIdx == 0) ? 1 : 0;
+    ucDoubleBufferIdx = (ucDoubleBufferIdx == 0) ? 1 : 0;
+    bitExtr.setBitStream(&bit_streams[ucDoubleBufferIdx]); // switch to the other buffer
     ResumeAllInterrupts();
 
-    while (!oldDeque.empty())
+    while (!bs.empty())
     {
-      ul_Fetch_Count++;
-      bitExtr.execute(delimitTimeDelta(oldDeque.front())); // informs the handler (if any)
-      oldDeque.pop_front();
+      if (bs.invFront())
+      {
+        pktExtr.invalid();
+      }
+      else
+      {
+        ul_Fetch_Count++;
+        bs.front() ? pktExtr.one() : pktExtr.zero(); // informs the handler (if any)
+      }
+      bs.pop();
     }
   }
 

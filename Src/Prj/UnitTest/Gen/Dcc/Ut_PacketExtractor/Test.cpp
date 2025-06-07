@@ -37,7 +37,7 @@ public:
   PacketType lastpacket;
   PacketExtractorHandlerClass() : nReceived(0)
   {}
-  virtual void packetReceived(const PacketType& pkt)
+  virtual void packetReceived(PacketType& pkt) override
   {
     nReceived++;
     lastpacket = pkt;
@@ -155,18 +155,19 @@ TEST(Ut_PacketExtractor, packetextractor_preamble_valid_10_bit)
   EXPECT_EQ(packet.refByte(1) == packethandler.lastpacket.refByte(1), true);
 }
 
-/// @brief This function is called before each test case
 void setUp(void)
 {
 }
 
-/// @brief This function is called before each test case
 void tearDown(void)
 {
 }
 
-/// @brief This function calls all test cases
-int main(void)
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
 {
   UNITY_BEGIN();
 
@@ -175,5 +176,8 @@ int main(void)
   RUN_TEST(packetextractor_preamble_invalid_9_bit_with_packets);
   RUN_TEST(packetextractor_preamble_valid_10_bit);
 
-  return UNITY_END();
+  (void) UNITY_END();
+
+  // Return false to stop program execution (relevant on Windows)
+  return false;
 }

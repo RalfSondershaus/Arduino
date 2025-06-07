@@ -12,6 +12,8 @@
 #include <Std_Types.h> // for uint32_t
 #include <Dcc/PacketExtractor.h>
 #include <Util/Array.h> // for debugging
+#include <Util/Fix_Queue.h>   // For the bit stream queue
+#include <Util/Ptr.h>   // for pointer to bit stream
 
 namespace dcc
 {
@@ -37,16 +39,144 @@ namespace dcc
     static constexpr uint32_t getPartTimeLongMax() { return unPartTimeLongMax; }
   };
 
-  // ---------------------------------------------------
-  // Generate a bit out of short ticks and long ticks (so called half bits).
-  // The bit is forwarded to an instance of class PacketGenerator.
-  // ---------------------------------------------------
-  template<class TBitExtractorConstants, class PacketGen>
+  /**
+   * @class BitStream
+   * @brief A fixed-size bit stream with parallel invalid bit tracking for digital protocols.
+   *
+   * The BitStream class manages a queue of bits and a parallel queue for marking invalid bits,
+   * supporting bit-level operations and error tracking. It is intended for use in digital
+   * communication protocols (such as DCC decoders) where both the value and validity of each bit
+   * must be tracked.
+   *
+   * Features:
+   * - Fixed maximum size, determined by the template parameter N (default: kBitStreamSize).
+   * - Efficient push and pop operations for both bit and invalid bit queues.
+   * - Query current size, maximum capacity, and front elements of both queues.
+   * - Methods to handle state changes when valid or invalid bit sequences are detected.
+   *
+   * @tparam N The maximum number of bits the stream can hold (default: kBitStreamSize).
+   *
+   * @note The underlying queue implementation is util::fix_queue_bool<N>.
+   * @note Invalid bits are tracked in parallel with the main bit queue.
+   *
+   * Example usage:
+   * @code
+   * BitStream<128> stream;
+   * stream.push(true, false); // Push a valid '1' bit
+   * stream.push(false, true); // Push an invalid '0' bit
+   * if (!stream.empty()) {
+   *   bool bit = stream.front();
+   *   bool invalid = stream.invFront();
+   *   stream.pop();
+   * }
+   * @endcode
+   */
+  template<uint16 N>
+  class BitStream
+  {
+  public:
+    /// @brief Alias for a fixed-size boolean queue used in the bit stream.
+    using queue_type = util::fix_queue_bool<N>;
+
+    /// @brief The maximum size of the bit stream.
+    /// This is a compile-time constant that defines the maximum number of bits that can be stored in the bit stream.
+    /// @note The maximum size is set to N, which is the template parameter for the BitStream class.
+    static constexpr uint16 kMaxSize = N;
+
+    BitStream() = default;
+    /// @brief Returns the number of bits currently stored in the bit stream.
+    /// @return The number of bits in the bit stream.
+    uint16 size() const noexcept
+    {
+      return static_cast<uint16>(bitQueue.size());
+    }
+    /// @brief Returns the maximum size of the bit stream.
+    /// @return The maximum number of bits that can be stored in the bit stream.
+    constexpr uint16 max_size() noexcept
+    {
+      return static_cast<uint16>(bitQueue.max_size());
+    }
+    /// @brief Adds a bit to the end of the queue
+    /// @param bit The bit to add (true for "1", false for "0").
+    void push(bool bit, bool invBit) noexcept
+    {
+      if (bitQueue.size() < bitQueue.max_size())
+      {
+        bitQueue.push(bit);
+        invQueue.push(invBit);
+      }
+    }
+    /// @brief Removes the first bit from the bit stream.
+    ///
+    /// This function removes the front element from both the bit queue and the invalid bits queue.
+    /// It should be called when the first bit in the stream has been processed and is no longer needed.
+    ///
+    /// @note If the queues are already empty, calling this function may result in undefined behavior.
+    void pop() noexcept
+    {
+      bitQueue.pop();
+      invQueue.pop();
+    }
+    /// @brief Checks if the bit stream is empty.
+    /// @return true if the bit stream is empty, false otherwise.
+    bool empty() const noexcept
+    {
+      return bitQueue.empty();
+    }
+    /// @brief Returns the first bit in the bit stream.
+    /// @return The first bit in the bit stream.
+    bool front() const noexcept
+    {
+      return bitQueue.front();
+    }
+    /// @brief Returns the first invalid bit in the invalid bits queue.
+    /// @return The first invalid bit in the invalid bits queue.
+    bool invFront() const noexcept
+    {
+      return invQueue.front();
+    }
+
+    /// Called when an invalid bit sequence is detected (state machine reset)
+    void invalid() { push(false, true); }
+    /// Called when a valid "1" bit is detected
+    void one() { push(true, false); }
+    /// Called when a valid "0" bit is detected
+    void zero() { push(false, false); }
+
+  private:
+    /// The queue that stores the bits
+    queue_type bitQueue;
+    /// Queue for invalid bits
+    queue_type invQueue; 
+  };
+
+  /**
+   * @brief Generates bits from short and long ticks ("half bits") according to DCC timing.
+   *
+   * This class implements a state machine that interprets timing intervals (ticks) as DCC bits ("1" or "0")
+   * based on configurable timing constants. The resulting bits are forwarded as events to an instance of the
+   * BitStream class (template parameter).
+   *
+   * @details
+   * The BitExtractor receives timing intervals (in microseconds) and classifies them as "short", "long", or "invalid"
+   * according to the DCC specification. It then transitions its internal state machine and triggers the appropriate
+   * event on the BitStream instance.
+   *
+   * The following interface (member functions) must be provided by the BitStream template parameter:
+   * - void invalid();    ///< Called when an invalid bit sequence is detected (state machine reset)
+   * - void one();        ///< Called when a valid "1" bit is detected
+   * - void zero();       ///< Called when a valid "0" bit is detected
+   */
+  template<class TBitExtractorConstants, class TBitStream>
   class BitExtractor
   {
   protected:
     /// This class
-    typedef BitExtractor<TBitExtractorConstants, PacketGen> This;
+    typedef BitExtractor<TBitExtractorConstants, TBitStream> This;
+    using bitstream_type = TBitStream;
+    using pointer_type = typename util::ptr<bitstream_type>;
+    using reference_type = bitstream_type&;
+    using const_reference_type = const bitstream_type&;
 
     /// [us] Minimum time between two edges for a "short" part (first or second part of a "1"). Spec: 52 us, with resolution of 4 us: 48 us
     static constexpr uint32_t getPartTimeShortMin() { return TBitExtractorConstants::getPartTimeShortMin(); }
@@ -89,8 +219,8 @@ namespace dcc
     /// Previous state
     eState prevState;
 
-    /// The packet generator
-    PacketGen& pktGen;
+    /// The bit stream that receives events
+    pointer_type pBitStream;
 
     /// For debugging: number of received interrupts per state (half bits)
     TickArray tickcounts;
@@ -143,13 +273,18 @@ namespace dcc
 
   public:
     /// constructor
-    BitExtractor(PacketGen& pktgen) : state(STATE_INVALID), pktGen(pktgen)
+    BitExtractor(pointer_type pbs) : state(STATE_INVALID), pBitStream(pbs)
     {
       tickcounts.fill(0);
     }
 
     /// destructor
     ~BitExtractor() = default;
+
+    void setBitStream(pointer_type pbs) noexcept { pBitStream = pbs;}
+    reference_type refBitStream() noexcept  { return *pBitStream; }
+    const_reference_type refBitStream() const noexcept  { return *pBitStream; }
+
     /// Execute state machine with a time difference (to last tick / interrupt, that is, to last half bit)
     void execute(uint32_t ulTimeDiff);
     /// For debugging: return number of calls for a state (< STATE_MAX_COUNT)
@@ -187,15 +322,15 @@ namespace dcc
 
     switch (state)
     {
-    case STATE_INVALID:      { pktGen.invalid(); } break;
-    case STATE_SHORT_INIT_1: {                   } break;
-    case STATE_SHORT_INIT_2: { pktGen.one();     } break;
-    case STATE_LONG_INIT_1:  {                   } break;
-    case STATE_LONG_INIT_2:  { pktGen.zero();    } break;
-    case STATE_SHORT_1:      {                   } break;
-    case STATE_SHORT_2:      { pktGen.one();     } break;
-    case STATE_LONG_1:       {                   } break;
-    case STATE_LONG_2:       { pktGen.zero();    } break;
+    case STATE_INVALID:      { pBitStream->invalid(); } break;
+    case STATE_SHORT_INIT_1: {                        } break;
+    case STATE_SHORT_INIT_2: { pBitStream->one();     } break;
+    case STATE_LONG_INIT_1:  {                        } break;
+    case STATE_LONG_INIT_2:  { pBitStream->zero();    } break;
+    case STATE_SHORT_1:      {                        } break;
+    case STATE_SHORT_2:      { pBitStream->one();     } break;
+    case STATE_LONG_1:       {                        } break;
+    case STATE_LONG_2:       { pBitStream->zero();    } break;
     default:                 { } break;
     }
   }
