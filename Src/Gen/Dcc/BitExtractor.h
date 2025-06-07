@@ -1,10 +1,23 @@
 /**
-  * @file BitExtractor.h
-  *
-  * @author Ralf Sondershaus
-  *
-  * @brief Defines class BitExtractor in namespace dcc
-  */
+ * @file BitExtractor.h
+ *
+ * @author Ralf Sondershaus
+ *
+ * @brief Provides classes for extracting DCC bits from timing intervals in namespace dcc.
+ *
+ * This file defines:
+ * - BitExtractorConstants: Compile-time configuration for DCC timing thresholds.
+ * - BitStream: A fixed-size bit stream with parallel invalid bit tracking for digital protocols.
+ * - BitExtractor: A state machine that interprets timing intervals as DCC bits and forwards events to a user-supplied bit stream or packet generator.
+ *
+ * @details
+ * The BitExtractor class implements a state machine for decoding DCC signals from timing intervals.
+ * It uses configurable timing constants (via BitExtractorConstants) and forwards detected bit events
+ * to a user-supplied class (such as BitStream or a packet generator) that must provide the following interface:
+ *   - void invalid(); ///< Called when an invalid bit sequence is detected (state machine reset)
+ *   - void one();     ///< Called when a valid "1" bit is detected
+ *   - void zero();    ///< Called when a valid "0" bit is detected
+ */
 
 #ifndef DCC_BITEXTRACTOR_H
 #define DCC_BITEXTRACTOR_H
@@ -17,9 +30,18 @@
 
 namespace dcc
 {
-  // ---------------------------------------------------
-  /// a helper class to define all constant values in a single class
-  // ---------------------------------------------------
+  /**
+   * @class BitExtractorConstants
+   * @brief Helper class to define all DCC timing constants in a single place.
+   *
+   * This class provides compile-time constants for the minimum and maximum durations (in microseconds)
+   * of "short" and "long" parts of DCC bits, as required by the DCC protocol specification.
+   *
+   * @tparam unPartTimeShortMin Minimum time for a "short" part [us].
+   * @tparam unPartTimeShortMax Maximum time for a "short" part [us].
+   * @tparam unPartTimeLongMin  Minimum time for a "long" part [us].
+   * @tparam unPartTimeLongMax  Maximum time for a "long" part [us].
+   */
   template<
       int unPartTimeShortMin = 48   ///< [us] Minimum time between two edges for a "short" part (first or second part of a "1"). Spec: 52 us, with resolution of 4 us: 48 us
     , int unPartTimeShortMax = 68   ///< [us] Maximum time between two edges for a "short" part (first or second part of a "1"). Spec: 64 us, with resolution of 4 us: 68 us
@@ -41,14 +63,14 @@ namespace dcc
 
   /**
    * @class BitStream
-   * @brief A fixed-size bit stream with parallel invalid bit tracking for digital protocols.
+   * @brief Fixed-size bit stream with parallel invalid bit tracking for digital protocols.
    *
    * The BitStream class manages a queue of bits and a parallel queue for marking invalid bits,
    * supporting bit-level operations and error tracking. It is intended for use in digital
    * communication protocols (such as DCC decoders) where both the value and validity of each bit
    * must be tracked.
    *
-   * Features:
+   * **Features:**
    * - Fixed maximum size, determined by the template parameter N (default: kBitStreamSize).
    * - Efficient push and pop operations for both bit and invalid bit queues.
    * - Query current size, maximum capacity, and front elements of both queues.
@@ -59,7 +81,15 @@ namespace dcc
    * @note The underlying queue implementation is util::fix_queue_bool<N>.
    * @note Invalid bits are tracked in parallel with the main bit queue.
    *
-   * Example usage:
+   * **Interface requirements for the underlying queue (util::fix_queue_bool<N>):**
+   * - `void push(const value_type&)`
+   * - `void pop()`
+   * - `bool empty() const`
+   * - `size_t size() const`
+   * - `size_t max_size() const`
+   * - `value_type front() const`
+   *
+   * **Example usage:**
    * @code
    * BitStream<128> stream;
    * stream.push(true, false); // Push a valid '1' bit
@@ -151,18 +181,23 @@ namespace dcc
   };
 
   /**
-   * @brief Generates bits from short and long ticks ("half bits") according to DCC timing.
+   * @class BitExtractor
+   * @brief State machine for generating DCC bits from timing intervals ("half bits").
    *
    * This class implements a state machine that interprets timing intervals (ticks) as DCC bits ("1" or "0")
    * based on configurable timing constants. The resulting bits are forwarded as events to an instance of the
-   * BitStream class (template parameter).
+   * BitStream or a user-supplied packet generator class (template parameter).
+   *
+   * @tparam TBitExtractorConstants Class providing static timing constants (see BitExtractorConstants).
+   * @tparam TBitStream             Class that receives bit events (must provide: invalid(), one(), zero()).
    *
    * @details
    * The BitExtractor receives timing intervals (in microseconds) and classifies them as "short", "long", or "invalid"
    * according to the DCC specification. It then transitions its internal state machine and triggers the appropriate
-   * event on the BitStream instance.
+   * event on the TBitStream instance.
    *
-   * The following interface (member functions) must be provided by the BitStream template parameter:
+   * @section BitExtractor_Interface Interface requirements for TBitStream
+   * The TBitStream (or PacketGen) template parameter must provide the following public member functions:
    * - void invalid();    ///< Called when an invalid bit sequence is detected (state machine reset)
    * - void one();        ///< Called when a valid "1" bit is detected
    * - void zero();       ///< Called when a valid "0" bit is detected
@@ -272,28 +307,62 @@ namespace dcc
     }
 
   public:
-    /// constructor
+    /**
+     * @brief Constructs a BitExtractor with a pointer to the bit stream or packet generator.
+     * @param pbs Pointer to the bit stream or packet generator that receives bit events.
+     */
     BitExtractor(pointer_type pbs) : state(STATE_INVALID), pBitStream(pbs)
     {
       tickcounts.fill(0);
     }
 
-    /// destructor
+    /// @brief Destructor (defaulted).
     ~BitExtractor() = default;
 
+    /**
+     * @brief Set the pointer to the bit stream or packet generator.
+     * @param pbs Pointer to the new bit stream or packet generator.
+     */
     void setBitStream(pointer_type pbs) noexcept { pBitStream = pbs;}
+
+    /**
+     * @brief Returns a reference to the current bit stream or packet generator.
+     * @return Reference to the bit stream or packet generator.
+     */
     reference_type refBitStream() noexcept  { return *pBitStream; }
+
+    /**
+     * @brief Returns a const reference to the current bit stream or packet generator.
+     * @return Const reference to the bit stream or packet generator.
+     */
     const_reference_type refBitStream() const noexcept  { return *pBitStream; }
 
-    /// Execute state machine with a time difference (to last tick / interrupt, that is, to last half bit)
+    /**
+     * @brief Execute the state machine with a time difference (to last tick/interrupt, i.e., to last half bit).
+     * @param ulTimeDiff Time difference in microseconds since the last tick/interrupt.
+     *
+     * This function processes the timing interval, updates the state machine, and forwards the detected bit event
+     * to the bit stream or packet generator.
+     */
     void execute(uint32_t ulTimeDiff);
-    /// For debugging: return number of calls for a state (< STATE_MAX_COUNT)
+
+    /**
+     * @brief For debugging: return the number of calls for a given state (< STATE_MAX_COUNT).
+     * @param unState State index (must be less than STATE_MAX_COUNT).
+     * @return Number of times the state has been entered, or -1 if out of range.
+     */
     uint32_t getNrCalls(unsigned int unState) const;
   };
 
-  // ---------------------------------------------------
-  /// Execute state machine with an event
-  // ---------------------------------------------------
+  /**
+   * @brief Executes the BitExtractor state machine with a timing event.
+   * 
+   * @param ulTimeDiff Time difference in microseconds since the last tick/interrupt (i.e., since the last half bit).
+   *
+   * This function processes the given timing interval, updates the internal state machine according to the DCC protocol,
+   * and triggers the appropriate event (invalid, one, or zero) on the connected bit stream or packet generator.
+   * The state transition logic ensures correct decoding of DCC bits from the incoming timing intervals.
+   */
   template<class TBitExtractorConstants, class PacketGen>
   void BitExtractor<TBitExtractorConstants, PacketGen>::execute(uint32_t ulTimeDiff)
   {

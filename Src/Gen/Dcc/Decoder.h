@@ -53,46 +53,46 @@
 
 namespace dcc
 {
-  // ---------------------------------------------------------------------
-  /// The Decoder class is the main class. It converts received DCC signals
-  /// into packets and pushes the packets into an internal FIFO buffer.
-  ///
-  /// Clients can access the FIFO buffer with an interface that is similar to
-  /// a std::deque interface with functions such as
-  /// - empty()
-  /// - front()
-  /// - pop()
-  /// - size()
-  ///
-  /// Typical application:
-  ///
-  /// <CODE>
-  /// Decoder myDec;
-  /// Decoder::PacketType packet;
-  /// int DccPinNr = 2;
-  ///
-  /// myDec.init(DccPinNr);
-  ///
-  /// while (1)
-  /// {
-  ///   myDec.fetch();
-  ///
-  ///   while (!myDec.empty())
-  ///   {
-  ///     packet = myDec.front();
-  ///     myDec.pop();
-  ///     // do something useful witch packet
-  ///   }
-  /// }
-  /// </CODE>
-  // ---------------------------------------------------------------------
+  /**
+   * @class Decoder
+   * @brief Main class for converting DCC signals into packets and providing FIFO access.
+   *
+   * The Decoder class receives DCC signals, decodes them into packets, and stores the packets in an internal FIFO buffer.
+   * Clients can access the FIFO buffer using an interface similar to @c std::deque, with functions such as:
+   * - empty()
+   * - front()
+   * - pop()
+   * - size()
+   *
+   * Typical usage:
+   * @code
+   * dcc::Decoder myDec;
+   * dcc::Decoder::PacketType packet;
+   * int DccPinNr = 2;
+   *
+   * myDec.init(DccPinNr);
+   *
+   * while (1)
+   * {
+   *   myDec.fetch();
+   *
+   *   while (!myDec.empty())
+   *   {
+   *     packet = myDec.front();
+   *     myDec.pop();
+   *     // Process packet
+   *   }
+   * }
+   * @endcode
+   *
+   * @note The FIFO buffer has a fixed maximum size. If more packets are received than can be stored, an overflow flag is set.
+   * @note Optional packet filtering is supported.
+   */
   class Decoder
   {
   public:
     using PacketExtractorType = PacketExtractor<>;
-
     using PacketType = PacketExtractorType::PacketType;
-
     /// Such a handler is called when a new packet is received
     using HandlerIfc = PacketExtractorType::HandlerIfc;
 
@@ -107,10 +107,40 @@ namespace dcc
     } IsrStats;
 
   protected:
-    // ---------------------------------------------------
-    /// Interface for a handler that is called if a packet is received.
-    /// Stores received packets into a FIFO buffer.
-    // ---------------------------------------------------
+    /**
+     * @class FifoHandlerIfc
+     * @brief Handler interface for received DCC packets with FIFO buffering and optional filtering.
+     *
+     * This class implements the HandlerIfc interface and is responsible for storing received DCC packets
+     * in a fixed-size FIFO buffer. Optionally, a filter can be assigned to only store packets that match
+     * specific criteria. The handler also provides overflow detection and configuration options for
+     * packet decoding (such as extended addressing and output address method).
+     *
+     * @tparam MaxNrPackets Maximum number of packets that can be stored in the FIFO buffer.
+     *
+     * **Features:**
+     * - Stores received packets in a FIFO buffer of fixed size.
+     * - Optional packet filtering via setFilter().
+     * - Overflow detection if more packets are received than can be stored.
+     * - Methods to enable/disable extended addressing and output address method.
+     * - Provides access to the front packet, buffer size, and empty state.
+     *
+     * **Interface:**
+     * - void packetReceived(PacketType &pkt) override
+     * - const PacketType &front() const
+     * - void pop()
+     * - bool empty() const
+     * - size_type size() const
+     * - bool isOverflow() const noexcept
+     * - void clearOverflow() noexcept
+     * - void setFilter(const FilterType &filter)
+     * - void enableExtendedAddressing() noexcept
+     * - void disableExtendedAddressing() noexcept
+     * - void enableOutputAddressMethod() noexcept
+     * - void disableOutputAddressMethod() noexcept
+     *
+     * @note No dynamic memory allocation is used. No virtual destructor is defined for compatibility with AVR GCC.
+     */
     template <uint8 MaxNrPackets>
     class FifoHandlerIfc : public HandlerIfc
     {
