@@ -653,13 +653,190 @@ TEST(Ut_Fix_Deque, const_iterator_1)
   EXPECT_EQ(n, 1);
 }
 
-TEST(Ut_Fix_Deque_Bool, bool_construct_1)
+TEST(Ut_Fix_Deque_Bool, test_fix_deque_bool_contstruct_1)
 {
   constexpr size_t kMaxSize = 400;
-  using deque_t = util::fix_deque_bool<kMaxSize>;
+  using deque_t = util::fix_deque<bool, kMaxSize>;
   deque_t myDeque;
   EXPECT_EQ(myDeque.empty(), true);
   EXPECT_EQ(myDeque.size(), static_cast<size_t>(0));
+}
+
+TEST(Ut_Fix_Deque_Bool, test_fix_deque_bool_basic)
+{
+  using util::fix_deque_bool;
+  fix_deque_bool<5> dq;
+
+  // Test empty
+  EXPECT_EQ(dq.empty(), true);
+  EXPECT_EQ(dq.size() == 0, true);
+
+  // Test push_back
+  dq.push_back(true);
+  EXPECT_EQ(!dq.empty(), true);
+  EXPECT_EQ(dq.size() == 1, true);
+  EXPECT_EQ(dq.front() == true, true);
+  EXPECT_EQ(dq.back() == true, true);
+
+  dq.push_back(false);
+  EXPECT_EQ(dq.size() == 2, true);
+  EXPECT_EQ(dq.front() == true, true);
+  EXPECT_EQ(dq.back() == false, true);
+
+  dq.push_back(true);
+  dq.push_back(false);
+  dq.push_back(true);
+  EXPECT_EQ(dq.size() == 5, true);
+  EXPECT_EQ(dq.front() == true, true);
+  EXPECT_EQ(dq.back() == true, true);
+
+  // Test max_size
+  EXPECT_EQ(dq.max_size() == 5, true);
+
+  // Test at and operator[]
+  EXPECT_EQ(dq.at(0) == true, true);
+  EXPECT_EQ(dq.at(1) == false, true);
+  EXPECT_EQ(dq[2] == true, true);
+  EXPECT_EQ(dq[3] == false, true);
+  EXPECT_EQ(dq[4] == true, true);
+
+  // Test push_back when full (should not add)
+  dq.push_back(false);
+  EXPECT_EQ(dq.size() == 5, true);
+
+  // Test pop_front
+  dq.pop_front();
+  EXPECT_EQ(dq.size() == 4, true);
+  EXPECT_EQ(dq.front() == false, true);
+
+  dq.pop_front();
+  dq.pop_front();
+  dq.pop_front();
+  dq.pop_front();
+  EXPECT_EQ(dq.empty(), true);
+
+  // Test clear
+  dq.push_back(true);
+  dq.push_back(false);
+  dq.clear();
+  EXPECT_EQ(dq.empty(), true);
+  EXPECT_EQ(dq.size() == 0, true);
+}
+
+TEST(Ut_Fix_Deque_Bool, test_fix_deque_bool_wraparound)
+{
+  using util::fix_deque_bool;
+  fix_deque_bool<3> dq;
+
+  dq.push_back(true);
+  dq.push_back(false);
+  dq.push_back(true);
+
+  // Remove two elements, then add two more to test wraparound
+  dq.pop_front();
+  dq.pop_front();
+  dq.push_back(false);
+  dq.push_back(true);
+
+  EXPECT_TRUE(dq.size() == 3);
+  EXPECT_TRUE(dq.front() == true);
+  EXPECT_TRUE(dq.back() == true);
+  EXPECT_TRUE(dq.at(0) == true);
+  EXPECT_TRUE(dq.at(1) == false);
+  EXPECT_TRUE(dq.at(2) == true);
+}
+
+TEST(Ut_Fix_Deque_Bool, test_fix_deque_bool_full_empty_cycle)
+{
+  using util::fix_deque_bool;
+  fix_deque_bool<2> dq;
+
+  // Fill and empty multiple times
+  for (int i = 0; i < 10; ++i) {
+      dq.clear();
+      EXPECT_TRUE(dq.empty());
+      dq.push_back(true);
+      dq.push_back(false);
+      EXPECT_TRUE(dq.size() == 2);
+      EXPECT_TRUE(dq.front() == true);
+      EXPECT_TRUE(dq.back() == false);
+      dq.pop_front();
+      dq.pop_front();
+      EXPECT_TRUE(dq.empty());
+  }
+}
+
+TEST(Ut_Fix_Deque_Bool, test_fix_deque_bool_edge_cases)
+{
+  using util::fix_deque_bool;
+  fix_deque_bool<1> dq;
+
+  EXPECT_TRUE(dq.empty());
+  dq.push_back(true);
+  EXPECT_TRUE(dq.size() == 1);
+  EXPECT_TRUE(dq.front() == true);
+  dq.pop_front();
+  EXPECT_TRUE(dq.empty());
+
+  // Try popping from empty deque (should not crash)
+  dq.pop_front();
+  EXPECT_TRUE(dq.empty());
+
+  // Try pushing more than max_size
+  dq.push_back(false);
+  dq.push_back(true);
+  EXPECT_TRUE(dq.size() == 1);
+  EXPECT_TRUE(dq.front() == false);
+}
+
+/// @brief Test fix_deque_bool with 400 elements.
+/// 
+/// This test fills a fix_deque_bool<400> with alternating true/false values,
+/// checks correct storage and retrieval, tests wraparound by removing and adding elements,
+/// and verifies that clear() resets the container.
+TEST(Ut_Fix_Deque_Bool, test_fix_deque_bool_400)
+{
+    constexpr size_t N = 400;
+    using util::fix_deque_bool;
+    fix_deque_bool<N> dq;
+
+    // Initially empty
+    EXPECT_TRUE(dq.empty());
+    EXPECT_TRUE(dq.size() == 0);
+
+    // Fill with alternating true/false
+    for (size_t i = 0; i < N; ++i) {
+        dq.push_back(i % 2 == 0);
+        EXPECT_TRUE(dq.size() == i + 1);
+        EXPECT_TRUE(dq.back() == (i % 2 == 0));
+    }
+    EXPECT_TRUE(dq.size() == N);
+    EXPECT_TRUE(!dq.empty());
+
+    // Check all values
+    for (size_t i = 0; i < N; ++i) {
+        EXPECT_TRUE(dq.at(i) == (i % 2 == 0));
+        EXPECT_TRUE(dq[i] == (i % 2 == 0));
+    }
+
+    // Remove half, check front
+    for (size_t i = 0; i < N / 2; ++i) {
+        EXPECT_TRUE(dq.front() == (i % 2 == 0));
+        dq.pop_front();
+        EXPECT_TRUE(dq.size() == N - i - 1);
+    }
+
+    // Add more to wrap around
+    for (size_t i = 0; i < N / 2; ++i) {
+        dq.push_back(true);
+        EXPECT_TRUE(dq.back() == true);
+    }
+    EXPECT_TRUE(dq.size() == N);
+
+    // Clear and check
+    dq.clear();
+    EXPECT_TRUE(dq.empty());
+    EXPECT_TRUE(dq.size() == 0);
 }
 
 void setUp(void)
@@ -689,7 +866,12 @@ bool test_loop(void)
   RUN_TEST(push_front_push_back_2);
   RUN_TEST(const_iterator_1);
 
-  RUN_TEST(bool_construct_1);
+  RUN_TEST(test_fix_deque_bool_contstruct_1);
+  RUN_TEST(test_fix_deque_bool_basic);
+  RUN_TEST(test_fix_deque_bool_wraparound);
+  RUN_TEST(test_fix_deque_bool_full_empty_cycle);
+  RUN_TEST(test_fix_deque_bool_edge_cases);
+  RUN_TEST(test_fix_deque_bool_400);
 
   (void) UNITY_END();
 

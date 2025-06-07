@@ -75,6 +75,15 @@ template<> void EXPECT_EQ<uint64,uint64>(uint64 actual, uint64 expected)  { TEST
 template<> void EXPECT_EQ<uint64,uint32>(uint64 actual, uint32 expected)  { TEST_ASSERT_EQUAL_UINT64(static_cast<uint64>(expected), actual); }
 template<> void EXPECT_EQ<util::streampos,util::streampos>(util::streampos actual, util::streampos expected) { EXPECT_EQ<util::streamoff,util::streamoff>(expected, actual); }
 
+inline void EXPECT_TRUE(bool condition)
+{
+  TEST_ASSERT_TRUE(condition);
+}
+inline void EXPECT_FALSE(bool condition)
+{
+  TEST_ASSERT_FALSE(condition);
+}
+
 /// Declares a test function
 #define TEST(group, test_fct)       void test_fct(void)
 
