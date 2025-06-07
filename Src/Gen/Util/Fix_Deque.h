@@ -28,6 +28,7 @@
 #define UTIL_FIX_DEQUE_H
 
 #include <Std_Types.h>
+#include <Util/bitset.h> // for fix_deque_bool
 
 // General rules: 
 //    (1) first <= last (first shall alway be less than or equal to last)
@@ -394,6 +395,132 @@ namespace util
     size_type map_idx_N_1(size_type pos) const noexcept { return pos % MaxSize; }
   };
 
+  // ---------------------------------------------------
+  /// This is a sort-of specialization of #util::fix_deque for bools / bits.
+  ///
+  /// An indexed sequence container that allows fast insertion and
+  /// deletion at its beginning and its end.
+  /// 
+  /// Insertion or deletion never invalidates pointers or references
+  /// to the rest of the elements.
+  /// 
+  /// In contrast to the std::deque specification, a util::fix_deque has a
+  /// fixed storage size. The storage is not automatically expanded or
+  /// contracted.
+  /// 
+  /// @typeparam N: the number of bits to be stored
+  // ---------------------------------------------------
+  template<size_t N>
+  class fix_deque_bool
+  {
+  public:
+    /// Type of the elements to be stored
+    typedef bool value_type;
+    /// This class
+    typedef fix_deque_bool<N> This;
+    /// size type
+    typedef size_t size_type;
+
+    /// @brief The bitset types
+    using bitset_base_type = uint32;
+    using bitset_type = bitset<uint32, N>;
+
+  public:
+    /// @brief Maximal number of elements
+    static constexpr size_type kMaxSize = N;
+    static constexpr size_type MaxIdx = kMaxSize;
+
+    /// Constructor
+    fix_deque_bool() : front_idx(0), back_idx(-1), nr_elements(0) {}
+    /// Destructor
+    ~fix_deque_bool() = default;
+
+    /// @name Element access
+    /// @{
+    /// Returns a reference to the element at specified location without range check for pos.
+    /// Note: std::deque performs a range check here. If the range check fails, an exception
+    /// is thrown. We avoid exceptions and perform a modulo operation instead. So the return
+    /// value is defined by the modulo operation if pos is out of range.
+    /// Check range of pos before calling this function if demanded.
+    value_type at(size_type pos) const { return bits[(front_idx + pos) % kMaxSize]; }
+
+    /// Returns a reference to the element at specified location without range check for pos.
+    value_type operator[](size_type pos) const { return at(pos); }
+
+    /// Access the first element.
+    /// Returns a reference to the first element in the container.
+    /// Calling front on an empty container causes undefined behavior.
+    value_type front() const { return bits[front_idx]; }
+
+    /// Access the last element.
+    /// Returns a reference to the last element in the container.
+    /// Calling back on an empty container causes undefined behavior.
+    value_type back() const  { return bits[back_idx]; }
+    /// @}
+
+    /// @name Capacity
+    /// @{
+    /// checks whether the container is empty
+    bool empty() const noexcept { return nr_elements == 0; }
+    ///  returns the number of elements
+    size_type size() const noexcept { return nr_elements; }
+    /// returns the maximum possible number of elements
+    /// Note: std::deque::max_size is not constexpr but we can make max_size constexpr
+    /// because it just returns a template parameter (no dynamic allocation)
+    constexpr size_type max_size() noexcept { return kMaxSize; }
+    /// @}
+
+    /// @name Modifiers
+    /// @{
+    /// clears the contents
+    void clear() { front_idx = 0; back_idx = -1; nr_elements = 0; }
+
+    /// Adds an element to the end if space is available.
+    /// Does nothing if space is not available anymore
+    /// (can be checked with size() < max_size() before).
+    void push_back(const bool value)
+    {
+      if (size() < max_size())
+      {
+        back_idx = (back_idx + 1) % kMaxSize;
+        nr_elements++;
+        bits.set(back_idx, value);
+      }
+    }
+
+    // not implemented yet: void push_back(T&& value);
+
+    // removes the last element
+    // not implemented yet
+    // void pop_back()
+
+    // inserts an element to the beginning
+    // not implemented yet
+    // void push_front(const T& value)
+
+    // not implemented yet: void push_front(T&& value);
+
+    /// removes the first element
+    void pop_front()
+    {
+      if (!empty())
+      {
+        front_idx = (front_idx + 1) % kMaxSize;
+        nr_elements--;
+      }
+    }
+    /// @}
+
+  protected:
+    /// The bits / bools
+    bitset_type bits;
+    /// Index of the first element (returned and removed by pop())
+    size_type front_idx;
+    /// Index of the last element (added by push()).
+    size_type back_idx;
+    /// Number of elements in the queue
+    size_type nr_elements;
+  };
 } // namespace Util
 
 #endif // UTIL_FIX_DEQUE_H

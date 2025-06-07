@@ -653,6 +653,15 @@ TEST(Ut_Fix_Deque, const_iterator_1)
   EXPECT_EQ(n, 1);
 }
 
+TEST(Ut_Fix_Deque_Bool, bool_construct_1)
+{
+  constexpr size_t kMaxSize = 400;
+  using deque_t = util::fix_deque_bool<kMaxSize>;
+  deque_t myDeque;
+  EXPECT_EQ(myDeque.empty(), true);
+  EXPECT_EQ(myDeque.size(), static_cast<size_t>(0));
+}
+
 void setUp(void)
 {
 }
@@ -679,6 +688,8 @@ bool test_loop(void)
   RUN_TEST(pop_back_2);
   RUN_TEST(push_front_push_back_2);
   RUN_TEST(const_iterator_1);
+
+  RUN_TEST(bool_construct_1);
 
   (void) UNITY_END();
 
