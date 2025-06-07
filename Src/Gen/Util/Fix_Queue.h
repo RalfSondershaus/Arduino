@@ -215,14 +215,11 @@ namespace util
     /// @param val The value to add.
     void push(const value_type& val) { container.push_back(val); }
 
-    //void push(value_type&& val) {}
-    ///  Pushes a new element to the end of the queue. The element is constructed in-place
-    //template<class... Args> void emplace(Args&&... args);
-
     /// @brief Removes the first element from the queue.
     void pop() { container.pop_front(); }
 
-    //void swap(queue& other) noexcept {}
+    /// @brief Exchanges the contents of this queue with another queue. Not implemented.
+    void swap(this_type& other) noexcept = delete;
     /// @}
   };
 } // namespace util

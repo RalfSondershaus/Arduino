@@ -70,8 +70,14 @@
 namespace util
 {
   // ---------------------------------------------------
-  /// base struct for iterators
-  // ---------------------------------------------------
+  /**
+   * @brief Base struct for fix_deque iterators.
+   *
+   * Provides common functionality for iterator types used by util::fix_deque,
+   * including position tracking, increment/decrement operations, and comparison.
+   *
+   * @tparam FixDeque The fix_deque type for which this iterator is defined.
+   */
   template<class FixDeque>
   struct fix_deque_iterator_base
   {
@@ -85,38 +91,46 @@ namespace util
     typedef fix_deque_iterator_base<FixDeque> This;
 
   protected:
-    /// Returns pos + n, considers overflows
+    /// @brief Returns pos + n, wrapped around MaxIdx.
     static size_type add_wrap(size_type pos, size_type n) { return (pos + n) % MaxIdx; }
-    /// Returns pos - n, considers underflows
+    /// @brief Returns pos - n, wrapped around MaxIdx.
     static size_type sub_wrap(size_type pos, size_type n) { return (pos - n) % MaxIdx; }
-    /// Current position (index) in the container
+    /// @brief Current position (index) in the container.
     size_type myPos;
 
   public:
-    /// Constructor
+    /// @brief Constructs an iterator at the given position.
     fix_deque_iterator_base(size_type pos = 0U) : myPos(pos) {}
 
     /// @name Increment / decrement
     /// @{
-    /// prefix increment / decrement
+    /// @brief Prefix increment.
     This& operator++() noexcept { myPos = add_wrap(myPos, 1U); return *this; }
+    /// @brief Prefix decrement.
     This& operator--() noexcept { myPos = sub_wrap(myPos, 1U); return *this; }
-    /// postfix increment / decrement
+    /// @brief Postfix increment.
     This operator++(int) noexcept { This old = *this; operator++(); return old; }
+    /// @brief Postfix decrement.
     This operator--(int) noexcept { This old = *this; operator--(); return old; }
     /// @}
 
     /// @name Compare
     /// @{
-    /// compare
+    /// @brief Checks if two iterators are not equal.
     friend bool operator!=(const This& it1, const This& it2) noexcept { return !(it1 == it2); }
+    /// @brief Checks if two iterators are equal.
     friend bool operator==(const This& it1, const This& it2) noexcept { return it1.myPos == it2.myPos; }
     /// @}
   };
 
   // ---------------------------------------------------
-  /// iterators (non const)
-  // ---------------------------------------------------
+  /**
+   * @brief Non-const iterator for util::fix_deque.
+   *
+   * Allows modification of elements in the fix_deque.
+   *
+   * @tparam FixDeque The fix_deque type for which this iterator is defined.
+   */
   template<class FixDeque>
   struct fix_deque_iterator : public fix_deque_iterator_base<FixDeque>
   {
@@ -128,28 +142,35 @@ namespace util
     using size_type = typename Base::size_type;
 
   protected:
+    /// @brief Reference to the underlying fix_deque.
     FixDeque& myDeque;
 
   public:
-    /// Constructor
+    /// @brief Constructs an iterator for the given deque at the specified position.
     fix_deque_iterator(FixDeque& deque, size_type pos = 0U) : Base(pos), myDeque(deque) {}
 
     /// @name Element access
     /// @{
+    /// @brief Dereferences the iterator to access the element.
     reference operator*() noexcept { return myDeque.at(Base::myPos); }
     /// @}
 
     /// @name Increment / decrement
     /// @{
-    /// postfix increment / decrement
+    /// @brief Postfix increment.
     This operator++(int) noexcept { This old = *this; Base::operator++(); return old; }
+    /// @brief Postfix decrement.
     This operator--(int) noexcept { This old = *this; Base::operator--(); return old; }
     /// @}
   };
 
-  // ---------------------------------------------------
-  /// const iterators
-  // ---------------------------------------------------
+  /**
+   * @brief Const iterator for util::fix_deque.
+   *
+   * Provides read-only access to elements in the fix_deque.
+   *
+   * @tparam FixDeque The fix_deque type for which this iterator is defined.
+   */
   template<class FixDeque>
   struct fix_deque_iterator_const : public fix_deque_iterator_base<FixDeque>
   {
@@ -161,58 +182,59 @@ namespace util
     using size_type = typename Base::size_type;
 
   protected:
+    /// @brief Reference to the underlying fix_deque (const).
     FixDeque& myDeque; // "FixDeque" is of type "const fix_deque<T,N>"
 
   public:
-    /// Constructor
+    /// @brief Constructs a const iterator for the given deque at the specified position.
     fix_deque_iterator_const(FixDeque& deque, size_type pos = 0U) : Base(pos), myDeque(deque) {}
 
     /// @name Element access
     /// @{
+    /// @brief Dereferences the iterator to access the element (read-only).
     const_reference operator*() const noexcept { return myDeque.at(Base::myPos); }
     /// @}
 
     /// @name Increment / decrement
     /// @{
-    /// postfix increment / decrement
+    /// @brief Postfix increment.
     This operator++(int) noexcept { This old = *this; Base::operator++(); return old; }
+    /// @brief Postfix decrement.
     This operator--(int) noexcept { This old = *this; Base::operator--(); return old; }
     /// @}
   };
 
   // ---------------------------------------------------
-  /// An indexed sequence container that allows fast insertion and
-  /// deletion at its beginning and its end.
-  /// 
-  /// Insertion or deletion never invalidates pointers or references
-  /// to the rest of the elements.
-  /// 
-  /// In contrast to the std::deque specification, a util::fix_deque has a
-  /// fixed storage size. The storage is not automatically expanded or
-  /// contracted.
-  /// 
-  /// @typeparam T: type of the elements to be stored
-  /// @typeparam N: the size of the storage (number of elements)
-  // ---------------------------------------------------
+  /**
+   * @brief Fixed-size double-ended queue (deque) container.
+   *
+   * An indexed sequence container that allows fast insertion and deletion at both its beginning and its end.
+   * Insertion or deletion never invalidates pointers or references to the remaining elements.
+   * Unlike std::deque, util::fix_deque has a fixed storage size that is not automatically expanded or contracted.
+   *
+   * @tparam T Type of the elements to be stored.
+   * @tparam N The size of the storage (number of elements).
+   */
   template<class T, size_t N>
   class fix_deque
   {
   public:
-    /// Type of the elements to be stored
-    typedef T value_type;
-    /// This class
-    typedef fix_deque<T, N> This;
-    /// size type
-    typedef size_t size_type;
-    /// pointer type
-    typedef T * pointer;
-    typedef const T * const_pointer;
-    /// reference type
-    typedef T& reference;
-    typedef const T& const_reference;
+    /// @brief Type of the elements to be stored.
+    using value_type = T;
+    /// @brief This class type.
+    using This = fix_deque<T, N>;
+    /// @brief Type used for sizes and indices.
+    using size_type = size_t;
+    /// @brief Pointer type.
+    using pointer = T *;
+    using const_pointer = const T *;
+    /// @brief Reference type.
+    using reference = T&;
+    using const_reference = const T&;
 
-    /// iterator type
+    /// @brief Iterator type.
     using iterator = fix_deque_iterator<This>;
+    /// @brief Const iterator type.
     using const_iterator = fix_deque_iterator_const<const This>;
 
   public:
@@ -221,89 +243,88 @@ namespace util
     static constexpr size_type One = 1U;
     static constexpr size_type Zero = 0U;
 
-    /// Constructor
+    /// @brief Constructs an empty deque.
     fix_deque() : unFirst(MaxIdx), unSize(Zero) {}
-    /// Destructor
+    /// @brief Destructor.
     ~fix_deque() = default;
 
     /// @name Element access
     /// @{
-    /// Returns a reference to the element at specified location without range check for pos.
-    /// Note: std::deque performs a range check here. If the range check fails, an exception
-    /// is thrown. We avoid exceptions and perform a modulo operation instead. So the return
-    /// value is defined by the modulo operation if pos is out of range.
-    /// Check range of pos before calling this function if demanded.
+    /// @brief Returns a reference to the element at specified location without range check for pos.
+    /// @param pos Index position (0-based).
+    /// @return Reference to the element at the given position.
+    /// @note If pos is out of range, the result is defined by modulo operation.
     reference at(size_type pos)             { return aElements[map_idx_N_1(unFirst + pos)]; }
     const_reference at(size_type pos) const { return aElements[map_idx_N_1(unFirst + pos)]; }
 
-    /// Returns a reference to the element at specified location without range check for pos.
+    /// @brief Returns a reference to the element at specified location without range check for pos.
     reference operator[](size_type pos)             { return aElements[map_idx_N_1(unFirst + pos)]; }
     const_reference operator[](size_type pos) const { return aElements[map_idx_N_1(unFirst + pos)]; }
 
-    /// Access the first element.
-    /// Returns a reference to the first element in the container.
-    /// Calling front on an empty container causes undefined behavior.
+    /// @brief Returns a reference to the first element in the container.
+    /// @warning Calling front on an empty container causes undefined behavior.
     reference front()             { return aElements[unFirst]; }
     const_reference front() const { return aElements[unFirst]; }
 
-    /// Access the last element.
-    /// Returns a reference to the last element in the container.
-    /// Calling back on an empty container causes undefined behavior.
+    /// @brief Returns a reference to the last element in the container.
+    /// @warning Calling back on an empty container causes undefined behavior.
     reference back()              { return aElements[map_idx_N_1(last_idx())]; }
     const_reference back() const  { return aElements[map_idx_N_1(last_idx())]; }
     /// @}
 
     /// @name Iterators
     /// @{
-    /// returns an iterator to the beginning
+    /// @brief Returns an iterator to the beginning.
     iterator begin() noexcept { return iterator(*this, Zero); }
     const_iterator begin() const noexcept { return const_iterator(*this, Zero); }
     const_iterator cbegin() const noexcept { return const_iterator(*this, Zero); }
 
-    /// returns an iterator to the end
+    /// @brief Returns an iterator to the end.
     iterator end() noexcept { return iterator(*this, size()); }
     const_iterator end() const noexcept { return const_iterator(*this, size()); }
     const_iterator cend() const noexcept { return const_iterator(*this, size()); }
 
-    /// returns an reverse iterator to the beginning
-    iterator rbegin() noexcept {}
-    const_iterator rbegin() const noexcept {}
-    const_iterator crbegin() const noexcept {}
+    /// @brief Returns a reverse iterator to the beginning (not implemented).
+    iterator rbegin() noexcept = delete;
+    const_iterator rbegin() const noexcept = delete;
+    const_iterator crbegin() const noexcept = delete;
 
-    /// returns an reverse iterator to the end
-    iterator rend() noexcept {}
-    const_iterator rend() const noexcept {}
-    const_iterator crend() const noexcept {}
+    /// @brief Returns a reverse iterator to the end (not implemented).
+    iterator rend() noexcept = delete;
+    const_iterator rend() const noexcept = delete;
+    const_iterator crend() const noexcept = delete;
     /// @}
 
     /// @name Capacity
     /// @{
-    /// checks whether the container is empty
+    /// @brief Checks whether the container is empty.
+    /// @return true if the container is empty, false otherwise.
     bool empty() const noexcept { return unSize == Zero; }
-    ///  returns the number of elements
+    /// @brief Returns the number of elements currently stored.
+    /// @return The number of elements in the container.
     size_type size() const noexcept { return unSize; }
-    /// returns the maximum possible number of elements
-    /// Note: std::deque::max_size is not constexpr but we can make max_size constexpr
-    /// because it just returns a template parameter (no dynamic allocation)
+    /// @brief Returns the maximum possible number of elements.
+    /// @return The maximum capacity of the container.
+    /// @note Unlike std::deque, this is constexpr because storage is fixed.
     constexpr size_type max_size() noexcept { return MaxSize; }
     /// @}
 
     /// @name Modifiers
     /// @{
-    /// clears the contents
+    /// @brief Clears the contents of the container.
     void clear() { unFirst = MaxIdx; unSize = Zero; }
-    /// inserts elements before pos
+    /// @brief Inserts elements before pos (not implemented).
     iterator insert(const_iterator pos, const T& value) {}
     iterator insert(const_iterator pos, T&& value) {}
     iterator insert(const_iterator pos, size_type count, const T& value) {}
 
-    /// erases elements
+    /// @brief Erases elements (not fully implemented).
     iterator erase(const_iterator pos);
     iterator erase(const_iterator first, const_iterator last);
 
-    /// Adds an element to the end if space is available.
-    /// Does nothing if space is not available anymore
-    /// (can be checked with size() < max_size() before).
+    /// @brief Adds an element to the end if space is available.
+    /// @param value The value to add.
+    /// @note If the container is full, the operation does nothing.
     void push_back(const T& value)
     {
       if (size() < max_size())
@@ -319,7 +340,7 @@ namespace util
 
     // not implemented yet: void push_back(T&& value);
 
-    /// removes the last element
+    /// @brief Removes the last element.
     void pop_back()
     {
       if (unSize > Zero)
@@ -333,7 +354,8 @@ namespace util
         }
       }
     }
-    /// inserts an element to the beginning
+    /// @brief Inserts an element to the beginning.
+    /// @param value The value to insert.
     void push_front(const T& value)
     {
       if (size() < max_size())
@@ -360,7 +382,7 @@ namespace util
 
     // not implemented yet: void push_front(T&& value);
 
-    /// removes the first element
+    /// @brief Removes the first element.
     void pop_front()
     {
       if (size() > Zero)
@@ -381,103 +403,110 @@ namespace util
     /// @}
 
   protected:
-    /// The array of elements
+    /// @brief The array of elements.
     value_type aElements[N];
-    /// Index of the first element (0 ... N-1; 2N after construct)
+    /// @brief Index of the first element (0 ... N-1; 2N after construct).
     size_type unFirst;
-    /// Number of elements (0 ... N-1)
+    /// @brief Number of elements (0 ... N-1).
     size_type unSize;
-    /// Index of the last element (0 ... 2N-1)
+    /// @brief Index of the last element (0 ... 2N-1).
     size_type last_idx() const noexcept { return static_cast<size_type>((unFirst + unSize) - One); }
-    /// Index to the element after last (0 ... 2N)
+    /// @brief Index to the element after last (0 ... 2N).
     size_type end_idx() const noexcept { return static_cast<size_type>(last_idx() + One); }
-    /// Fold an index back into range [0 ... N-1]
+    /// @brief Fold an index back into range [0 ... N-1].
     size_type map_idx_N_1(size_type pos) const noexcept { return pos % MaxSize; }
   };
 
   // ---------------------------------------------------
-  /// This is a sort-of specialization of #util::fix_deque for bools / bits.
-  ///
-  /// An indexed sequence container that allows fast insertion and
-  /// deletion at its beginning and its end.
-  /// 
-  /// Insertion or deletion never invalidates pointers or references
-  /// to the rest of the elements.
-  /// 
-  /// In contrast to the std::deque specification, a util::fix_deque has a
-  /// fixed storage size. The storage is not automatically expanded or
-  /// contracted.
-  /// 
-  /// @typeparam N: the number of bits to be stored
-  // ---------------------------------------------------
+  /**
+   * @brief Fixed-size double-ended queue (deque) specialization for bool values.
+   *
+   * This class is a specialization of util::fix_deque for efficiently storing and manipulating
+   * a sequence of boolean values as bits. It provides fast insertion and deletion at both the
+   * beginning and the end of the container, similar to std::deque, but with a fixed storage size.
+   *
+   * - The storage is not automatically expanded or contracted.
+   * - Insertion or deletion never invalidates pointers or references to the remaining elements.
+   * - The container uses a bitset for compact storage of boolean values.
+   *
+   * @tparam N The number of bits (elements) to be stored in the container.
+   */
   template<size_t N>
   class fix_deque_bool
   {
   public:
-    /// Type of the elements to be stored
+    /// @brief Type of the elements to be stored (always bool).
     typedef bool value_type;
-    /// This class
+    /// @brief Type alias for this class.
     typedef fix_deque_bool<N> This;
-    /// size type
+    /// @brief Type used for sizes and indices.
     typedef size_t size_type;
 
-    /// @brief The bitset types
+    /// @brief Underlying word type for the bitset.
     using bitset_base_type = uint32;
+    /// @brief Bitset type used for storage.
     using bitset_type = bitset<uint32, N>;
 
   public:
-    /// @brief Maximal number of elements
+    /// @brief Maximum number of elements the container can hold.
     static constexpr size_type kMaxSize = N;
+    /// @brief Maximum index value (equal to kMaxSize).
     static constexpr size_type MaxIdx = kMaxSize;
 
-    /// Constructor
+    /// @brief Constructs an empty deque.
     fix_deque_bool() : front_idx(0), back_idx(-1), nr_elements(0) {}
-    /// Destructor
+
+    /// @brief Destructor.
     ~fix_deque_bool() = default;
 
     /// @name Element access
     /// @{
-    /// Returns a reference to the element at specified location without range check for pos.
-    /// Note: std::deque performs a range check here. If the range check fails, an exception
-    /// is thrown. We avoid exceptions and perform a modulo operation instead. So the return
-    /// value is defined by the modulo operation if pos is out of range.
-    /// Check range of pos before calling this function if demanded.
+    /// @brief Returns the value at the specified position (no range check).
+    /// @param pos Index position (0-based).
+    /// @return Value at the given position.
+    /// @note If pos is out of range, the result is defined by modulo operation.
     value_type at(size_type pos) const { return bits[(front_idx + pos) % kMaxSize]; }
 
-    /// Returns a reference to the element at specified location without range check for pos.
+    /// @brief Returns the value at the specified position (no range check).
+    /// @param pos Index position (0-based).
+    /// @return Value at the given position.
     value_type operator[](size_type pos) const { return at(pos); }
 
-    /// Access the first element.
-    /// Returns a reference to the first element in the container.
-    /// Calling front on an empty container causes undefined behavior.
+    /// @brief Returns the value of the first element in the container.
+    /// @return Value of the first element.
+    /// @warning Calling on an empty container is undefined behavior.
     value_type front() const { return bits[front_idx]; }
 
-    /// Access the last element.
-    /// Returns a reference to the last element in the container.
-    /// Calling back on an empty container causes undefined behavior.
+    /// @brief Returns the value of the last element in the container.
+    /// @return Value of the last element.
+    /// @warning Calling on an empty container is undefined behavior.
     value_type back() const  { return bits[back_idx]; }
     /// @}
 
     /// @name Capacity
     /// @{
-    /// checks whether the container is empty
+    /// @brief Checks whether the container is empty.
+    /// @return true if the container is empty, false otherwise.
     bool empty() const noexcept { return nr_elements == 0; }
-    ///  returns the number of elements
+
+    /// @brief Returns the number of elements currently stored.
+    /// @return The number of elements in the container.
     size_type size() const noexcept { return nr_elements; }
-    /// returns the maximum possible number of elements
-    /// Note: std::deque::max_size is not constexpr but we can make max_size constexpr
-    /// because it just returns a template parameter (no dynamic allocation)
+
+    /// @brief Returns the maximum number of elements the container can hold.
+    /// @return The maximum capacity of the container.
+    /// @note Unlike std::deque, this is constexpr because storage is fixed.
     constexpr size_type max_size() noexcept { return kMaxSize; }
     /// @}
 
     /// @name Modifiers
     /// @{
-    /// clears the contents
+    /// @brief Removes all elements from the container.
     void clear() { front_idx = 0; back_idx = -1; nr_elements = 0; }
 
-    /// Adds an element to the end if space is available.
-    /// Does nothing if space is not available anymore
-    /// (can be checked with size() < max_size() before).
+    /// @brief Adds an element to the end if space is available.
+    /// @param value The value to add.
+    /// @note If the container is full, the operation does nothing.
     void push_back(const bool value)
     {
       if (size() < max_size())
@@ -500,7 +529,8 @@ namespace util
 
     // not implemented yet: void push_front(T&& value);
 
-    /// removes the first element
+    /// @brief Removes the first element from the container.
+    /// @note If the container is empty, the operation does nothing.
     void pop_front()
     {
       if (!empty())
@@ -512,15 +542,15 @@ namespace util
     /// @}
 
   protected:
-    /// The bits / bools
+    /// @brief Bitset storage for the boolean values.
     bitset_type bits;
-    /// Index of the first element (returned and removed by pop())
+    /// @brief Index of the first element (returned and removed by pop()).
     size_type front_idx;
-    /// Index of the last element (added by push()).
+    /// @brief Index of the last element (added by push()).
     size_type back_idx;
-    /// Number of elements in the queue
+    /// @brief Number of elements currently in the container.
     size_type nr_elements;
   };
-} // namespace Util
+} // namespace util
 
 #endif // UTIL_FIX_DEQUE_H
