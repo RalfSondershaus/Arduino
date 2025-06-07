@@ -33,21 +33,43 @@
 namespace util
 {
   // ---------------------------------------------------
-  /// A container adaptor for embedded systems that provides a 
-  /// FIFO data structure with
-  /// 
-  /// - front
-  /// - back
-  /// - push
-  /// - pop
-  /// - empty
-  /// 
-  /// and other functions as known from std::queue.
-  /// 
-  /// @typeparam T The type of the stored elements
-  /// @typeparam N size of the queue
-  /// @typeparam Container the type of the underlying container
-  // ---------------------------------------------------
+  /**
+   * @brief A container adaptor for embedded systems that provides a FIFO data structure.
+   *
+   * This class template implements a fixed-size queue (FIFO) with a user-provided underlying container.
+   * It provides the following queue operations:
+   * - front()
+   * - back()
+   * - push()
+   * - pop()
+   * - empty()
+   * - size()
+   * - max_size()
+   *
+   * The default container is util::fix_deque<T, N>, but any container type can be used as long as it
+   * provides the required interface.
+   *
+   * @tparam T         The type of the stored elements.
+   * @tparam N         The size (capacity) of the queue.
+   * @tparam Container The type of the underlying container.
+   *
+   * @note
+   * The Container type must provide the following member functions and types:
+   *   - value_type:           The type of elements stored.
+   *   - reference:            Reference to value_type.
+   *   - const_reference:      Const reference to value_type.
+   *   - size_type:            Unsigned integer type for sizes.
+   *   - static constexpr size_type MaxSize: Maximum number of elements.
+   *   - reference front();                // Returns reference to first element
+   *   - const_reference front() const;    // Returns const reference to first element
+   *   - reference back();                 // Returns reference to last element
+   *   - const_reference back() const;     // Returns const reference to last element
+   *   - bool empty() const;               // Returns true if container is empty
+   *   - size_type size() const;           // Returns number of elements
+   *   - constexpr size_type max_size() const; // Returns maximum capacity
+   *   - void push_back(const value_type&);    // Adds element to the end
+   *   - void pop_front();                     // Removes element from the front
+   */
   template<class T, size_t N, class Container = util::fix_deque<T, N> >
   struct fix_queue
   {
@@ -104,22 +126,37 @@ namespace util
   };
 
   // ---------------------------------------------------
-  /// @brief A fixed-size FIFO queue specialization for bool values.
-  ///
-  /// This container adaptor provides a FIFO (first-in, first-out) queue for boolean values,
-  /// optimized for embedded systems. It supports typical queue operations such as:
-  /// - front()
-  /// - back()
-  /// - push()
-  /// - pop()
-  /// - empty()
-  /// - size()
-  /// - max_size()
-  ///
-  /// The underlying container is by default util::fix_deque_bool<N>, which stores the bits efficiently.
-  ///
-  /// @tparam N         The maximum number of elements the queue can hold.
-  /// @tparam Container The underlying container type (defaults to util::fix_deque_bool<N>).
+  /**
+   * @brief A fixed-size FIFO queue specialization for bool values.
+   *
+   * This container adaptor provides a FIFO (first-in, first-out) queue for boolean values,
+   * optimized for embedded systems. It supports typical queue operations such as:
+   * - front()
+   * - back()
+   * - push()
+   * - pop()
+   * - empty()
+   * - size()
+   * - max_size()
+   *
+   * The underlying container is by default util::fix_deque_bool<N>, which stores the bits efficiently.
+   *
+   * @tparam N         The maximum number of elements the queue can hold.
+   * @tparam Container The underlying container type (defaults to util::fix_deque_bool<N>).
+   *
+   * @note
+   * The Container type must provide the following member functions and types:
+   *   - value_type:           The type of elements stored.
+   *   - size_type:            Unsigned integer type for sizes.
+   *   - static constexpr size_type kMaxSize: Maximum number of elements.
+   *   - value_type front() const;           // Returns the first element
+   *   - value_type back();                  // Returns the last element
+   *   - bool empty() const;                 // Returns true if container is empty
+   *   - size_type size() const;             // Returns number of elements
+   *   - constexpr size_type max_size() const; // Returns maximum capacity
+   *   - void push_back(const value_type&);  // Adds element to the end
+   *   - void pop_front();                   // Removes element from the front
+   */
   // ---------------------------------------------------
   template<size_t N, class Container = util::fix_deque_bool<N> >
   struct fix_queue_bool
@@ -129,12 +166,6 @@ namespace util
 
     /// @brief The type of elements stored in the queue.
     using value_type = typename Container::value_type;
-
-    /// @brief Reference type to an element.
-    using reference = typename Container::reference;
-
-    /// @brief Const reference type to an element.
-    using const_reference = typename Container::const_reference;
 
     /// @brief Type used for sizes and indices.
     using size_type = size_t;
@@ -153,19 +184,12 @@ namespace util
 
     /// @brief Returns a reference to the first element in the queue.
     /// @return Reference to the first element.
-    reference front() { return container.front(); }
-
-    /// @brief Returns a const reference to the first element in the queue.
-    /// @return Const reference to the first element.
-    const_reference front() const { return container.front(); }
+    value_type front() const { return container.front(); }
 
     /// @brief Returns a reference to the last element in the queue.
     /// @return Reference to the last element.
-    reference back() { return container.back(); }
+    value_type back() { return container.back(); }
 
-    /// @brief Returns a const reference to the last element in the queue.
-    /// @return Const reference to the last element.
-    const_reference back() const { return container.back(); }
     /// @}
 
     /// @name Capacity
