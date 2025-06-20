@@ -237,7 +237,7 @@ TEST(Ut_Packet, packet_011_type_BasicAccessory_Correct)
 {
   dcc::Packet<6> packet;
   dcc::Packet<6>::packet_type type;
-
+  dcc::Packet<6>::config_type cfg { .Accessory_OutputAddressMethod = 0, .Multifunction_ExtendedAddressing = 0 };
   // BasicAccessory
   // {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
   // {preamble} 0 10000001 0 1111CDDD 0 EEEEEEEE 1
@@ -245,7 +245,7 @@ TEST(Ut_Packet, packet_011_type_BasicAccessory_Correct)
   addByteToPacket(packet, 0b11110111U);
   addByteToPacket(packet, packet.refByte(0) ^ packet.refByte(1));
 
-  type = packet.decode();
+  type = packet.decode(cfg);
   EXPECT_EQ(type, dcc::Packet<6>::packet_type::BasicAccessory);
   EXPECT_EQ(packet.getType(), dcc::Packet<6>::packet_type::BasicAccessory);
   EXPECT_EQ(packet.baGetC(), static_cast<uint8>(0U));
@@ -257,6 +257,7 @@ TEST(Ut_Packet, packet_012_type_ExtendedAccessory_Correct)
 {
   dcc::Packet<6> packet;
   dcc::Packet<6>::packet_type type;
+  dcc::Packet<6>::config_type cfg { .Accessory_OutputAddressMethod = 0, .Multifunction_ExtendedAddressing = 0 };
 
   // ExtendedAccessory
   // {preamble} 0 10AAAAAA 0 0AAA0AA1 0 000XXXXX 0 EEEEEEEE 1
@@ -266,24 +267,44 @@ TEST(Ut_Packet, packet_012_type_ExtendedAccessory_Correct)
   addByteToPacket(packet, 0b00010101U);
   addByteToPacket(packet, (packet.refByte(0) ^ packet.refByte(1)) ^ packet.refByte(2));
 
-  type = packet.decode();
+  type = packet.decode(cfg);
   EXPECT_EQ(type, dcc::Packet<6>::packet_type::ExtendedAccessory);
   EXPECT_EQ(packet.getType(), dcc::Packet<6>::packet_type::ExtendedAccessory);
   EXPECT_EQ(packet.eaGetAspect(), static_cast<uint8>(0b00010101U));
 }
 
-/// @brief This function is called before running a test case
+//-------------------------------------------------------------------------
+TEST(Ut_Packet, packet_013_checksum_MultiFunction7_03_3F_0D_0A)
+{
+  dcc::Packet<6> packet;
+  bool result;
+
+  // BasicAccessory
+  // {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
+  // {preamble} 0 10000001 0 1111CDDD 0 EEEEEEEE 1
+  addByteToPacket(packet, 0x03);
+  addByteToPacket(packet, 0x3F);
+  addByteToPacket(packet, 0x0D);
+  addByteToPacket(packet, 0x0A);
+
+  result = packet.testChecksum();
+  EXPECT_EQ(result, false);
+}
+
+
 void setUp(void)
 {
 }
 
-/// @brief This function is called after running a test case
 void tearDown(void)
 {
 }
 
-/// @brief This function runs all test cases
-int main(void)
+void test_setup(void)
+{
+}
+
+bool test_loop(void)
 {
   UNITY_BEGIN();
 
@@ -299,6 +320,11 @@ int main(void)
   RUN_TEST(packet_010_checksum_ExtendedAccessory_Incorrect);
   RUN_TEST(packet_011_type_BasicAccessory_Correct);
   RUN_TEST(packet_012_type_ExtendedAccessory_Correct);
+  RUN_TEST(packet_013_checksum_MultiFunction7_03_3F_0D_0A);
 
-  return UNITY_END();
+  (void) UNITY_END();
+
+  // Return false to stop program execution (relevant on Windows)
+  return false;
 }
+

@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - master
+      - feature-bit-extractor-in-ISR
 
 jobs:
   build:

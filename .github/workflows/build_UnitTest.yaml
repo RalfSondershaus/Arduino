@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - fix_Ut_Sstream_Formatted_input_char_array
+      - feature-bit-extractor-in-ISR
   pull_request:
     branches:
       - master
@@ -27,6 +28,11 @@ jobs:
 
       - name: Navigate to Repository
         run: cd arduino
+
+      - name: Run Build Script UnitTest/Gen/Dcc/Ut_PacketExtractor
+        run: |
+          ./Build/build.sh UnitTest/Gen/Dcc/Ut_PacketExtractor win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Dcc/Ut_PacketExtractor win32 gcc win unity run
 
       - name: Run Build Script UnitTest/Gen/Util/Ut_Algorithm
         run: |
