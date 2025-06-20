@@ -17,6 +17,7 @@
             "description": "Select project name",
             "default": "UnitTest/Gen/Util/Ut_Sstream",
             "options": [ 
+                "UnitTest/Gen/Dcc/Ut_Packet",
                 "UnitTest/Gen/Util/Ut_Algorithm",
                 "UnitTest/Gen/Util/Ut_Array",
                 "UnitTest/Gen/Util/Ut_Bitset",

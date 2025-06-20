@@ -149,21 +149,21 @@ void loop()
     dcc::Decoder::IsrStats stats;
     myDecoder.isrGetStats(stats);
     hal::serial::print(hal::micros());
-    hal::serial::print(" ");
+    hal::serial::print(" isr=");
     hal::serial::print(myDecoder.getNrInterrupts());
-    hal::serial::print(" ");
+    hal::serial::print(" fetches=");
     hal::serial::print(myDecoder.getNrFetches());
-    hal::serial::print(" ");
+    hal::serial::print(" ones=");
     hal::serial::print(myDecoder.getNrOnes());
-    hal::serial::print(" ");
+    hal::serial::print(" zeros=");
     hal::serial::print(myDecoder.getNrZeros());
-    hal::serial::print(" ");
+    hal::serial::print(" inv=");
     hal::serial::print(myDecoder.getNrInvalids());
-    hal::serial::print(" ");
-    hal::serial::println(myDecoder.getPacketCount());
-    hal::serial::print(" ");
+    hal::serial::print(" pkt=");
+    hal::serial::print(myDecoder.getPacketCount());
+    hal::serial::print(" size=");
     hal::serial::print(stats.curSize);
-    hal::serial::print(" ");
+    hal::serial::print(" maxsize=");
     hal::serial::println(stats.maxSize);
   }
 
