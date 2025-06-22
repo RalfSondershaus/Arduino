@@ -2,22 +2,38 @@
   * @file DccSniffer.cpp
   * @author Ralf Sondershaus
   *
-  * @brief DCC Sniffer for Arduino
+  * @brief DCC Sniffer for Arduino - captures DCC packets and outputs them via a simple binary protocol over serial.
   *
-  * @copyright Copyright 2018 - 2023 Ralf Sondershaus
+  * This application listens to DCC signals on a specified interrupt pin, decodes them into packets using the dcc::Decoder,
+  * and transmits the packets over the serial interface in a compact binary format. It also provides periodic status output
+  * with statistics such as interrupt count, fetches, and buffer usage.
   *
-  * This program is free software: you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the
-  * Free Software Foundation, either version 3 of the License, or (at your
-  * option) any later version.
+  * @section BinaryProtocol Binary Protocol Description
   *
-  * This program is distributed in the hope that it will be useful, but
-  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-  * for more details.
+  * Each decoded DCC packet is sent as a binary message with the following structure:
+  *   <0x2E> <len> <data bytes> <0x00>
   *
-  * You should have received a copy of the GNU General Public License
-  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  * - 0x2E: Start-of-packet marker (kCodeResponse)
+  * - len:  Number of data bytes in the packet (1 byte)
+  * - data bytes: The raw DCC packet bytes (len bytes)
+  * - 0x00: End-of-packet marker
+  *
+  * Example (for a 3-byte DCC packet 0xAA 0xBB 0xCC):
+  *   2E 03 AA BB CC 00
+  *
+  * @note The ASCII output function (PrintAscii) is provided for debugging and prints each byte as two hex digits separated by '-'.
+  *
+  * @section Usage
+  * - Connect the DCC signal to the configured interrupt pin (default: pin 2).
+  * - Open a serial terminal at the configured baud rate (default: 115200).
+  * - Each received DCC packet will be output in the binary protocol format described above.
+  * - You can use the Windows application DccSniffer to visualize the packets in real-time.
+  * - You can connect with a Windows terminal program (e.g., PuTTY or HTerm) to see the 
+  *   ASCII output (between the binary packets) for debugging purposes.
+  *
+  * @note This documentation was partly generated from the source code using Gen AI (GitHub Copilot).
+  * 
+  * @copyright Copyright 2018 - 2025 Ralf Sondershaus
   */
 
 #include <Std_Types.h>
@@ -72,7 +88,7 @@ void setup()
 
   pinMode(kBlinkLedPin, OUTPUT);
 
-  Serial.begin(kSerialBaudRate);
+  hal::serial::begin(kSerialBaudRate);
 }
 
 static inline uint8 convertNibbleToHex(uint8 ucNibble)
@@ -85,7 +101,7 @@ static inline uint8 convertNibbleToHex(uint8 ucNibble)
   return aucChars[ucNibble % 16U];
 }
 
-static void convertToHex(uint8 ucByte, uint8 pcBuf[3])
+static void convertToHex(uint8 ucByte, char pcBuf[3])
 {
   pcBuf[0] = convertNibbleToHex((ucByte >> 4U) & 0x0FU);
   pcBuf[1] = convertNibbleToHex((ucByte >> 0U) & 0x0FU);
@@ -105,10 +121,10 @@ void PrintAscii(const PacketType& pkt)
   for (i = 0; i < n; i++)
   {
     convertToHex(pkt.refByte(i), pcBuf);
-    Serial.print(pcBuf);
-    Serial.print("-");
+    hal::serial::print(pcBuf);
+    hal::serial::print("-");
   }
-  Serial.println();
+  hal::serial::println();
 }
 
 // ----------------------------------------------------
@@ -130,7 +146,7 @@ void PrintBin(const PacketType& pkt)
   i += n;
   pcBuf[i] = 0x00;
 
-  Serial.println(pcBuf);
+  hal::serial::println(pcBuf);
 }
 
 // ---------------------------------------------------
@@ -149,21 +165,21 @@ void loop()
     dcc::Decoder::IsrStats stats;
     myDecoder.isrGetStats(stats);
     hal::serial::print(hal::micros());
-    hal::serial::print(" ");
+    hal::serial::print(" isr=");
     hal::serial::print(myDecoder.getNrInterrupts());
-    hal::serial::print(" ");
+    hal::serial::print(" fetches=");
     hal::serial::print(myDecoder.getNrFetches());
-    hal::serial::print(" ");
+    hal::serial::print(" ones=");
     hal::serial::print(myDecoder.getNrOnes());
-    hal::serial::print(" ");
+    hal::serial::print(" zeros=");
     hal::serial::print(myDecoder.getNrZeros());
-    hal::serial::print(" ");
+    hal::serial::print(" inv=");
     hal::serial::print(myDecoder.getNrInvalids());
-    hal::serial::print(" ");
-    hal::serial::println(myDecoder.getPacketCount());
-    hal::serial::print(" ");
+    hal::serial::print(" pkt=");
+    hal::serial::print(myDecoder.getPacketCount());
+    hal::serial::print(" size=");
     hal::serial::print(stats.curSize);
-    hal::serial::print(" ");
+    hal::serial::print(" maxsize=");
     hal::serial::println(stats.maxSize);
   }
 

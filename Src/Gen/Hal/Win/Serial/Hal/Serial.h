@@ -23,6 +23,11 @@
 
 #include <Std_Types.h>
 
+// From Arduino's Print.h
+#define DEC 10
+#define HEX 16
+#define OCT 8
+
 namespace hal
 {
   // -----------------------------------------------------------------------------------
@@ -39,6 +44,26 @@ namespace hal
     int available(void);
     /// The first byte of incoming serial data available (or -1 if no data is available).
     int read(void);
+
+    /// Print functions
+    size_t print(const char *p);
+    size_t print(char c);
+    size_t print(unsigned char uc, int base = DEC);
+    size_t print(int n, int base = DEC);
+    size_t print(unsigned int un, int base = DEC);
+    size_t print(long n, int base = DEC);
+    size_t print(unsigned long un, int base = DEC);
+    size_t print(double d, int digits = 2);
+
+    size_t println(const char *p);
+    size_t println(char c);
+    size_t println(unsigned char uc, int base = DEC);
+    size_t println(int n, int base = DEC);
+    size_t println(unsigned int un, int base = DEC);
+    size_t println(long n, int base = DEC);
+    size_t println(unsigned long un, int base = DEC);
+    size_t println(double d, int digits = 2);
+    size_t println();
   }
 } // namespace com
 

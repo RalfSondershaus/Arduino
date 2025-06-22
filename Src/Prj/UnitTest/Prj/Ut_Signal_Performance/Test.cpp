@@ -29,6 +29,7 @@
 #include <InputClassifier.h>
 #include <Util/Array.h>
 #include <LedRouter.h>
+#include <Dcc/Decoder.h>
 
 #ifdef ARDUINO
 #include <Arduino.h>
@@ -206,6 +207,39 @@ TEST(Ut_Signal, LedRouter_AllRamps)
   hal::serial::println(td / nrRep);
 }
 
+namespace dcc 
+{
+  void ISR_Dcc(void);
+}
+
+// ------------------------------------------------------------------------------------------------
+///
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_Signal, ISR_Dcc1)
+{
+  dcc::Decoder myDec;
+  signal::LedRouter ledr;
+  constexpr int nrRep = 400; // shall not exceed kTimeBufferSize
+  uint32 t1;
+  uint32 td;
+
+  t1 = micros();
+  for (int i = 0; i < nrRep; i++)
+  {
+    dcc::ISR_Dcc();
+  }
+  td = micros() - t1;
+  hal::serial::print("ISR_Dcc1 ");
+  hal::serial::println(td / nrRep);
+  
+  // empty the queue for the next run.
+  myDec.fetch();
+  while (!myDec.empty())
+  {
+    myDec.pop();
+  }
+}
+
 void setUp(void)
 {
   cleanRte();
@@ -226,6 +260,7 @@ bool test_loop(void)
   RUN_TEST(InputClassifier1);
   RUN_TEST(LedRouter_OneRamp);
   RUN_TEST(LedRouter_AllRamps);
+  RUN_TEST(ISR_Dcc1);
 
   (void) UNITY_END();
 

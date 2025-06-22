@@ -124,7 +124,7 @@ endif
 CFLAGS := $(CFLAGS)               \
         -c                        \
         -g                        \
-        -Os                       \
+        -O3                       \
         -w                        \
         -std=gnu++17              \
         -fpermissive              \
