@@ -174,6 +174,149 @@ TEST(Ut_Fix_Queue, push_pop_3)
   }
 }
 
+using util::fix_queue_bool;
+
+/// @brief Tests basic queue operations: push, front, back, pop, empty, and size.
+/// @details Test Design: Functional/Black-box. Verifies FIFO behavior and correct size tracking.
+TEST(FixQueueBool, BasicOperations)
+{
+    fix_queue_bool<5> q;
+
+    EXPECT_TRUE(q.empty());
+    EXPECT_TRUE(q.size() == 0);
+
+    q.push(true);
+    EXPECT_FALSE(q.empty());
+    EXPECT_TRUE(q.size() == 1);
+    EXPECT_TRUE(q.front());
+    EXPECT_TRUE(q.back());
+
+    q.push(false);
+    EXPECT_TRUE(q.size() == 2);
+    EXPECT_TRUE(q.front());
+    EXPECT_FALSE(q.back());
+
+    q.pop();
+    EXPECT_TRUE(q.size() == 1);
+    EXPECT_FALSE(q.front());
+    EXPECT_FALSE(q.back());
+
+    q.pop();
+    EXPECT_TRUE(q.empty());
+    EXPECT_TRUE(q.size() == 0);
+}
+
+/// @brief Tests queue capacity and overflow behavior.
+/// @details Test Design: Boundary Value Analysis. Ensures queue does not exceed its fixed size.
+TEST(FixQueueBool, Capacity)
+{
+    constexpr size_t N = 3;
+    fix_queue_bool<N> q;
+
+    for (size_t i = 0; i < N; ++i) {
+        q.push(i % 2 == 0);
+        EXPECT_TRUE(q.size() == i + 1);
+    }
+    // Try to push beyond capacity
+    q.push(true);
+    EXPECT_TRUE(q.size() == N); // Should not grow beyond N
+
+    // Check values
+    EXPECT_TRUE(q.front());
+    EXPECT_TRUE(q.back());
+}
+
+/// @brief Tests wraparound behavior after popping and pushing elements.
+/// @details Test Design: State Transition/Edge Case. Ensures correct circular buffer logic.
+TEST(FixQueueBool, Wraparound)
+{
+    fix_queue_bool<4> q;
+
+    q.push(true);
+    q.push(false);
+    q.push(true);
+    q.push(false);
+
+    q.pop();
+    q.pop();
+
+    q.push(true);
+    q.push(false);
+
+    EXPECT_TRUE(q.size() == 4);
+    EXPECT_TRUE(q.front());
+    EXPECT_FALSE(q.back());
+}
+
+/// @brief Tests queue with a large number of elements (400).
+/// @details Test Design: Stress/Scalability. Verifies correct operation with large N.
+TEST(FixQueueBool, LargeQueue)
+{
+    constexpr size_t N = 400;
+    fix_queue_bool<N> q;
+
+    for (size_t i = 0; i < N; ++i) {
+        q.push(i % 2 == 0);
+        EXPECT_TRUE(q.size() == i + 1);
+    }
+    for (size_t i = 0; i < N; ++i) {
+        EXPECT_TRUE(q.front() == (i % 2 == 0));
+        q.pop();
+    }
+    EXPECT_TRUE(q.empty());
+}
+
+/// @brief Tests popping from an empty queue does not crash or change state.
+/// @details Test Design: Robustness/Negative Testing.
+TEST(FixQueueBool, PopEmpty)
+{
+    fix_queue_bool<2> q;
+    q.pop(); // Should not crash
+    EXPECT_TRUE(q.empty());
+    q.push(true);
+    q.pop();
+    q.pop(); // Should not crash
+    EXPECT_TRUE(q.empty());
+}
+
+/// @brief Tests fix_queue_bool with a container size of 400.
+/// @details Test Design: Stress/Scalability. Fills the queue, checks FIFO order, and verifies wraparound and clear.
+TEST(FixQueueBool, Size400)
+{
+    constexpr size_t N = 400;
+    fix_queue_bool<N> q;
+
+    // Initially empty
+    EXPECT_TRUE(q.empty());
+    EXPECT_TRUE(q.size() == 0);
+
+    // Fill with alternating true/false
+    for (size_t i = 0; i < N; ++i) {
+        q.push(i % 2 == 0);
+        EXPECT_TRUE(q.size() == i + 1);
+        EXPECT_TRUE(q.back() == (i % 2 == 0));
+    }
+    EXPECT_TRUE(q.size() == N);
+    EXPECT_FALSE(q.empty());
+
+    // Check all values in FIFO order
+    for (size_t i = 0; i < N; ++i) {
+        EXPECT_TRUE(q.front() == (i % 2 == 0));
+        q.pop();
+        EXPECT_TRUE(q.size() == N - i - 1);
+    }
+    EXPECT_TRUE(q.empty());
+
+    // Fill again and clear
+    for (size_t i = 0; i < N; ++i) {
+        q.push(true);
+    }
+    EXPECT_TRUE(q.size() == N);
+    q.container.clear();
+    EXPECT_TRUE(q.empty());
+    EXPECT_TRUE(q.size() == 0);
+}
+
 void setUp(void)
 {
 }
@@ -194,6 +337,12 @@ bool test_loop(void)
   RUN_TEST(push_pop_1);
   RUN_TEST(push_pop_2);
   RUN_TEST(push_pop_3);
+  RUN_TEST(BasicOperations);
+  RUN_TEST(Capacity);
+  RUN_TEST(Wraparound);
+  RUN_TEST(LargeQueue);
+  RUN_TEST(PopEmpty);
+  RUN_TEST(Size400);
 
   (void) UNITY_END();
 
