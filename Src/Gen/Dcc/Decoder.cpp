@@ -47,7 +47,9 @@ namespace dcc
 
   // ---------------------------------------------------
   /// Interrupt service routine: a falling or rising edge has triggered this interrupt.
-  /// Write the time difference into the FIFO buffer.
+  ///
+  /// Pushes a 0, 1, or invalid into the underlying bit stream.
+  ///
   /// @note Average run time 27 usec @ATmega2560 @16 MHz with gcc -Os
   /// @note Average run time 14 usec @ATmega2560 @16 MHz with gcc -O3
   // ---------------------------------------------------
