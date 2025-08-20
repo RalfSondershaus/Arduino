@@ -25,6 +25,12 @@
 #include <array>
 #include <Dcc/Packet.h>
 
+/// @brief Specialization for T = dcc::Packet<>::packet_type
+template<> void EXPECT_EQ<dcc::Packet<>::packet_type,dcc::Packet<>::packet_type>(dcc::Packet<>::packet_type expected, dcc::Packet<>::packet_type actual) 
+{ 
+    EXPECT_EQ(static_cast<int>(expected), static_cast<int>(actual)); 
+}
+
 /// Helper function: add all bits of a byte to a packet. Start with MSB, end with LSB.
 template<int N>
 void addByteToPacket(dcc::Packet<N>& pkt, uint8 byte)
@@ -237,7 +243,6 @@ TEST(Ut_Packet, packet_011_type_BasicAccessory_Correct)
 {
   dcc::Packet<6> packet;
   dcc::Packet<6>::packet_type type;
-  dcc::Packet<6>::config_type cfg { .Accessory_OutputAddressMethod = 0, .Multifunction_ExtendedAddressing = 0 };
   // BasicAccessory
   // {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
   // {preamble} 0 10000001 0 1111CDDD 0 EEEEEEEE 1
@@ -245,7 +250,7 @@ TEST(Ut_Packet, packet_011_type_BasicAccessory_Correct)
   addByteToPacket(packet, 0b11110111U);
   addByteToPacket(packet, packet.refByte(0) ^ packet.refByte(1));
 
-  type = packet.decode(cfg);
+  type = packet.decode();
   EXPECT_EQ(type, dcc::Packet<6>::packet_type::BasicAccessory);
   EXPECT_EQ(packet.getType(), dcc::Packet<6>::packet_type::BasicAccessory);
   EXPECT_EQ(packet.baGetC(), static_cast<uint8>(0U));
@@ -257,7 +262,6 @@ TEST(Ut_Packet, packet_012_type_ExtendedAccessory_Correct)
 {
   dcc::Packet<6> packet;
   dcc::Packet<6>::packet_type type;
-  dcc::Packet<6>::config_type cfg { .Accessory_OutputAddressMethod = 0, .Multifunction_ExtendedAddressing = 0 };
 
   // ExtendedAccessory
   // {preamble} 0 10AAAAAA 0 0AAA0AA1 0 000XXXXX 0 EEEEEEEE 1
@@ -267,7 +271,7 @@ TEST(Ut_Packet, packet_012_type_ExtendedAccessory_Correct)
   addByteToPacket(packet, 0b00010101U);
   addByteToPacket(packet, (packet.refByte(0) ^ packet.refByte(1)) ^ packet.refByte(2));
 
-  type = packet.decode(cfg);
+  type = packet.decode();
   EXPECT_EQ(type, dcc::Packet<6>::packet_type::ExtendedAccessory);
   EXPECT_EQ(packet.getType(), dcc::Packet<6>::packet_type::ExtendedAccessory);
   EXPECT_EQ(packet.eaGetAspect(), static_cast<uint8>(0b00010101U));
