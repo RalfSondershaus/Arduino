@@ -7,6 +7,7 @@
  */
 
 #include <Util/Classifier.h>
+#include <Hal/TImer.h>
 #include <unity_adapt.h>
 
 // ------------------------------------------------------------------------------
@@ -18,8 +19,7 @@ TEST(Ut_InputClassifier, Test_1_Classifier_5_Classes)
   constexpr int kNrClassifiers = 1;
   constexpr int kNrClasses = 5;
 
-  typedef util::input_classifier<kNrClassifiers, kNrClasses> input_classifier_type;
-  using cal_type        = input_classifier_type::input_classifier_cal_type;
+  using input_classifier_type = util::input_classifier<kNrClassifiers, kNrClasses>;
   using classifier_type = input_classifier_type::classifier_type;
   using time_type       = input_classifier_type::classifier_type::time_type;
 
@@ -35,14 +35,17 @@ TEST(Ut_InputClassifier, Test_1_Classifier_5_Classes)
   } step_type;
 
 #define V2P(v) classifier_type::convertInput(v)
-  const cal_type cfg =
+  const input_classifier_type::classifier_limits_cal_type cfg_limits = 
   {
-      pin
-    , debounce
-    , V2P(  0), V2P(104), V2P(204), V2P(304), V2P(404)  // Lower limit for class x [0, 255]
-    , V2P(100), V2P(200), V2P(300), V2P(400), V2P(1023) // Upper limit for class x [0, 255]
+      debounce
+    , { V2P(  0), V2P(104), V2P(204), V2P(304), V2P(404) } // Lower limit for class x [0, 255]
+    , { V2P(100), V2P(200), V2P(300), V2P(400), V2P(1023) } // Upper limit for class x [0, 255]
   };
 #undef V2P
+  const input_classifier_type::input_classifier_cal_type cfg =
+  {
+      pin, &cfg_limits
+  };
 
   const step_type aSteps[] =
   {
@@ -116,14 +119,13 @@ TEST(Ut_InputClassifier, Test_3_Classifiers_5_Classes)
   constexpr int kNrClassifiers = 3;
   constexpr int kNrClasses = 5;
 
-  typedef util::input_classifier<kNrClassifiers, kNrClasses> input_classifier_type;
-  using cal_type        = input_classifier_type::input_classifier_cal_type;
+  using input_classifier_type = util::input_classifier<kNrClassifiers, kNrClasses>;
   using classifier_type = input_classifier_type::classifier_type;
   using time_type       = input_classifier_type::classifier_type::time_type;
 
   input_classifier_type classifier;
   const uint8 pins[] = { 13U, 14U, 15U };
-  const uint8 debounce[] = { 10U, 10U, 10U };// [10 ms] debounce
+  constexpr uint8 debounce = 10;// [10 ms] debounce
 
   typedef struct
   {
@@ -133,30 +135,31 @@ TEST(Ut_InputClassifier, Test_3_Classifiers_5_Classes)
   } step_type;
 
 #define V2P(v) classifier_type::convertInput(v)
-  const cal_type cfg =
+  const input_classifier_type::classifier_limits_cal_type cfg_limits1 = 
+  {
+      debounce
+    , { /* struct util::array */ { V2P(0), V2P(101), V2P(201), V2P(301), V2P(401) } } // Lower limit for class x [0, 255]
+    , { /* struct util::array */ { V2P(100), V2P(200), V2P(300), V2P(400), V2P(500) } } // Upper limit for class x [0, 255]
+  };
+  const input_classifier_type::classifier_limits_cal_type cfg_limits2 = 
+  {
+      debounce
+    , { { V2P(101), V2P(201), V2P(301), V2P(401), V2P(501) } } // Lower limit for class x [0, 255]
+    , { { V2P(200), V2P(300), V2P(400), V2P(500), V2P(600) } } // Upper limit for class x [0, 255]
+  };
+  const input_classifier_type::classifier_limits_cal_type cfg_limits3 = 
+  {
+      debounce
+    , { { V2P(201), V2P(301), V2P(401), V2P(501), V2P(601) } } // Lower limit for class x [0, 255]
+    , { { V2P(300), V2P(400), V2P(500), V2P(600), V2P(700) } } // Upper limit for class x [0, 255]
+  };
+  const input_classifier_type::input_classifier_cal_type cfg =
   { /* struct input_classifier_cfg */
     { /* struct util::array */
       { /* array */
-        { pins[0]
-          , { /* struct classifier_limits */
-            debounce[0]
-            , { /* struct util::array */ { V2P(0), V2P(101), V2P(201), V2P(301), V2P(401) } } // Lower limit for class x [0, 1023]
-            , { /* struct util::array */ { V2P(100), V2P(200), V2P(300), V2P(400), V2P(500) } } // Upper limit for class x [0, 1023]
-            }
-        }
-      , { pins[1]
-          , {
-            debounce[1]
-            , { { V2P(101), V2P(201), V2P(301), V2P(401), V2P(501) } } // Lower limit for class x [0, 1023]
-            , { { V2P(200), V2P(300), V2P(400), V2P(500), V2P(600) } } // Upper limit for class x [0, 1023]
-            }
-        }
-      , { pins[2]
-          , {  debounce[2]
-          , { { V2P(201), V2P(301), V2P(401), V2P(501), V2P(601) } } // Lower limit for class x [0, 1023]
-          , { { V2P(300), V2P(400), V2P(500), V2P(600), V2P(700) } } // Upper limit for class x [0, 1023]
-           }
-        }
+        { pins[0], &cfg_limits1 },
+        { pins[1], &cfg_limits2 },
+        { pins[2], &cfg_limits3 },
       }
     }
   };
