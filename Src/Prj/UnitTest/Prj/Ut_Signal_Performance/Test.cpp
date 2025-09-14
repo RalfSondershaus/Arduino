@@ -39,7 +39,7 @@
 
 #include <Cal/CalM_config.h>
 
-typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> input_classifier_type;
+typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> classifier_array_type;
 
 // ---------------------------------------------------------------------------
 /// Set elements of RTE arrays to 0

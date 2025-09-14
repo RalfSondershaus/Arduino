@@ -28,477 +28,827 @@
 
 namespace cal
 {
-  /// CV Name                                     CV#    CV#       Required  Default  Read
-  ///                                                    optional            Value    Only
-  /// Decoder Address LSB                         1      513       M         1        Y     LSB of accessory decoder address
-  /// Auxiliary Activation                        2      514       O                        Auxiliary activation of outputs
-  /// Time On F1                                  3      515       O
-  /// Time On F2                                  4      516       O
-  /// Time On F3                                  5      517       O
-  /// Time On F4                                  6      518       O
-  /// Manufacturer Version Info                   7      519       M
-  /// ManufacturerID                              8      520       M                  Y     Values assigned by NMRA
-  /// Decoder Address MSB                         9      521       M         0        Y     3 MSB of accessory decoder address
-  /// Bi-Directional Communication Configuration 28      540       O
-  /// Accessory Decoder Configuration            29      541       M                        similar to CV#29; for acc. decoders
-  /// Indexed Area Pointers                      31, 32                                     Index High and Low Address
-  /// Manufacturer Unique                        112-128 (17 bytes)
-  /// Manufacturer Unique                        129-256 (128 bytes)
-  /// Manufacturer Unique                        513-895 (383 bytes)
-  
-  // 129        Checksum
-  // 130 - 147	Signal 0
-  // 148 - 165	Signal 1
-  // 166 - 183	Signal 2
-  // 184 - 201	Signal 3
-  // 202 - 219	Signal 4
-  // 220 - 237	Signal 5    108 bytes for 6 signals
-  // 238 - 249	Classifier 0    
-  // 250 - 261	Classifier 1
-  // 262 - 273	Classifier 2
-  // 274 - 285	Classifier 3
-  // 286 - 297	Classifier 4
-  // 298 - 309	Classifier 5     72 bytes for 6 classifiers
+    /// CV Name                                     CV#    CV#       Required  Default  Read
+    ///                                                    optional            Value    Only
+    /// Decoder Address LSB                         1      513       M         1        Y     LSB of accessory decoder address
+    /// Auxiliary Activation                        2      514       O                        Auxiliary activation of outputs
+    /// Time On F1                                  3      515       O
+    /// Time On F2                                  4      516       O
+    /// Time On F3                                  5      517       O
+    /// Time On F4                                  6      518       O
+    /// Manufacturer Version Info                   7      519       M
+    /// ManufacturerID                              8      520       M                  Y     Values assigned by NMRA
+    /// Decoder Address MSB                         9      521       M         0        Y     3 MSB of accessory decoder address
+    /// Bi-Directional Communication Configuration 28      540       O
+    /// Accessory Decoder Configuration            29      541       M                        similar to CV#29; for acc. decoders
+    /// Indexed Area Pointers                      31, 32                                     Index High and Low Address
+    /// Manufacturer Unique                        112-128 (17 bytes)
+    /// Manufacturer Unique                        129-256 (128 bytes)
+    /// Manufacturer Unique                        513-895 (383 bytes)
 
-  namespace eeprom
-  {
-    namespace default_values
+    // 129        Checksum
+
+    namespace eeprom
     {
-      static const signal_cal_type signals{ CAL_SIGNAL_ARRAY };
-      static const input_classifier_cal_type input_classifiers{ CAL_INPUT_CLASSIFIER_CFG };
-      static const base_cv_cal_type base_cv{ CAL_BASE_CV_CFG };
-    }
-  }
-
-  // -----------------------------------------------
-  /// Returns CRC8 from EEPROM addresses unStartNvmId ... unStartNvmId + unLen - 1.
-  /// ucCrc is initial CRC value.
-  // -----------------------------------------------
-  uint8 calcSum(const void* src, uint16 unLen, uint8 ucCrc)
-  {
-    const uint8* pSrc = static_cast<const uint8*>(src);
-
-    for (; unLen > 0U; unLen--)
-    {
-      ucCrc += *pSrc;
-      pSrc++;
-    }
-
-    return ucCrc;
-  }
-
-  // -----------------------------------------------
-  /// Constructor
-  // -----------------------------------------------
-  CalM::CalM()
-    : signals{ CAL_SIGNAL_ARRAY }
-    , input_classifiers{ CAL_INPUT_CLASSIFIER_CFG }
-    , base_cv{ CAL_BASE_CV_CFG }
-    // member element leds is calculated in init() runable
-  {}
-
-  // -----------------------------------------------
-  /// Returns true if the EEPROM values are valid.
-  /// That is, if Manufacturer ID is not the EEPROM initial value
-  /// (EEPROM not programmed yet).
-  // -----------------------------------------------
-  bool CalM::isValid()
-  {
-    return hal::eeprom::read(eeprom::eManufacturerID) != hal::eeprom::kInitial;
-  }
-
-  // -----------------------------------------------
-  /// Returns checksum for all calibration data
-  /// - signals
-  /// - classifiers
-  // -----------------------------------------------
-  uint8 CalM::calcChecksum()
-  {
-    uint8 ucCrc = 0; // start value
-
-    // signals
-    for (auto it = signals.begin(); it < signals.end(); it++)
-    {
-      ucCrc = calcSum(it, sizeof(signal_type), ucCrc);
-    }
-
-    // classifiers
-    for (auto it = input_classifiers.classifiers.begin(); it < input_classifiers.classifiers.end(); it++)
-    {
-      ucCrc = calcSum(it, sizeof(input_classifier_single_type), ucCrc);
-    }
-
-    return ucCrc;
-  }
-
-  // -----------------------------------------------
-  /// Initialize internal data structures and EEPROM values with default values
-  /// from ROM.    
-  // -----------------------------------------------
-  void CalM::initBaseCV()
-  {
-    util::memcpy(&base_cv, &eeprom::default_values::base_cv, sizeof(base_cv_cal_type));
-    
-    (void)updateBaseCV();
-  }
-
-  // -----------------------------------------------
-  /// Initialize internal data structures and EEPROM values with default values
-  /// from ROM.    
-  // -----------------------------------------------
-  void CalM::initSignals()
-  {
-    const auto it_begin = eeprom::default_values::signals.begin();
-    for (auto it = it_begin; it < eeprom::default_values::signals.end(); it++)
-    {
-      set_signal(it - it_begin, *it);
-    }
-
-    (void)updateSignals();
-  }
-
-  // -----------------------------------------------
-  /// Initialize internal data structures and EEPROM values with default values
-  /// from ROM.    
-  // -----------------------------------------------
-  void CalM::initClassifiers()
-  {
-    const auto it_begin = eeprom::default_values::input_classifiers.classifiers.begin();
-    for (auto it = it_begin; it < eeprom::default_values::input_classifiers.classifiers.end(); it++)
-    {
-      set_input_classifier(it - it_begin, *it);
-    }
-
-    (void)updateClassifiers();
-  }
-
-  // -----------------------------------------------
-  /// Read values from EEPROM
-  // -----------------------------------------------
-  void CalM::readBaseCV()
-  {
-    base_cv.AddressLSB = hal::eeprom::read(eeprom::eDecoderAddressLSB);
-    base_cv.AddressMSB = hal::eeprom::read(eeprom::eDecoderAddressMSB);
-    base_cv.AuxAct = hal::eeprom::read(eeprom::eAuxiliaryActivattion);
-    for (int i = 0; i < 4; i++)
-    {
-      base_cv.TimeOn[i] = hal::eeprom::read(eeprom::eTimeOnBase + i);
-    }
-    base_cv.ManufacturerID = hal::eeprom::read(eeprom::eManufacturerID);
-    base_cv.ManufacturerVersionID = hal::eeprom::read(eeprom::eManufacturerVersionID);
-    base_cv.Configuration = hal::eeprom::read(eeprom::eConfiguration);
-  }
-
-  // -----------------------------------------------
-  /// Read values from EEPROM and store them in member variable signals.
-  // -----------------------------------------------
-  void CalM::readSignals()
-  {
-    uint16 unEepIdx = eeprom::eSignalBase; // local index, starts with first signal
-
-    for (auto it = signals.begin(); it < signals.end(); it++)
-    {
-      // byte 1: input
-      it->input.raw = hal::eeprom::read(unEepIdx); unEepIdx++;
-
-      // bytes 2 - 11: aspect and blinking
-      for (auto aspect_it = it->aspects.begin(); aspect_it < it->aspects.end(); aspect_it++)
-      {
-        aspect_it->aspect = hal::eeprom::read(unEepIdx); unEepIdx++;
-        aspect_it->blink = hal::eeprom::read(unEepIdx); unEepIdx++;
-      }
-
-      // bytes 12 - 16: targets
-      for (auto target_it = it->targets.begin(); target_it < it->targets.end(); target_it++)
-      {
-        uint8 val = hal::eeprom::read(unEepIdx); unEepIdx++;
-        target_it->type = util::bits::extract(val, 0, 2);
-        target_it->idx  = util::bits::extract(val, 2, 6);
-      }
-
-      // bytes 17, 18: change over time and blink change over time
-      it->changeOverTime = hal::eeprom::read(unEepIdx); unEepIdx++;
-      it->blinkChangeOverTime = hal::eeprom::read(unEepIdx); unEepIdx++;
-    }
-  }
-
-  // -----------------------------------------------
-  /// Read values from EEPROM and store them in member variable input_classifiers.
-  // -----------------------------------------------
-  void CalM::readClassifiers()
-  {
-    uint16 unEepIdx = eeprom::eClassifierBase; // local index, starts with first classifier
-
-    for (auto it = input_classifiers.classifiers.begin(); it < input_classifiers.classifiers.end(); it++)
-    {
-      // byte 1: pin
-      it->ucPin = hal::eeprom::read(unEepIdx); unEepIdx++;
-
-      // byte 2: debounce
-      it->limits.ucDebounce = hal::eeprom::read(unEepIdx); unEepIdx++;
-
-      // bytes 3 - 7: lower limits
-      for (auto limit_it = it->limits.aucLo.begin(); limit_it < it->limits.aucLo.end(); limit_it++)
-      {
-        *limit_it = hal::eeprom::read(unEepIdx); unEepIdx++;
-      }
-
-      // bytes 8 - 12: upper limits
-      for (auto limit_it = it->limits.aucHi.begin(); limit_it < it->limits.aucHi.end(); limit_it++)
-      {
-        *limit_it = hal::eeprom::read(unEepIdx); unEepIdx++;
-      }
-    }
-  }
-
-  // -----------------------------------------------
-  /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
-  // -----------------------------------------------
-  bool CalM::updateBaseCV()
-  {
-    hal::eeprom::update(eeprom::eDecoderAddressLSB, base_cv.AddressLSB);
-    hal::eeprom::update(eeprom::eDecoderAddressMSB, base_cv.AddressMSB);
-    hal::eeprom::update(eeprom::eAuxiliaryActivattion, base_cv.AuxAct);
-    for (int i = 0; i < 4; i++)
-    {
-      hal::eeprom::update(eeprom::eTimeOnBase + i, base_cv.TimeOn[i]);
-    }
-    hal::eeprom::update(eeprom::eManufacturerID, base_cv.ManufacturerID);
-    hal::eeprom::update(eeprom::eManufacturerVersionID, base_cv.ManufacturerVersionID);
-    hal::eeprom::update(eeprom::eConfiguration, base_cv.Configuration);
-
-    return true;
-  }
-
-  // -----------------------------------------------
-  /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
-  // -----------------------------------------------
-  bool CalM::updateSignals()
-  {
-    uint16 unEepIdx = eeprom::eSignalBase;
-
-    for (auto it = signals.begin(); it < signals.end(); it++)
-    {
-      // byte 1: input
-      hal::eeprom::update(unEepIdx, it->input.raw); unEepIdx++;
-
-      // bytes 2 - 11: aspect and blinking
-      for (auto aspect_it = it->aspects.begin(); aspect_it < it->aspects.end(); aspect_it++)
-      {
-        hal::eeprom::update(unEepIdx, aspect_it->aspect); unEepIdx++;
-        hal::eeprom::update(unEepIdx, aspect_it->blink); unEepIdx++;
-      }
-
-      // bytes 12 - 16: targets
-      for (auto target_it = it->targets.begin(); target_it < it->targets.end(); target_it++)
-      {
-        uint8 val = (target_it->idx << 2) | target_it->type;
-        hal::eeprom::update(unEepIdx, val); unEepIdx++;
-      }
-
-      // bytes 17, 18: change over time and blink change over time
-      hal::eeprom::update(unEepIdx, it->changeOverTime); unEepIdx++;
-      hal::eeprom::update(unEepIdx, it->blinkChangeOverTime); unEepIdx++;
-    }
-
-    return true;
-  }
-
-  // -----------------------------------------------
-  /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
-  // -----------------------------------------------
-  bool CalM::updateClassifiers()
-  {
-    uint16 unEepIdx = eeprom::eClassifierBase;
-
-    for (auto it = input_classifiers.classifiers.begin(); it < input_classifiers.classifiers.end(); it++)
-    {
-      // byte 1: pin
-      hal::eeprom::update(unEepIdx, it->ucPin); unEepIdx++;
-
-      // byte 2: debounce
-      hal::eeprom::update(unEepIdx, it->limits.ucDebounce); unEepIdx++;
-
-      // bytes 3 - 7: lower limits
-      for (auto limit_it = it->limits.aucLo.begin(); limit_it < it->limits.aucLo.end(); limit_it++)
-      {
-        hal::eeprom::update(unEepIdx, *limit_it); unEepIdx++;
-      }
-
-      // bytes 8 - 12: upper limits
-      for (auto limit_it = it->limits.aucHi.begin(); limit_it < it->limits.aucHi.end(); limit_it++)
-      {
-        hal::eeprom::update(unEepIdx, *limit_it); unEepIdx++;
-      }
-    }
-
-    return true;
-  }
-
-  // -----------------------------------------------
-  /// Initialize internal data structures and EEPROM values with default values
-  /// from ROM.    
-  // -----------------------------------------------
-  void CalM::initAll()
-  {
-    initBaseCV();
-    initSignals();
-    initClassifiers();
-  }
-
-  // -----------------------------------------------
-  /// Read data from EEPROM
-  // -----------------------------------------------
-  bool CalM::readAll()
-  {
-    readBaseCV();
-    readSignals();
-    readClassifiers();
-    return isValid();
-  }
-
-  // -----------------------------------------------
-  /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
-  /// Validate the data after write.
-  /// Returns true if successful, returns false otherwise.
-  // -----------------------------------------------
-  bool CalM::update()
-  {
-    updateBaseCV();
-    updateSignals();
-    updateClassifiers();
-
-    // verify
-    return readAll();
-  }
-
-  // -----------------------------------------------
-  /// Server function: Store data in RAM. If doUpdate is true, stores data
-  /// in EEPROM. Otherwise, call update() for this.
-  /// Return OK is successful, returns NOK otherwise.
-  // -----------------------------------------------
-  rte::ret_type CalM::set_signal(uint8 ucSignalId, const signal_type& values, bool doUpdate)
-  {
-    rte::ret_type ret = rte::ret_type::NOK;
-
-    if (signals.check_boundary(ucSignalId))
-    {
-      util::memcpy(&signals.at(ucSignalId), &values, sizeof(signal_type));
-      calcLeds();
-      if (doUpdate)
-      {
-        ret = updateSignals() ? rte::ret_type::OK : rte::ret_type::NOK;
-      }
-      else
-      {
-        ret = rte::ret_type::OK;
-      }
-    }
-
-    return ret;
-  }
-  
-  // -----------------------------------------------
-  /// Server function: Store data in RAM. If doUpdate is true, stores data
-  /// in EEPROM. Otherwise, call update() for this.
-  /// Return OK is successful, returns NOK otherwise.
-  // -----------------------------------------------
-  rte::ret_type CalM::set_input_classifier(uint8 ucClassifierId, const input_classifier_single_type& values, bool doUpdate)
-  {
-    rte::ret_type ret = rte::ret_type::NOK;
-
-    if (input_classifiers.classifiers.check_boundary(ucClassifierId))
-    {
-      util::memcpy(&input_classifiers.classifiers.at(ucClassifierId), &values, sizeof(input_classifier_single_type));
-      if (doUpdate)
-      {
-        ret = updateClassifiers() ? rte::ret_type::OK : rte::ret_type::NOK;
-      }
-      else
-      {
-        ret = rte::ret_type::OK;
-      }
-    }
-
-    return ret;
-  }
-
-  // -----------------------------------------------
-  /// Server function: Store data in RAM. If doUpdate is true, stores data
-  /// in EEPROM. Otherwise, call update() for this.
-  /// Return OK is successful, returns NOK otherwise.
-  // -----------------------------------------------
-  rte::ret_type CalM::set_base_cv(const base_cv_cal_type& p, bool doUpdate)
-  {
-    rte::ret_type ret;
-
-    base_cv = p;
-
-    if (doUpdate)
-    {
-      ret = updateBaseCV() ? rte::ret_type::OK : rte::ret_type::NOK;
-    }
-    else
-    {
-      ret = rte::ret_type::OK;
-    }
-    
-    return ret;
-  }
-
-  // -----------------------------------------------
-  /// Server function: initialize EEPROM with ROM default values
-  // -----------------------------------------------
-  rte::ret_type CalM::init_all()
-  {
-    initAll();
-    return rte::ret_type::OK;
-  }
-
-  // -----------------------------------------------
-  /// Calculate bit field: for each port, set a bit to 1 if the port is used by a LED
-  /// or clear the bit to 0 if the port is not used by a LED.
-  // -----------------------------------------------
-  void CalM::calcLeds()
-  {
-    const signal_cal_type * pSignals = get_signal();
-    if (pSignals != nullptr)
-    {
-      // set all bits to zero
-      leds.reset();
-      for (auto it = pSignals->begin(); it != pSignals->end(); it++)
-      {
-        for (auto tgtit = it->targets.begin(); tgtit != it->targets.end(); tgtit++)
+        namespace default_values
         {
-          if (tgtit->type == target_type::eOnboard)
-          {
-            // set idx-th bit to one
-            leds.set(tgtit->idx);
-          }
+            static const uint8 init_values[] = EEPROM_INIT;
+
+            static const util::array<output_type, cfg::kNrBuiltInSignals> built_in_signal_outputs = CAL_BUILT_IN_SIGNAL_OUTPUTS;
         }
-      }
     }
-  }
 
-  // -----------------------------------------------
-  /// Init runable
-  // -----------------------------------------------
-  void CalM::init()
-  {
-    if (!readAll())
+    // -----------------------------------------------
+    /// Returns CRC8 from EEPROM addresses unStartNvmId ... unStartNvmId + unLen - 1.
+    /// ucCrc is initial CRC value.
+    // -----------------------------------------------
+
+    /**
+     * @brief Returns the byte-wise sum of all bytes modulo 256.
+     * 
+     * @param src Pointer to first memory location
+     * @param unLen Length in bytes for sum
+     * @param ucCrc Starting value
+     * @return uint8 Sum over all bytes modulo 256.
+     */
+    uint8 calc_sum(const void *src, uint16 unLen, uint8 ucCrc)
     {
-      // invalid / never programmed: initialize EEPROM with default values
-      initAll();
+        const uint8 *pSrc = static_cast<const uint8 *>(src);
+
+        for (; unLen > 0U; unLen--)
+        {
+            ucCrc += *pSrc;
+            pSrc++;
+        }
+
+        return ucCrc;
     }
 
-    calcLeds();
-  }
+    /**
+     * @brief Construct a new CalM object
+     */
+    CalM::CalM()
+    {
+    }
 
-  // -----------------------------------------------
-  /// Cyclic runable
-  // -----------------------------------------------
-  void CalM::cycle100()
-  {
-  }
+    /**
+     * @brief Read manufacturer ID and compare against initial value (default EEPORM value if never
+     * written before).
+     */
+    bool CalM::is_valid()
+    {
+        return hal::eeprom::read(eeprom::eManufacturerID) != hal::eeprom::kInitial;
+    }
+
+    /**
+     * @brief calculate checksum for @ref signals and @ref classifier_array.
+     */
+    uint8 CalM::calc_checksum()
+    {
+        uint8 ucCrc = 0; // start value
+
+        // signals
+        for (auto it = signals.begin(); it < signals.end(); it++)
+        {
+            ucCrc = calc_sum(it, sizeof(signal_type), ucCrc);
+        }
+
+        // classifiers
+        for (auto it = classifier_array.classifiers.begin(); it < classifier_array.classifiers.end(); it++)
+        {
+            ucCrc = calc_sum(it, sizeof(classifier_array_element_type), ucCrc);
+        }
+
+        return ucCrc;
+    }
+
+#if 0
+    /**
+     * @brief Initialize @ref base_cv and corresponding EEPROM values with default values from ROM.
+     */
+    void CalM::init_base_CV()
+    {
+        base_cv.CV1_address_LSB = eeprom::default_values::init_values[eeprom::eDecoderAddressLSB];
+        base_cv.CV7_manufacturer_version_ID = eeprom::default_values::init_values[eeprom::eManufacturerVersionID];
+        base_cv.CV8_manufacturer_ID = eeprom::default_values::init_values[eeprom::eManufacturerID];
+        base_cv.CV9_address_MSB = eeprom::default_values::init_values[eeprom::eDecoderAddressMSB];
+        base_cv.CV29_configuration = eeprom::default_values::init_values[eeprom::eConfiguration];
+
+        (void)update_base_CV();
+    }
+#endif
+    /**
+     * @brief Update @ref sig_type and @ref classifier_array_element from given raw values
+     * 
+     * @todo Add digital inputs
+     */
+    void CalM::set_input_and_classifier(
+        uint8 signal_pos,
+        classifier_array_element_type& classifier_array_element,
+        signal_type& sig_type,
+        uint8 signal_input_raw_val, 
+        uint8 classifier_type_raw_val)
+    {
+        uint8 adc_pin{ 0 };
+        uint8 classifier_type_val;
+        util::ptr<const cal::classifier_type> limits_ptr;
+
+        bool update_classifier_array = false;
+
+        const uint8 input_type_val = util::bits::masked_shift(
+                                    signal_input_raw_val,
+                                    cal::signal::bitmask::kInputType,
+                                    cal::signal::bitshift::kInputType);
+        // A classifier is required for ADC values only
+        if (input_type_val == cal::signal::values::kInputType_ADC)
+        {
+            adc_pin = util::bits::masked_shift(
+                                 signal_input_raw_val,
+                                 cal::signal::bitmask::kAdcPin, 
+                                 cal::signal::bitshift::kAdcPin);
+            classifier_type_val = util::bits::masked_shift(
+                                    classifier_type_raw_val,
+                                    cal::signal::bitmask::kClassifierType,
+                                    cal::signal::bitshift::kClassifierType);
+            if (classifier_type_val >= cfg::kNrUserDefinedClassifierTypes)
+            {
+                // fallback in case of out-of-bounds: use first classifier
+                classifier_type_val = 0;
+            }
+            limits_ptr = &user_defined_classifier_types[classifier_type_val];
+            sig_type.input.type = cal::input_type::eAdc;
+            sig_type.input.idx = signal_pos;
+            update_classifier_array = true;
+        }
+        else if (input_type_val == cal::signal::values::kInputType_DCC)
+        {
+            // DCC address is DCC output address plus signal index
+            adc_pin = 0;
+            // limits_ptr is already nullptr
+            sig_type.input.type = cal::input_type::eDcc;
+            sig_type.input.idx = signal_pos;
+            update_classifier_array = true;
+        }
+        else
+        {
+            // Digital input
+        }
+
+        if (update_classifier_array)
+        {
+            if ((classifier_array_element.pin != adc_pin) ||
+                (classifier_array_element.limits_ptr != limits_ptr))
+            {
+                classifier_array_element.pin = adc_pin;
+                classifier_array_element.limits_ptr = limits_ptr;
+                    //&user_defined_classifier_types[classifier_type_val];
+            }
+            // Classifiers do not read the configuration cyclicly, so we need to inform
+            // them if anything changed. This causes the classifier to reset and use
+            // the new configuration.
+            rte::ifc_rte_update_config_for_classifier::call(signal_pos);
+        }
+    }
+
+    /**
+     * @brief Returns true if signal is a built in signal
+     * 
+     * @param id Signal ID from CV values
+     * @return true if signal is built in
+     * @return false otherwise
+     */
+    inline bool is_built_in(CalM::SignalId id) noexcept
+    {
+        return (id.val >= kFirstBuiltInSignalID) &&
+               (id.val < eeprom::default_values::built_in_signal_outputs.max_size());
+    }
+
+    /**
+     * @brief Returns the zero based index of signal id to be used for array indexing
+     * 
+     * @param id signal id
+     * @return uint8 zero based index of the signal id
+     * 
+     * @note Use for built in signal ids only.
+     */
+    uint8 zero_based_built_in(CalM::SignalId id)  { return id.val - kFirstBuiltInSignalID; }
+
+    /**
+     * @brief Returns the zero based index of signal id to be used for array indexing
+     * 
+     * @param id signal id
+     * @return uint8 uint8 zero based index of the signal id
+     * 
+     * @note Use for built in signal ids only.
+     */
+    uint8 zero_based_user_defined(CalM::SignalId id) { return id.val - kFirstUserDefinedSignalID; }
+
+    /**
+     * @brief Use bit operations to update @ref first_target with @ref raw_val.
+     */
+    void CalM::set_first_target(cal::signal_type& sig_type, uint8 raw_val)
+    {
+        sig_type.first_target.type = util::bits::masked_shift(
+                                    raw_val,
+                                    cal::signal::bitmask::kFirstOutputType,
+                                    cal::signal::bitshift::kFirstOutputType);
+        sig_type.first_target.idx = util::bits::masked_shift(
+                                    raw_val,
+                                    cal::signal::bitmask::kFirstOutputPin,
+                                    cal::signal::bitshift::kFirstOutputPin);
+    }
+
+    /**
+     * @brief Update output_ptr of @ref sig_type.
+     * 
+     * @param sig_type The data structure to be updated
+     * @param signal_id Which signal type it is
+     */
+    void CalM::set_output(signal_type& sig_type, CalM::SignalId signal_id)
+    {
+        if (is_built_in(signal_id))
+        {
+            sig_type.output_ptr = eeprom::default_values::built_in_signal_outputs.data()
+                                + zero_based_built_in(signal_id);
+            sig_type.signal_id = signal_id.val;
+        }
+        else if (is_user_defined(signal_id))
+        {
+            sig_type.output_ptr = user_defined_signal_outputs.data() 
+                                + zero_based_user_defined(signal_id);
+            sig_type.signal_id = signal_id.val;
+        }
+        else
+        {
+            // invalid signal
+            sig_type.output_ptr = util::ptr<const cal::output_type>();
+            sig_type.signal_id = signal_id.val;
+        }
+    }
+
+#if 0
+    /**
+     * @brief Initialize @ref signals, @ref classifier_array, and @ref user_defined_signal_outputs
+     *        with default values from ROM.
+     */
+    void CalM::init_signals()
+    {
+        uint16 eep_idx;
+        uint16 eep_idx_input;
+        uint16 eep_idx_classifier_type;
+        uint16 eep_idx_signal_id;
+        uint16 eep_idx_first_output;
+        uint8 pos;
+
+        // user defined signals
+        eep_idx = eeprom::eUserDefinedSignalBase;
+        for (auto it = user_defined_signal_outputs.begin(); 
+                  it < user_defined_signal_outputs.end(); 
+                  it++)
+        {
+            it->num_targets = util::bits::masked_shift(
+                eeprom::default_values::init_values[eep_idx++],
+                user_defined_signal::bitmask::kNumberOfOutputs,
+                user_defined_signal::bitshift::kNumberOfOutputs);
+            for (auto asp_it = it->aspects.begin(); asp_it < it->aspects.end(); asp_it++)
+            {
+                asp_it->aspect = eeprom::default_values::init_values[eep_idx++];
+                asp_it->blink = eeprom::default_values::init_values[eep_idx++];
+            }
+            it->change_over_time = eeprom::default_values::init_values[eep_idx++];
+            it->change_over_time_blink = eeprom::default_values::init_values[eep_idx++];
+        }
+
+        // first target and output
+        eep_idx_signal_id = eeprom::eSignalIDBase;
+        eep_idx_first_output = cal::eeprom::eSignalFirstOutputBase;
+
+        for (pos = 0; pos < cfg::kNrSignals; pos++)
+        {
+            SignalId signal_id { eeprom::default_values::init_values[eep_idx_signal_id++] };
+
+            set_first_target(
+                signals.at(pos), 
+                eeprom::default_values::init_values[eep_idx_first_output++]);
+            set_output(signals.at(pos), signal_id);
+        }
+
+        // inputs
+        eep_idx_input = cal::eeprom::eSignalInputBase;
+        eep_idx_classifier_type = cal::eeprom::eSignalInputClassifierTypeBase;
+
+        for (pos = 0; pos < cfg::kNrSignals; pos++)
+        {
+            set_input_and_classifier(
+                pos,
+                classifier_array.classifiers.at(pos),
+                signals.at(pos),
+                eeprom::default_values::init_values[eep_idx_input++],
+                eeprom::default_values::init_values[eep_idx_classifier_type++]);
+
+        }
+
+        update_signals();
+    }
+#endif
+
+#if 0
+   /**
+     * @brief Initialize @ref user_defined_classifier_types and corresponding EEPROM values
+     *        with default values from ROM
+     */
+    void CalM::init_user_defined_classifiers()
+    {
+        // Initialize user-defined classifiers
+        util::memcpy(user_defined_classifier_types.begin(), 
+                     &eeprom::default_values::init_values[eeprom::eClassifierBase], 
+                     cfg::kNrUserDefinedClassifierTypes * sizeof(classifier_type));
+
+        update_user_defined_classifiers();
+    }
+#endif
+    /**
+     * @brief Read values for @ref base_cv from EEPROM
+     */
+    void CalM::read_base_CV()
+    {
+        base_cv.CV1_address_LSB = hal::eeprom::read(eeprom::eDecoderAddressLSB);
+        base_cv.CV9_address_MSB = hal::eeprom::read(eeprom::eDecoderAddressMSB);
+        base_cv.CV8_manufacturer_ID = hal::eeprom::read(eeprom::eManufacturerID);
+        base_cv.CV7_manufacturer_version_ID = hal::eeprom::read(eeprom::eManufacturerVersionID);
+        base_cv.CV29_configuration = hal::eeprom::read(eeprom::eConfiguration);
+    }
+
+    /**
+     * @brief Read values for @ref signals and @ref classifier_array from EEPROM
+     */
+    void CalM::read_signals()
+    {
+        uint16 eep_idx = eeprom::eUserDefinedSignalBase;
+        uint16 eep_idx_first_output;
+        uint16 eep_idx_classifier_type;
+        uint8 pos;
+
+        // user defined signals
+        for (auto it = user_defined_signal_outputs.begin(); 
+                  it < user_defined_signal_outputs.end(); 
+                  it++)
+        {
+            it->num_targets = util::bits::masked_shift(
+                hal::eeprom::read(eep_idx),
+                user_defined_signal::bitmask::kNumberOfOutputs,
+                user_defined_signal::bitshift::kNumberOfOutputs);
+            eep_idx++;
+            for (auto asp_it = it->aspects.begin(); asp_it < it->aspects.end(); asp_it++)
+            {
+                asp_it->aspect = hal::eeprom::read(eep_idx++);
+                asp_it->blink = hal::eeprom::read(eep_idx++);
+            }
+            it->change_over_time = hal::eeprom::read(eep_idx++);
+            it->change_over_time_blink = hal::eeprom::read(eep_idx++);
+        }
+
+        // first target and output
+        eep_idx = eeprom::eSignalIDBase;
+        eep_idx_first_output = eeprom::eSignalFirstOutputBase;
+        for (auto it = signals.begin(); it < signals.end(); it++)
+        {
+            const SignalId signal_id { hal::eeprom::read(eep_idx++) };
+
+            set_first_target(*it, hal::eeprom::read(eep_idx_first_output++));
+            set_output(*it, signal_id);
+        }
+
+        // inputs
+        eep_idx = eeprom::eSignalInputBase;
+        eep_idx_classifier_type = eeprom::eSignalInputClassifierTypeBase;
+        for (pos = 0; pos < cfg::kNrSignals; pos++)
+        {
+            set_input_and_classifier(
+                pos,
+                classifier_array.classifiers.at(pos),
+                signals.at(pos),
+                hal::eeprom::read(eep_idx++),
+                hal::eeprom::read(eep_idx_classifier_type++));
+        }
+    }
+
+    /**
+     * @brief Read values for @ref user_defined_classifier_types from EEPROM.
+     */
+    void CalM::read_classifiers()
+    {
+        uint16 unEepIdx = eeprom::eClassifierBase; // local index, starts with first classifier
+
+        for (auto it = user_defined_classifier_types.begin(); 
+                  it < user_defined_classifier_types.end(); 
+                  it++)
+        {
+            it->debounce_time = hal::eeprom::read(unEepIdx++);
+            for (auto limit_it = it->lo_limits.begin(); limit_it < it->lo_limits.end(); limit_it++)
+            {
+                *limit_it = hal::eeprom::read(unEepIdx++);
+            }
+            for (auto limit_it = it->hi_limits.begin(); limit_it < it->hi_limits.end(); limit_it++)
+            {
+                *limit_it = hal::eeprom::read(unEepIdx++);
+            }
+        }
+    }
+
+    /**
+     * @brief Store @ref base_cv in EEPROM if a value differs from the value already stored 
+     *        in the EEPROM.
+     */
+    void CalM::update_base_CV()
+    {
+        hal::eeprom::update(eeprom::eDecoderAddressLSB, base_cv.CV1_address_LSB);
+        hal::eeprom::update(eeprom::eDecoderAddressMSB, base_cv.CV9_address_MSB);
+        hal::eeprom::update(eeprom::eManufacturerID, base_cv.CV8_manufacturer_ID);
+        hal::eeprom::update(eeprom::eManufacturerVersionID, base_cv.CV7_manufacturer_version_ID);
+        hal::eeprom::update(eeprom::eConfiguration, base_cv.CV29_configuration);
+    }
+
+    /**
+     * @brief Returns the position of limits_ptr in @ref user_defined_classifier_types
+     * 
+     * @param limits_ptr Pointer to limits that shall be found
+     * @return uint8 Position of limits_ptr in @ref user_defined_classifier_types.
+     *         255 if limits_ptr is not found.
+     */
+    uint8 CalM::find_classifier_type(util::ptr<const classifier_type> limits_ptr)
+    {
+        uint8 pos = 0;
+        for (auto it = user_defined_classifier_types.begin();
+                  it != user_defined_classifier_types.end();
+                  it++)
+        {
+            if (it == limits_ptr.get())
+            {
+                break;
+            }
+            pos++;
+        }
+
+        if (pos >= user_defined_classifier_types.size())
+        {
+            pos = 255;
+        }
+
+        return pos;
+    }
+
+    /**
+     * @brief Store @ref signals and @ref classifier_array to EEPROM. 
+     *        Save data to EEPROM only if the new value differs from the one currently stored.
+     */
+    void CalM::update_signals()
+    {
+        uint16 eep_idx;
+        uint16 eep_idx_signal_id;
+        uint16 eep_idx_first_output;
+        uint16 eep_idx_classifier_type;
+        uint8 tmp;
+
+        eep_idx_signal_id = eeprom::eSignalIDBase;
+        eep_idx_first_output = cal::eeprom::eSignalFirstOutputBase;
+
+        // signal ids and first outputs
+        for (auto it = signals.begin(); it < signals.end(); it++)
+        {
+            tmp = util::bits::lshift(it->first_target.type, signal::bitshift::kFirstOutputType)
+                | util::bits::lshift(it->first_target.idx, signal::bitshift::kFirstOutputPin);
+            hal::eeprom::update(eep_idx_signal_id++, it->signal_id);
+            hal::eeprom::update(eep_idx_first_output++, tmp);
+        }
+
+        // user defined signals
+        eep_idx = eeprom::eUserDefinedSignalBase;
+        for (auto it = user_defined_signal_outputs.begin(); 
+                  it < user_defined_signal_outputs.end(); 
+                  it++)
+        {
+            hal::eeprom::update(eep_idx++, it->num_targets);
+            for (auto asp_it = it->aspects.begin(); asp_it < it->aspects.end(); asp_it++)
+            {
+                hal::eeprom::update(eep_idx++, asp_it->aspect);
+                hal::eeprom::update(eep_idx++, asp_it->blink);
+            }
+            hal::eeprom::update(eep_idx++, it->change_over_time);
+            hal::eeprom::update(eep_idx++, it->change_over_time_blink);
+        }
+
+        // signal inputs
+        eep_idx = cal::eeprom::eSignalInputBase;
+        eep_idx_classifier_type = cal::eeprom::eSignalInputClassifierTypeBase;
+        for (auto it = signals.begin(); it < signals.end(); it++)
+        {
+            tmp = util::bits::lshift(it->input.type, signal::bitshift::kInputType)
+                | util::bits::lshift(classifier_array.classifiers[it->input.idx].pin, signal::bitshift::kAdcPin);
+            hal::eeprom::update(eep_idx++, tmp);
+            if (it->input.type == cal::input_type::eAdc)
+            {
+                tmp = util::bits::lshift(
+                    find_classifier_type(classifier_array.classifiers[it->input.idx].limits_ptr),
+                    signal::bitshift::kClassifierType
+                );
+            }
+            else
+            {
+                tmp = 0;
+            }
+            hal::eeprom::update(eep_idx_classifier_type++, tmp);
+        }
+    }
+
+    /**
+     * @brief Store @ref user_defined_classifier_types in EEPROM.
+     */
+    void CalM::update_user_defined_classifiers()
+    {
+        uint16 unEepIdx = eeprom::eClassifierBase; // local index, starts with first classifier
+
+        for (auto it = user_defined_classifier_types.begin(); 
+                  it < user_defined_classifier_types.end(); 
+                  it++)
+        {
+            hal::eeprom::update(unEepIdx++, it->debounce_time);
+            for (auto limit_it = it->lo_limits.begin(); limit_it < it->lo_limits.end(); limit_it++)
+            {
+                hal::eeprom::update(unEepIdx++, *limit_it);
+            }
+            for (auto limit_it = it->hi_limits.begin(); limit_it < it->hi_limits.end(); limit_it++)
+            {
+                hal::eeprom::update(unEepIdx++, *limit_it);
+            }
+        }
+    }
+
+    /**
+     * @brief Read all configurations from EEPROM and compare CV 9 (manufacturer ID) against initial
+     * value (default EEPORM value if never written before).
+     * 
+     * @return true CV 9 has been written
+     * @return false CV 9 has not been written
+     */
+    bool CalM::read_all()
+    {
+        read_base_CV();
+        read_signals();
+        read_classifiers();
+        return is_valid();
+    }
+
+    /**
+     * @brief Store all configurations to EEPROM.
+     * 
+     * @return true CV 9 has been written successfully
+     * @return false CV 9 has not been written
+     */
+    bool CalM::update()
+    {
+        update_base_CV();
+        update_signals();
+        update_user_defined_classifiers();
+
+        // verify
+        return read_all();
+    }
+
+    /**
+     * @brief Server function. Update @ref signal at @ref signal_pos.
+     * 
+     * @todo Re-calculate LEDs.
+     */
+    rte::ret_type CalM::set_signal_first_target(
+        uint8 signal_pos, 
+        const target_type& first_target, 
+        bool do_update)
+    {
+        rte::ret_type ret = rte::ret_type::NOK;
+
+        if (signals.check_boundary(signal_pos))
+        {
+            signals.at(signal_pos).first_target = first_target;
+            // 
+            if (do_update)
+            {
+                update_signals();
+            }
+            ret = rte::ret_type::OK;
+        }
+
+        return ret;
+    }
+
+    /**
+     * @brief Server function. Update @ref signal at @ref signal_pos.
+     */
+    rte::ret_type CalM::set_signal_id(uint8 signal_pos, const uint8 signal_id, bool do_update)
+    {
+        rte::ret_type ret = rte::ret_type::NOK;
+
+        if (signals.check_boundary(signal_pos))
+        {
+            SignalId sig_id { signal_id };
+            set_output(signals.at(signal_pos), sig_id);
+            if (signals.at(signal_pos).output_ptr)
+            {
+                if (do_update)
+                {
+                    update_signals();
+                }
+                ret = rte::ret_type::OK;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * @brief Server function. Update @ref signals and @ref classifier_array at @ref signal_pos.
+     */
+    rte::ret_type CalM::set_signal_input_classifier(
+        uint8 signal_pos, 
+        const uint8 adc_pin, 
+        const uint8 classifier_type_val,
+        bool do_update)
+    {
+        rte::ret_type ret = rte::ret_type::NOK;
+
+        if (user_defined_classifier_types.check_boundary(classifier_type_val) &&
+            classifier_array.classifiers.check_boundary(signal_pos) &&
+            signals.check_boundary(signal_pos))
+        {
+            signals.at(signal_pos).input.type = input_type::eAdc;
+            signals.at(signal_pos).input.idx = signal_pos;
+            classifier_array.classifiers.at(signal_pos).pin = adc_pin;
+            classifier_array.classifiers.at(signal_pos).limits_ptr = 
+                user_defined_classifier_types.data() + classifier_type_val;
+            if (do_update)
+            {
+                update_signals();
+            }
+            ret = rte::ret_type::OK;
+        }
+
+        return ret;
+    }
+
+    /**
+     * @brief Server function. Update @ref signals at @ref signal_pos
+     */
+    rte::ret_type CalM::set_signal_input_dcc(uint8 signal_pos, 
+                                       bool do_update)
+    {
+        rte::ret_type ret = rte::ret_type::NOK;
+
+        if (signals.check_boundary(signal_pos))
+        {
+            signals.at(signal_pos).input.type = input_type::eDcc;
+            signals.at(signal_pos).input.idx = signal_pos;
+            if (do_update)
+            {
+                update_signals();
+            }
+            ret = rte::ret_type::OK;
+        }
+
+        return ret;
+    }
+
+    /**
+     * @brief Server function. Update base_cv.
+     */
+    rte::ret_type CalM::set_base_cv(const base_cv_cal_type &new_base_cv, bool do_update)
+    {
+        base_cv = new_base_cv;
+
+        if (do_update)
+        {
+            update_base_CV();
+        }
+
+        return rte::ret_type::OK;
+    }
+
+    /**
+     * @brief Set a CV
+     */
+    rte::ret_type CalM::set_cv(uint16 cv_id, uint8 val)
+    {
+        typedef void (CalM::*member_func_type)(void);
+        struct CvFuncTuple 
+        {
+            uint16 cv_min;
+            uint16 cv_max;
+            member_func_type func;
+        };
+
+        static const util::array<CvFuncTuple, 5> lut = {{ 
+            {                          0, cv::eConfiguration        , &CalM::read_base_CV },
+            { cv::eSignalIDBase         , cv::eClassifierBase       , &CalM::read_signals },
+            { cv::eClassifierBase       , cv::eUserDefinedSignalBase, &CalM::read_classifiers },
+            { cv::eUserDefinedSignalBase, cv::eLastCV               , &CalM::read_signals },
+        }};
+
+        rte::ret_type success = rte::ret_type::NOK;
+
+        if (cv_id < static_cast<uint16>(cv::eLastCV))
+        {
+            hal::eeprom::update(cv_id, val);
+            for (const auto& element : lut)
+            {
+                if ((cv_id >= element.cv_min) && (cv_id < element.cv_max))
+                {
+                    (this->*element.func)();
+                }
+            }
+            success = rte::ret_type::OK;
+        }
+
+        return success;
+    }
+
+    #if 0
+    /**
+     * @brief Server function. Initialize EEPROM with ROM default values
+     * 
+     * @return rte::ret_type 
+     */
+    rte::ret_type CalM::init_all()
+    {
+        init_base_CV();
+        init_signals();
+        init_user_defined_classifiers();
+        return rte::ret_type::OK;
+    }
+    #endif
+    /**
+     * @brief Server function. Initialize EEPROM with ROM default values
+     * 
+     * @return rte::ret_type OK Data validation ok (written manufacturer ID valid)
+     * @return rte::ret_type NOK Data validation ok (written manufacturer ID in valid)
+     */
+    rte::ret_type CalM::set_defaults()
+    {
+        uint16 pos;
+
+        for (pos = 0; pos < eeprom::eSizeOfData; pos++)
+        {
+            hal::eeprom::update(pos, eeprom::default_values::init_values[pos]);
+        }
+
+        return read_all() ? rte::ret_type::OK : rte::ret_type::NOK;
+    }
+
+    // -----------------------------------------------
+    /// Calculate bit field: for each port, set a bit to 1 if the port is used by a LED
+    /// or clear the bit to 0 if the port is not used by a LED.
+    // -----------------------------------------------
+    void CalM::calc_leds()
+    {
+        const signal_cal_type *signals_ptr = get_signal();
+        if (signals_ptr != nullptr)
+        {
+            // set all bits to zero
+            leds.reset();
+            for (auto it = signals_ptr->begin(); it != signals_ptr->end(); it++)
+            {
+                if (it->first_target.type == target_type::eOnboard)
+                {
+                    uint8 pos;
+                    const uint8 num_targets = (it->output_ptr) ? (it->output_ptr->num_targets) : (0);
+                    for (pos = it->first_target.idx; 
+                         pos < it->first_target.idx + num_targets; 
+                         pos++)
+                    {
+                        leds.set(pos);
+                    }
+                }
+            }
+        }
+    }
+
+    // -----------------------------------------------
+    /// Init runable
+    // -----------------------------------------------
+    void CalM::init()
+    {
+        if (!read_all())
+        {
+            // invalid / never programmed: initialize EEPROM with default values
+            set_defaults();
+            read_all();
+        }
+
+        calc_leds();
+    }
+
+    // -----------------------------------------------
+    /// Cyclic runable
+    // -----------------------------------------------
+    void CalM::cycle100()
+    {
+    }
 
 } // namespace cal

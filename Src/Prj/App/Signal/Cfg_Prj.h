@@ -27,14 +27,17 @@
 
 namespace cfg
 {
-  constexpr int kNrClassifiers = 6; ///< Number of (AD value) classifiers
-  constexpr int kNrClassifierClasses = 5; ///< Number of classifier classes
+  constexpr uint8 kNrSignals = 8; ///< Maximum number of signals
+  constexpr uint8 kNrSignalAspects = 8; ///< Maximum number of signal aspects
+  constexpr uint8 kNrSignalTargets = 8; ///< Maximum number of LED strings of a signal
 
-  constexpr int kNrDccAddresses = 6;  ///< Number of DCC addresses supported
+  constexpr int kNrClassifiers = kNrSignals;    ///< Number of (AD value) classifiers: 
+                                                ///< number of signals because each signal might have a classifier
+  constexpr int kNrClassifierClasses = 5;       ///< Number of classifier classes
 
-  constexpr uint8 kNrSignals = 6; ///< Maximal number of signals
-  constexpr uint8 kNrSignalAspects = 5; ///< Maximal number of signal aspects
-  constexpr uint8 kNrSignalTargets = 5; ///< Maximal number of LED strings of a signal
+  constexpr uint8 kNrUserDefinedClassifierTypes = 2;    ///< Number of user defineable classifier types (in EEPROM)
+  constexpr uint8 kNrUserDefinedSignals = 2;        ///< Number of user defineable signal IDs (in EEPROM)
+  constexpr uint8 kNrBuiltInSignals = 2;            ///< Number of built in signal IDs (in ROM)
 
   constexpr int kNrOnboardTargets = 54; ///< We support up to 54 onboard LED targets (some of them with PWM))
   constexpr int kNrExternalTargets = 32; ///< We support up to 32 external outputs (such as 4 shift registers with 8 bit each)

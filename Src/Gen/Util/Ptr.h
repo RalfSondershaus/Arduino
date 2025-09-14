@@ -70,6 +70,11 @@ namespace util
     explicit operator bool() const noexcept { return get() != nullptr; }
   };
 
+    template<class T>
+    inline bool operator==(const ptr<T>& lhs, const ptr<T>& rhs) { return lhs.get() == rhs.get(); }
+    template<class T>
+    inline bool operator!=(const ptr<T>& lhs, const ptr<T>& rhs) { return !(lhs == rhs); }
+
 } // namespace util
 
 #endif // UTIL_PTR_H

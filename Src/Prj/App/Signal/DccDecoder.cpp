@@ -26,9 +26,6 @@
 
 namespace signal
 {
-  static constexpr uint8 kBlinkLedPin = 13U;
-  static constexpr util::MilliTimer::time_type kBlinkLedPeriodValid_ms = 1000U;
-  static constexpr util::MilliTimer::time_type kBlinkLedPeriodInvalid_ms = 500U;
 
   // --------------------------------------------------------------------------
   /// @brief Toggle the alive LED
@@ -46,7 +43,7 @@ namespace signal
       lastWrite = LOW;
     }
 
-    hal::digitalWrite(kBlinkLedPin, lastWrite);
+    hal::digitalWrite(DccDecoder::kBlinkLedPin, lastWrite);
   }
 
   // --------------------------------------------------------------------------
@@ -75,30 +72,13 @@ namespace signal
   }
 
   // --------------------------------------------------------------------------
-  /// @brief Returns true if the addressing method is Decoder Address Method.
+  /// @brief Returns the DCC decoder address
   // --------------------------------------------------------------------------
-  static inline bool cal_isDecoderAddressingMethod(const cal::base_cv_cal_type* pCal) noexcept
+  static inline uint16 calc_address(const cal::base_cv_cal_type* pCal)
   {
-    return (pCal->Configuration & cal::configuration::bitmask::kAddressingMethod) == cal::configuration::kAddressingMethod_Decoder;
-  }
-  
-  // --------------------------------------------------------------------------
-  /// @brief Returns the decoder address (depending on addressing method).
-  // --------------------------------------------------------------------------
-  static inline uint16 cal_calcAddress(const cal::base_cv_cal_type* pCal) noexcept
-  {
-    uint16 address;
-    
-    if (cal_isDecoderAddressingMethod(pCal))
-    {
-      address = static_cast<uint16_t>((pCal->AddressLSB & 0xb00111111U) + (static_cast<uint16>(pCal->AddressMSB & 0xb00000111U) << 6U));
-    }
-    else
-    {
-      address = static_cast<uint16>(pCal->AddressLSB + (static_cast<uint16>(pCal->AddressMSB) << 8U));
-    }
+    return (static_cast<uint16>(pCal->CV1_address_LSB)     ) | 
+           (static_cast<uint16>(pCal->CV9_address_MSB) << 6);
 
-    return address;
   }
 
   // --------------------------------------------------------------------------
@@ -139,18 +119,8 @@ namespace signal
 
     if (cal_isValid(pCal))
     {
-      address = cal_calcAddress(pCal);
-      if (cal_isDecoderAddressingMethod(pCal))
-      {
-        decoder.disableOutputAddressMethod();
-      }
-      else
-      {
-        decoder.enableOutputAddressMethod();
-      }
+      address = calc_address(pCal);
     }   
-
-    //decoder.setFilter(passFilter);
   }
 
   // --------------------------------------------------------------------------
@@ -179,12 +149,12 @@ namespace signal
       while (!decoder.empty())
       {
         const PacketType& pkt = decoder.front();
-        // In case the address changed at run time (e.g. reconfiguration)
-        // we check here again
+
         if (passFilter.filter(pkt))
         {
           packet_received(pkt);
         }
+
         decoder.pop();
       }
       if (toggleLedPin(kBlinkLedPeriodValid_ms))

@@ -23,4 +23,13 @@
 
 #include <Cal/CalM_Type_Prj.h>
 
+/**
+ * @brief For type safety: a CV
+ */
+struct CV
+{
+    uint16 id;
+    uint8 val;
+};
+
 #endif // CALM_TYPE_H_

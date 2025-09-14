@@ -38,44 +38,40 @@ namespace util
   namespace cal
   {
     template<int NrClasses>
-    struct classifier_limits
+    struct classifier
     {
-      uint8 ucDebounce;                    ///< [10 ms] Debounce time until a class is classified: 0 sec ... 2.55 sec
-      util::array<uint8, NrClasses> aucLo; ///< Lower limits for classes [0, 255]. Needs to be upscaled to match the AD value resolution.
-      util::array<uint8, NrClasses> aucHi; ///< Upper limits for classes [0, 255]. Needs to be upscaled to match the AD value resolution.
+      uint8 debounce_time;              ///< [10 ms] Debounce time until a class is classified: 0 sec ... 2.55 sec
+      util::array<uint8, NrClasses> lo_limits; ///< Lower limits for classes [0, 255]. Needs to be upscaled to match the AD value resolution.
+      util::array<uint8, NrClasses> hi_limits; ///< Upper limits for classes [0, 255]. Needs to be upscaled to match the AD value resolution.
     };
 
     template<int NrClasses>
-    struct input_classifier_single
+    struct classifier_array_element
     {
-      using classifier_limits_type = classifier_limits<NrClasses>;
-      uint8 ucPin; ///< Pin of AD channel (such as A0)
-      util::ptr<const classifier_limits_type> pLimits;    ///< Pointer to debounce and limits.
-                                                                ///< Pointer is used because this can be shared between aClassifiers.
+      using classifier_type = classifier<NrClasses>;
+
+      uint8 pin;                                    ///< Pin of AD channel (such as A0)
+      util::ptr<const classifier_type> limits_ptr;  ///< Pointer to debounce and limits.
+                                ///< A pointer is used because it can be shared between classifiers.
     };
 
-    /// Example byte layout with NrClassifiers = 6, NrClasses = 5:
-    /// 
-    /// 12 byte per classifier:
-    ///  0     ucPin
-    ///  1     ucDebounce
-    ///  2- 6  aucLo 0 ... 4
-    ///  7-11  aucHi 0 ... 4
+    /// Coding data for an array of classifiers
     template<int NrClassifiers, int NrClasses>
-    struct input_classifier_cal
+    struct classifier_array
     {
-      using input_classifier_single_type = input_classifier_single<NrClasses>;
-      util::array<input_classifier_single_type, NrClassifiers> aClassifiers; ///< pin, debounce and limits
+      using classifier_array_element_type = classifier_array_element<NrClasses>;
+
+      util::array<classifier_array_element_type, NrClassifiers> classifiers; ///< pin, debounce and limits
     };
   } // namespace cal
 
   // -----------------------------------------------------------------------------------
   /// Classify AD input value into classes. Supports NrClasses classes.
   /// Class n is active if all measured values are within the associated interval for the specified time.
-  /// - Class 0: anLow[0] <= M <= anHigh[0] for time tmrDebounce_ms
-  /// - Class 1: anLow[1] <= M <= anHigh[1] for time tmrDebounce_ms
+  /// - Class 0: anLow[0] <= M <= anHigh[0] for time debounce_timer_ms
+  /// - Class 1: anLow[1] <= M <= anHigh[1] for time debounce_timer_ms
   /// - ...
-  /// - Class N: anLow[N] <= M <= anHigh[N] for time tmrDebounce_ms (with N = NrClasses - 1)
+  /// - Class N: anLow[N] <= M <= anHigh[N] for time debounce_timer_ms (with N = NrClasses - 1)
   /// If any of the above conditions is true, the class is invalid.
   /// Method measure() must be called cyclicly.
   // -----------------------------------------------------------------------------------
@@ -94,56 +90,60 @@ namespace util
     using This = classifier<NrClasses>;
 
     /// Configuration data
-    using classifier_limits_cal_type = cal::classifier_limits<NrClasses>;
-    using cal_const_pointer = util::ptr<const classifier_limits_cal_type>;
+    using classifier_cal_type = cal::classifier<NrClasses>;
+    using cal_const_pointer = util::ptr<const classifier_cal_type>;
 
     /// The invalid index
     static constexpr class_type kInvalidIndex = platform::numeric_limits<class_type>::max_();
 
   protected:
-    cal_const_pointer pCfg;      ///< Pointer to the configuration
-    class_type currentClass;     ///< Index for anLow and anHigh for last AD sample value, 0 ... NrClasses-1; nCurClass = INVALID_INDEX if no valid class from last sample
-    MilliTimer tmrDebounce_ms;   ///< Timer until button is considered to be pressed
+    cal_const_pointer cfg_ptr;      ///< Pointer to the configuration
+    class_type current_class;     ///< Index for anLow and anHigh for last AD sample value, 0 ... NrClasses-1; nCurClass = INVALID_INDEX if no valid class from last sample
+    MilliTimer debounce_timer_ms;   ///< Timer until button is considered to be pressed
 
   public:
     /// Default constructor
-    classifier() : currentClass{ kInvalidIndex }
+    classifier() : current_class{ kInvalidIndex }
     {}
     /// Constructor with coding data
     classifier(cal_const_pointer p)
-      : pCfg{ p }
-      , currentClass{ kInvalidIndex }
+      : cfg_ptr{ p }
+      , current_class{ kInvalidIndex }
     {}
     /// Set new configuration values
     void set_config(cal_const_pointer p) noexcept
     {
-      pCfg = p;
-      currentClass = kInvalidIndex;
+      cfg_ptr = p;
+      current_class = kInvalidIndex;
     }
 
     /// Returns input (measured) value v in limit_type units
-    static limit_type convertInput(const input_type v) noexcept { return static_cast<limit_type>(v / static_cast<input_type>(4U)); }
+    static constexpr limit_type convert_input(const input_type v) noexcept { return static_cast<limit_type>(v / static_cast<input_type>(4U)); }
 
     /// Returns the debounce time in [ms]
-    time_type cod_get_debounce_time_ms() { return static_cast<time_type>(10U * static_cast<uint32>(pCfg->ucDebounce)); }
+    time_type cod_get_debounce_time_ms() { return static_cast<time_type>(10U * static_cast<uint32>(cfg_ptr->debounce_time)); }
 
     /// Classify without debouncing.
-    /// Returns the index to cfg.aunLo / cfg.aunHi with cfg.aucLo[.] <= convertInput(val) <= cfg.aucHi[.]. 
-    /// Returns kInvalidIndex if convertInput(val) is never between cfg.aucLo[.] and cfg.aucHi[.].
+    /// Returns the index to cfg.aunLo / cfg.aunHi with cfg.lo_limits[.] <= convertInput(val) <= cfg.hi_limits[.]. 
+    /// Returns kInvalidIndex if convertInput(val) is never between cfg.lo_limits[.] and cfg.hi_limits[.].
     class_type classify(input_type val)
     {
       class_type idx = kInvalidIndex;
       
-      const limit_type v = convertInput(val);
-
-      for (class_type i = 0; i < static_cast<class_type>(NrClasses); i++)
+      if (cfg_ptr)
       {
-        if ((v >= pCfg->aucLo[i]) && (v <= pCfg->aucHi[i]))
+        const limit_type v = convert_input(val);
+
+        for (class_type i = 0; i < static_cast<class_type>(NrClasses); i++)
         {
-          idx = i;
-          break;
+            if ((v >= cfg_ptr->lo_limits[i]) && (v <= cfg_ptr->hi_limits[i]))
+            {
+                idx = i;
+                break;
+            }
         }
       }
+
       return idx;
     }
 
@@ -156,11 +156,12 @@ namespace util
     class_type classify_debounce(input_type val)
     {
       class_type idx = classify(val);
-      if (idx != currentClass)
+      if (idx != current_class)
       {
-        // start timer even if nIdx is equal to val_not_found (in order to measure time for invalid matches)
-        currentClass = idx;
-        tmrDebounce_ms.start(cod_get_debounce_time_ms());
+        // start timer even if idx is equal to kInvalidIndex (in order to measure time for 
+        // invalid matches)
+        current_class = idx;
+        debounce_timer_ms.start(cod_get_debounce_time_ms());
       }
       return get_class_index();
     }
@@ -168,8 +169,8 @@ namespace util
     /// Reset to a new measurement
     void reset()
     {
-      currentClass = kInvalidIndex;
-      tmrDebounce_ms.start(cod_get_debounce_time_ms());
+      current_class = kInvalidIndex;
+      debounce_timer_ms.start(cod_get_debounce_time_ms());
     }
     
     /// Returns class index that was deteced or kInvalidIndex.
@@ -177,9 +178,9 @@ namespace util
     {
       class_type idx = kInvalidIndex;
 
-      if (tmrDebounce_ms.timeout())
+      if (debounce_timer_ms.timeout())
       {
-        idx = currentClass;
+        idx = current_class;
       }
 
       return idx;
@@ -197,11 +198,11 @@ namespace util
   /// @tparam NrClasses Number of classes that the values shall be classified into
   // -----------------------------------------------------------------------------------
   template<int NrClassifiers, int NrClasses>
-  class input_classifier
+  class classifier_array
   {
   public:
     /// type of this class
-    using This = input_classifier<NrClassifiers, NrClasses>;
+    using This = classifier_array<NrClassifiers, NrClasses>;
 
     /// A single classifier
     using classifier_type = classifier<NrClasses>;
@@ -209,17 +210,18 @@ namespace util
     using classifier_array_type = util::array<classifier_type, NrClassifiers>;
 
     /// Calibration data type for this class including 'NrClassifiers' classifiers
-    using classifier_limits_cal_type = typename classifier_type::classifier_limits_cal_type;
-    using input_classifier_cal_type = cal::input_classifier_cal<NrClassifiers, NrClasses>;
-    using cal_const_pointer = util::ptr<const input_classifier_cal_type>;
+    using classifier_cal_type = typename classifier_type::classifier_cal_type;
+    using classifier_array_cal_type = cal::classifier_array<NrClassifiers, NrClasses>;
+    using cal_const_pointer = util::ptr<const classifier_array_cal_type>;
 
     /// Take over classifier_type's types. These types define bit resolution of input signals and limits
     using input_type = typename classifier_type::input_type;
     using limit_type = typename classifier_type::limit_type;
     using class_type = typename classifier_type::class_type;
 
-    /// The classified values are arranged in an util::array
+    /// @brief Stores classified values in a fixed-size util::array, one entry per classifier
     using classified_values_array_type = util::array<uint8, NrClassifiers>;
+    /// @brief Holds raw ADC values corresponding to each classifier (for debugging)
     using adc_values_array_type = util::array<uint16, NrClassifiers>;
 
     /// The invalid index, type is uint8
@@ -230,56 +232,72 @@ namespace util
     static constexpr int kNrClasses = NrClasses;
 
   protected:
-    /// Array of input aClassifiers
-    classifier_array_type aClassifiers;
+    /// Array of classifiers
+    classifier_array_type classifiers;
     /// Array of classified values (output)
-    classified_values_array_type aClassifiedValues;
+    classified_values_array_type classified_values;
     /// Array of last AD values (for debugging)
-    adc_values_array_type aunAdcValues;
+    adc_values_array_type adc_values;
     /// The configuration
-    cal_const_pointer pCfg;
+    cal_const_pointer cfg_ptr;
     
   public:
     /// Constructor
-    input_classifier()
+    classifier_array()
     {}
 
     /// Constructor
-    explicit input_classifier(cal_const_pointer p)
+    explicit classifier_array(cal_const_pointer p)
     {
       set_config(p);
+    }
+
+    /**
+     * @brief Update the configuration and update the limits for the classifier at classifier_pos
+     * 
+     * @param p Pointer to the configuration
+     * @param classifier_pos Position of the classifier [0 ... @ref NrClassifiers).
+     */
+    void set_config(cal_const_pointer p, uint8 classifier_pos) noexcept
+    {
+        cfg_ptr = p;
+
+        if (valid_cfg() && classifiers.check_boundary(classifier_pos))
+        {
+            classifiers.at(classifier_pos).set_config(p->classifiers.at(classifier_pos).limits_ptr);
+        }
     }
 
     /// Set new configuration values
     void set_config(cal_const_pointer p) noexcept
     {
-      pCfg = p;
+      cfg_ptr = p;
 
       if (valid_cfg())
       {
-        auto cit = p->aClassifiers.begin();
-        for (auto it = aClassifiers.begin(); it != aClassifiers.end(); it++)
+        auto cit = p->classifiers.begin();
+        for (auto it = classifiers.begin(); it != classifiers.end(); it++)
         {
-          it->set_config(cit->pLimits);
+          it->set_config(cit->limits_ptr);
           cit++;
         }
       }
     }
 
     /// Returns true if configuration parameters are available
-    bool valid_cfg() const noexcept { return (bool) pCfg; }
+    bool valid_cfg() const noexcept { return (bool) cfg_ptr; }
 
     /// Get / calculate AD value for the given pin
-    int get_ADC(uint8 ucPin) const
+    int get_ADC(uint8 pin) const
     {
-      return hal::analogRead(static_cast<int>(ucPin));
+      return hal::analogRead(static_cast<int>(pin));
     }
 
     /// Returns classified values. No boundary check on i.
-    const class_type classified_value(int i) const { return aClassifiedValues[i]; }
-    const classified_values_array_type& classified_values() const noexcept { return aClassifiedValues; }
+    const class_type classified_value(int i) const { return classified_values[i]; }
+    const classified_values_array_type& get_classified_values() const noexcept { return classified_values; }
     /// Returns ADC values.
-    const adc_values_array_type& adc_values() const noexcept { return aunAdcValues; }
+    const adc_values_array_type& get_adc_values() const noexcept { return adc_values; }
 
     /// Initialization at system start
     void init(void) noexcept
@@ -293,15 +311,17 @@ namespace util
       {
         int nAdc;
         int nClass;
-        auto it_cls = aClassifiedValues.begin();
-        auto it_adc = aunAdcValues.begin();
-        auto it_cfg = pCfg->aClassifiers.begin();
-        for (auto it = aClassifiers.begin(); it != aClassifiers.end(); it++)
+        auto it_cls = classified_values.begin();
+        auto it_adc = adc_values.begin();
+        auto it_cfg = cfg_ptr->classifiers.begin();
+        for (auto it = classifiers.begin(); 
+                  it != classifiers.end(); 
+                  it++, it_adc++, it_cfg++, it_cls++)
         {
-          nAdc = get_ADC((it_cfg++)->ucPin);
-          nClass = it->classify_debounce(static_cast<input_type>(nAdc));
-          (*it_cls++) = static_cast<uint8>(nClass);
-          (*it_adc++) = static_cast<uint16>(nAdc);
+            nAdc = get_ADC(it_cfg->pin);
+            nClass = it->classify_debounce(static_cast<input_type>(nAdc));
+            *it_cls = static_cast<uint8>(nClass);
+            *it_adc = static_cast<uint16>(nAdc);
         }
       }
     }

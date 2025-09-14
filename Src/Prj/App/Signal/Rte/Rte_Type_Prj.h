@@ -36,6 +36,7 @@ namespace signal
 {
   class InputCommand;
   class LedRouter;
+  class InputClassifier;
 }
 
 namespace rte
@@ -48,13 +49,14 @@ namespace rte
   /// The AD classified values (from buttons) are written into an array of this type
   using classified_values_array = util::array<cmd_type, cfg::kNrClassifiers>;
   using ad_values_array = util::array<uint16, cfg::kNrClassifiers>;
-  using dcc_commands_arry = util::array<cmd_type, cfg::kNrDccAddresses>;
+  using dcc_commands_array = util::array<cmd_type, cfg::kNrSignals>;
 
-  /// The DCC values are written into an array of this type
-  /// Array index 0 corresponds to DCC address as defined by cal::dcc_type::address
-  /// Array index cfg::kNrDccAddresses-1 corresponds to DCC address as defined by 
-  /// cal::dcc_type::address + cfg::kNrDccAddresses - 1.
-  using dcc_values_array = util::array<cmd_type, cfg::kNrDccAddresses>;
+  /// The DCC values are written into an array of this type.
+  /// For signals:
+  /// Array index 0 corresponds to DCC address as defined by CV values.
+  /// Array index 1 corresponds to DCC address + 1.
+  /// Array index 2 corresponds to DCC address + 2, etc.
+  using dcc_values_array = util::array<cmd_type, cfg::kNrSignals>;
 
   /// The target intensities are written into an array of this type
   using onboard_target_array = util::array<intensity8_255, cfg::kNrOnboardTargets>;
@@ -69,7 +71,7 @@ namespace rte
   using Ifc_ClassifiedValues = rte::ifc_sr_array<classified_values_array>;
   using Ifc_ADValues = rte::ifc_sr_array<ad_values_array>;
 
-  using Ifc_DccCommands = rte::ifc_sr_array<dcc_commands_arry>;
+  using Ifc_DccCommands = rte::ifc_sr_array<dcc_commands_array>;
   // -----------------------------------------------------------------------------------
   /// SR interface for onboard and external target duty cycles
   // -----------------------------------------------------------------------------------
@@ -83,14 +85,20 @@ namespace rte
   /// CS interface for calibration values
   // -----------------------------------------------------------------------------------
   using Ifc_Cal_Signal          = rte::ifc_cs<const cal::signal_cal_type *          , cal::CalM>;
-  using Ifc_Cal_InputClassifier = rte::ifc_cs<const cal::input_classifier_cal_type *, cal::CalM>;
+  using Ifc_Cal_InputClassifier = rte::ifc_cs<const cal::classifier_array_cal_type *, cal::CalM>;
   using Ifc_Cal_Led             = rte::ifc_cs<const cal::led_cal_type *             , cal::CalM>;
   using Ifc_Cal_Base_CV         = rte::ifc_cs<const cal::base_cv_cal_type *         , cal::CalM>;
+  using Ifc_Cal_Get_CV          = rte::ifc_cs<uint8                                 , cal::CalM>;
 
   using Ifc_Cal_Set_Signal          = rte::ifc_cs<ret_type, cal::CalM, uint8, const cal::signal_type&, bool>;
-  using Ifc_Cal_Set_InputClassifier = rte::ifc_cs<ret_type, cal::CalM, uint8, const cal::input_classifier_single_type&, bool>;
+  using Ifc_Cal_Set_CV              = rte::ifc_cs<ret_type, cal::CalM, uint16, uint8>;
+//using Ifc_Cal_Set_InputClassifier = rte::ifc_cs<ret_type, cal::CalM, uint8, const cal::input_classifier_single_type&, bool>;
+  using Ifc_Cal_Set_Defaults        = rte::ifc_cs<ret_type, cal::CalM, void>;
 
-  using Ifc_Cal_Init_All            = rte::ifc_cs<ret_type, cal::CalM, void>;
+  /**
+   * @brief Inform classifier about new coding data.
+   */
+  using Ifc_Rte_UpdateConfigForClassifier = rte::ifc_cs<ret_type, signal::InputClassifier, uint8>;
 
   // -----------------------------------------------------------------------------------
   /// CS interface for commands

@@ -37,7 +37,7 @@ namespace com
   {
     mySerAsciiTP.init();
     mySerAsciiTP.setDriver(mySerDrv);
-    myAsciiCom.listenTo(mySerAsciiTP);
+    myAsciiCom.listen_to(mySerAsciiTP);
   }
 
   // -----------------------------------------------------------------------------------

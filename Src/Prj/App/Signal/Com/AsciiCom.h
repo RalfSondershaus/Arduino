@@ -9,25 +9,44 @@
  * aspects, blinks, targets, input classification, and change-over times, as well
  * as copying signal configurations between IDs.
  *
+ * Capital letters and lower letters can be used. Capital letters are used here to support
+ * readability.
+ * 
+ * Set CV
+ * - SET_CV <cv_id> <value>
+ * 
+ * Set signal id (Ausfahrsignal, Blocksignal, ...)
+ * - SET_SIGNAL <signal_pos> ID <signal_id>
+ * with 1 <= signal_pos <= @ref cfg::kNrSignals
+ * 
+ * Set first output pin for a signal
+ * - SET_SIGNAL <signal_pos> FIRST_OUPUT ONBOARD <pin_nr>
+ * - SET_SIGNAL <signal_pos> FIRST_OUPUT EXTERNAL <pin_nr>
+ * 
+ * Set source of commands for a signal
+ * - SET_SIGNAL <signal_pos> INPUT ADC <pin_nr>
+ * - SET_SIGNAL <signal_pos> INPUT DCC
+ * - SET_SIGNAL <signal_pos> INPUT DIG <first_pin_nr> (not implemented yet)
+ * 
+ * Define a user-defined signal
+ * - SET_USER_DEFINED_SIGNAL <signal_id> ASPECTS 11000 00100 00000 00000 00000
+ * - SET_USER_DEFINED_SIGNAL <signal_id> BLINKS 11000 00100 00000 00000 00000
+ * - SET_USER_DEFINED_SIGNAL <signal_id> COT 10 20
+ * with 128 <= signal_id <= @ref cfg::kNrUserDefinedSignals
+ * The number of aspects is defined by the number of elements in the ASPECTS / BLINKS command.
+ * Per signal, a maximum of 8 aspects is supported.
+ * The number of LEDs is defined by the number of bits in an element (such as 11000) in the 
+ * ASPECTS / BLINKS command.
+ * Per signal, a maximum of 8 LEDs is supported.
+ * 
  * Example telegrams:
- * - SET_SIGNAL 0 ASPECTS 11000 00100 00000 00000 00000
- * - SET_SIGNAL 0 BLINKS  00110 11001 11111 00000 00000
- * - SET_SIGNAL 0 TARGETS ONBOARD pin ONBOARD pin ONB pin
- * - SET_SIGNAL 0 INPUT CLASSIFIED 1
- * - SET_SIGNAL 0 COT 10 20
- * - SET_SIGNAL 0 DB_AUSFAHRSIGNAL PIN pin CLASS classifier_id
- * - GET_SIGNAL 0 ASPECTS
- * - GET_SIGNAL 0 TARGETS
- * - SET_CLASSIFIER 1 PIN 5
- * - SET_CLASSIFIER 1 LIMITS 2 10 20
- * - SET_CLASSIFIER 1 DEBOUNCE 5
- * - GET_CLASSIFIER 1 PIN
- * - GET_CLASSIFIER 1 LIMITS
- * - GET_CLASSIFIER 1 DEBOUNCE
- *
- * @note The signal ID is a number from 0 to 63. Aspects and blinks are bit values.
- * Target ports can be ONBOARD, ONB, EXTERN, or EXT, followed by a pin number (0-31).
- * Change-over times are two values in [10 ms].
+ * - SET_SIGNAL 1 ID 0      Assign Ausfahrsignal to signal 1
+ * - SET_SIGNAL 1 ID 128    Assign first user-defined signal id to signal 1
+ * - SET_SIGNAL 1 FIRST_OUTPUT ONBOARD 13  First pin is onboard pin 13
+ * - SET_SIGNAL 1 INPUT ADC 54             Input is calculated from ADC input pin 54
+ * - SET_SIGNAL 1 INPUT ADC A0
+ * - SET_SIGNAL 1 INPUT DCC
+ * - SET_USER_DEFINED_SIGNAL 128 ASPECTS 11000 00100 00000 00000 00000
  * 
  * @note Parts of the documentation of this file was created by GitHub Copilot.
  * 
@@ -184,7 +203,7 @@ namespace com
      *
      * @param tp Reference to the SerAsciiTP object to listen to.
      */
-    void listenTo(SerAsciiTP& tp) { asciiTP = &tp; tp.attach(*this); }
+    void listen_to(SerAsciiTP& tp) { asciiTP = &tp; tp.attach(*this); }
 
     /**
      * @brief Processes the given telegram and generates a response.

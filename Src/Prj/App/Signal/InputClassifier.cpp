@@ -31,7 +31,7 @@ namespace signal
   // -----------------------------------------------------------------------------------
   void InputClassifier::init()
   {
-    const cal::input_classifier_cal_type * pCal = rte::ifc_cal_input_classifier::call();
+    const cal::classifier_array_cal_type * pCal = rte::ifc_cal_input_classifier::call();
     classifiers.set_config(pCal);
     // log.start(1000);
   }
@@ -43,8 +43,8 @@ namespace signal
   {
     classifiers.run();
 
-    rte::ifc_classified_values::write(classifiers.classified_values());
-    rte::ifc_ad_values::write(classifiers.ad_values());
+    rte::ifc_classified_values::write(classifiers.get_classified_values());
+    rte::ifc_ad_values::write(classifiers.get_adc_values());
     // log.begin("AD Values ");
     // auto aADValues = classifiers.ad_values();
     // for (auto it = aADValues.begin(); it != aADValues.end(); it++)
@@ -58,5 +58,16 @@ namespace signal
     //   log << " " << static_cast<int>(*it);
     // }
     // log.end();
+  }
+
+  /**
+   * @brief 
+   * 
+   */
+  rte::ret_type InputClassifier::set_config(uint8 classifier_pos)
+  {
+    const cal::classifier_array_cal_type * pCal = rte::ifc_cal_input_classifier::call();
+    classifiers.set_config(pCal, classifier_pos);
+    return rte::ret_type::OK;
   }
 }

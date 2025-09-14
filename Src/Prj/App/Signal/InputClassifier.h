@@ -37,12 +37,12 @@ namespace signal
   class InputClassifier
   {
   public:
-    typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> input_classifier_type;
-    typedef const cal::input_classifier_cal_type * cal_const_pointer;
-    using classified_values_array_type = input_classifier_type::classified_values_array_type;
+    using classifier_array_type = util::classifier_array<cfg::kNrClassifiers, cfg::kNrClassifierClasses>;
+    using cal_const_pointer = const cal::classifier_array_cal_type *;
+    using classified_values_array_type = classifier_array_type::classified_values_array_type;
     
   protected:
-    input_classifier_type classifiers;
+    classifier_array_type classifiers;
 
   public:
     /// Construct
@@ -55,6 +55,11 @@ namespace signal
     /// @brief Cyclic runable
     /// @note Average run time 85 usec @ATmega2560 @16 MHz
     void cycle();
+
+    /**
+     * @brief CS Interface: call this function when coding parameters have been changed.
+     */
+    rte::ret_type set_config(uint8 classifier_pos);
   };
 } // namespace signal
 

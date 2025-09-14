@@ -251,8 +251,8 @@ namespace dcc
           type = BasicAccessory;
           // this address type is known as "decoder address method"
           data.address = static_cast<address_type>(
-            (util::bits::stencil<uint8_t, address_type>( refByte(0), 0b00111111U)) |
-            (util::bits::stencil<uint8_t, address_type>(~refByte(1), 0b01110000U) << 2U)
+            (util::bits::apply_mask_as<uint8_t, address_type>( refByte(0), 0b00111111U)) |
+            (util::bits::apply_mask_as<uint8_t, address_type>(~refByte(1), 0b01110000U) << 2U)
             );
         }
         else
@@ -260,9 +260,9 @@ namespace dcc
           // {preamble} 0 10AAAAAA 0 0AAA0AA1 0 000XXXXX 0 EEEEEEEE 1
           type = ExtendedAccessory;
           data.address = static_cast<uint16>(
-            (util::bits::stencil<uint8, uint16>(refByte(0), 0b00111111U)) |
-            (util::bits::stencil<uint8, uint16>(refByte(1), 0b01110000U) << 4U) | 
-            (util::bits::stencil<uint8, uint16>(refByte(1), 0b00000110U) << 5U)
+            (util::bits::apply_mask_as<uint8, uint16>(refByte(0), 0b00111111U)) |
+            (util::bits::apply_mask_as<uint8, uint16>(refByte(1), 0b01110000U) << 4U) | 
+            (util::bits::apply_mask_as<uint8, uint16>(refByte(1), 0b00000110U) << 5U)
             );
         }
       }
@@ -277,7 +277,7 @@ namespace dcc
         // #7 having the value of "1" in this case. 
         type = MultiFunction14;
         data.address = static_cast<uint16>(
-          (util::bits::stencil<uint8, uint16>(refByte(0), 0b00111111U) << 8U) |
+          (util::bits::apply_mask_as<uint8, uint16>(refByte(0), 0b00111111U) << 8U) |
           (refByte(1))
             );
       }

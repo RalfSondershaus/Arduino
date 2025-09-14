@@ -32,39 +32,6 @@ namespace com
   using string_type = AsciiCom::string_type; // string of size 64
   using stringstream_type = util::basic_istringstream<SerAsciiTP::kMaxLenTelegram, char_type>;
 
-  enum tPreconfiguredSignalEnum
-  {
-    eDB_AUSFAHRSIGNAL = 0,      /**< 0: DB_AUSFAHRSIGNAL  */
-    eDB_BLOCKSIGNAL,            /**< 1: DB_BLOCKSIGNAL    */
-    eMAX_PRECONF_SIGNALS        /**< 2: number of preconfigured signals */
-  };
-
-  #define INPUT0 { cal::input_type::eNone, 0 }
-  #define INPUT1 { cal::input_type::eNone, 1 }
-
-  #define ASPECTS0 { { 0b00011000, 0b00000000 }, { 0b00000100, 0b00000000 }, { 0b00000110, 0b00000000 }, { 0b00011001, 0b00000000 }, { 0b00011111, 0b00000000 } }
-  #define ASPECTS1 { { 0b00000010, 0b00000000 }, { 0b00000001, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00000000, 0b00000000 }, { 0b00000011, 0b00000000 } }
-
-  #define NR_TARGETS0   5
-  #define NR_TARGETS1   2
-
-  #define TARGET0 { { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 } }
-  #define TARGET1 { { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 }, { cal::target_type::eNone, 0 } }
-
-  #define COT0          10
-  #define COT1          10
-  #define COT_BLINK0     0
-  #define COT_BLINK1     0
-
-  #define PRECONFIGURED_SIGNALS_ARRAY \
-  { \
-    { INPUT0, { ASPECTS0 }, { TARGET0 }, COT0, COT_BLINK0 }, \
-    { INPUT1, { ASPECTS1 }, { TARGET1 }, COT1, COT_BLINK1 }  \
-  }
-
-  static const util::array<cal::signal_type, eMAX_PRECONF_SIGNALS> preconfiguredSignals{ PRECONFIGURED_SIGNALS_ARRAY };
-  static const util::array<size_t, eMAX_PRECONF_SIGNALS> preconfiguredSignalsNrTargets = { NR_TARGETS0, NR_TARGETS1 }; // Number of targets for DB_AUSFAHRSIGNAL
-
   /// To monitor a RTE port
   typedef struct
   {
@@ -73,7 +40,7 @@ namespace com
     uint16 unCycleTime;                   ///< [ms] Cycle time for output
     uint16 unFirstIdx;                    ///< For array types: index of the first element
     uint16 unNrIdx;                       ///< For array types: number of elements to be transmitted
-  } port_t;
+  } port_type;
   
   /// Return values of process() function family
   typedef enum
@@ -81,6 +48,7 @@ namespace com
     eOK = 0,                    ///< OK
     eINV_CMD,                   ///< Command invalid (or unknown)
     eERR_EEPROM,                ///< EEPROM update failure
+    eINV_CV_ID,                 ///< SET_CV with an invalid CV id
     eINV_SIGNAL_ID,             ///< SIGNAL ID invalid
     eINV_SIGNAL_CMD,
     eINV_SIGNAL_ASPECTS,
@@ -106,6 +74,7 @@ namespace com
     "OK",                                   // eOK
     "ERR: Invalid command",                 // eINV_CMD
     "ERR: EEPROM failure",                  // eERR_EEPROM
+    "ERR: Invalid CV ID",                   // eINV_CV_ID
     "ERR: Signal id invalid",               // eINV_SIGNAL_ID
     "ERR: Unknown signal sub command",      // eINV_SIGNAL_CMD
     "ERR: Unknown signal aspects",          // eINV_SIGNAL_ASPECTS
@@ -124,33 +93,42 @@ namespace com
     "ERR: unknown error"                    // has to be the last element
   };
 
+#if 0
   static uint8 convertStrToU8(util::string_view sv);
+#endif
 
+  static tRetType process_set_cv(stringstream_type& st, string_type& response);
+  static tRetType process_monitor_list(stringstream_type& st, string_type& response);
+  static tRetType process_monitor_start(stringstream_type& st, string_type& response);
+  static tRetType process_monitor_stop(stringstream_type& st, string_type& response);
+  static tRetType process_set_defaults(stringstream_type& st, string_type& response);
+#if 0
   static tRetType process_set_signal(stringstream_type& st, string_type& response);
   static tRetType process_get_signal(stringstream_type& st, string_type& response);
   static tRetType process_set_classifier(stringstream_type& st, string_type& response);
   static tRetType process_get_classifier(stringstream_type& st, string_type& response);
-  static tRetType process_monitor_list(stringstream_type& st, string_type& response);
-  static tRetType process_monitor_start(stringstream_type& st, string_type& response);
-  static tRetType process_monitor_stop(stringstream_type& st, string_type& response);
-  static tRetType process_init(stringstream_type& st, string_type& response);
+#endif
 
   static bool output_monitor_list(string_type& response);
-  static bool output_port_data(port_t& pm, string_type& response);
+  static bool output_port_data(port_type& pm, string_type& response);
 
+#if 0
   static int process_set_signal_aspects(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_blinks(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_targets(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_input(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_cot(stringstream_type& st, cal::signal_type& cal_sig);
   static int process_set_signal_preconfigured_signal(stringstream_type& st, cal::signal_type& cal_sig, tPreconfiguredSignalEnum signalId);
-
+#endif
+#if 0
   static tRetType process_get_signal_aspects(stringstream_type& st, cal::signal_type& cal_sig, string_type& response);
   static tRetType process_get_signal_blinks(stringstream_type& st, cal::signal_type& cal_sig, string_type& response);
   static tRetType process_get_signal_targets(stringstream_type& st, cal::signal_type& cal_sig, string_type& response);
   static tRetType process_get_signal_input(stringstream_type& st, cal::signal_type& cal_sig, string_type& response);
   static tRetType process_get_signal_cot(stringstream_type& st, cal::signal_type& cal_sig, string_type& response);
- 
+
+#endif
+#if 0
   static int process_set_classifier_pin(stringstream_type& st, cal::input_classifier_single_type& cal_cls);
   static int process_set_classifier_limits(stringstream_type& st, cal::input_classifier_single_type& cal_cls);
   static int process_set_classifier_debounce(stringstream_type& st, cal::input_classifier_single_type& cal_cls);
@@ -158,9 +136,9 @@ namespace com
   static tRetType process_get_classifier_pin(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
   static tRetType process_get_classifier_limits(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
   static tRetType process_get_classifier_debounce(stringstream_type& st, cal::input_classifier_single_type& cal_cls, string_type& response);
-
+#endif
   static bool doOutputPortList = false;
-  static port_t portMonitor;
+  static port_type portMonitor;
 
   typedef tRetType (*func_type)(stringstream_type& st, string_type& response);
 
@@ -177,15 +155,17 @@ namespace com
   // Max Length of strings: kMaxLenToken
   const util::array<tCommands, 8> commands =
   { {
+    { "SET_CV", process_set_cv },
+    { "MON_LIST", process_monitor_list },
+    { "MON_START", process_monitor_start },
+    { "MON_STOP", process_monitor_stop },
+    { "INIT", process_set_defaults }
+#if 0
     { "SET_SIGNAL", process_set_signal },
     { "GET_SIGNAL", process_get_signal },
     { "SET_CLASSIFIER", process_set_classifier },
     { "GET_CLASSIFIER", process_get_classifier },
-    { "MON_LIST", process_monitor_list },
-    { "MON_START", process_monitor_start },
-    { "MON_STOP", process_monitor_stop },
-    { "INIT", process_init }
-
+#endif
   } };
 
   // -----------------------------------------------------------------------------------
@@ -316,6 +296,7 @@ namespace com
     #endif
   }
 
+#if 0
   // -----------------------------------------------------------------------------------
   /// Convert a string of 1's and 0's to a uint8.
   /// "11000" -> 0x18 = 24.
@@ -365,7 +346,41 @@ namespace com
 
     return str;
   }
+#endif
 
+  /**
+   * @brief Implements command SET_CV <cv_id> <value>
+   * 
+   * @param st Contains the command string without "SET_CV"
+   * @param response [out] The response is stored here, it is the contains the command parameters.
+   * @return tRetType eOK
+   * @return tRetType eINV_CMD Ill-formed command or CV id is out-of-bounds
+   */
+  static tRetType process_set_cv(stringstream_type& st, string_type& response)
+  {
+    tRetType ret = eINV_CMD;
+    CV new_cv;
+
+    // The response shall contain the command parameters
+    response.append(st.str());
+
+    st >> new_cv.id;
+    st >> new_cv.val;
+
+    // Do not check for eof() since eof() is true after extracting the last element
+    // (and if the last element doesn't have trailing white spaces).
+    if (!st.fail())
+    {
+        if (rte::ifc_cal_set_cv::call(new_cv.id, new_cv.val) == rte::ret_type::OK)
+        {
+            ret = eOK;
+        }
+    }
+
+    return ret;
+  }
+
+#if 0
   // -----------------------------------------------------------------------------------
   /// <SET_SIGNAL> id [ASPECTS, BLINKS, TARGETS, INPUT, COT] ...
   // -----------------------------------------------------------------------------------
@@ -640,7 +655,8 @@ namespace com
 
     return idx;
   }
-
+#endif
+#if 0
   // -----------------------------------------------------------------------------------
   /// <GET_SIGNAL> id [ASPECTS, BLINKS, TARGETS, INPUT, COT]
   // -----------------------------------------------------------------------------------
@@ -793,7 +809,9 @@ namespace com
 
     return eOK;
   }
+#endif
 
+#if 0
   // -----------------------------------------------------------------------------------
   /// <SET_CLASSIFIER> id [PIN, LIMITS, DEBOUNCE] ...
   ///
@@ -1018,6 +1036,7 @@ namespace com
 
     return eOK;
   }
+#endif
 
   // -----------------------------------------------------------------------------------
   /// <MON_LIST>
@@ -1027,6 +1046,7 @@ namespace com
   static tRetType process_monitor_list(stringstream_type& st, string_type& response)
   {
     util::basic_string<4, char> tmp;
+    (void)st;
     util::to_string(rte::getNrPorts(), tmp);
     response.append("number of ports=").append(tmp);
     doOutputPortList = true;
@@ -1070,7 +1090,7 @@ namespace com
   ///
   /// @return eOK
   // -----------------------------------------------------------------------------------
-  static bool output_port_data(port_t& pm, string_type& response)
+  static bool output_port_data(port_type& pm, string_type& response)
   {
     bool ret;
     size_t i;
@@ -1161,16 +1181,23 @@ namespace com
   // -----------------------------------------------------------------------------------
   static tRetType process_monitor_stop(stringstream_type& st, string_type& response)
   {
+    (void) st;
+    (void) response;
+
     portMonitor.pPortData = nullptr;
+
     return eOK;
   }
 
   // -----------------------------------------------------------------------------------
   /// Write default values to NVM
   // -----------------------------------------------------------------------------------
-  static tRetType process_init(stringstream_type& st, string_type& response)
+  static tRetType process_set_defaults(stringstream_type& st, string_type& response)
   {
-    return (rte::ifc_cal_init_all::call() == rte::ret_type::OK) ? eOK : eERR_EEPROM;
+    (void) st;
+    (void) response;
+
+    return (rte::ifc_cal_set_defaults::call() == rte::ret_type::OK) ? eOK : eERR_EEPROM;
   }
 
 } // namespace com

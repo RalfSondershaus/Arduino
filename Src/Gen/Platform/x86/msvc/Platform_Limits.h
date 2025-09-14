@@ -25,6 +25,7 @@ namespace platform
   public:
     static constexpr uint8 min_() noexcept { return std::numeric_limits<uint8>::min(); }
     static constexpr uint8 max_() noexcept { return std::numeric_limits<uint8>::max(); }
+    static constexpr int digits = CHAR_BIT;
   };
 } // namespace util
 

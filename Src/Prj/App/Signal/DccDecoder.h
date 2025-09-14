@@ -24,6 +24,7 @@
 #include <Dcc/Decoder.h>
 #include <Dcc/Filter.h>
 #include <Rte/Rte_Type.h>
+#include <Util/Timer.h>
 #include <Cal/CalM_Type.h>
 
 namespace signal
@@ -42,11 +43,15 @@ namespace signal
     /// the first address.
     uint16 address;
 
+    void packet_received(const PacketType& pkt);
+
+  public:
     /// The interrupt pin
     static constexpr uint8 kIntPin = 2U;
+    static constexpr uint8 kBlinkLedPin = 13U;
+    static constexpr util::MilliTimer::time_type kBlinkLedPeriodValid_ms = 1000U;
+    static constexpr util::MilliTimer::time_type kBlinkLedPeriodInvalid_ms = 500U;
 
-    void packet_received(const PacketType& pkt);
-  public:
     DccDecoder() = default;
 
     /// Returns the DCC address of the decoder.

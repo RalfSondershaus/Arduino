@@ -45,10 +45,25 @@ namespace signal
 
     /// Access calibration data
     static bool cal_valid(const cal::signal_type * pCal) { return pCal != nullptr; }
+    static uint8 cal_getNrTargets(const cal::signal_type * pCal) 
+    { 
+        return (pCal->output_ptr) ? (pCal->output_ptr->num_targets) : (0); 
+    }
     static cal::input_type cal_getInput(const cal::signal_type * pCal) { return pCal->input; }
-    static cal::aspect_type cal_getAspect(const cal::signal_type * pCal, cmd_type cmd) { return pCal->aspects[static_cast<size_type>(cmd)]; }
-    static cal::target_type cal_getTarget(const cal::signal_type * pCal, size_type idx) { return pCal->targets[idx]; }
-    static uint8 cal_getChangeOverTime(const cal::signal_type * pCal) { return pCal->changeOverTime; }
+    static cal::aspect_type cal_getAspect(const cal::signal_type * pCal, cmd_type cmd) 
+    { 
+        return (pCal->output_ptr) ? 
+               (pCal->output_ptr->aspects[static_cast<size_type>(cmd)]) :
+               (cal::aspect_type{}); 
+    }
+    static cal::target_type cal_getFirstTarget(const cal::signal_type * pCal) 
+    { 
+        return pCal->first_target;
+    }
+    static uint8 cal_getChangeOverTime(const cal::signal_type * pCal) 
+    { 
+        return (pCal->output_ptr) ? (pCal->output_ptr->change_over_time) : (0);
+    }
 
     /// Returns true if the aspect is in its initial state (after startup). 
     /// Returns false otherwise (aspect has been used once at least).
