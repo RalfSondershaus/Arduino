@@ -149,6 +149,10 @@ namespace cal
       eSignalInputClassifierTypeBase    = 66,
       eClassifierBase                   = 112, // Number of classifiers: cfg::kNrClassifiers
                                                // with number of classes: cfg::kNrClassifierClasses
+      eClassifierType1LoLimitBase       = 113,
+      eClassifierType1HiLimitBase       = 118,
+      eClassifierType2LoLimitBase       = 124,
+      eClassifierType2HiLimitBase       = 129,
       eUserDefinedSignalBase            = 134,
       eLastCV                           = static_cast<uint16>(eUserDefinedSignalBase)
                                         + kUserDefinedSignalLength*cfg::kNrUserDefinedSignals 

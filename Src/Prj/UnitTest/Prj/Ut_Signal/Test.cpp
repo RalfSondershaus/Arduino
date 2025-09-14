@@ -108,7 +108,7 @@ TEST(Ut_Signal, Default_Green_Red)
   using cmd_type = rte::cmd_type;
 
   Logger log;
-  constexpr int kSignalId = 0; // Need to configure signal 0 as Ausfahrsignal
+  constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
   constexpr uint8 kFirstOutputPin = 13;
   constexpr uint8 kInputPin0 = 54;
   constexpr uint8 kClassifierType = 0;
@@ -186,28 +186,26 @@ TEST(Ut_Signal, Default_Green_Red)
   log.start("Default_Green_Red.txt");
 
   // Initialize
-  // CalM shall initialize EEPROM from ROM.
-  //hal::eeprom::write(cal::eeprom::eManufacturerID, hal::eeprom::kInitial);
   hal::stubs::analogRead[aSteps[0].nPin] = aSteps[0].nAdc;
   hal::stubs::millis = aSteps[0].ms;
   hal::stubs::micros = 1000U * hal::stubs::millis;
   
-  // Initialize EEPROM
+  // Here we go
   rte::start();
 
   // Initialize EEPROM with ROM default values
   rte::ifc_cal_set_defaults::call();
-  // And now activate signal kSignalId
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalId, kBuiltInSignalIDAusfahrsignal);
+  // And now activate signal kSignalPos
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos, kBuiltInSignalIDAusfahrsignal);
   // ... with first output pin kFirstOutputPin
   tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, kFirstOutputPin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalId, tmp);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos, tmp);
   // ... with ADC input pin kInputPin0
   tmp = cal::signal::make_signal_input(cal::signal::values::kInputType_ADC, kInputPin0);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalId, tmp);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos, tmp);
   // ... with classifier type kClassifierType
   tmp = kClassifierType;
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + kSignalId, tmp);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + kSignalPos, tmp);
 
   in.type = cal::input_type::eAdc;
   in.idx = 0;
@@ -222,7 +220,7 @@ TEST(Ut_Signal, Default_Green_Red)
     rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
-    uint8 target_pos = rte::calm.signals.at(kSignalId).first_target.idx;
+    uint8 target_pos = rte::calm.signals.at(kSignalPos).first_target.idx;
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
       rte::intensity8_255 pwm;
@@ -249,7 +247,11 @@ TEST(Ut_Signal, Default_All)
   using size_type = signal_target_array::size_type;
   using time_type = classifier_array_type::classifier_type::time_type;
   using cmd_type = rte::cmd_type;
+  constexpr uint8 kFirstOutputPin = 13;
   constexpr uint8 kInputPin0 = 54;
+  constexpr uint8 kClassifierType = 0;
+  constexpr int kClassifierPos = 0;
+  constexpr int kSignalPos = kClassifierPos; // A signal uses the the classifier with the same pos
 
   Logger log;
 
@@ -295,32 +297,39 @@ TEST(Ut_Signal, Default_All)
   classifier_array_type classifiers;
   cal::input_type in;
   size_t nStep;
-  constexpr int kSignalId = 0;
-  constexpr int kClassifierId = 0;
+  uint8 tmp;
 
   log.start("Default_All.txt");
 
   // Initialize
-  // CalM shall initialize EEPROM from ROM.
-  hal::eeprom::write(cal::eeprom::eManufacturerID, hal::eeprom::kInitial);
   hal::stubs::analogRead[aSteps[0].nPin] = aSteps[0].nAdc;
   hal::stubs::millis = aSteps[0].ms;
   hal::stubs::micros = 1000U * hal::stubs::millis;
 
-  // CalM initializes EEPROM with ROM values
+  // Here we go
   rte::start();
 
-  // Manipulate calibration data for classifier kClassifierId (0)
-  //const cal::classifier_array_cal_type * pCalCls = rte::ifc_cal_input_classifier::call();
-  //cal::classifier_array_element_type cal_cls = pCalCls->classifiers.at(kClassifierId);
-  //cal_cls.limits_ptr->lo_limits.at(4) = 0;
-  //cal_cls.limits_ptr->hi_limits.at(4) = 255;
-  //rte::ifc_cal_set_input_classifier::call(kClassifierId, cal_cls, true);
-  rte::ifc_cal_set_cv::call(cal::cv::eClassifierBase + kSignalId, kClassifierId);
+  // Initialize EEPROM with ROM default values (in case another unit test changed 
+  // coding data before)
+  rte::ifc_cal_set_defaults::call();
+  // And now activate signal kSignalPos
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos, kBuiltInSignalIDAusfahrsignal);
+  // ... with first output pin kFirstOutputPin
+  tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, kFirstOutputPin);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos, tmp);
+  // ... with ADC input pin kInputPin0
+  tmp = cal::signal::make_signal_input(cal::signal::values::kInputType_ADC, kInputPin0);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos, tmp);
+  // ... with classifier type kClassifierType
+  tmp = kClassifierType;
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + kSignalPos, tmp);
+  // Classifier type 0 shall identify class 4 for AD value 0, so set limits accordingly.
+  rte::ifc_cal_set_cv::call(cal::cv::eClassifierType1LoLimitBase + 4, 0);
+  rte::ifc_cal_set_cv::call(cal::cv::eClassifierType1HiLimitBase + 4, 255);
 
-  // Prepare RTE call to get command for kClassifierId
+  // Prepare RTE call to get command for kClassifierPos
   in.type = cal::input_type::eAdc;
-  in.idx = kClassifierId;
+  in.idx = kClassifierPos;
 
   for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
   {
@@ -329,11 +338,11 @@ TEST(Ut_Signal, Default_All)
     hal::stubs::micros = 1000U * hal::stubs::millis;
     rte::exec();
     printRte();
-    // Get command for kClassifierId
+    // Get command for kClassifierPos
     rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
-    uint8 target_pos = rte::calm.signals.at(kSignalId).first_target.idx;
+    uint8 target_pos = rte::calm.signals.at(kSignalPos).first_target.idx;
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
       // Get pins for current signal target
@@ -367,7 +376,7 @@ bool test_loop(void)
   UNITY_BEGIN();
 
   RUN_TEST(Default_Green_Red);
-  //RUN_TEST(Default_All);
+  RUN_TEST(Default_All);
 
   (void) UNITY_END();
 
