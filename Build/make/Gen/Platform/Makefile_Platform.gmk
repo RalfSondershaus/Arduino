@@ -377,7 +377,7 @@ OBJ_FILENAME_EXT := obj
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # GCC
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Supported target MCUs with AVR_GCC:
+# Supported targets with GCC:
 # - ARG_TARGET_ECU win32
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 else ifeq ($(ARG_COMPILER),gcc)
@@ -432,11 +432,15 @@ endif
 # We need C++17 for std::string_view
 CFLAGS := $(CFLAGS)     \
           -Wall         \
+          -Wshadow      \
+          -Wextra       \
+          -Wpedantic    \
+          -Werror       \
           -std=gnu++17  \
           -MMD
 
-ifeq ($(ARG_BSW_TESTFRAMEWORK),unity)
 # add -g to produce debugging information
+ifeq ($(ARG_BSW_TESTFRAMEWORK),unity)
 CFLAGS := $(CFLAGS) \
           -g
 endif
