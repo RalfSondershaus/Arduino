@@ -230,8 +230,8 @@ TEST(Ut_Ramp, do_ramp_16bit_10_0x0_0x8000_0x8000)
 
   const util::array<step_type, 2> aSteps = 
   { {
-        { .ms = 10, .expectedCur = 32768 }
-      , { .ms = 20, .expectedCur = 32768 }
+        { 10, 32768 }
+      , { 20, 32768 }
   } };
 
   myRamp.init_from_slope(intensity, slope, kCycleTime);
