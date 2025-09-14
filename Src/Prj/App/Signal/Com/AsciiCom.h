@@ -20,6 +20,9 @@
  * - `MON_START cycle-time ifc-name [id-first id-nr]` Start to print current values of `ifc-name`
  * - `MON_STOP` Stop to print RTE port
  * 
+ * Set to defaults
+ * - `INIT` Write default values to NVM
+ * 
  * Example to configure signal 1 as Ausfahrsignal
  * - `SET_CV 42 1`            Assign Ausfahrsignal (1) to signal 1 (42)
  * - `SET_CV 50 0x0D`         First output pin of signal 1 is internal (0) pin 13 (D)
@@ -102,13 +105,14 @@ namespace com
      * and change-over times, as well as configuring classifiers.
      *
      * @section Set and get CV's
-     * @brief Commands to set a CV
+     * @brief Commands to set and get a CV. Command to initialize EEPROM.
      *
      * | Command | Description | Example Usage |
      * |---------|-------------|--------------|
      * | `SET_CV cv_id value` | Set the CV with id `cv_id` to `value value`. | `MON_LIST` |
+     * | `INIT` | Initialize EEPROM with default values. | `INIT` |
      * 
-     * @section MONITOR
+     * @section Monitoring
      * @brief Commands to monitor RTE
      *
      * | Command | Description | Example Usage |

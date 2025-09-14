@@ -32,7 +32,7 @@ namespace cal
   namespace eeprom
   {
     /// 19 bytes per user defined signal (with 8 aspects)
-    constexpr uint16 kUserDefinedSignalLength = 19;
+    constexpr uint16 kUserDefinedSignalLength = cv::kUserDefinedSignalLength;
 
     // Depends on hardware platform.
     /// EEPROM indices.
@@ -57,7 +57,7 @@ namespace cal
       eSignalInputClassifierTypeBase   = cv::eSignalInputClassifierTypeBase,
       eClassifierBase                  = cv::eClassifierBase,
       eUserDefinedSignalBase           = cv::eUserDefinedSignalBase,
-      eSizeOfData                      = eClassifierBase + kUserDefinedSignalLength*cfg::kNrUserDefinedSignals 
+      eSizeOfData                      = cv::eLastCV 
                                          ///< One past last element = number of bytes in EEPROM
     };
 
