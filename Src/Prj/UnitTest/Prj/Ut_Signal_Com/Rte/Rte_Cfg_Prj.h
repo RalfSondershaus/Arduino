@@ -22,7 +22,9 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#include <Cal/CalM.h>
+
+#include <InputClassifier.h>
+ #include <Cal/CalM.h>
 #include <Com/ComR.h>
 
 RTE_DEF_START
@@ -30,6 +32,7 @@ RTE_DEF_START
 RTE_DEF_OBJ_START
 RTE_DEF_OBJ(cal::CalM, calm)
 RTE_DEF_OBJ(com::ComR, comr)
+RTE_DEF_OBJ(signal::InputClassifier, input_classifier)
 RTE_DEF_OBJ_END
 
 RTE_DEF_INIT_RUNABLE_START
@@ -47,10 +50,9 @@ RTE_DEF_PORT_SR_END
 
 RTE_DEF_PORT_CS_START
 RTE_DEF_PORT_CS(Ifc_Cal_Signal             , ifc_cal_signal              , calm, &cal::CalM::get_signal)
-RTE_DEF_PORT_CS(Ifc_Cal_InputClassifier    , ifc_cal_input_classifier    , calm, &cal::CalM::get_input_classifiers)
-RTE_DEF_PORT_CS(Ifc_Cal_Set_Signal         , ifc_cal_set_signal          , calm, &cal::CalM::set_signal)
-//RTE_DEF_PORT_CS(Ifc_Cal_Set_InputClassifier, ifc_cal_set_input_classifier, calm, &cal::CalM::set_input_classifier)
-RTE_DEF_PORT_CS(Ifc_Cal_Init_All           , ifc_cal_init_all            , calm, &cal::CalM::init_all)
+RTE_DEF_PORT_CS(Ifc_Cal_Set_CV             , ifc_cal_set_cv              , calm, &cal::CalM::set_cv)
+RTE_DEF_PORT_CS(Ifc_Cal_Set_Defaults       , ifc_cal_set_defaults        , calm, &cal::CalM::set_defaults)
+RTE_DEF_PORT_CS(Ifc_Rte_UpdateConfigForClassifier, ifc_rte_update_config_for_classifier, input_classifier, &signal::InputClassifier::set_config)
 RTE_DEF_PORT_CS_END
 
 RTE_DEF_END

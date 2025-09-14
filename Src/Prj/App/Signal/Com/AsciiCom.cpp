@@ -19,6 +19,7 @@
  */
 
 #include <Cfg_Prj.h>
+#include <Platform_Limits.h>
 #include <Cal/CalM_Type.h>
 #include <Com/AsciiCom.h>
 #include <Util/Sstream.h>
@@ -49,6 +50,7 @@ namespace com
         eINV_CMD,    ///< Command invalid (or unknown)
         eERR_EEPROM, ///< EEPROM update failure
         eINV_CV_ID,  ///< SET_CV with an invalid CV id
+        eCV_VALUE_OUT_OF_RANGE, ///< SET_CV with an invalid CV value
         // eINV_SIGNAL_ID,             ///< SIGNAL ID invalid
         // eINV_SIGNAL_CMD,
         // eINV_SIGNAL_ASPECTS,
@@ -75,6 +77,7 @@ namespace com
             "ERR: Invalid command", // eINV_CMD
             "ERR: EEPROM failure",  // eERR_EEPROM
             "ERR: Invalid CV ID",   // eINV_CV_ID
+            "ERR: CV value is out of range",   // eCV_VALUE_OUT_OF_RANGE
             // "ERR: Signal id invalid",               // eINV_SIGNAL_ID
             // "ERR: Unknown signal sub command",      // eINV_SIGNAL_CMD
             // "ERR: Unknown signal aspects",          // eINV_SIGNAL_ASPECTS
@@ -312,29 +315,42 @@ namespace com
     /**
      * @brief Implements command SET_CV <cv_id> <value>
      *
-     * @param st Contains the command string without "SET_CV"
+     * @param st Contains the command string, get pointer points to first element after "SET_CV".
      * @param response [out] The response is stored here, it is the contains the command parameters.
      * @return tRetType eOK
      * @return tRetType eINV_CMD Ill-formed command or CV id is out-of-bounds
+     * @return tRetType eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
+     * 
      */
     static tRetType process_set_cv(stringstream_type &st, string_type &response)
     {
         tRetType ret = eINV_CMD;
+        uint16 value;
         CV new_cv;
 
         // The response shall contain the command parameters
         response.append(st.str());
 
+        // Use uint16 here to ensure numeric values are extracted correctly.
+        // If uint8 is used, the extraction may interpret the value as a character instead of a 
+        // number.
         st >> new_cv.id;
-        st >> new_cv.val;
-
+        st >> value;
         // Do not check for eof() since eof() is true after extracting the last element
         // (and if the last element doesn't have trailing white spaces).
         if (!st.fail())
         {
-            if (rte::ifc_cal_set_cv::call(new_cv.id, new_cv.val) == rte::ret_type::OK)
+            if (value < platform::numeric_limits<uint8>::max_())
             {
-                ret = eOK;
+                new_cv.val = static_cast<uint8>(value);
+                if (rte::ifc_cal_set_cv::call(new_cv.id, new_cv.val) == rte::ret_type::OK)
+                {
+                    ret = eOK;
+                }
+            }
+            else
+            {
+                ret = eCV_VALUE_OUT_OF_RANGE;
             }
         }
 

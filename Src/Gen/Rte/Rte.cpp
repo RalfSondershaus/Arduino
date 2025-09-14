@@ -204,6 +204,8 @@ namespace rte
       pRet = &aPorts[idx];
     }
     else
+  #else
+    (void) idx;
   #endif
     {
       pRet = nullptr;
@@ -224,6 +226,8 @@ namespace rte
         break;
       }
     }
+  #else
+    (void) portName;
   #endif
     return p;
   }
