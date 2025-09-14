@@ -58,7 +58,6 @@ namespace dcc
     static bool bFirstCall = true;
     static unsigned long prev = 0;
     const unsigned long now = hal::micros();
-    unsigned long dt;
 
     if (bFirstCall)
     {

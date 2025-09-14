@@ -103,7 +103,7 @@ namespace util
         if (!noskip)
         {
           int_type nc = this->rdbuf()->sgetc();
-           const ctype_type& facet = util::use_facet<ctype_type>(this->getloc());
+           const ctype_type facet = util::use_facet<ctype_type>(this->getloc());
 
           while ((!traits_type::eq_int_type(traits_type::eof(), nc))
             && (facet.isspace(traits_type::to_char_type(nc))))

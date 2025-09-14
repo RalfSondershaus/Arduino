@@ -48,23 +48,23 @@ namespace hal
     inline int read(void)                      { return stubs::read; }
 
     /// Print functions
-    inline size_t print(const char *p)                       { return 0; }
-    inline size_t print(char c)                              { return 0; }
-    inline size_t print(unsigned char uc, int base = 10)     { return 0; }
-    inline size_t print(int n, int base = 10)                { return 0; }
-    inline size_t print(unsigned int un, int base = 10)      { return 0; }
-    inline size_t print(long n, int base = 10)               { return 0; }
-    inline size_t print(unsigned long un, int base = 10)     { return 0; }
-    inline size_t print(double d, int digits = 2)            { return 0; }
+    inline size_t print(const char *p)                       { (void) p; return 0; }
+    inline size_t print(char c)                              { (void) c; return 0; }
+    inline size_t print(unsigned char uc, int base = 10)     { (void) uc; (void) base; return 0; }
+    inline size_t print(int n, int base = 10)                { (void) n; (void) base; return 0; }
+    inline size_t print(unsigned int un, int base = 10)      { (void) un; (void) base; return 0; }
+    inline size_t print(long n, int base = 10)               { (void) n; (void) base; return 0; }
+    inline size_t print(unsigned long un, int base = 10)     { (void) un; (void) base; return 0; }
+    inline size_t print(double d, int digits = 2)            { (void) d; (void) digits; return 0; }
 
-    inline size_t println(const char *p)                       { return 0; }
-    inline size_t println(char c)                              { return 0; }
-    inline size_t println(unsigned char uc, int base = 10)     { return 0; }
-    inline size_t println(int n, int base = 10)                { return 0; }
-    inline size_t println(unsigned int un, int base = 10)      { return 0; }
-    inline size_t println(long n, int base = 10)               { return 0; }
-    inline size_t println(unsigned long un, int base = 10)     { return 0; }
-    inline size_t println(double d, int digits = 2)            { return 0; }
+    inline size_t println(const char *p)                       { (void) p; return 0; }
+    inline size_t println(char c)                              { (void) c; return 0; }
+    inline size_t println(unsigned char uc, int base = 10)     { (void) uc; (void) base; return 0; }
+    inline size_t println(int n, int base = 10)                { (void) n; (void) base; return 0; }
+    inline size_t println(unsigned int un, int base = 10)      { (void) un; (void) base; return 0; }
+    inline size_t println(long n, int base = 10)               { (void) n; (void) base; return 0; }
+    inline size_t println(unsigned long un, int base = 10)     { (void) un; (void) base; return 0; }
+    inline size_t println(double d, int digits = 2)            { (void) d; (void) digits; return 0; }
     inline size_t println()                                    { return 0; }
   }
 } // namespace com

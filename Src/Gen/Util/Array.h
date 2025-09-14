@@ -106,7 +106,7 @@ namespace util
     /// Returns the number of elements
     constexpr size_type size() const noexcept { return N; }
     /// Return true if the index is valid (within boundaries)
-    constexpr bool check_boundary(size_type pos) const { return (pos >= static_cast<size_type>(0)) && (pos < size()); }
+    constexpr bool check_boundary(size_type pos) const { return pos < size(); }
     /// Assigns the given value value to all elements in the container.
     void fill(const T& value) { util::fill(begin(), end(), value); }
   };
