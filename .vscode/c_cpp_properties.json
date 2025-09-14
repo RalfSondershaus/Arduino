@@ -6,9 +6,10 @@
                 "${workspaceFolder}/Src/Gen/**",
                 "${workspaceFolder}/Src/Gen/Test/unity/src",
                 "${workspaceFolder}/Src/Gen/Hal/Stub/Gpio",
+                "${workspaceFolder}/Src/Gen/Hal/Stub/Timer",
                 "${workspaceFolder}/Src/Gen/Bsw/Arduino/avr/**",
                 "${workspaceFolder}/../../tools/avr8-gnu-toolchain/3.7.0.1796/avr/include/**",
-                "/usr/lib/avr/include",
+                "${workspaceFolder}/Src/Prj/UnitTest/Prj/Ut_Signal",
                 "${workspaceFolder}/Src/Prj/App/Signal",
                 "${workspaceFolder}/Src/Prj/App/Signal/**"
             ],

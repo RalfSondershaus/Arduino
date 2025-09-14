@@ -42,7 +42,7 @@
         {
             "type": "cppbuild",
             "label": "Build App avr_gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:AppProjectName}",
                 "mega",
@@ -64,7 +64,7 @@
         {
             "type": "cppbuild",
             "label": "Rebuild App avr_gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:AppProjectName}",
                 "mega",
@@ -87,7 +87,7 @@
         {
             "type": "cppbuild",
             "label": "Run App avr_gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:AppProjectName}",
                 "mega",
@@ -107,7 +107,7 @@
         {
             "type": "cppbuild",
             "label": "Build UnitTest Win gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:UnitTestProjectName}",
                 "win32",
@@ -129,7 +129,7 @@
         {
             "type": "cppbuild",
             "label": "Rebuild UnitTest Win gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:UnitTestProjectName}",
                 "win32",
@@ -149,7 +149,7 @@
         {
             "type": "cppbuild",
             "label": "Run UnitTest Win gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:UnitTestProjectName}",
                 "win32",
