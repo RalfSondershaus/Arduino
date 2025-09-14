@@ -103,7 +103,10 @@ namespace util
                 if (!noskip)
                 {
                     int_type nc = this->rdbuf()->sgetc();
-                    const ctype_type &facet = util::use_facet<ctype_type>(this->getloc());
+                    // Store reference to locale to suppress GCC 13.3 compiler error 
+                    // "error: possibly dangling reference to a temporary [-Werror=dangling-reference]".
+                    const locale &loc = this->getloc();
+                    const ctype_type &facet = util::use_facet<ctype_type>(loc);
 
                     while ((!traits_type::eq_int_type(traits_type::eof(), nc)) && (facet.isspace(traits_type::to_char_type(nc))))
                     {
@@ -128,7 +131,10 @@ namespace util
             ios_base::iostate err = ios_base::goodbit;
             if (ok)
             {
-                const num_get_type &facet = util::use_facet<num_get_type>(this->getloc());
+                // Store reference to locale to suppress GCC 13.3 compiler error 
+                // "error: possibly dangling reference to a temporary [-Werror=dangling-reference]".
+                const locale &loc = this->getloc();
+                const num_get_type &facet = util::use_facet<num_get_type>(loc);
                 facet.gets(*this, 0, *this, err, val);
                 if (val > platform::numeric_limits<sint16>::max_())
                 {
@@ -158,7 +164,10 @@ namespace util
             ios_base::iostate err = ios_base::goodbit;
             if (ok)
             {
-                const num_get_type &facet = util::use_facet<num_get_type>(this->getloc());
+                // Store reference to locale to suppress GCC 13.3 compiler error 
+                // "error: possibly dangling reference to a temporary [-Werror=dangling-reference]".
+                const locale &loc = this->getloc();
+                const num_get_type &facet = util::use_facet<num_get_type>(loc);
                 facet.getu(*this, 0, *this, err, val);
                 if (val > platform::numeric_limits<uint16>::max_())
                 {
@@ -224,6 +233,8 @@ namespace util
         /// characters and stores them into character string pointed to by s until '\n' is found.
         basic_istream &get(char_type *s, streamsize count)
         {
+            // Store reference to locale to suppress GCC 13.3 compiler error 
+            // "error: possibly dangling reference to a temporary [-Werror=dangling-reference]".
             const locale &loc = this->getloc();
             const ctype_type &facet = util::use_facet<ctype_type>(loc);
             return get(s, count, facet.widen('\n'));
@@ -285,7 +296,10 @@ namespace util
         /// characters and stores them into character string pointed to by s until '\n' is found.
         basic_istream &getline(char_type *s, streamsize count)
         {
-            const ctype_type &facet = util::use_facet<ctype_type>(this->getloc());
+            // Store reference to locale to suppress GCC 13.3 compiler error 
+            // "error: possibly dangling reference to a temporary [-Werror=dangling-reference]".
+            const locale &loc = this->getloc();
+            const ctype_type &facet = util::use_facet<ctype_type>(loc);
             return get(s, count, facet.widen('\n'));
         }
 
@@ -481,7 +495,10 @@ namespace util
 
             int_type n = st.rdbuf()->sgetc();
 
-            const ctype_type &facet = util::use_facet<ctype_type>(st.getloc());
+            // Store reference to locale to suppress GCC 13.3 compiler error 
+            // "error: possibly dangling reference to a temporary [-Werror=dangling-reference]".
+            const locale &st_loc = st.getloc();
+            const ctype_type &facet = util::use_facet<ctype_type>(st_loc);
 
             while (!traits_type::eq_int_type(n, traits_type::eof()) && !facet.isspace(traits_type::to_char_type(n)) && (gcount < width - 1))
             {
