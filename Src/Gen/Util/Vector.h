@@ -54,7 +54,10 @@ namespace util
     /// @param p Pointer to the memory to be deallocated
     /// @param n Number of elements in the memory
     void deallocate(T * p, size_type n)
-    {}
+    {
+        (void) p;
+        (void) n;
+    }
 
     /// Returns the maximum possible number of elements
     size_type max_size() const noexcept { return kMaxSize; }
