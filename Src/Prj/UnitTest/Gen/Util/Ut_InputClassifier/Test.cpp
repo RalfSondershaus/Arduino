@@ -7,7 +7,7 @@
  */
 
 #include <Util/Classifier.h>
-#include <Hal/TImer.h>
+#include <Hal/Timer.h>
 #include <unity_adapt.h>
 
 // ------------------------------------------------------------------------------
