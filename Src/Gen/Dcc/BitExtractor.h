@@ -128,6 +128,7 @@ namespace dcc
     }
     /// @brief Adds a bit to the end of the queue
     /// @param bit The bit to add (true for "1", false for "0").
+    /// @param invBit Indicates if the bit is invalid (true) or valid (false).
     void push(bool bit, bool invBit) noexcept
     {
       if (bitQueue.size() < bitQueue.max_size())

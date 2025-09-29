@@ -7,24 +7,23 @@ Coding styles are like traffic rules: they don’t limit creativity, they enable
 
 ## Why these conventions? ##
 
-1. Consistency = Readability
-When code follows a consistent style, it’s easier to read and understand — even if you didn’t 
+1. **Consistency = Readability.** When code follows a consistent style, it’s easier to read and understand — even if you didn’t 
 write it. Think of it like punctuation in writing: without it, even brilliant ideas become a mess.
 
-2. Team Collaboration
+1. **Team Collaboration.**
 In teams, coding styles prevent “style wars” and reduce friction during code reviews.
 Everyone speaks the same “code dialect,” so the focus stays on logic, not formatting.
 
-3. Tooling & Automation
+1. **Tooling & Automation.**
 Linters, formatters, and static analysis tools rely on predictable patterns. A consistent style 
 makes it easier to catch bugs, enforce rules, and automate formatting.
 
-4. Maintainability Over Time
+1. **Maintainability Over Time.**
 Code lives longer than you think. Months or years later, someone (maybe you!) will revisit it. 
 A clear style helps future developers understand intent without deciphering cryptic naming or 
 structure.
 
-5. Avoiding Errors
+1. **Avoiding Errors.**
 Styles help prevent subtle bugs — like confusing variable names or ambiguous logic. Naming 
 conventions signal type, scope, or purpose.
 
@@ -38,7 +37,7 @@ conventions signal type, scope, or purpose.
 
 **Examples:**
 - `motor_control.cpp`
-- `adc_driver.hpp`
+- `adc_driver.h`
 
 ---
 
@@ -91,11 +90,16 @@ void motor_disable();
 class MotorController;
 struct AdcConfig;
 enum class MotorState { eOff, eOn, eError };
+namespace util 
+{
+    class array;
+}
 ```
 
 ## Constants
 - Use `constexpr` or `static const` instead of `#define`
-- Naming: `kPascalCase` or `ALL_CAPS`
+- Use `kPascalCase` for `constexpr` or `static const`: 
+- Use `ALL_CAPS` for `#define`
 
 **Examples:**
 ```cpp
@@ -107,33 +111,36 @@ static constexpr float kTemperatureThreshold = 75.0f;
 
 ### Doxygen
 Wichtige Tags
-Tag	Bedeutung
-@brief	Kurzbeschreibung
-@param	Parameterbeschreibung
-@return	Rückgabewert
-@see	Verweis auf andere Elemente
-@note	Zusätzliche Hinweise
-@todo	Aufgaben oder offene Punkte
-@ref	Referenz auf andere Symbole
+
+|Tag      | Bedeutung                   |
+|---------|-----------------------------|
+| @brief  | Short description           |
+| @param  | Parameter description       |
+| @return | Return value                |
+| @see    | Reference to other elements |
+| @note   | Additional notes            |
+| @todo   | Tasks or pending items      |
+| @ref    | Reference to other symbols  |
+
 ### Comments in the Header File (.h)
 
 When appropriate:
-- Public API documentation 
-   → e.g. function descriptions, parameters, return values → Ideal for Doxygen or other documentation tools
-- Class descriptions / purpose of the class
-   → What the class does and how it should be used
-- Constants, type definitions, enums
-   → Meaning, value range, constraints
+- **Public API documentation**
+   - e.g. function descriptions, parameters, return values
+- **Class descriptions / purpose of the class**
+   - What the class does and how it should be used
+- **Constants, type definitions, enums**
+   - Meaning, value range, constraints
 
 ### Comments in the Implementation File (.cpp)
 
 When appropriate:
-- Algorithm explanation 
-   → Why something is done a certain way, edge cases
-- Optimizations or workarounds 
-   → e.g. hardware quirks, compiler-specific behavior
-- Temporary notes / TODOs
-   → e.g. // TODO(ralf): Handle overflow case
+- **Algorithm explanation**
+   - Why something is done a certain way, edge cases
+- **Optimizations or workarounds**
+   - e.g. hardware quirks, compiler-specific behavior
+- **Temporary notes / TODOs**
+   - e.g. // TODO(Ralf): Handle overflow case
 
 ### Best practice
 
@@ -170,8 +177,10 @@ then:
 - Avoid bitfields
 - Use bit masks and shift operations instead
 ```cpp
-constexpr uint32_t MASK_A = 0xE0; // Bits 5–7
-constexpr uint32_t MASK_B = 0x1F; // Bits 0–4
+constexpr uint32_t kMask_A = 0xE0; // Bits 5–7
+constexpr uint32_t MMask_B = 0x1F; // Bits 0–4
+constexpr uint32_t kShift_A = 5; // Bits 5–7
+constexpr uint32_t MShift_B = 0; // Bits 0–4
 
 uint32_t value = (a << 5) | b;
 ```
@@ -185,6 +194,6 @@ This gives you full control over bit assignment — independent of the compiler.
 
 ## Why these conventions? ##
 
-- Clarity: Snake case separates words clearly — especially important for long variable names.
-- Tool compatibility: Many static analysis tools expect specific naming patterns.
-- Avoiding name conflicts: For example, preventing overlap with macros or global symbols.
+- **Clarity**: Snake case separates words clearly — especially important for long variable names.
+- **Tool compatibility**: Many static analysis tools expect specific naming patterns.
+- **Avoiding name conflicts**: For example, preventing overlap with macros or global symbols.

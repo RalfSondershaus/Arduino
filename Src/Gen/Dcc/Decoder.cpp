@@ -11,6 +11,7 @@
   */
 
 #include <Std_Types.h>
+#include <Dcc/BitExtractor.h>
 #include <Dcc/Decoder.h>
 #include <Util/Algorithm.h> // max
 #include <Util/Fix_Queue.h>
@@ -32,7 +33,7 @@ namespace dcc
   /// the ISR to write into one buffer while the main loop reads from the other.
   /// The double buffering is implemented with a static index.
   /// The index is toggled in the ISR and in the main loop.
-  static bit_stream_type bit_streams[2];
+  bit_stream_type bit_streams[2];
   
   static bit_extractor_type bitExtr(&bit_streams[0]); ///< The bit extractor that processes the timing intervals and generates bits
 

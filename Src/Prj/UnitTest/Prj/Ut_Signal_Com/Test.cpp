@@ -60,6 +60,24 @@ TEST(Ut_Signal_Com, AsciiCom_process_SET_CV_SignalIDs)
   EXPECT_EQ(response, string_type("OK SET_CV 43 1"));
 }
 
+//-------------------------------------------------------------------------
+TEST(Ut_Signal_Com, AsciiCom_process_INIT)
+{
+  AsciiCom asciiCom;
+  string_type telegram = "INIT";
+  string_type response;
+  asciiCom.process(telegram, response);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eDecoderAddressLSB], cal::kAddressLSB);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eDecoderAddressMSB], cal::kAddressMSB);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eManufacturerVersionID], cal::kManufacturerVersionID);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eManufacturerID], cal::kManufacturerID);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eConfiguration], cal::kConfiguration);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eManufacturerCVStructureID], cal::kManufacturerCVStructureID);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalIDBase + 0], cal::kSignalNotUsed);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalIDBase + 1], cal::kSignalNotUsed);
+  EXPECT_EQ(response, string_type("OK"));
+}
+
 void setUp(void)
 {
 }
@@ -77,6 +95,7 @@ bool test_loop(void)
   UNITY_BEGIN();
 
   RUN_TEST(AsciiCom_process_SET_CV_SignalIDs);
+  RUN_TEST(AsciiCom_process_INIT);
 
   UNITY_END();
 

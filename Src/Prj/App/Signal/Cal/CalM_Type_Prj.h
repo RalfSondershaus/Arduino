@@ -166,6 +166,11 @@ namespace cal
   constexpr uint8 kSignalNotUsed = 0;
   constexpr uint8 kFirstBuiltInSignalID = 1;
   constexpr uint8 kFirstUserDefinedSignalID = 128;
+
+  /* CV1 contains the eight least significant bits of the Output Address */
+  constexpr uint8 kMaskCV1_address_LSB = 0xFF; 
+  /* CV9 contains the three most significant bits of the Output Address */
+  constexpr uint8 kMaskCV9_address_MSB = 0x07; 
 } // namespace cal
 
 #endif // CALM_TYPE_PRJ_H_

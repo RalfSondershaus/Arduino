@@ -142,6 +142,7 @@ namespace cal
   constexpr uint8 kTimeOn = 0;
   constexpr uint8 kManufacturerVersionID = 0x01;  /* v0.1 */
   constexpr uint8 kManufacturerID = 'S';          /* Sondershaus */
+  constexpr uint8 kManufacturerCVStructureID = 0x10;   /* v1.0 */
   constexpr uint8 kConfiguration =  configuration::kDecoderType_BasicAccessory      /* Configuration CV 29 */
                                   | configuration::kAddressingMethod_OutputAddress
                                   | configuration::kAccessoryDecoder;
@@ -182,7 +183,7 @@ namespace cal
         0,              /* CV 28 */                                         \
         kConfiguration, /* CV 29 */                                         \
         0, 0, 0,        /* CV 30 - 32 */                                    \
-        kManufacturerVersionID,     /* CV 33 */                             \
+        kManufacturerCVStructureID, /* CV 33 */                             \
         0, 0, 0, 0, 0,              /* 34 - 38 */                           \
         kDccAddressingMode,         /* CV 39 */                             \
         cfg::kNrSignals,            /* CV 40 */                             \
