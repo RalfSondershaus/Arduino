@@ -5,10 +5,10 @@
             "type": "pickString",
             "description": "Select project name",
             "default": "App/Signal",
-            "options": [ 
-                "App/BlinkSample", 
-                "App/DccSniffer", 
-                "App/Signal", 
+            "options": [
+                "App/BlinkSample",
+                "App/DccSniffer",
+                "App/Signal",
             ]
         },
         {
@@ -16,7 +16,7 @@
             "type": "pickString",
             "description": "Select project name",
             "default": "UnitTest/Gen/Util/Ut_Sstream",
-            "options": [ 
+            "options": [
                 "UnitTest/Gen/Dcc/Ut_Packet",
                 "UnitTest/Gen/Dcc/Ut_PacketExtractor",
                 "UnitTest/Gen/Util/Ut_Algorithm",
@@ -36,7 +36,6 @@
                 "UnitTest/Prj/Ut_Signal_Com",
             ]
         }
-
     ],
     "tasks": [
         {
@@ -226,6 +225,25 @@
             ],
             "group": "build"
         },
+        {
+            "label": "Generate Doxygen Docs",
+            "type": "shell",
+            "command": "doxygen",
+            "args": [
+                "Doxyfile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        }
     ],
     "version": "2.0.0"
 }
