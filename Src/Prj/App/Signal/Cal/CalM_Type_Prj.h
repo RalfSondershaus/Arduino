@@ -133,7 +133,7 @@ namespace cal
     enum
     {
       eDecoderAddressLSB                = 1,
-      eAuxiliaryActivattion             = 2,
+      eAuxiliaryActivation              = 2,
       eTimeOnBase                       = 3,
       eManufacturerVersionID            = 7,
       eManufacturerID                   = 8,

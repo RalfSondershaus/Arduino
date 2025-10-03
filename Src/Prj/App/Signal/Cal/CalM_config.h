@@ -41,7 +41,7 @@ namespace cal
     enum
     {
       eDecoderAddressLSB               = cv::eDecoderAddressLSB,
-      eAuxiliaryActivattion            = cv::eAuxiliaryActivattion,
+      eAuxiliaryActivation             = cv::eAuxiliaryActivation,
       eTimeOnBase                      = cv::eTimeOnBase,
       eManufacturerVersionID           = cv::eManufacturerVersionID,
       eManufacturerID                  = cv::eManufacturerID,
