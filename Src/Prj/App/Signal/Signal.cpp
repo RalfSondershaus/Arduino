@@ -94,12 +94,13 @@ namespace signal
     }
 
     // write intensity and speed to RTE
-    constexpr size_t kSignalTargetIndexMax = static_cast<size_t>(cfg::kNrSignalTargets) - 1U;
-    for (pos = 0U; pos <= kSignalTargetIndexMax; pos++)
+    const size_t kNrTargets = cal_getNrTargets(pCal);
+    cal::target_type tgt = cal_getFirstTarget(pCal);
+    for (pos = 0U; pos < kNrTargets; pos++)
     {
       // MSB of aspect is index 0 in target intensity array
       // LSB of aspect is index cfg::kNrSignalTargets-1 in target intensity array
-      if (util::bits::test<uint8>(aspect_cur.aspect, kSignalTargetIndexMax - pos))
+      if (util::bits::test<uint8>(aspect_cur.aspect, (kNrTargets - 1) - pos))
       {
         intensity = rte::kIntensity16_100;
       }
@@ -117,12 +118,16 @@ namespace signal
         // calculate speed for ramp from 0x0000 (0%) to 0x8000 (100%) within dimtime
         const speed16_ms_type speed = rte::kIntensity16_100 / scale_10ms_1ms(dimtime);
         //log << " (" << cal_getTarget(pCal, pos).idx << ": " << intensity << ")";
-        rte::ifc_rte_set_intensity_and_speed::call(cal_getTarget(pCal, pos), intensity, speed);
+        // boundary check is performed in rte::ifc_rte_set_intensity_and_speed
+        rte::ifc_rte_set_intensity_and_speed::call(tgt, intensity, speed);
+        tgt.idx++;
       }
       else
       {
         //log << " (" << cal_getTarget(pCal, pos).idx << ": " << intensity << ")";
-        rte::ifc_rte_set_intensity::call(cal_getTarget(pCal, pos), intensity);
+        // boundary check is performed in rte::ifc_rte_set_intensity
+        rte::ifc_rte_set_intensity::call(tgt, intensity);
+        tgt.idx++;
       }
     }
 
@@ -153,10 +158,8 @@ namespace signal
       auto calit = pCal->begin();
       for (auto sigit = signals.begin(); sigit != signals.end(); sigit++)
       {
-        //if (sigit == signals.begin()) log.begin("Signal");
         sigit->exec(calit);
         calit++;
-        //if (sigit == signals.begin()) log.end();
       }
     }
   }

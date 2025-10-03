@@ -30,17 +30,17 @@ namespace signal
     cmd_type cmd = rte::kInvalidCmd;
     using size_type = rte::classified_values_array::size_type;
 
-    if (in.bits.type == cal::input_type::eClassified)
+    if (in.type == cal::input_type::eAdc)
     {
-      const size_type pos = static_cast<size_type>(in.bits.idx);
+      const size_type pos = static_cast<size_type>(in.idx);
       if (rte::ifc_classified_values::boundaryCheck(pos))
       {
         rte::ifc_classified_values::readElement(pos, cmd);
       }
     }
-    else if (in.bits.type == cal::input_type::eDcc)
+    else if (in.type == cal::input_type::eDcc)
     { 
-      const size_type pos = static_cast<size_type>(in.bits.idx);
+      const size_type pos = static_cast<size_type>(in.idx);
       if (rte::ifc_dcc_commands::boundaryCheck(pos))
       {
         rte::ifc_dcc_commands::readElement(pos, cmd);

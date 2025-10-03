@@ -11,6 +11,7 @@
   */
 
 #include <Std_Types.h>
+#include <Dcc/BitExtractor.h>
 #include <Dcc/Decoder.h>
 #include <Util/Algorithm.h> // max
 #include <Util/Fix_Queue.h>
@@ -32,7 +33,7 @@ namespace dcc
   /// the ISR to write into one buffer while the main loop reads from the other.
   /// The double buffering is implemented with a static index.
   /// The index is toggled in the ISR and in the main loop.
-  static bit_stream_type bit_streams[2];
+  bit_stream_type bit_streams[2];
   
   static bit_extractor_type bitExtr(&bit_streams[0]); ///< The bit extractor that processes the timing intervals and generates bits
 
@@ -47,7 +48,9 @@ namespace dcc
 
   // ---------------------------------------------------
   /// Interrupt service routine: a falling or rising edge has triggered this interrupt.
-  /// Write the time difference into the FIFO buffer.
+  ///
+  /// Pushes a 0, 1, or invalid into the underlying bit stream.
+  ///
   /// @note Average run time 27 usec @ATmega2560 @16 MHz with gcc -Os
   /// @note Average run time 14 usec @ATmega2560 @16 MHz with gcc -O3
   // ---------------------------------------------------
@@ -56,7 +59,6 @@ namespace dcc
     static bool bFirstCall = true;
     static unsigned long prev = 0;
     const unsigned long now = hal::micros();
-    unsigned long dt;
 
     if (bFirstCall)
     {

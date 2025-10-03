@@ -95,7 +95,7 @@ namespace util
     // for logger::endl
     logger& operator<<(logger& (*pfunc)(logger&)) { return pfunc(*this); }
 
-    logger& endl(logger& log) { end(); return *this; }
+    logger& endl(logger& log) { (void) log; end(); return *this; }
   };
 } // namespace util
 

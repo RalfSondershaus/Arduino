@@ -5,10 +5,10 @@
             "type": "pickString",
             "description": "Select project name",
             "default": "App/Signal",
-            "options": [ 
-                "App/BlinkSample", 
-                "App/DccSniffer", 
-                "App/Signal", 
+            "options": [
+                "App/BlinkSample",
+                "App/DccSniffer",
+                "App/Signal",
             ]
         },
         {
@@ -16,7 +16,7 @@
             "type": "pickString",
             "description": "Select project name",
             "default": "UnitTest/Gen/Util/Ut_Sstream",
-            "options": [ 
+            "options": [
                 "UnitTest/Gen/Dcc/Ut_Packet",
                 "UnitTest/Gen/Dcc/Ut_PacketExtractor",
                 "UnitTest/Gen/Util/Ut_Algorithm",
@@ -36,13 +36,12 @@
                 "UnitTest/Prj/Ut_Signal_Com",
             ]
         }
-
     ],
     "tasks": [
         {
             "type": "cppbuild",
             "label": "Build App avr_gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:AppProjectName}",
                 "mega",
@@ -64,7 +63,7 @@
         {
             "type": "cppbuild",
             "label": "Rebuild App avr_gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:AppProjectName}",
                 "mega",
@@ -87,7 +86,7 @@
         {
             "type": "cppbuild",
             "label": "Run App avr_gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:AppProjectName}",
                 "mega",
@@ -107,7 +106,7 @@
         {
             "type": "cppbuild",
             "label": "Build UnitTest Win gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:UnitTestProjectName}",
                 "win32",
@@ -129,7 +128,7 @@
         {
             "type": "cppbuild",
             "label": "Rebuild UnitTest Win gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:UnitTestProjectName}",
                 "win32",
@@ -149,7 +148,7 @@
         {
             "type": "cppbuild",
             "label": "Run UnitTest Win gcc",
-            "command": "./Build/build.sh",
+            "command": ".\\Build\\build.bat",
             "args": [
                 "${input:UnitTestProjectName}",
                 "win32",
@@ -226,6 +225,25 @@
             ],
             "group": "build"
         },
+        {
+            "label": "Generate Doxygen Docs",
+            "type": "shell",
+            "command": "doxygen",
+            "args": [
+                "Doxyfile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        }
     ],
     "version": "2.0.0"
 }

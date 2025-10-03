@@ -1,0 +1,107 @@
+/* Base layout */
+body {
+  font-family: "Noto Sans", "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  background-color: #ffffff;
+  color: #222;
+  margin: 0;
+  padding: 0;
+}
+
+/* Header bar */
+div.header {
+  background-color: #005b94;
+  color: white;
+  padding: 12px 20px;
+  font-size: 20px;
+  font-weight: bold;
+  border-bottom: 2px solid #003f6b;
+}
+
+/* Navigation path */
+div.navpath {
+  background-color: #f0f0f0;
+  padding: 8px 20px;
+  font-size: 14px;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Section headings */
+h1, h2, h3, h4 {
+  color: #005b94;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+/* Code blocks */
+div.fragment {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  overflow-x: auto;
+  border-radius: 4px;
+}
+
+/* Line wrapping in code blocks */
+div.fragment pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* Inline code */
+tt, code {
+  background-color: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+/* Tables */
+table.doxtable {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+table.doxtable th {
+  background-color: #005b94;
+  color: white;
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ccc;
+}
+
+table.doxtable td {
+  padding: 8px;
+  border: 1px solid #ccc;
+}
+
+table.doxtable tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table.doxtable tr:hover {
+  background-color: #e6f2ff;
+}
+
+/* Footer */
+div.footer {
+  background-color: #f0f0f0;
+  padding: 10px;
+  font-size: 12px;
+  text-align: center;
+  color: #555;
+  border-top: 1px solid #ccc;
+}
+
+/* Larger font for template declarations */
+.memtemplate {
+  font-size: 16px;       /* Standard is often 11px or 12px */
+  font-family: monospace;
+  color: #333;
+}

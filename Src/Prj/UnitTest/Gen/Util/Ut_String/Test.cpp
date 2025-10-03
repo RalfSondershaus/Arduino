@@ -31,8 +31,8 @@
 
 
 #if CFG_TEST_WITH_STD == CFG_ON
-template<> void EXPECT_EQ<std::streampos>(std::streampos actual, std::streampos expected) { EXPECT_EQ<std::streamoff>(expected, actual); }
-template<> void EXPECT_EQ<std::string>(std::string actual, std::string expected) { TEST_ASSERT_EQUAL_STRING(expected.c_str(), actual.c_str()); }
+template<> void EXPECT_EQ<std::streampos,std::streampos>(std::streampos actual, std::streampos expected) { EXPECT_EQ<std::streamoff,std::streamoff>(expected, actual); }
+template<> void EXPECT_EQ<std::string,std::string>(std::string actual, std::string expected) { TEST_ASSERT_EQUAL_STRING(expected.c_str(), actual.c_str()); }
 #endif
 
 // -------------------------------------------------------------------------

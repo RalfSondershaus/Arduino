@@ -24,8 +24,10 @@
 #define CAL_H_
 
 #include <Std_Types.h>
+#include <Cfg_Prj.h>
 #include <Cal/CalM_Type.h>
 #include <Rte/Rte_Type.h>
+#include <Util/Array.h>
 
 namespace cal
 {
@@ -33,44 +35,108 @@ namespace cal
   class CalM
   {
   public:
+    /// @brief User-defined coding data for signals
+    util::array<output_type, cfg::kNrUserDefinedSignals> user_defined_signal_outputs;
+    /// @brief User-defined classifiers
+    util::array<classifier_type, cfg::kNrUserDefinedClassifierTypes> user_defined_classifier_types;
+
+    /**
+     * @defgroup Type safety
+     * @{
+     * Use these types for type safety.
+     */
+    struct Pin
+    {
+        uint8 val;
+    };
+    struct SignalId
+    {
+        uint8 val;
+    };
+    /** @} */
+
+    /// @brief An invalid classifier type. A valid type is any of 0 ... cfg::kNrUserDefinedClassifierTypes
+    static constexpr uint8 kInvalidClassifierType = 255;
+
+    static constexpr Pin kInvalidPin = Pin { cal::kInvalidPin };
+
     /// coding data for signals
     signal_cal_type signals;
-    input_classifier_cal_type input_classifiers;
+    classifier_array_cal_type classifier_array;
     led_cal_type leds;
     base_cv_cal_type base_cv;
 
   protected:
     /// Calc data for leds from signals
-    void calcLeds();
+    void calc_leds();
 
-    /// Initialize internal data structures and EEPROM values with default values
-    /// from ROM.    
-    void initAll();
+    bool is_user_defined(SignalId signal_id) const noexcept 
+    { 
+        return (signal_id.val >= kFirstUserDefinedSignalID) && 
+               (signal_id.val <  user_defined_signal_outputs.max_size());
+    }
+    util::ptr<const cal::output_type> getBuiltInSignal(SignalId signal_id);
+    util::ptr<const cal::output_type> getUserDefinedSignal(SignalId signal_id);
 
-    /// Load values from EEPROM
-    bool readAll();
-    void readSignals();
-    void readClassifiers();
-    void readBaseCV();
+    uint8 find_classifier_type(util::ptr<const classifier_type> limits_ptr);
 
-    /// Save data to EEPROM if a value differs from the value already stored in the EEPROM
-    bool updateSignals();
-    bool updateClassifiers();
-    bool updateBaseCV();
+    /**
+     * @defgroup Helper functions to update configuration.
+     * @{
+     */
+    void set_first_target(cal::signal_type& sig_type, uint8 raw_val);
+    void set_output(signal_type& sig_type, CalM::SignalId signal_id);
+    /**
+     * @note Digital inputs are not supported yet.
+     */
+    void set_input_and_classifier(
+        uint8 signal_pos,
+        classifier_array_element_type& classifier_array_element,
+        signal_type& sig_type,
+        uint8 signal_input_raw_val, 
+        uint8 classifier_type_raw_val);
+    /** @} */
 
-    /// Initialize internal data structures and EEPROM values with default values
-    /// from ROM.
-    void initSignals();
-    void initClassifiers();
-    void initBaseCV();
+    /**
+     * @defgroup EEPROM access
+     * @{
+     */
+    /** Read data from EEPROM */
+    bool read_all();
+    void read_signals();
+    void read_classifiers();
+    void read_base_CV();
 
-    /// Returns true if the EEPROM coding data are valid.
-    /// That is, if 
-    /// - eeprom::eManufacturerID is not EEPROM initial value (FF)
-    bool isValid();
+    /** Save data to EEPROM if a value differs from the value already stored in the EEPROM */
+    void update_signals();
+    void update_user_defined_classifiers();
+    void update_base_CV();
+    /** @} */
 
-    /// Returns checksum for all calibration data
-    uint8 calcChecksum();
+    /**
+     * @defgroup Initializer from ROM
+     * @{
+     * Initialize data structures and EEPROM with default values from ROM
+     */
+    void init_signals();
+    void init_user_defined_classifiers();
+    void init_base_CV();
+    /** @} */
+
+    /**
+     * @brief Returns true if eeprom::eManufacturerID is not EEPROM initial value (FF)
+     * 
+     * @return true ManufacturerID in EEPROM is valid
+     * @return false ManufacturerID in EEPROM is invalid
+     */
+    bool is_valid();
+
+    /**
+     * @brief Returns a checksum for calibration data
+     * 
+     * @return uint8 The checksum.
+     */
+    uint8 calc_checksum();
   public:
     CalM();
 
@@ -79,26 +145,129 @@ namespace cal
     /// Runable 100 ms
     void cycle100();
 
-    /// Server functions: read access to coding parameters
+    /**
+     * @defgroup Server functions
+     * @{
+     */
+    /** @brief Read access to coding parameters */ 
     const signal_cal_type *           get_signal()             { return &signals; }
-    const input_classifier_cal_type * get_input_classifiers()  { return &input_classifiers; }
+    const classifier_array_cal_type * get_classifiers_array()  { return &classifier_array; }
     const led_cal_type *              get_leds()               { return &leds; }
     const base_cv_cal_type *          get_base_cv()            { return &base_cv; }
 
-    /// Server functions: Store data in RAM. If doUpdate is true, stores data
-    /// in EEPROM. Otherwise, call update() for this.
-    /// Return OK is successful, returns NOK otherwise.
-    rte::ret_type set_signal(uint8 ucSignalId, const signal_type& values, bool doUpdate = false);
-    rte::ret_type set_input_classifier(uint8 ucClassifierId, const input_classifier_single_type& values, bool doUpdate = false);
-    rte::ret_type set_base_cv(const base_cv_cal_type& p, bool doUpdate = false);
+    /**
+     * @brief Set the first target of signal @ref signal_pos.
+     * 
+     * @param signal_pos Index of the signal [0 ... cfg::kNrSignals). 
+     * @param first_target The first target (output pin number and type - internal/external)
+     * @param do_update If true, values are stored in EEPROM
+     * @return rte::ret_type E_OK Values are update successfully.
+     * @return rte::ret_type E_NOK Index out of bounds.
+     * 
+     * @note If do_update is false, EEPROM is not updated. You can use @ref update() to store
+     *       data in EEPROM later.
+     */
+    rte::ret_type set_signal_first_target(
+        uint8 signal_pos, 
+        const target_type& first_target, 
+        bool do_update = false);
+
+    /**
+     * @brief Set the signal id of signal @ref signal_pos.
+     * 
+     * @param signal_pos Index of the signal [0 ... cfg::kNrSignals). 
+     * @param signal_id The signal ID that shall be used (1 ... 127: built-in, 128 ... 255: user defined)
+     * @param do_update If true, values are stored in EEPROM
+     * @return rte::ret_type E_OK Values are update successfully.
+     * @return rte::ret_type E_NOK Index out of bounds.
+     * 
+     * @note If do_update is false, EEPROM is not updated. You can use @ref update() to store
+     *       data in EEPROM later.
+     */
+    rte::ret_type set_signal_id(uint8 signal_pos, const uint8 signal_id, bool do_update = false);
+
+    /**
+     * @brief Server function: Configure signal @ref signal_pos to use an ADC pin and a
+     *        classifier as input. If do_update is true, data is stored in EEPROM.
+     * 
+     * @param signal_pos Index of the signal [0 ... cfg::kNrSignals). It is the position
+     *                   of the classified values on RTE.
+     * @param adc_pin ADC pin number
+     * @param classifier_type The classifier type.
+     * @param do_update If true, values are stored in EEPROM.
+     * @return rte::ret_type E_OK Values are update successfully.
+     * @return rte::ret_type E_NOK Index out of bounds.
+     * 
+     * @note If do_update is false, EEPROM is not updated. You can use @ref update() to store
+     *       data in EEPROM later.
+     */
+    rte::ret_type set_signal_input_classifier(uint8 signal_pos, 
+                                              const uint8 adc_pin, 
+                                              const uint8 classifier_type_val,
+                                              bool do_update = false);
+
+    /**
+     * @brief Server function: Configure signal @ref signal_pos to use a DCC commands as input. 
+     *        If do_update is true, data is stored in EEPROM.
+     * 
+     * @param signal_pos Index of the signal [0 ... cfg::kNrSignals).
+     * @param do_update If true, values are stored in EEPROM.
+     * @return rte::ret_type E_OK Values are update successfully.
+     * @return rte::ret_type E_NOK Index out of bounds.
+     * 
+     * @note If do_update is false, EEPROM is not updated. You can use @ref update() to store
+     *       data in EEPROM later.
+     */
+    rte::ret_type set_signal_input_dcc(uint8 signal_pos, 
+                                       bool do_update = false);
+    /**
+    * @brief Set the base CVs
+    * 
+    * @param new_base_cv The base CVs
+    * @param do_update If true, values are stored in EEPROM.
+    * @return rte::ret_type OK success.
+    */
+    rte::ret_type set_base_cv(const base_cv_cal_type& new_base_cv, bool do_update = false);
     
-    /// Server function: initialize EEPROM with ROM default values
-    rte::ret_type init_all();
+    /**
+     * @brief Get a CV
+     * 
+     * @param cv_id [in] CV ID
+     * @param val [out] The CV value
+     * @return rte::ret_type OK CV value was read successfully.
+     * @return rte::ret_type NOK CV with invalid id.
+     */
+    rte::ret_type get_cv(uint16 cv_id, uint8 *val);
+
+    /**
+     * @brief Set a CV
+     * 
+     * @param cv_id CV ID
+     * @param val The new value for the CV
+     * @return rte::ret_type OK CV value was updated in EEPROM successfully. Internal structures 
+     *         were updated.
+     * @return rte::ret_type NOK CV with invalid id.
+     */
+    rte::ret_type set_cv(uint16 cv_id, uint8 val);
+
+    /**
+     * @brief initialize EEPROM with ROM default values
+     * 
+     * @return rte::ret_type OK success.
+     * @return rte::ret_type NOK Data validation ok (written manufacturer ID invalid)
+     */
+    rte::ret_type set_defaults();
     
-    /// Save data to EEPROM if a value differs from the value already stored in the EEPROM.
-    /// Validate the data after write.
-    /// Returns true if successful, returns false otherwise.
+    /**
+     * @brief Save data to EEPROM if a value differs from the value already stored in the EEPROM.
+     * 
+     * Validate the data after write.
+     * 
+     * @return true Validation successful
+     * @return false Validation failed
+     */
     bool update();
+    /** @} */
   };
 
 } // namespace cal

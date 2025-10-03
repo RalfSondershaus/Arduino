@@ -28,16 +28,6 @@ static void test_ramp(const int cycleTime, const T startIntensity, const T endIn
 {
   using ramp_base_type = T;
   using ramp_type = typename util::ramp<ramp_base_type>;
-  /// 16 bit, [./ms], 0 = zero speed, 65535 = 65535 / ms
-  /// If used for intensity:
-  /// - 0x8000 / ms is 100% / ms (fastest, see also kSpeed16Max)
-  /// - 0x4000 / ms is  50% / ms
-  /// - 0x0001 / ms is  0.000030517% / ms = 0.03% / s = 1.83% / min (slowest)
-  typedef struct
-  {
-    ramp_base_type ms; // [ms] current time
-    ramp_base_type expectedCur;
-  } step_type;
 
   Logger log;
   ramp_type myRamp;
@@ -230,8 +220,8 @@ TEST(Ut_Ramp, do_ramp_16bit_10_0x0_0x8000_0x8000)
 
   const util::array<step_type, 2> aSteps = 
   { {
-        { .ms = 10, .expectedCur = 32768 }
-      , { .ms = 20, .expectedCur = 32768 }
+        { 10, 32768 }
+      , { 20, 32768 }
   } };
 
   myRamp.init_from_slope(intensity, slope, kCycleTime);

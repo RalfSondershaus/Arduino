@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feature-dcc-addressing
   pull_request:
     branches:
       - master

@@ -28,6 +28,7 @@
 #define BITSET_H_
 
 #include <Std_Types.h>
+#include <Platform_Limits.h>
 
 namespace util
 {
@@ -109,14 +110,14 @@ namespace util
     template <typename W>
     constexpr size_t nr_words(size_t nbits) noexcept { return (nbits + (bits_per_word<W>() - static_cast<size_t>(1))) / bits_per_word<W>(); }
 
-    /// @brief Returns w & mask (both of type W1) as type W2.
-    /// @tparam W1 Input word type.
-    /// @tparam W2 Output word type.
-    /// @param w Input value.
-    /// @param mask Bit mask.
-    /// @return Masked value as type W2.
+    /// @brief Applies a bitmask to the input value and returns the result as type W2 (no shifts).
+    /// @tparam W1 Type of input value and mask.
+    /// @tparam W2 Desired output type.
+    /// @param w Input value to be masked.
+    /// @param mask Bitmask to apply.
+    /// @return Result of (w & mask), converted to type W2.
     template <typename W1, typename W2>
-    constexpr W2 stencil(W1 w, W1 mask) { return static_cast<W2>(w & mask); }
+    constexpr W2 apply_mask_as(W1 w, W1 mask) { return static_cast<W2>(w & mask); }
 
     /// @brief Extracts a bitfield from w at position pos with length nr_bits.
     /// @tparam W The word type (must be unsigned).
@@ -125,7 +126,16 @@ namespace util
     /// @param nr_bits Number of bits to extract.
     /// @return Extracted value.
     template <typename W>
-    W extract(W w, size_t pos, size_t nr_bits) { return static_cast<W>((w >> pos) & bit_mask_n<W>(nr_bits)); }
+    constexpr W bitfield_at(W w, size_t pos, size_t nr_bits) { return static_cast<W>((w >> pos) & bit_mask_n<W>(nr_bits)); }
+
+    /// @brief Extracts a bitfield from w by applying (1) the mask and (2) the shift.
+    /// @tparam W The word type (must be unsigned).
+    /// @param w Input value.
+    /// @param mask The bit mask to be applied
+    /// @param shift Value for right shift.
+    /// @return Extracted value.
+    template <typename W>
+    constexpr W masked_shift(W w, W mask, W shift) { return static_cast<W>(apply_mask_as<W,W>(w, mask) >> shift); }
 
     /// @brief Counts the number of least significant zero bits in w.
     /// @tparam W The word type.
@@ -161,6 +171,25 @@ namespace util
         retpos = getLSBZeros(w);
       }
       return retpos;
+    }
+
+    /**
+     * @brief Performs a left bitwise shift operation.
+     *
+     * This function shifts the value `w` to the left by `nr_bits` bits.
+     * It is implemented as a constexpr and marked noexcept.
+     *
+     * @tparam W Integral type (e.g., uint8, int, etc.)
+     * @param w The value to be shifted.
+     * @param nr_bits The number of bits to shift.
+     * @return The result of shifting `w` left by `nr_bits` bits.
+     */
+    template<typename W>
+    constexpr W lshift(W w, W nr_bits) noexcept
+    {
+        // Shifting by a value greater than or equal to the bit width of the type (shft >= sizeof(W) * 8) 
+        // is undefined behavior in C++.
+        return (nr_bits < platform::numeric_limits<W>::digits) ? static_cast<W>(w << nr_bits) : 0;
     }
   } // namespace bits
 
@@ -369,7 +398,7 @@ namespace util
           wordpos++;
           for (; (wordpos < NWORDS) && (pos != notfound); wordpos++)
           {
-            tWord w = aWords[wordpos];
+            w = aWords[wordpos];
             pos = bits::first(w, notfound);
           }
         }

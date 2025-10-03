@@ -26,170 +26,242 @@
 
 namespace signal
 {
-  static constexpr uint8 kBlinkLedPin = 13U;
-  static constexpr util::MilliTimer::time_type kBlinkLedPeriodValid_ms = 1000U;
-  static constexpr util::MilliTimer::time_type kBlinkLedPeriodInvalid_ms = 500U;
 
-  // --------------------------------------------------------------------------
-  /// @brief Toggle the alive LED
-  // --------------------------------------------------------------------------
-  static void toggleLedPin()
-  {
-    static uint8 lastWrite = LOW;
-
-    if (lastWrite == LOW)
+    // --------------------------------------------------------------------------
+    /// @brief Toggle the alive LED
+    // --------------------------------------------------------------------------
+    static void toggle_led_pin()
     {
-      lastWrite = HIGH;
-    }
-    else
-    {
-      lastWrite = LOW;
-    }
+        static uint8 lastWrite = LOW;
 
-    hal::digitalWrite(kBlinkLedPin, lastWrite);
-  }
-
-  // --------------------------------------------------------------------------
-  /// @brief If current timer is elapsed, toggle LED and reload timer with period_ms
-  /// @param period_ms New blink period [ms]
-  // --------------------------------------------------------------------------
-  static bool toggleLedPin(util::MilliTimer::time_type period_ms)
-  {
-    static util::MilliTimer LedTimer;
-    // alive LED
-    if (LedTimer.timeout())
-    {
-      toggleLedPin();
-      LedTimer.start(period_ms);
-      return true;
-    }
-    return false;
-  }
-
-  // --------------------------------------------------------------------------
-  /// @brief Returns true if the coding data are valid.
-  // --------------------------------------------------------------------------
-  static inline bool cal_isValid(const cal::base_cv_cal_type* pCal)
-  {
-    return pCal != nullptr;
-  }
-
-  // --------------------------------------------------------------------------
-  /// @brief Returns true if the addressing method is Decoder Address Method.
-  // --------------------------------------------------------------------------
-  static inline bool cal_isDecoderAddressingMethod(const cal::base_cv_cal_type* pCal) noexcept
-  {
-    return (pCal->Configuration & cal::configuration::bitmask::kAddressingMethod) == cal::configuration::kAddressingMethod_Decoder;
-  }
-  
-  // --------------------------------------------------------------------------
-  /// @brief Returns the decoder address (depending on addressing method).
-  // --------------------------------------------------------------------------
-  static inline uint16 cal_calcAddress(const cal::base_cv_cal_type* pCal) noexcept
-  {
-    uint16 address;
-    
-    if (cal_isDecoderAddressingMethod(pCal))
-    {
-      address = static_cast<uint16_t>((pCal->AddressLSB & 0xb00111111U) + (static_cast<uint16>(pCal->AddressMSB & 0xb00000111U) << 6U));
-    }
-    else
-    {
-      address = static_cast<uint16>(pCal->AddressLSB + (static_cast<uint16>(pCal->AddressMSB) << 8U));
-    }
-
-    return address;
-  }
-
-  // --------------------------------------------------------------------------
-  /// @brief Handle a valid packet. Precondition: coding data must be valid.
-  /// @param pkt The received packet
-  // --------------------------------------------------------------------------
-  void DccDecoder::packet_received(const PacketType& pkt)
-  {
-    const size_t pos = pkt.getAddress() - get_address();
-    if (rte::ifc_dcc_commands::boundaryCheck(pos))
-    {
-      // TBD could be improved by defining sub classes for PacketType
-      switch (pkt.getType())
-      {
-        case PacketType::BasicAccessory:
-          rte::ifc_dcc_commands::writeElement(pos, pkt.baGetDSwitch());
-          break;
-        case PacketType::ExtendedAccessory:
-          rte::ifc_dcc_commands::writeElement(pos, pkt.eaGetAspect());
-          break;
-        default:
-          break;
-      }
-    }
-    toggleLedPin();
-  }
-
-  // --------------------------------------------------------------------------
-  /// @brief Init after power on
-  // --------------------------------------------------------------------------
-  void DccDecoder::init()
-  {
-    const cal::base_cv_cal_type* pCal = rte::ifc_cal_base_cv::call();
-
-    hal::pinMode(kBlinkLedPin, OUTPUT);
-
-    decoder.init(kIntPin);
-
-    if (cal_isValid(pCal))
-    {
-      address = cal_calcAddress(pCal);
-      if (cal_isDecoderAddressingMethod(pCal))
-      {
-        decoder.disableOutputAddressMethod();
-      }
-      else
-      {
-        decoder.enableOutputAddressMethod();
-      }
-    }   
-
-    //decoder.setFilter(passFilter);
-  }
-
-  // --------------------------------------------------------------------------
-  /// Function is called cyclicly. Fetches new packets and handles them.
-  // --------------------------------------------------------------------------
-  void DccDecoder::cycle()
-  {
-    const cal::base_cv_cal_type* pCal = rte::ifc_cal_base_cv::call();
-
-    if (cal_isValid(pCal))
-    {
-      passFilter.setLo(get_address());
-      passFilter.setHi(get_address() + cfg::kNrAddresses);
-
-      if (decoder.isrOverflow())
-      {
-        hal::serial::println("ISR OVERFLOW");
-      }
-
-      if (decoder.fifoOverflow())
-      {
-        hal::serial::println("FIFO OVERFLOW");
-      }
-
-      decoder.fetch();
-      while (!decoder.empty())
-      {
-        const PacketType& pkt = decoder.front();
-        // In case the address changed at run time (e.g. reconfiguration)
-        // we check here again
-        if (passFilter.filter(pkt))
+        if (lastWrite == LOW)
         {
-          packet_received(pkt);
+            lastWrite = HIGH;
         }
-        decoder.pop();
-      }
-      if (toggleLedPin(kBlinkLedPeriodValid_ms))
-      {
-        #if 0
+        else
+        {
+            lastWrite = LOW;
+        }
+
+        hal::digitalWrite(DccDecoder::kBlinkLedPin, lastWrite);
+    }
+
+    // --------------------------------------------------------------------------
+    /// @brief If current timer is elapsed, toggle LED and reload timer with period_ms
+    /// @param period_ms New blink period [ms]
+    // --------------------------------------------------------------------------
+    static bool toggle_led_pin(util::MilliTimer::time_type period_ms)
+    {
+        static util::MilliTimer LedTimer;
+        // alive LED
+        if (LedTimer.timeout())
+        {
+            toggle_led_pin();
+            LedTimer.start(period_ms);
+            return true;
+        }
+        return false;
+    }
+
+    // --------------------------------------------------------------------------
+    /// @brief Returns true if the coding data are valid.
+    // --------------------------------------------------------------------------
+    static inline bool is_valid(const cal::base_cv_cal_type *cal_ptr)
+    {
+        return cal_ptr != nullptr;
+    }
+
+    // --------------------------------------------------------------------------
+    /// @brief Returns the DCC output address
+    // --------------------------------------------------------------------------
+    static inline uint16 calc_output_address(const cal::base_cv_cal_type *cal_ptr)
+    {
+        return (static_cast<uint16>(cal_ptr->CV1_address_LSB & cal::kMaskCV1_address_LSB)) |
+               (static_cast<uint16>(cal_ptr->CV9_address_MSB & cal::kMaskCV9_address_MSB) << 6);
+    }
+
+    /**
+     * @brief Handles the reception of basic DCC packets.
+     * 
+     * Each signal uses `@ref cfg::kNrDccAddressesPerSignal` DCC addresses, and the signals
+     * use consecutive DCC addresses.
+     * 
+     * For example, with `@ref cfg::kNrDccAddressesPerSignal` = 4:
+     * - Signal 0 uses DCC addresses `first_output_address` - `first_output_address + 3`
+     * - Signal 1 uses DCC addresses `first_output_address + 4` - `first_output_address + 7`
+     * - ...
+     * 
+     * The command is calculated from the output direction:
+     * - first_output_address     R = command 0
+     * - first_output_address     G = command 1
+     * - first_output_address + 1 R = command 2
+     * - first_output_address + 1 G = command 3
+     * - first_output_address + 2 R = command 4
+     * - first_output_address + 2 G = command 5
+     * - ...
+     * 
+     * @param pkt Reference to the received DCC packet
+     */
+    void DccDecoder::basic_packet_received(packet_type& pkt)
+    {
+        // The pass filter owns a copy of CV29 from the decoder configuration data.
+        const uint16 pkt_address = pkt.get_address(get_cv29());
+        if (pkt_address >= get_first_output_address())
+        {
+            // pair index
+            // 0 - 3: Signal 0
+            // 4 - 7: Signal 1
+            // ...
+            const size_t idx = (pkt_address - get_first_output_address()) % cfg::kNrDccAddressesPerSignal;
+            // and position on RTE
+            const size_t pos = (pkt_address - get_first_output_address()) / cfg::kNrDccAddressesPerSignal;
+            // command: 0 = 1R, 1 = 1G, 2 = 2R, 3 = 2G, ...
+            const uint8 cmd = static_cast<uint8>(2U*idx + pkt.ba_get_output_direction());
+            hal::serial::print("Basic Accessory Packet received: addr=");
+            hal::serial::print(pkt_address);
+            hal::serial::print(" pos=");
+            hal::serial::print(static_cast<int>(pos));
+            hal::serial::print(" cmd=");
+            hal::serial::print(static_cast<int>(cmd));
+            if (rte::ifc_dcc_commands::boundaryCheck(pos))
+            {
+                rte::ifc_dcc_commands::writeElement(pos, cmd);
+                hal::serial::print(" update RTE");
+            }
+            hal::serial::println();
+        }
+    }
+
+    /**
+     * @brief Handles the reception of extended DCC accessory packets.
+     * 
+     * This function processes extended DCC packets. It forwards the aspect value to the RTE.
+     * The position on RTE is calculated from the DCC address of the packet minus the first output
+     * address.
+     * 
+     * @param pkt Reference to the received DCC packet
+     */
+    void DccDecoder::extended_packet_received(packet_type& pkt)
+    {
+        const size_t pos = pkt.get_address(get_cv29()) - get_first_output_address();
+        hal::serial::print("Extended Accessory Packet received: addr=");
+        hal::serial::println(pkt.get_address(get_cv29()));
+        hal::serial::print(" pos=");
+        hal::serial::println(static_cast<int>(pos));
+        if (rte::ifc_dcc_commands::boundaryCheck(pos))
+        {
+            rte::ifc_dcc_commands::writeElement(pos, pkt.ea_get_aspect());
+        }
+    }
+
+    /**
+     * @brief Processes received DCC packets for accessory decoders
+     * 
+     * This function handles both basic and extended accessory DCC packets.
+     * It forwards the output direction or the aspect value to the RTE.
+     * The position on RTE is calculated from the DCC address of the packet minus the first output 
+     * address.
+     * 
+     * @param pkt Reference to the received DCC packet
+     * 
+     * @details For basic accessory packets, forwards the output direction.
+     *          For extended accessory packets, forwards the aspect value.
+     *          Toggles an LED pin after processing to indicate activity.
+     *          Ignores packets if the calculated position is out of bounds.
+     * 
+     * @note The address calculation depends on CV29 configuration stored in pass_filter
+     */
+    void DccDecoder::packet_received(packet_type &pkt)
+    {
+        // TBD could be improved by defining sub classes for packet_type
+        switch (pkt.get_type())
+        {
+        case packet_type::packet_type::BasicAccessory:
+            basic_packet_received(pkt);
+            break;
+        case packet_type::packet_type::ExtendedAccessory:
+            extended_packet_received(pkt);
+            break;
+        default:
+            break;
+        }
+
+        toggle_led_pin();
+    }
+
+    // --------------------------------------------------------------------------
+    /// @brief Init after power on
+    // --------------------------------------------------------------------------
+    void DccDecoder::init()
+    {
+        const cal::base_cv_cal_type *cal_ptr = rte::ifc_cal_base_cv::call();
+
+        hal::pinMode(kBlinkLedPin, OUTPUT);
+
+        decoder.init(kIntPin);
+
+        if (is_valid(cal_ptr))
+        {
+            first_output_address = calc_output_address(cal_ptr);
+            pass_accessory_filter.set_lo(first_output_address);
+            pass_accessory_filter.set_hi(first_output_address + cfg::kNrAddresses);
+            pass_accessory_filter.set_cv29(cal_ptr->CV29_configuration);
+            decoder.set_filter(pass_accessory_filter);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+    /// Function is called cyclicly. Fetches new packets and handles them.
+    // --------------------------------------------------------------------------
+    void DccDecoder::cycle()
+    {
+        const cal::base_cv_cal_type *cal_ptr = rte::ifc_cal_base_cv::call();
+
+        if (is_valid(cal_ptr))
+        {
+            // recalculate address because coding data might have changed.
+            // TBD: Can be optimized if CalM informs about coding data changes or 
+            // if DCC address is publicly available.
+            first_output_address = calc_output_address(cal_ptr);
+            if ((pass_accessory_filter.get_lo() != first_output_address) ||
+                (pass_accessory_filter.get_hi() != (first_output_address + cfg::kNrAddresses)) ||
+                (pass_accessory_filter.get_cv29() != cal_ptr->CV29_configuration))
+            {
+                hal::serial::println("Update filter");
+                pass_accessory_filter.set_lo(first_output_address);
+                pass_accessory_filter.set_hi(first_output_address + cfg::kNrAddresses);
+                pass_accessory_filter.set_cv29(cal_ptr->CV29_configuration);
+                decoder.set_filter(pass_accessory_filter);
+            }
+
+            if (decoder.isrOverflow())
+            {
+                hal::serial::println("ISR OVERFLOW");
+            }
+
+            if (decoder.fifoOverflow())
+            {
+                hal::serial::println("FIFO OVERFLOW");
+            }
+
+            decoder.fetch();
+            while (!decoder.empty())
+            {
+                packet_type &pkt = decoder.front();
+                hal::serial::print("Packet type=");
+                hal::serial::print(static_cast<uint8>(pkt.get_type()));
+                hal::serial::print(" Packet address=");
+                hal::serial::println(pkt.get_address(get_cv29()));
+                if (pass_accessory_filter.filter(pkt))
+                {
+                    packet_received(pkt);
+                }
+
+                decoder.pop();
+            }
+            if (toggle_led_pin(kBlinkLedPeriodValid_ms))
+            {
+#if 0
         hal::serial::print("[");
         hal::serial::print(hal::micros());
         hal::serial::print("]");
@@ -197,13 +269,13 @@ namespace signal
         hal::serial::print(decoder.getNrInterrupts());
         hal::serial::print(" packets=");
         hal::serial::println(decoder.getPacketCount());
-        #endif
-      }
+#endif
+            }
+        }
+        else
+        {
+            toggle_led_pin(kBlinkLedPeriodInvalid_ms);
+        }
     }
-    else
-    {
-      toggleLedPin(kBlinkLedPeriodInvalid_ms);
-    }
-  }
 
 } // namespace signal

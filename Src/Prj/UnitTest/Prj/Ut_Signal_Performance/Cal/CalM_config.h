@@ -26,7 +26,7 @@
 #include <Cfg_Prj.h> // number of signals
 #include <Cal/CalM_Type.h>
 
-using classifier_type = cal::input_classifier_type::classifier_type;
+using classifier_type = cal::classifier_array_type::classifier_type;
 
 namespace cal
 {

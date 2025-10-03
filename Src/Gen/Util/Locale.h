@@ -31,58 +31,89 @@
 
 namespace util
 {
-  // ---------------------------------------------------
-  /// Locale
-  // ---------------------------------------------------
+
+    /**
+     * @brief Represents a customizable C++ locale system with support for user-defined facets.
+     *
+     * The locale class provides a mechanism to manage and access formatting and classification
+     * components (facets) such as character types, numeric formatting, and collation rules.
+     * It mimics the behavior of the standard C++ locale system but allows for controlled
+     * registration and retrieval of facets using a static ID-based dispatch mechanism.
+     *
+     * Each facet is associated with a unique ID, managed by the nested @ref locale::id class.
+     * Facets are stored in a fixed-size array and accessed via their ID. The locale supports
+     * combining and overriding facets from other locale instances.
+     *
+     * Each locale holds at least the following standard facets (i.e. util::has_facet returns true
+     * for all these facet types), but a program may define additional specializations or 
+     * completely new facets and add them to any existing locale object.
+     * - ctype
+     * - num_get
+     * - numpunct
+     * 
+     * @note The C++ standard specifies further facets that are not currently supported by this 
+     * implementation's default configuration. 
+     * 
+     * Internally, a locale object is implemented as if it is a reference-counted pointer to an 
+     * array (indexed by std::locale::id) of reference-counted pointers to facets.
+     * 
+     * [https://en.cppreference.com/w/cpp/locale/locale.html]
+     * 
+     * @note This implementation assumes a maximum number of facets defined by @ref locale::id::kMaxNrFacets.
+     *       Facets must be manually registered using @ref set_facet before they can be retrieved.
+     *
+     * @see locale::facet
+     * @see locale::id
+     * @see locale::get_facet
+     * @see locale::combine
+     * @see util::use_facet
+     * @see util::has_facet
+     */
   class locale
   {
   public:
-    // ---------------------------------------------------
-    /// Base class for facets
-    // ---------------------------------------------------
+    /**
+     * @brief Abstract base class for all locale facets.
+     *
+     * Facets represent modular components of a locale, such as character classification,
+     * numeric formatting, or collation rules. Each facet is typically derived from this
+     * base class and registered within a locale instance using a unique ID.
+     *
+     * This class serves as a polymorphic anchor for all facet types and allows
+     * safe storage and retrieval via base-class pointers.
+     *
+     * @note Facets are managed through pointers and stored in a fixed-size array
+     *       inside the locale. They are accessed via their associated @ref locale::id.
+     *
+     * @see locale
+     * @see locale::id
+     */
     class facet
     {
     public:
     };
 
-    // ---------------------------------------------------
-    /// Base class for facet IDs.
-    /// 
-    /// This class is used as static data member in facets.
-    /// 
-    /// The logic relies on the initialization sequence as defined by the C++ standard.
-    /// The data member unique_id is default initialized to zero as part of the static
-    /// initialization stage as described below.
-    /// 
-    /// A variable without an initializer is default initialized. The default value
-    /// depends on the type of the variable and where the variable is defined.
-    /// 
-    /// The value of a variable of built-in type that is not explicitly initialized 
-    /// depends on where it is defined. Variables of built in types that are
-    /// defined outside any function body are initialized to zero, so the default value
-    /// is zero.
-    /// 
-    /// All non-local variables with static storage duration are initialized as part of
-    /// program startup. The initialization occurs in two stages.
-    /// (1) static initialization
-    /// - Either 
-    /// -- constant initialization or 
-    /// -- zero-initialization
-    /// (2) dynamic initialization
-    /// - Unordered dynamic initialization
-    /// -- applies only to class template static data members that are not explicitly specialized
-    /// -- initialization is indeterminately sequenced to all other dynamic initialization
-    /// - Ordered dynamic initialization
-    /// -- applies to all other non-local variables
-    /// -- within a single translation unit, initialization is always sequenced in exact order 
-    ///    their definitions appear in the source code
-    /// -- initialization in different translation units is indeterminately sequenced
-    /// 
-    /// For example: constructors are called as part of dynamic initialization and after static
-    /// initialization.
-    /// 
-    /// See also https://en.cppreference.com/w/cpp/language/initialization
-    // ---------------------------------------------------
+    /**
+     * @brief Unique identifier class for locale facets.
+     *
+     * Each facet type is associated with a static instance of this class, which
+     * provides a unique numeric ID used for indexing into the locale's facet array.
+     * The ID is lazily assigned during runtime via static initialization and dynamic
+     * sequencing, as defined by the C++ standard.
+     *
+     * The default value of `unique_id` is zero, which indicates that no ID has been
+     * assigned yet. Upon first use, a new ID is generated and stored.
+     *
+     * @note The ID assignment relies on static initialization rules. See the C++ standard
+     *       for details on initialization sequencing.
+     *
+     * @warning Copying is disabled to ensure uniqueness of each facet ID.
+     *
+     * @see locale::facet
+     * @see locale::set_facet
+     * @see locale::get_facet
+     * @see https://en.cppreference.com/w/cpp/language/initialization
+     */
     class id
     {
     public:
@@ -119,13 +150,16 @@ namespace util
     using const_facet_pointer = const facet*;
     // array type of facets
     using facet_array_type = array<const_facet_pointer, id::kMaxNrFacets>;
+    // pointer to the table with facets
+    using facet_array_const_pointer = const facet_array_type*;
 
   protected:
     /// The global C++ locale. There is just one global C++ locale.
     static locale global_locale;
 
     /// array of facets
-    facet_array_type facets;
+    //facet_array_type facets;
+    facet_array_const_pointer facets_pointer;
 
     /// construct facets
     void construct();
@@ -134,12 +168,13 @@ namespace util
     template<class Facet>
     void set_facet(Facet* f)
     {
-      facets.at(Facet::id) = f;
+      facets_pointer->at(Facet::id) = f;
     }
 
   public:
+
     /// Construct with default facets
-    locale() noexcept { construct(); }
+    locale() noexcept;
 
     /// Construct as a copy of other except for Facet f
     template<class Facet>
@@ -172,9 +207,9 @@ namespace util
     {
       const_facet_pointer pFacet;
       
-      if (facets.check_boundary(idx))
+      if (facets_pointer->check_boundary(idx))
       {
-        pFacet = facets.at(idx);
+        pFacet = facets_pointer->at(idx);
       }
       else
       {

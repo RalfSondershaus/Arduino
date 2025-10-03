@@ -9,6 +9,11 @@
 
 #include "Platform_Types.h"
 
+/* AVR doesn't support CHAR_BIT */
+#ifndef CHAR_BIT
+#define CHAR_BIT     8
+#endif
+
 namespace platform
 {
   template<class T> class numeric_limits
@@ -24,6 +29,7 @@ namespace platform
   public:
     static constexpr uint8 min_() noexcept { return static_cast<uint8>(0); }
     static constexpr uint8 max_() noexcept { return UINT8_MAX; }
+    static constexpr int digits = CHAR_BIT; 
   };
 
   template<> class numeric_limits<uint16>
@@ -31,6 +37,7 @@ namespace platform
   public:
     static constexpr uint16 min_() noexcept { return static_cast<uint16>(0); }
     static constexpr uint16 max_() noexcept { return UINT16_MAX; }
+    static constexpr int digits = CHAR_BIT*sizeof(uint16);
   };
 
   template<> class numeric_limits<uint32>
@@ -38,6 +45,7 @@ namespace platform
   public:
     static constexpr uint32 min_() noexcept { return static_cast<uint32>(0); }
     static constexpr uint32 max_() noexcept { return UINT32_MAX; }
+    static constexpr int digits = CHAR_BIT*sizeof(uint32);
   };
 
   template<> class numeric_limits<uint64>
@@ -45,6 +53,7 @@ namespace platform
   public:
     static constexpr uint64 min_() noexcept { return static_cast<uint64>(0); }
     static constexpr uint64 max_() noexcept { return UINT64_MAX; }
+    static constexpr int digits = CHAR_BIT*sizeof(uint64);
   };
 
   template<> class numeric_limits<sint8>
@@ -52,6 +61,7 @@ namespace platform
   public:
     static constexpr sint8 min_() noexcept { return INT8_MIN; }
     static constexpr sint8 max_() noexcept { return INT8_MAX; }
+    static constexpr int digits = CHAR_BIT - 1;
   };
 
   template<> class numeric_limits<sint16>
@@ -59,6 +69,7 @@ namespace platform
   public:
     static constexpr sint16 min_() noexcept { return INT16_MIN; }
     static constexpr sint16 max_() noexcept { return INT16_MAX; }
+    static constexpr int digits = CHAR_BIT*sizeof(sint16) - 1;
   };
 
   template<> class numeric_limits<sint32>
@@ -66,6 +77,7 @@ namespace platform
   public:
     static constexpr sint32 min_() noexcept { return INT32_MIN; }
     static constexpr sint32 max_() noexcept { return INT32_MAX; }
+    static constexpr int digits = CHAR_BIT*sizeof(sint32) - 1;
   };
 
   template<> class numeric_limits<sint64>
@@ -73,6 +85,7 @@ namespace platform
   public:
     static constexpr sint64 min_() noexcept { return INT64_MIN; }
     static constexpr sint64 max_() noexcept { return INT64_MAX; }
+    static constexpr int digits = CHAR_BIT*sizeof(sint64) - 1;
   };
 } // namespace util
 
