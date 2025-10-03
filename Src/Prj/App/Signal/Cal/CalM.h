@@ -230,14 +230,14 @@ namespace cal
     rte::ret_type set_base_cv(const base_cv_cal_type& new_base_cv, bool do_update = false);
     
     /**
-     * @brief Set a CV
+     * @brief Get a CV
      * 
-     * @param cv_new 
-     * @return rte::ret_type OK CV value was updated in EEPROM successfully. Internal structures 
-     *         were updated.
+     * @param cv_id [in] CV ID
+     * @param val [out] The CV value
+     * @return rte::ret_type OK CV value was read successfully.
      * @return rte::ret_type NOK CV with invalid id.
      */
-    //rte::ret_type set_cv(CV cv_new) { return set_cv(cv_new.id, cv_new.val); }
+    rte::ret_type get_cv(uint16 cv_id, uint8 *val);
 
     /**
      * @brief Set a CV

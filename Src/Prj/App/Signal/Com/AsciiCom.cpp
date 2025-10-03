@@ -101,6 +101,7 @@ namespace com
 #endif
 
     static tRetType process_set_cv(stringstream_type &st, string_type &response);
+    static tRetType process_get_cv(stringstream_type &st, string_type &response);
     static tRetType process_monitor_list(stringstream_type &st, string_type &response);
     static tRetType process_monitor_start(stringstream_type &st, string_type &response);
     static tRetType process_monitor_stop(stringstream_type &st, string_type &response);
@@ -125,8 +126,9 @@ namespace com
     static constexpr util::streamsize kMaxLenToken = 20;
 
     // Max Length of strings: kMaxLenToken
-    const util::array<tCommands, 5> commands =
+    const util::array<tCommands, 6> commands =
         {{{"SET_CV", process_set_cv},
+          {"GET_CV", process_get_cv},
           {"MON_LIST", process_monitor_list},
           {"MON_START", process_monitor_start},
           {"MON_STOP", process_monitor_stop},
@@ -351,6 +353,53 @@ namespace com
             else
             {
                 ret = eCV_VALUE_OUT_OF_RANGE;
+            }
+        }
+
+        return ret;
+    }
+
+    /**
+     * @brief Implements command GET_CV <cv_id>
+     *
+     * @param st Contains the command string, get pointer points to first element after "GET_CV".
+     * @param response [out] The response is stored here, it is the contains the command parameters.
+     * @return tRetType eOK
+     * @return tRetType eINV_CMD Ill-formed command or CV id is out-of-bounds
+     * @return tRetType eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
+     * 
+     */
+    static tRetType process_get_cv(stringstream_type &st, string_type &response)
+    {
+        tRetType ret = eINV_CMD;
+        CV cv;
+
+        // The response shall contain the command parameters
+        response.append(st.str());
+
+        // Use uint16 here to ensure numeric values are extracted correctly.
+        // If uint8 is used, the extraction may interpret the value as a character instead of a 
+        // number.
+        st >> cv.id;
+        // Do not check for eof() since eof() is true after extracting the last element
+        // (and if the last element doesn't have trailing white spaces).
+        if (!st.fail())
+        {
+            if (rte::ifc_cal_get_cv::call(cv.id, &cv.val) == rte::ret_type::OK)
+            {
+                util::basic_string<4, char> tmp;
+                util::to_string(static_cast<int>(cv.val), tmp);
+                response.append(" ");
+                response.append(tmp);
+                hal::serial::print("GET_CV");
+                hal::serial::print(" ");hal::serial::print(static_cast<int>(cv.id));
+                hal::serial::print(" ");hal::serial::print(static_cast<int>(cv.val));
+                hal::serial::println();
+                ret = eOK;
+            }
+            else
+            {
+                ret = eINV_CV_ID;
             }
         }
 

@@ -24,6 +24,7 @@
 #include <Dcc/Decoder.h>
 #include <Dcc/Filter.h>
 #include <Rte/Rte_Type.h>
+#include <Util/Array.h>
 #include <Util/Timer.h>
 #include <Cal/CalM_Type.h>
 
@@ -34,7 +35,7 @@ namespace signal
   protected:
     using packet_type = dcc::Decoder::PacketType;
     using filter_type = dcc::PassAccessoryAddressFilter<packet_type>;
-    
+
     /**
      * @brief The DCC decoder instance.
      */
@@ -52,6 +53,28 @@ namespace signal
      * If the decoder supports a series of addresses, this variable stores the first address.
      */
     uint16 first_output_address;
+
+    /**
+     * @brief Handles the reception of basic DCC accessory packets.
+     * 
+     * This function processes basic DCC packets. It calculates the command from the packet's
+     * address and the output direction, and forwards the result to the RTE. The position on RTE 
+     * is calculated from the DCC address of the packet minus the first output address.
+     * 
+     * @param pkt Reference to the received DCC packet
+     */
+    void basic_packet_received(packet_type& pkt);
+    
+    /**
+     * @brief Handles the reception of extended DCC accessory packets.
+     * 
+     * This function processes extended DCC packets. It forwards the aspect value to the RTE.
+     * The position on RTE is calculated from the DCC address of the packet minus the first output
+     * address.
+     * 
+     * @param pkt Reference to the received DCC packet
+     */
+    void extended_packet_received(packet_type& pkt);
 
     /**
      * @brief Processes received DCC packets for accessory decoders.
@@ -74,6 +97,8 @@ namespace signal
     static constexpr util::MilliTimer::time_type kBlinkLedPeriodInvalid_ms = 500U;
 
     DccDecoder() = default;
+
+    uint8 get_cv29() const noexcept { return pass_accessory_filter.get_cv29(); }
 
     /// Returns the first DCC output address of the decoder.
     uint16 get_first_output_address() const noexcept { return first_output_address; }

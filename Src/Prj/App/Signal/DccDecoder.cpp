@@ -81,6 +81,80 @@ namespace signal
     }
 
     /**
+     * @brief Handles the reception of basic DCC packets.
+     * 
+     * Each signal uses `@ref cfg::kNrDccAddressesPerSignal` DCC addresses, and the signals
+     * use consecutive DCC addresses.
+     * 
+     * For example, with `@ref cfg::kNrDccAddressesPerSignal` = 4:
+     * - Signal 0 uses DCC addresses `first_output_address` - `first_output_address + 3`
+     * - Signal 1 uses DCC addresses `first_output_address + 4` - `first_output_address + 7`
+     * - ...
+     * 
+     * The command is calculated from the output direction:
+     * - first_output_address     R = command 0
+     * - first_output_address     G = command 1
+     * - first_output_address + 1 R = command 2
+     * - first_output_address + 1 G = command 3
+     * - first_output_address + 2 R = command 4
+     * - first_output_address + 2 G = command 5
+     * - ...
+     * 
+     * @param pkt Reference to the received DCC packet
+     */
+    void DccDecoder::basic_packet_received(packet_type& pkt)
+    {
+        // The pass filter owns a copy of CV29 from the decoder configuration data.
+        const uint16 pkt_address = pkt.get_address(get_cv29());
+        if (pkt_address >= get_first_output_address())
+        {
+            // pair index
+            // 0 - 3: Signal 0
+            // 4 - 7: Signal 1
+            // ...
+            const size_t idx = (pkt_address - get_first_output_address()) % cfg::kNrDccAddressesPerSignal;
+            // and position on RTE
+            const size_t pos = (pkt_address - get_first_output_address()) / cfg::kNrDccAddressesPerSignal;
+            // command: 0 = 1R, 1 = 1G, 2 = 2R, 3 = 2G, ...
+            const uint8 cmd = static_cast<uint8>(2U*idx + pkt.ba_get_output_direction());
+            hal::serial::print("Basic Accessory Packet received: addr=");
+            hal::serial::print(pkt_address);
+            hal::serial::print(" pos=");
+            hal::serial::print(static_cast<int>(pos));
+            hal::serial::print(" cmd=");
+            hal::serial::print(static_cast<int>(cmd));
+            if (rte::ifc_dcc_commands::boundaryCheck(pos))
+            {
+                rte::ifc_dcc_commands::writeElement(pos, cmd);
+                hal::serial::print(" update RTE");
+            }
+            hal::serial::println();
+        }
+    }
+
+    /**
+     * @brief Handles the reception of extended DCC accessory packets.
+     * 
+     * This function processes extended DCC packets. It forwards the aspect value to the RTE.
+     * The position on RTE is calculated from the DCC address of the packet minus the first output
+     * address.
+     * 
+     * @param pkt Reference to the received DCC packet
+     */
+    void DccDecoder::extended_packet_received(packet_type& pkt)
+    {
+        const size_t pos = pkt.get_address(get_cv29()) - get_first_output_address();
+        hal::serial::print("Extended Accessory Packet received: addr=");
+        hal::serial::println(pkt.get_address(get_cv29()));
+        hal::serial::print(" pos=");
+        hal::serial::println(static_cast<int>(pos));
+        if (rte::ifc_dcc_commands::boundaryCheck(pos))
+        {
+            rte::ifc_dcc_commands::writeElement(pos, pkt.ea_get_aspect());
+        }
+    }
+
+    /**
      * @brief Processes received DCC packets for accessory decoders
      * 
      * This function handles both basic and extended accessory DCC packets.
@@ -99,29 +173,19 @@ namespace signal
      */
     void DccDecoder::packet_received(packet_type &pkt)
     {
-        // The pass filter owns a copy of CV29 from the decoder configuration data.
-        // It is used for address calculation.
-        const size_t pos = pkt.get_address(pass_accessory_filter.get_cv29()) - get_first_output_address();
-        hal::serial::print("DCC packet received: addr=");
-        hal::serial::println(pkt.get_address(pass_accessory_filter.get_cv29()));
-        hal::serial::print(" pos=");
-        hal::serial::println(static_cast<int>(pos));
-        if (rte::ifc_dcc_commands::boundaryCheck(pos))
+        // TBD could be improved by defining sub classes for packet_type
+        switch (pkt.get_type())
         {
-            // TBD could be improved by defining sub classes for packet_type
-            switch (pkt.get_type())
-            {
-            case packet_type::packet_type::BasicAccessory:
-                // We store the command as 11 bit output address
-                rte::ifc_dcc_commands::writeElement(pos, pkt.ba_get_output_direction());
-                break;
-            case packet_type::packet_type::ExtendedAccessory:
-                rte::ifc_dcc_commands::writeElement(pos, pkt.ea_get_aspect());
-                break;
-            default:
-                break;
-            }
+        case packet_type::packet_type::BasicAccessory:
+            basic_packet_received(pkt);
+            break;
+        case packet_type::packet_type::ExtendedAccessory:
+            extended_packet_received(pkt);
+            break;
+        default:
+            break;
         }
+
         toggle_led_pin();
     }
 
@@ -169,6 +233,7 @@ namespace signal
                 pass_accessory_filter.set_cv29(cal_ptr->CV29_configuration);
                 decoder.set_filter(pass_accessory_filter);
             }
+
             if (decoder.isrOverflow())
             {
                 hal::serial::println("ISR OVERFLOW");
@@ -186,7 +251,7 @@ namespace signal
                 hal::serial::print("Packet type=");
                 hal::serial::print(static_cast<uint8>(pkt.get_type()));
                 hal::serial::print(" Packet address=");
-                hal::serial::println(pkt.get_address(pass_accessory_filter.get_cv29()));
+                hal::serial::println(pkt.get_address(get_cv29()));
                 if (pass_accessory_filter.filter(pkt))
                 {
                     packet_received(pkt);

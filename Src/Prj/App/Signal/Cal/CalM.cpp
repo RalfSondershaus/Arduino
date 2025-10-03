@@ -732,6 +732,26 @@ namespace cal
     }
 
     /**
+     * @brief Get a CV
+     */
+    rte::ret_type CalM::get_cv(uint16 cv_id, uint8 *val)
+    {
+        rte::ret_type success = rte::ret_type::NOK;
+
+        if (cv_id < static_cast<uint16>(cv::eLastCV))
+        {
+            *val = hal::eeprom::read(cv_id);
+            hal::serial::print("CalM::get_cv cv_id=");
+            hal::serial::print(cv_id);
+            hal::serial::print(" val=");
+            hal::serial::println(*val);
+            success = rte::ret_type::OK;
+        }
+
+        return success;
+    }
+
+    /**
      * @brief Set a CV
      */
     rte::ret_type CalM::set_cv(uint16 cv_id, uint8 val)
