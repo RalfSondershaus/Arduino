@@ -129,7 +129,11 @@ namespace cal
     /// 19 bytes per user defined signal (with 8 aspects)
     constexpr uint16 kUserDefinedSignalLength = 19;
 
-    /// @brief CVs and CV base addresses
+    /**
+     * @brief CVs and CV base addresses
+     * 
+     * The CV numbers are independent of the hardware platform.
+     */
     enum
     {
       eDecoderAddressLSB                = 1,
@@ -160,6 +164,79 @@ namespace cal
     };
   }
 
+  /**
+   * @brief Bit masks and values for configuration CV 29
+   */
+  namespace configuration
+  {
+    namespace bitmask
+    {
+      constexpr uint8 kDecoderType      = 0b00100000;
+      constexpr uint8 kAddressingMethod = 0b01000000;
+      constexpr uint8 kAccessoryDecoder = 0b10000000;
+    }
+    constexpr uint8 kDecoderType_BasicAccessory     = 0b00000000;
+    constexpr uint8 kDecoderType_ExtendedAccessory  = 0b00100000;
+    constexpr uint8 kAddressingMethod_Decoder       = 0b00000000;
+    constexpr uint8 kAddressingMethod_OutputAddress = 0b01000000;
+    constexpr uint8 kAccessoryDecoder               = 0b00000000;
+    constexpr uint8 kMultifunctionDecoder           = 0b10000000;
+  }
+
+  /**
+   * @brief Bit masks, bit shifts and values for signal configuration
+   */
+  namespace signal
+  {
+    namespace bitmask
+    {
+        constexpr uint8 kFirstOutputType    = 0b11000000;
+        constexpr uint8 kFirstOutputPin     = 0b00111111;
+        constexpr uint8 kInputType          = 0b11000000;
+        constexpr uint8 kAdcPin             = 0b00111111;
+        constexpr uint8 kClassifierType     = 0b00000011;
+    }
+    namespace bitshift
+    {
+        constexpr uint8 kFirstOutputType = 6;
+        constexpr uint8 kFirstOutputPin  = 0;
+        constexpr uint8 kInputType       = 6;
+        constexpr uint8 kAdcPin          = 0;
+        constexpr uint8 kClassifierType  = 0;
+    }
+    namespace values
+    {
+        constexpr uint8 kOutputType_Onboard   = target_type::eOnboard;
+        constexpr uint8 kOutputType_External  = target_type::eExternal;
+
+        constexpr uint8 kInputType_DCC   = input_type::eDcc;
+        constexpr uint8 kInputType_ADC   = input_type::eAdc;
+        constexpr uint8 kInputType_DI    = input_type::eDig;
+    }
+    constexpr uint8 make_signal_input(uint8 input_type, uint8 input_pin) 
+    {
+        return (input_type << cal::signal::bitshift::kInputType) |
+               (input_pin  << cal::signal::bitshift::kAdcPin);
+    }
+    constexpr uint8 make_signal_first_output(uint8 output_type, uint8 output_pin) 
+    {
+        return (output_type << cal::signal::bitshift::kFirstOutputType) |
+               (output_pin  << cal::signal::bitshift::kFirstOutputPin);
+    }
+  }
+
+  namespace user_defined_signal
+  {
+    namespace bitmask
+    {
+        constexpr uint8 kNumberOfOutputs    = 0b00001111;
+    }
+    namespace bitshift
+    {
+        constexpr uint8 kNumberOfOutputs    = 0;
+    }
+  }
+
   constexpr uint8 kRCN123 = 1;          /* for CV 39 kDccAddressingMode */
   constexpr uint8 kRoco = 0;            /* for CV 39 kDccAddressingMode */
 
@@ -167,9 +244,9 @@ namespace cal
   constexpr uint8 kFirstBuiltInSignalID = 1;
   constexpr uint8 kFirstUserDefinedSignalID = 128;
 
-  /* CV1 contains the eight least significant bits of the Output Address */
+  /** CV1 contains the eight least significant bits of the Output Address */
   constexpr uint8 kMaskCV1_address_LSB = 0xFF; 
-  /* CV9 contains the three most significant bits of the Output Address */
+  /** CV9 contains the three most significant bits of the Output Address */
   constexpr uint8 kMaskCV9_address_MSB = 0x07; 
 } // namespace cal
 
