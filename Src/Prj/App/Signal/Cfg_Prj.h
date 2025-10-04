@@ -27,7 +27,14 @@
 
 namespace cfg
 {
-    constexpr uint8 kNrSignals = 8; ///< Maximum number of signals
+    /**
+     * @brief Manufacturer version ID (for CV 7)
+     */
+    constexpr uint8 kManufacturerVersionID = 0x01;  /* v0.1 */
+    /** 
+     * @brief Maximum number of signals 
+     */
+    constexpr uint8 kNrSignals = 8;
     /**
      * @brief Maximum number of signal aspects
      */

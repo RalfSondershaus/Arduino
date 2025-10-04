@@ -66,7 +66,7 @@ namespace cal
   constexpr uint8 kAddressMSB = 0;      /* DCC Address MSB */
   constexpr uint8 kAuxAct = 0;
   constexpr uint8 kTimeOn = 0;
-  constexpr uint8 kManufacturerVersionID = 0x01;  /* v0.1 */
+  constexpr uint8 kManufacturerVersionID = cfg::kManufacturerVersionID;
   constexpr uint8 kManufacturerID = 'S';          /* Sondershaus */
   constexpr uint8 kManufacturerCVStructureID = 0x10;   /* v1.0 */
   constexpr uint8 kConfiguration =  configuration::kDecoderType_BasicAccessory      /* Configuration CV 29 */
