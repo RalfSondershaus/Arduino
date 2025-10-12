@@ -141,25 +141,26 @@ static void printRte()
 #endif // PRINT_RTE
 }
 
-// ------------------------------------------------------------------------------------------------
-/// Test if aspects and dim ramps are ok for
-/// - Commands from classifiers
-/// - Start with default (init) aspect
-/// - Switch to green
-/// - Switch to red
-// ------------------------------------------------------------------------------------------------
-TEST(Ut_Signal, Default_Green_Red)
+/**
+ * @brief 
+ * 
+ * @param signal_pos 
+ * @param first_output_pin 
+ * @param input_pin
+ * @param classifier_type 
+ */
+void do_signal_test_red_green(
+    const int signal_pos, 
+    uint8 first_output_pin, 
+    uint8 input_pin, 
+    uint8 classifier_type, 
+    Logger& log)
 {
-  typedef util::array<uint8, cfg::kNrSignalTargets> signal_target_array;
+  using signal_target_array = util::array<uint8, cfg::kNrSignalTargets>;
   using size_type = signal_target_array::size_type;
   using time_type = classifier_array_type::classifier_type::time_type;
   using cmd_type = rte::cmd_type;
 
-  Logger log;
-  constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
-  constexpr uint8 kFirstOutputPin = 13;
-  constexpr uint8 kInputPin0 = 54;
-  constexpr uint8 kClassifierType = 0;
   uint8 tmp;
 
   typedef struct
@@ -173,65 +174,64 @@ TEST(Ut_Signal, Default_Green_Red)
 
   const step_type aSteps[] =
   {
-      {   0,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
-    , {  10,  kInputPin0,             0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
-    , {  20,  kInputPin0,             0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
-    , {  30,  kInputPin0,             0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
-    , {  40,  kInputPin0,             0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
-    , {  50,  kInputPin0,             0, rte::kInvalidCmd, { 16,  16,   0,   0,   0 } }
-    , {  60,  kInputPin0,             0, rte::kInvalidCmd, { 27,  27,   0,   0,   0 } }
-    , {  70,  kInputPin0,             0, rte::kInvalidCmd, { 48,  48,   0,   0,   0 } }
-    , {  80,  kInputPin0,             0, rte::kInvalidCmd, { 82,  82,   0,   0,   0 } }
-    , {  90,  kInputPin0,             0, rte::kInvalidCmd, {145, 145,   0,   0,   0 } }
-    , { 100,  kInputPin0,             0, rte::kInvalidCmd, {250, 250,   0,   0,   0 } }
-    , { 510,  kInputPin0, cal::kGreenLo, rte::kInvalidCmd, {255, 255,   0,   0,   0 }}
-    , { 560,  kInputPin0, cal::kGreenLo,                1, {145, 145,   0,   0,   0 }}
-    , { 570,  kInputPin0, cal::kGreenLo,                1, { 84,  84,   0,   0,   0 }}
-    , { 580,  kInputPin0, cal::kGreenLo,                1, { 48,  48,   0,   0,   0 }}
-    , { 590,  kInputPin0, cal::kGreenLo,                1, { 28,  28,   0,   0,   0 }}
-    , { 600,  kInputPin0, cal::kGreenLo,                1, { 16,  16,   0,   0,   0 }}
-    , { 610,  kInputPin0, cal::kGreenLo,                1, {  9,   9,   0,   0,   0 }}
-    , { 620,  kInputPin0, cal::kGreenLo,                1, {  5,   5,   0,   0,   0 }}
-    , { 630,  kInputPin0, cal::kGreenLo,                1, {  3,   3,   0,   0,   0 }}
-    , { 640,  kInputPin0, cal::kGreenLo,                1, {  2,   2,   0,   0,   0 }}
-    , { 650,  kInputPin0, cal::kGreenLo,                1, {  0,   0,   0,   0,   0 }}
-    , { 660,  kInputPin0, cal::kGreenLo,                1, {  0,   0,   2,   0,   0 }}
-    , { 670,  kInputPin0, cal::kGreenLo,                1, {  0,   0,   3,   0,   0 }}
-    , { 680,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,   5,   0,   0 } }
-    , { 690,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,   9,   0,   0 } }
-    , { 700,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,  16,   0,   0 } }
-    , { 710,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,  27,   0,   0 } }
-    , { 720,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,  48,   0,   0 } }
-    , { 730,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,  82,   0,   0 } }
-    , { 740,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0, 145,   0,   0 } }
-    , { 750,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0, 250,   0,   0 } }
-    , { 760,  kInputPin0,   cal::kRedLo, rte::kInvalidCmd, {  0,   0, 255,   0,   0 } }
-    , { 810,  kInputPin0,   cal::kRedLo,                0, {  0,   0, 145,   0,   0 } }
-    , { 820,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,  84,   0,   0 } }
-    , { 830,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,  48,   0,   0 } }
-    , { 840,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,  28,   0,   0 } }
-    , { 850,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,  16,   0,   0 } }
-    , { 860,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,   9,   0,   0 } }
-    , { 870,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,   5,   0,   0 } }
-    , { 880,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,   3,   0,   0 } }
-    , { 890,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,   2,   0,   0 } }
-    , { 900,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
-    , { 910,  kInputPin0,             0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
-    , { 920,  kInputPin0,             0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
-    , { 930,  kInputPin0,             0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
-    , { 940,  kInputPin0,             0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
-    , { 950,  kInputPin0,             0, rte::kInvalidCmd, { 16,  16,   0,   0,   0 } }
-    , { 960,  kInputPin0,             0, rte::kInvalidCmd, { 27,  27,   0,   0,   0 } }
-    , { 970,  kInputPin0,             0, rte::kInvalidCmd, { 48,  48,   0,   0,   0 } }
-    , { 980,  kInputPin0,             0, rte::kInvalidCmd, { 82,  82,   0,   0,   0 } }
-    , { 990,  kInputPin0,             0, rte::kInvalidCmd, {145, 145,   0,   0,   0 } }
-    , {1000,  kInputPin0,             0, rte::kInvalidCmd, {250, 250,   0,   0,   0 } }
+      {   0,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
+    , {  10,  input_pin,             0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
+    , {  20,  input_pin,             0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
+    , {  30,  input_pin,             0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
+    , {  40,  input_pin,             0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
+    , {  50,  input_pin,             0, rte::kInvalidCmd, { 16,  16,   0,   0,   0 } }
+    , {  60,  input_pin,             0, rte::kInvalidCmd, { 27,  27,   0,   0,   0 } }
+    , {  70,  input_pin,             0, rte::kInvalidCmd, { 48,  48,   0,   0,   0 } }
+    , {  80,  input_pin,             0, rte::kInvalidCmd, { 82,  82,   0,   0,   0 } }
+    , {  90,  input_pin,             0, rte::kInvalidCmd, {145, 145,   0,   0,   0 } }
+    , { 100,  input_pin,             0, rte::kInvalidCmd, {250, 250,   0,   0,   0 } }
+    , { 510,  input_pin, cal::kGreenLo, rte::kInvalidCmd, {255, 255,   0,   0,   0 }}
+    , { 560,  input_pin, cal::kGreenLo,                1, {145, 145,   0,   0,   0 }}
+    , { 570,  input_pin, cal::kGreenLo,                1, { 84,  84,   0,   0,   0 }}
+    , { 580,  input_pin, cal::kGreenLo,                1, { 48,  48,   0,   0,   0 }}
+    , { 590,  input_pin, cal::kGreenLo,                1, { 28,  28,   0,   0,   0 }}
+    , { 600,  input_pin, cal::kGreenLo,                1, { 16,  16,   0,   0,   0 }}
+    , { 610,  input_pin, cal::kGreenLo,                1, {  9,   9,   0,   0,   0 }}
+    , { 620,  input_pin, cal::kGreenLo,                1, {  5,   5,   0,   0,   0 }}
+    , { 630,  input_pin, cal::kGreenLo,                1, {  3,   3,   0,   0,   0 }}
+    , { 640,  input_pin, cal::kGreenLo,                1, {  2,   2,   0,   0,   0 }}
+    , { 650,  input_pin, cal::kGreenLo,                1, {  0,   0,   0,   0,   0 }}
+    , { 660,  input_pin, cal::kGreenLo,                1, {  0,   0,   2,   0,   0 }}
+    , { 670,  input_pin, cal::kGreenLo,                1, {  0,   0,   3,   0,   0 }}
+    , { 680,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   5,   0,   0 } }
+    , { 690,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   9,   0,   0 } }
+    , { 700,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  16,   0,   0 } }
+    , { 710,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  27,   0,   0 } }
+    , { 720,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  48,   0,   0 } }
+    , { 730,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  82,   0,   0 } }
+    , { 740,  input_pin,             0, rte::kInvalidCmd, {  0,   0, 145,   0,   0 } }
+    , { 750,  input_pin,             0, rte::kInvalidCmd, {  0,   0, 250,   0,   0 } }
+    , { 760,  input_pin,   cal::kRedLo, rte::kInvalidCmd, {  0,   0, 255,   0,   0 } }
+    , { 810,  input_pin,   cal::kRedLo,                0, {  0,   0, 145,   0,   0 } }
+    , { 820,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  84,   0,   0 } }
+    , { 830,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  48,   0,   0 } }
+    , { 840,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  28,   0,   0 } }
+    , { 850,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  16,   0,   0 } }
+    , { 860,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   9,   0,   0 } }
+    , { 870,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   5,   0,   0 } }
+    , { 880,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   3,   0,   0 } }
+    , { 890,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   2,   0,   0 } }
+    , { 900,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
+    , { 910,  input_pin,             0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
+    , { 920,  input_pin,             0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
+    , { 930,  input_pin,             0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
+    , { 940,  input_pin,             0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
+    , { 950,  input_pin,             0, rte::kInvalidCmd, { 16,  16,   0,   0,   0 } }
+    , { 960,  input_pin,             0, rte::kInvalidCmd, { 27,  27,   0,   0,   0 } }
+    , { 970,  input_pin,             0, rte::kInvalidCmd, { 48,  48,   0,   0,   0 } }
+    , { 980,  input_pin,             0, rte::kInvalidCmd, { 82,  82,   0,   0,   0 } }
+    , { 990,  input_pin,             0, rte::kInvalidCmd, {145, 145,   0,   0,   0 } }
+    , {1000,  input_pin,             0, rte::kInvalidCmd, {250, 250,   0,   0,   0 } }
   };
 
   classifier_array_type classifiers;
   cal::input_type in;
   size_t nStep;
-  log.start("Default_Green_Red.txt");
 
   // Initialize
   hal::stubs::analogRead[aSteps[0].nPin] = aSteps[0].nAdc;
@@ -244,19 +244,19 @@ TEST(Ut_Signal, Default_Green_Red)
   // Initialize EEPROM with ROM default values
   rte::ifc_cal_set_defaults::call();
   // And now activate signal kSignalPos
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos, kBuiltInSignalIDAusfahrsignal);
-  // ... with first output pin kFirstOutputPin
-  tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, kFirstOutputPin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos, tmp);
-  // ... with ADC input pin kInputPin0
-  tmp = cal::signal::make_signal_input(cal::signal::values::kInputType_ADC, kInputPin0);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos, tmp);
-  // ... with classifier type kClassifierType
-  tmp = kClassifierType;
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + kSignalPos, tmp);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
+  // ... with first output pin first_output_pin
+  tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, first_output_pin);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + signal_pos, tmp);
+  // ... with ADC input pin input_pin
+  tmp = cal::signal::make_signal_input(cal::signal::values::kInputType_ADC, input_pin);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + signal_pos, tmp);
+  // ... with classifier type classifier_type
+  tmp = classifier_type;
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + signal_pos, tmp);
 
   in.type = cal::input_type::eAdc;
-  in.idx = 0;
+  in.idx = signal_pos;
 
   for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
   {
@@ -268,7 +268,7 @@ TEST(Ut_Signal, Default_Green_Red)
     rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
-    uint8 target_pos = rte::calm.signals.at(kSignalPos).first_target.idx;
+    uint8 target_pos = rte::calm.signals.at(signal_pos).first_target.idx;
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
       rte::intensity8_255 pwm;
@@ -278,6 +278,31 @@ TEST(Ut_Signal, Default_Green_Red)
     }
     log << std::endl;
   }
+}
+
+// ------------------------------------------------------------------------------------------------
+/// Test if aspects and dim ramps are ok for
+/// - Commands from classifiers
+/// - Start with default (init) aspect
+/// - Switch to green
+/// - Switch to red
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_Signal, Signal0_ADC_Green_Red)
+{
+  Logger log;
+  constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
+  constexpr uint8 kFirstOutputPin = 13;
+  constexpr uint8 kInputPin = 54;
+  constexpr uint8 kClassifierType = 0;
+
+  log.start("Signal0_ADC_Green_Red.txt");
+
+  do_signal_test_red_green(
+      kSignalPos, 
+      kFirstOutputPin, 
+      kInputPin, 
+      kClassifierType, 
+      log);
 
   log.stop();
 }
@@ -289,19 +314,73 @@ TEST(Ut_Signal, Default_Green_Red)
 /// - Switch to green
 /// - Switch to red
 // ------------------------------------------------------------------------------------------------
-TEST(Ut_Signal, Default_All)
+TEST(Ut_Signal, Signal1_ADC_Green_Red)
 {
-  typedef util::array<uint8, cfg::kNrSignalTargets> signal_target_array;
+  Logger log;
+  constexpr int kSignalPos = 1; // Need to configure signal 1 as Ausfahrsignal
+  constexpr uint8 kFirstOutputPin = 20;
+  constexpr uint8 kInputPin = 55;
+  constexpr uint8 kClassifierType = 0;
+
+  log.start("Signal1_ADC_Green_Red.txt");
+
+  do_signal_test_red_green(
+      kSignalPos, 
+      kFirstOutputPin, 
+      kInputPin, 
+      kClassifierType, 
+      log);
+
+  log.stop();
+}
+
+// ------------------------------------------------------------------------------------------------
+/// Test if aspects and dim ramps are ok for
+/// - Commands from classifiers
+/// - Start with default (init) aspect
+/// - Switch to green
+/// - Switch to red
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_Signal, Signal7_ADC_Green_Red)
+{
+  Logger log;
+  constexpr int kSignalPos = 7; // Need to configure signal 7 as Ausfahrsignal
+  constexpr uint8 kFirstOutputPin = 20;
+  constexpr uint8 kInputPin = 55;
+  constexpr uint8 kClassifierType = 0;
+
+  log.start("Signal7_ADC_Green_Red.txt");
+
+  do_signal_test_red_green(
+      kSignalPos, 
+      kFirstOutputPin, 
+      kInputPin, 
+      kClassifierType, 
+      log);
+
+  log.stop();
+}
+
+/**
+ * @brief 
+ * 
+ * @param signal_pos 
+ * @param first_output_pin 
+ * @param input_pin 
+ * @param classifier_type 
+ * @param log 
+ */
+void do_signal_test_all(
+    const int signal_pos, 
+    uint8 first_output_pin, 
+    uint8 input_pin, 
+    uint8 classifier_type, 
+    Logger& log)
+{
+  using signal_target_array = util::array<uint8, cfg::kNrSignalTargets>;
   using size_type = signal_target_array::size_type;
   using time_type = classifier_array_type::classifier_type::time_type;
   using cmd_type = rte::cmd_type;
-  constexpr uint8 kFirstOutputPin = 13;
-  constexpr uint8 kInputPin0 = 54;
-  constexpr uint8 kClassifierType = 0;
-  constexpr int kClassifierPos = 0;
-  constexpr int kSignalPos = kClassifierPos; // A signal uses the the classifier with the same pos
-
-  Logger log;
 
   typedef struct
   {
@@ -314,40 +393,38 @@ TEST(Ut_Signal, Default_All)
 
   const step_type aSteps[] =
   {
-      {   0,  kInputPin0,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
-    , {  10,  kInputPin0,             0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
-    , {  20,  kInputPin0,             0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
-    , {  30,  kInputPin0,             0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
-    , {  40,  kInputPin0,             0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
-    , {  50,  kInputPin0,             0,                4, {  5,   5,   0,   0,   0 } }
-    , {  60,  kInputPin0,             0,                4, {  3,   3,   0,   0,   0 } }
-    , {  70,  kInputPin0,             0,                4, {  2,   2,   0,   0,   0 } }
-    , {  80,  kInputPin0,             0,                4, {  0,   0,   0,   0,   0 } }
-    , {  90,  kInputPin0,             0,                4, {  0,   0,   0,   0,   0 } }
-    , { 100,  kInputPin0,             0,                4, {  0,   0,   0,   0,   0 } }
-    , { 110,  kInputPin0,             0,                4, {  0,   0,   0,   0,   0 } }
-    , { 120,  kInputPin0,             0,                4, {  0,   0,   0,   0,   0 } }
-    , { 130,  kInputPin0,             0,                4, {  0,   0,   0,   0,   0 } }
-    , { 140,  kInputPin0,             0,                4, {  0,   0,   0,   0,   0 } }
-    , { 150,  kInputPin0,             0,                4, {  2,   2,   2,   2,   2 } }
-    , { 160,  kInputPin0,             0,                4, {  3,   3,   3,   3,   3 } }
-    , { 170,  kInputPin0,             0,                4, {  5,   5,   5,   5,   5 } }
-    , { 180,  kInputPin0,             0,                4, {  9,   9,   9,   9,   9 } }
-    , { 190,  kInputPin0,             0,                4, { 16,  16,  16,  16,  16 } }
-    , { 200,  kInputPin0,             0,                4, { 27,  27,  27,  27,  27 } }
-    , { 210,  kInputPin0,             0,                4, { 48,  48,  48,  48,  48 } }
-    , { 220,  kInputPin0,             0,                4, { 82,  82,  82,  82,  82 } }
-    , { 230,  kInputPin0,             0,                4, {145, 145, 145, 145, 145 } }
-    , { 240,  kInputPin0,             0,                4, {250, 250, 250, 250, 250 } }
-    , { 250,  kInputPin0,             0,                4, {255, 255, 255, 255, 255 } }
+      {   0,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
+    , {  10,  input_pin,             0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
+    , {  20,  input_pin,             0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
+    , {  30,  input_pin,             0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
+    , {  40,  input_pin,             0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
+    , {  50,  input_pin,             0,                4, {  5,   5,   0,   0,   0 } }
+    , {  60,  input_pin,             0,                4, {  3,   3,   0,   0,   0 } }
+    , {  70,  input_pin,             0,                4, {  2,   2,   0,   0,   0 } }
+    , {  80,  input_pin,             0,                4, {  0,   0,   0,   0,   0 } }
+    , {  90,  input_pin,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 100,  input_pin,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 110,  input_pin,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 120,  input_pin,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 130,  input_pin,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 140,  input_pin,             0,                4, {  0,   0,   0,   0,   0 } }
+    , { 150,  input_pin,             0,                4, {  2,   2,   2,   2,   2 } }
+    , { 160,  input_pin,             0,                4, {  3,   3,   3,   3,   3 } }
+    , { 170,  input_pin,             0,                4, {  5,   5,   5,   5,   5 } }
+    , { 180,  input_pin,             0,                4, {  9,   9,   9,   9,   9 } }
+    , { 190,  input_pin,             0,                4, { 16,  16,  16,  16,  16 } }
+    , { 200,  input_pin,             0,                4, { 27,  27,  27,  27,  27 } }
+    , { 210,  input_pin,             0,                4, { 48,  48,  48,  48,  48 } }
+    , { 220,  input_pin,             0,                4, { 82,  82,  82,  82,  82 } }
+    , { 230,  input_pin,             0,                4, {145, 145, 145, 145, 145 } }
+    , { 240,  input_pin,             0,                4, {250, 250, 250, 250, 250 } }
+    , { 250,  input_pin,             0,                4, {255, 255, 255, 255, 255 } }
   };
 
   classifier_array_type classifiers;
   cal::input_type in;
   size_t nStep;
   uint8 tmp;
-
-  log.start("Default_All.txt");
 
   // Initialize
   hal::stubs::analogRead[aSteps[0].nPin] = aSteps[0].nAdc;
@@ -360,24 +437,24 @@ TEST(Ut_Signal, Default_All)
   // Initialize EEPROM with ROM default values (in case another unit test changed 
   // coding data before)
   rte::ifc_cal_set_defaults::call();
-  // And now activate signal kSignalPos
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos, kBuiltInSignalIDAusfahrsignal);
-  // ... with first output pin kFirstOutputPin
-  tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, kFirstOutputPin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos, tmp);
-  // ... with ADC input pin kInputPin0
-  tmp = cal::signal::make_signal_input(cal::signal::values::kInputType_ADC, kInputPin0);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos, tmp);
-  // ... with classifier type kClassifierType
-  tmp = kClassifierType;
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + kSignalPos, tmp);
+  // And now activate signal signal_pos
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
+  // ... with first output pin first_output_pin
+  tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, first_output_pin);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + signal_pos, tmp);
+  // ... with ADC input pin input_pin
+  tmp = cal::signal::make_signal_input(cal::signal::values::kInputType_ADC, input_pin);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + signal_pos, tmp);
+  // ... with classifier type classifier_type
+  tmp = classifier_type;
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + signal_pos, tmp);
   // Classifier type 0 shall identify class 4 for AD value 0, so set limits accordingly.
   rte::ifc_cal_set_cv::call(cal::cv::eClassifierType1LoLimitBase + 4, 0);
   rte::ifc_cal_set_cv::call(cal::cv::eClassifierType1HiLimitBase + 4, 255);
 
-  // Prepare RTE call to get command for kClassifierPos
+  // Prepare RTE call to get command for signal_pos
   in.type = cal::input_type::eAdc;
-  in.idx = kClassifierPos;
+  in.idx = signal_pos;
 
   for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
   {
@@ -390,7 +467,7 @@ TEST(Ut_Signal, Default_All)
     rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
-    uint8 target_pos = rte::calm.signals.at(kSignalPos).first_target.idx;
+    uint8 target_pos = rte::calm.signals.at(signal_pos).first_target.idx;
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
       // Get pins for current signal target
@@ -402,8 +479,6 @@ TEST(Ut_Signal, Default_All)
     }
     log << std::endl;
   }
-
-  log.stop();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -413,17 +488,74 @@ TEST(Ut_Signal, Default_All)
 /// - Switch to green
 /// - Switch to red
 // ------------------------------------------------------------------------------------------------
-TEST(Ut_Signal, Dcc_Green_Red)
+TEST(Ut_Signal, Signal0_ADC_All)
 {
-  typedef util::array<uint8, cfg::kNrSignalTargets> signal_target_array;
+    constexpr uint8 kFirstOutputPin = 13;
+    constexpr uint8 kInputPin = 54;
+    constexpr uint8 kClassifierType = 0;
+    constexpr int kSignalPos = 0;
+
+    Logger log;
+
+    log.start("Signal0_ADC_All.txt");
+
+    do_signal_test_all(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        log);
+
+    log.stop();
+}
+
+// ------------------------------------------------------------------------------------------------
+/// Test if aspects and dim ramps are ok for
+/// - Commands from classifiers
+/// - Start with default (init) aspect
+/// - Switch to green
+/// - Switch to red
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_Signal, Signal7_ADC_All)
+{
+    constexpr uint8 kFirstOutputPin = 13;
+    constexpr uint8 kInputPin = 54;
+    constexpr uint8 kClassifierType = 0;
+    constexpr int kSignalPos = 7;
+
+    Logger log;
+
+    log.start("Signal7_ADC_All.txt");
+
+    do_signal_test_all(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        log);
+
+    log.stop();
+}
+
+/**
+ * @brief 
+ * 
+ * @param signal_pos 
+ * @param first_output_pin 
+ * @param input_pin 
+ * @param classifier_type 
+ * @param log 
+ */
+void do_signal_dcc_test_aspects_2_3(
+    const int signal_pos, 
+    uint8 first_output_pin, 
+    Logger& log)
+{
+  using signal_target_array = util::array<uint8, cfg::kNrSignalTargets>;
   using size_type = signal_target_array::size_type;
   using time_type = classifier_array_type::classifier_type::time_type;
   using cmd_type = rte::cmd_type;
 
-  Logger log;
-  constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
-  constexpr uint8 kFirstOutputPin = 13;
-  //constexpr uint8 kOutputAddress = 1;
   uint8 tmp;
 
   typedef struct
@@ -435,33 +567,48 @@ TEST(Ut_Signal, Dcc_Green_Red)
     signal_target_array au8Curs; // expected value: target onboard duty cycles
   } step_type;
 
+  constexpr time_type kFirstTime_ms = 0; // initial time when RTE is started
   const step_type aSteps[] =
     {
-          {   0,  0b10000001, 0b11110011, 1, {  0,   0,   0,   0,   0 } }
-        , {  10,  0b10000001, 0b11110011, 1, {  2,   2,   0,   0,   0 } }
-        , {  20,  0b10000001, 0b11110011, 1, {  3,   3,   0,   0,   0 } }
-        , {  30,  0b10000001, 0b11110011, 1, {  5,   5,   0,   0,   0 } }
-        , {  40,  0b10000001, 0b11110011, 1, {  9,   9,   0,   0,   0 } }
-        , {  50,  0b10000001, 0b11110011, 1, { 16,  16,   0,   0,   0 } }
-        , {  60,  0b10000001, 0b11110011, 1, { 27,  27,   0,   0,   0 } }
-        , {  70,  0b10000001, 0b11110011, 1, { 48,  48,   0,   0,   0 } }
-        , {  80,  0b10000001, 0b11110011, 1, { 82,  82,   0,   0,   0 } }
-        , {  90,  0b10000001, 0b11110011, 1, {145, 145,   0,   0,   0 } }
-        , { 100,  0b10000001, 0b11110010, 0, {250, 250,   0,   0,   0 } }
-        , { 110,  0b10000001, 0b11110010, 0, {145, 145,   0,   0,   0 } }
-        , { 120,  0b10000001, 0b11110010, 0, { 84,  84,   0,   0,   0 } }
-        , { 130,  0b10000001, 0b11110010, 0, { 48,  48,   0,   0,   0 } }
-        , { 140,  0b10000001, 0b11110010, 0, { 28,  28,   0,   0,   0 } }
-        , { 150,  0b10000001, 0b11110010, 0, { 16,  16,   0,   0,   0 } }
+          {  10,  0b10000001, 0b11110011, 3, {  2,   2,   0,   0,   2 } }
+        , {  20,  0b10000001, 0b11110011, 3, {  3,   3,   0,   0,   3 } }
+        , {  30,  0b10000001, 0b11110011, 3, {  5,   5,   0,   0,   5 } }
+        , {  40,  0b10000001, 0b11110011, 3, {  9,   9,   0,   0,   9 } }
+        , {  50,  0b10000001, 0b11110011, 3, { 16,  16,   0,   0,  16 } }
+        , {  60,  0b10000001, 0b11110011, 3, { 27,  27,   0,   0,  27 } }
+        , {  70,  0b10000001, 0b11110011, 3, { 48,  48,   0,   0,  48 } }
+        , {  80,  0b10000001, 0b11110011, 3, { 82,  82,   0,   0,  82 } }
+        , {  90,  0b10000001, 0b11110011, 3, {145, 145,   0,   0, 145 } }
+        , { 100,  0b10000001, 0b11110011, 3, {250, 250,   0,   0, 250 } }
+        , { 110,  0b10000001, 0b11110011, 3, {255, 255,   0,   0, 255 } }
+        , { 120,  0b10000001, 0b11110010, 2, {145, 145,   0,   0, 145 } }
+        , { 130,  0b10000001, 0b11110010, 2, { 84,  84,   0,   0,  84 } }
+        , { 140,  0b10000001, 0b11110010, 2, { 48,  48,   0,   0,  48 } }
+        , { 150,  0b10000001, 0b11110010, 2, { 28,  28,   0,   0,  28 } }
+        , { 160,  0b10000001, 0b11110010, 2, { 16,  16,   0,   0,  16 } }
+        , { 170,  0b10000001, 0b11110010, 2, {  9,   9,   0,   0,   9 } }
+        , { 180,  0b10000001, 0b11110010, 2, {  5,   5,   0,   0,   5 } }
+        , { 190,  0b10000001, 0b11110010, 2, {  3,   3,   0,   0,   3 } }
+        , { 200,  0b10000001, 0b11110010, 2, {  2,   2,   0,   0,   2 } }
+        , { 210,  0b10000001, 0b11110010, 2, {  0,   0,   0,   0,   0 } }
+        , { 220,  0b10000001, 0b11110010, 2, {  0,   0,   2,   2,   0 } }
+        , { 230,  0b10000001, 0b11110010, 2, {  0,   0,   3,   3,   0 } }
+        , { 240,  0b10000001, 0b11110010, 2, {  0,   0,   5,   5,   0 } }
+        , { 250,  0b10000001, 0b11110010, 2, {  0,   0,   9,   9,   0 } }
+        , { 260,  0b10000001, 0b11110010, 2, {  0,   0,  16,  16,   0 } }
+        , { 270,  0b10000001, 0b11110010, 2, {  0,   0,  27,  27,   0 } }
+        , { 280,  0b10000001, 0b11110010, 2, {  0,   0,  48,  48,   0 } }
+        , { 290,  0b10000001, 0b11110010, 2, {  0,   0,  82,  82,   0 } }
+        , { 300,  0b10000001, 0b11110010, 2, {  0,   0, 145, 145,   0 } }
+        , { 310,  0b10000001, 0b11110010, 2, {  0,   0, 250, 250,   0 } }
+        , { 320,  0b10000001, 0b11110010, 2, {  0,   0, 255, 255,   0 } }
     };
-
   classifier_array_type classifiers;
   cal::input_type in;
   size_t nStep;
-  log.start("Dcc_Green_Red.txt");
 
   // Initialize
-  hal::stubs::millis = aSteps[0].ms;
+  hal::stubs::millis = kFirstTime_ms;
   hal::stubs::micros = 1000U * hal::stubs::millis;
   
   // Here we go
@@ -469,14 +616,14 @@ TEST(Ut_Signal, Dcc_Green_Red)
 
   // Initialize EEPROM with ROM default values
   rte::ifc_cal_set_defaults::call();
-  // And now activate signal kSignalPos
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos, kBuiltInSignalIDAusfahrsignal);
-  // ... with first output pin kFirstOutputPin
-  tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, kFirstOutputPin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos, tmp);
+  // And now activate signal signal_pos
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
+  // ... with first output pin first_output_pin
+  tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, first_output_pin);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + signal_pos, tmp);
   // ... with DCC input
   tmp = cal::signal::make_signal_input(cal::signal::values::kInputType_DCC, 0);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos, tmp);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + signal_pos, tmp);
 
   in.type = cal::input_type::eDcc;
   in.idx = 0;
@@ -496,20 +643,41 @@ TEST(Ut_Signal, Dcc_Green_Red)
     rte::exec();
     printRte();
     rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
-    log << std::setw(3) << (int)cmd << " ";
-//    EXPECT_EQ(cmd, aSteps[nStep].cmd);
-    uint8 target_pos = rte::calm.signals.at(kSignalPos).first_target.idx;
+    log << std::setw(3) << (int)cmd << " - ";
+    EXPECT_EQ(cmd, aSteps[nStep].cmd);
+    uint8 target_pos = rte::calm.signals.at(signal_pos).first_target.idx;
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
       rte::intensity8_255 pwm;
       rte::ifc_onboard_target_duty_cycles::readElement(target_pos++, pwm);
       log << std::setw(3) << (int)pwm << ", ";
-  //    EXPECT_EQ((uint8)pwm, aSteps[nStep].au8Curs[i]);
+      EXPECT_EQ((uint8)pwm, aSteps[nStep].au8Curs[i]);
     }
     log << std::endl;
   }
+}
 
-  log.stop();
+// ------------------------------------------------------------------------------------------------
+/// Test if aspects and dim ramps are ok for
+/// - Commands from classifiers
+/// - Start with default (init) aspect
+/// - Switch to green
+/// - Switch to red
+// ------------------------------------------------------------------------------------------------
+TEST(Ut_Signal, Signal0_DCC_Aspects_2_3)
+{
+    Logger log;
+    constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 13;
+
+    log.start("Signal0_DCC_Aspects_2_3.txt");
+
+    do_signal_dcc_test_aspects_2_3(
+        kSignalPos,
+        kFirstOutputPin,
+        log);
+
+    log.stop();
 }
 
 void setUp(void)
@@ -529,9 +697,12 @@ bool test_loop(void)
 {
   UNITY_BEGIN();
 
-  //RUN_TEST(Default_Green_Red);
-  //RUN_TEST(Default_All);
-  RUN_TEST(Dcc_Green_Red);
+  RUN_TEST(Signal0_ADC_Green_Red);
+  RUN_TEST(Signal1_ADC_Green_Red);
+  RUN_TEST(Signal7_ADC_Green_Red);
+  RUN_TEST(Signal0_ADC_All);
+  RUN_TEST(Signal7_ADC_All);
+  RUN_TEST(Signal0_DCC_Aspects_2_3);
 
   (void) UNITY_END();
 

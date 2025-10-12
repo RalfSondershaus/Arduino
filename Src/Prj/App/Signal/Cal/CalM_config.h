@@ -1,5 +1,5 @@
 /**
- * @file Ut_Signal/CalM_config.h
+ * @file App/Signal/Cal/CalM_config.h
  *
  * @author Ralf Sondershaus
  *

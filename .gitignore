@@ -27,3 +27,16 @@ Src/Gen/Test/googletest-main/googletest/src/output.txt
 Default_All.txt
 Default_Green_Red.txt
 do_ramp_16bit_10_0x0_0x8000_0x0100_set_and_step.txt
+Dcc_Green_Red.txt
+Signal0_ADC_All.txt
+Signal0_ADC_Green_Red.txt
+Signal0_All.txt
+Signal0_DCC_Aspects_2_3.txt
+Signal0_Green_Red.txt
+Signal1_ADC_Green_Red.txt
+Signal1_Green_Red.txt
+Signal7_ADC_All.txt
+Signal7_ADC_Green_Red.txt
+Signal7_All.txt
+Signal7_Green_Red.txt
+Signal8_Green_Red.txt
