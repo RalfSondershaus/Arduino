@@ -1,7 +1,7 @@
 /**
  * @file Ut_Signal/Test.cpp
  *
- * @brief Unit tests for project Signal
+ * @brief Unit tests and integration tests for project Signal
  *
  * @copyright Copyright 2022 - 2024 Ralf Sondershaus
  *
@@ -142,12 +142,33 @@ static void printRte()
 }
 
 /**
- * @brief 
+ * @brief Performs integration testing of signal processing using time-based test sequences
  * 
- * @param signal_pos 
- * @param first_output_pin 
- * @param input_pin
- * @param classifier_type 
+ * This test function uses state-transition testing technique to verify signal processing
+ * by stepping through predefined time sequences and validating outputs against expected values.
+ * 
+ * It verifies:
+ * - Aspect 0 is the default aspect on startup
+ * - Signal transitions to aspect 1 (green) when ADC input is equal to green
+ * - Signal transitions to aspect 0 (red) when ADC input is equal to red
+ * - Correct PWM duty cycles are set for each target during transitions including ramp-up and 
+ *   ramp-down
+ * 
+ * @param signal_pos Position/index of the signal to test
+ * @param first_output_pin First PWM output pin number for the signal
+ * @param input_pin ADC input pin number to read signal from
+ * @param classifier_type Type of classifier to use for signal processing
+ * @param log Logger instance for test output
+ * 
+ * Test sequence:
+ * 1. Initializes hardware stubs and RTE
+ * 2. Configures signal parameters (ID, I/O pins, classifier)
+ * 3. Steps through predefined test sequence validating:
+ *    - Command values from RTE
+ *    - PWM duty cycles for each target
+ * 
+ * @note Uses state table driven testing with predefined time steps, inputs and expected outputs
+ * @note Test data covers signal startup, classification and PWM ramping scenarios
  */
 void do_signal_test_red_green(
     const int signal_pos, 
@@ -280,13 +301,11 @@ void do_signal_test_red_green(
   }
 }
 
-// ------------------------------------------------------------------------------------------------
-/// Test if aspects and dim ramps are ok for
-/// - Commands from classifiers
-/// - Start with default (init) aspect
-/// - Switch to green
-/// - Switch to red
-// ------------------------------------------------------------------------------------------------
+/**
+ * @test Signal0_ADC_Green_Red
+ * @brief Tests whether signal 0 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ */
 TEST(Ut_Signal, Signal0_ADC_Green_Red)
 {
   Logger log;
@@ -307,13 +326,11 @@ TEST(Ut_Signal, Signal0_ADC_Green_Red)
   log.stop();
 }
 
-// ------------------------------------------------------------------------------------------------
-/// Test if aspects and dim ramps are ok for
-/// - Commands from classifiers
-/// - Start with default (init) aspect
-/// - Switch to green
-/// - Switch to red
-// ------------------------------------------------------------------------------------------------
+/**
+ * @test Signal1_ADC_Green_Red
+ * @brief Tests whether signal 1 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ */
 TEST(Ut_Signal, Signal1_ADC_Green_Red)
 {
   Logger log;
@@ -334,13 +351,11 @@ TEST(Ut_Signal, Signal1_ADC_Green_Red)
   log.stop();
 }
 
-// ------------------------------------------------------------------------------------------------
-/// Test if aspects and dim ramps are ok for
-/// - Commands from classifiers
-/// - Start with default (init) aspect
-/// - Switch to green
-/// - Switch to red
-// ------------------------------------------------------------------------------------------------
+/**
+ * @test Signal7_ADC_Green_Red
+ * @brief Tests whether signal 7 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ */
 TEST(Ut_Signal, Signal7_ADC_Green_Red)
 {
   Logger log;
@@ -362,13 +377,30 @@ TEST(Ut_Signal, Signal7_ADC_Green_Red)
 }
 
 /**
- * @brief 
+ * @brief Performs integration testing of signal processing using time-based test sequences
  * 
- * @param signal_pos 
- * @param first_output_pin 
- * @param input_pin 
- * @param classifier_type 
- * @param log 
+ * This test function uses state-transition testing technique to verify signal processing
+ * by stepping through predefined time sequences and validating outputs against expected values.
+ * 
+ * It verifies:
+ * - Aspect 0 is the default aspect on startup
+ * - Signal transitions to aspect 4 (all LEDs on) when ADC input is above green threshold
+ * 
+ * @param signal_pos Position/index of the signal to test
+ * @param first_output_pin First PWM output pin number for the signal
+ * @param input_pin ADC input pin number to read signal from
+ * @param classifier_type Type of classifier to use for signal processing
+ * @param log Logger instance for test output
+ * 
+ * Test sequence:
+ * 1. Initializes hardware stubs and RTE
+ * 2. Configures signal parameters (ID, I/O pins, classifier)
+ * 3. Steps through predefined test sequence validating:
+ *    - Command values from RTE
+ *    - PWM duty cycles for each target
+ * 
+ * @note Uses state table driven testing with predefined time steps, inputs and expected outputs
+ * @note Test data covers signal startup, classification and PWM ramping scenarios
  */
 void do_signal_test_all(
     const int signal_pos, 
@@ -481,13 +513,11 @@ void do_signal_test_all(
   }
 }
 
-// ------------------------------------------------------------------------------------------------
-/// Test if aspects and dim ramps are ok for
-/// - Commands from classifiers
-/// - Start with default (init) aspect
-/// - Switch to green
-/// - Switch to red
-// ------------------------------------------------------------------------------------------------
+/**
+ * @test Signal0_ADC_All
+ * @brief Tests whether signal 0 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ */
 TEST(Ut_Signal, Signal0_ADC_All)
 {
     constexpr uint8 kFirstOutputPin = 13;
@@ -509,13 +539,11 @@ TEST(Ut_Signal, Signal0_ADC_All)
     log.stop();
 }
 
-// ------------------------------------------------------------------------------------------------
-/// Test if aspects and dim ramps are ok for
-/// - Commands from classifiers
-/// - Start with default (init) aspect
-/// - Switch to green
-/// - Switch to red
-// ------------------------------------------------------------------------------------------------
+/**
+ * @test Signal7_ADC_All
+ * @brief Tests whether signal 7 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ */
 TEST(Ut_Signal, Signal7_ADC_All)
 {
     constexpr uint8 kFirstOutputPin = 13;
@@ -538,13 +566,23 @@ TEST(Ut_Signal, Signal7_ADC_All)
 }
 
 /**
- * @brief 
+ * @brief Tests DCC signal aspects 2 and 3 transitions for a railway signal
  * 
- * @param signal_pos 
- * @param first_output_pin 
- * @param input_pin 
- * @param classifier_type 
- * @param log 
+ * This test function simulates DCC packet reception and verifies correct signal behavior:
+ * - Transitions between aspect 2 and 3
+ * - PWM duty cycle changes for signal outputs
+ * - Timing of transitions
+ * 
+ * @param signal_pos Position index of the signal (0-7)
+ * @param first_output_pin First pin number for signal outputs
+ * @param log Logger reference for test output
+ * 
+ * @details The test:
+ * 1. Initializes signal configuration in EEPROM
+ * 2. Simulates DCC packets reception
+ * 3. Verifies correct command interpretation
+ * 4. Checks PWM duty cycles on signal outputs
+ * 5. Validates timing of transitions
  */
 void do_signal_dcc_test_aspects_2_3(
     const int signal_pos, 
@@ -661,13 +699,11 @@ void do_signal_dcc_test_aspects_2_3(
   }
 }
 
-// ------------------------------------------------------------------------------------------------
-/// Test if aspects and dim ramps are ok for
-/// - Commands from classifiers
-/// - Start with default (init) aspect
-/// - Switch to green
-/// - Switch to red
-// ------------------------------------------------------------------------------------------------
+/**
+ * @test Signal0_DCC_Aspects_2_3
+ * @brief Tests whether signal 0 is correctly triggered by DCC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ */
 TEST(Ut_Signal, Signal0_DCC_Aspects_2_3)
 {
     Logger log;
@@ -684,13 +720,11 @@ TEST(Ut_Signal, Signal0_DCC_Aspects_2_3)
     log.stop();
 }
 
-// ------------------------------------------------------------------------------------------------
-/// Test if aspects and dim ramps are ok for
-/// - Commands from classifiers
-/// - Start with default (init) aspect
-/// - Switch to green
-/// - Switch to red
-// ------------------------------------------------------------------------------------------------
+/**
+ * @test Signal7_DCC_Aspects_2_3
+ * @brief Tests whether signal 7 is correctly triggered by DCC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ */
 TEST(Ut_Signal, Signal7_DCC_Aspects_2_3)
 {
     Logger log;
