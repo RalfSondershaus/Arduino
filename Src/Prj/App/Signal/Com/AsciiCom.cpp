@@ -317,8 +317,8 @@ namespace com
     /**
      * @brief Implements command SET_CV <cv_id> <value>
      *
-     * @param st Contains the command string, get pointer points to first element after "SET_CV".
-     * @param response [out] The response is stored here, it is the contains the command parameters.
+     * @param st [in] Contains the command string, get pointer points to first element after "SET_CV".
+     * @param response [out] The response is stored here, it contains the command parameters.
      * @return tRetType eOK
      * @return tRetType eINV_CMD Ill-formed command or CV id is out-of-bounds
      * @return tRetType eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
@@ -363,7 +363,7 @@ namespace com
      * @brief Implements command GET_CV <cv_id>
      *
      * @param st Contains the command string, get pointer points to first element after "GET_CV".
-     * @param response [out] The response is stored here, it is the contains the command parameters.
+     * @param response [out] The response is stored here, it contains the command parameters.
      * @return tRetType eOK
      * @return tRetType eINV_CMD Ill-formed command or CV id is out-of-bounds
      * @return tRetType eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds

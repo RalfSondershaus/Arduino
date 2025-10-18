@@ -431,6 +431,8 @@ namespace cal
                 hal::eeprom::read(eep_idx++),
                 hal::eeprom::read(eep_idx_classifier_type++));
         }
+
+        calc_leds();
     }
 
     /**
@@ -860,8 +862,6 @@ namespace cal
             set_defaults();
             read_all();
         }
-
-        calc_leds();
     }
 
     // -----------------------------------------------

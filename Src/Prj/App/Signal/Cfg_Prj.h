@@ -64,7 +64,7 @@ namespace cfg
     /// The decoder supports this number of addresses, first address is
     /// defined by DecoderAddressLSB and DecoderAddressMSB.
     /// Address range: [first_adress, first_adress + kNrAddresses].
-    constexpr uint8 kNrAddresses = kNrSignals - 1;
+    constexpr uint8 kNrAddresses = kNrDccAddressesPerSignal*kNrSignals-1; // 4 addresses per signal
 
 } // namespace cfg
 
