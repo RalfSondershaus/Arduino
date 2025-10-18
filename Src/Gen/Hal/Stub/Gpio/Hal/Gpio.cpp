@@ -36,7 +36,18 @@ namespace hal
         util::array<uint8, kNrPins> pinMode;
         util::array<uint8, kNrPins> digitalWrite;
         util::array<uint8, kNrPins> digitalRead;
+        util::array<int, kNrPins> analogWrite;
         util::array<int, kNrPins> analogRead;
         uint8_t analogReference;
+    }
+
+    void init_gpio()
+    {
+        stubs::pinMode.fill(0);
+        stubs::digitalWrite.fill(0);
+        stubs::digitalRead.fill(0);
+        stubs::analogWrite.fill(0);
+        stubs::analogRead.fill(0);
+        //stubs::pin_pwm.fill(false);
     }
 }

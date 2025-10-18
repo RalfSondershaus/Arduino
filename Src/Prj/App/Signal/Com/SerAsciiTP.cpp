@@ -28,7 +28,6 @@ namespace com
   void SerAsciiTP::init()
   {}
 
-  // SET SIGNAL 0 ASPECTS 11000 00000 00100 00000 00110 00000 11001 00000 11111 00000
   /// Receive data from low level drivers and process them
   void SerAsciiTP::cycle()
   {

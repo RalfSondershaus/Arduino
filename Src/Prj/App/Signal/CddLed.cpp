@@ -20,13 +20,8 @@
 
 #include <Rte/Rte.h>
 #include <CddLed.h>
-// A CDD can include Arduino.h
-#ifdef ARDUINO
-#include <Arduino.h>
-#else
-#include <WinArduino.h>
-#endif
 #include <Hal/Serial.h>
+#include <Hal/Gpio.h>
 #include <Util/Logger.h>
 
 namespace cdd
@@ -54,16 +49,9 @@ namespace cdd
         if (pCalLeds->test(pos))
         {
           (void)rte::ifc_onboard_target_duty_cycles::readElement(pos, u8Int);
-          pinMode(pos, OUTPUT);
+          hal::pinMode(pos, OUTPUT);
           log << " pos=" << pos << " int=" << u8Int;
-          if (digitalPinHasPWM(pos))
-          {
-            analogWrite(pos, static_cast<int>(u8Int));
-          }
-          else
-          {
-            digitalWrite(pos, (u8Int > static_cast<rte::intensity8_255>(0U)) ? HIGH : LOW);
-          }
+          hal::analogWrite(pos, static_cast<int>(u8Int));
         }
       }
       log.end();

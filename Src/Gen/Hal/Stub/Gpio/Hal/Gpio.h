@@ -65,6 +65,11 @@ namespace hal
     inline int  analogRead     (uint8_t pin)                   { return stubs::analogRead[pin]; }
     inline void analogReference(uint8_t mode)                  { stubs::analogReference = mode; }
     inline void analogWrite    (uint8_t pin, int value)        { stubs::analogWrite[pin] = value; }
+
+    /**
+     * @brief Initialize GPIO stubs with 0
+     */
+    void init_gpio();
 }
 
 #endif // HAL_GPIO_H

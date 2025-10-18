@@ -116,7 +116,7 @@ namespace cal
         cfg::kNrBuiltInSignals,     /* CV 41 */                             \
         kSignalNotUsed, kSignalNotUsed, kSignalNotUsed, kSignalNotUsed, /* CV 42 - 45 (signal IDs) */ \
         kSignalNotUsed, kSignalNotUsed, kSignalNotUsed, kSignalNotUsed, /* CV 46 - 49 (signal IDs) */ \
-        0, 0, 0, 0,  0, 0, 0, 0,    /* CV 50 - 57 (signal outputs) */       \
+        0, 0, 0, 0,  0, 0, 0, 0,    /* CV 50 - 57 (signal output pins) */       \
         0, 0, 0, 0,  0, 0, 0, 0,    /* CV 58 - 65 (signal inputs) */        \
         0, 0, 0, 0,  0, 0, 0, 0,    /* CV 66 - 73 (signal classifiers) */   \
         0, 0, 0, 0, 0,              /* 74 - 78 */                           \

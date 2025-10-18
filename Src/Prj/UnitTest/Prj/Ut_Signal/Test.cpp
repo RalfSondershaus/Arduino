@@ -258,6 +258,7 @@ void do_signal_test_red_green(
   hal::stubs::analogRead[aSteps[0].nPin] = aSteps[0].nAdc;
   hal::stubs::millis = aSteps[0].ms;
   hal::stubs::micros = 1000U * hal::stubs::millis;
+  hal::init_gpio();
   
   // Here we go
   rte::start();
@@ -292,10 +293,15 @@ void do_signal_test_red_green(
     uint8 target_pos = rte::calm.signals.at(signal_pos).first_target.idx;
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
-      rte::intensity8_255 pwm;
-      rte::ifc_onboard_target_duty_cycles::readElement(target_pos++, pwm);
-      log << std::setw(3) << (int)pwm << ", ";
-      EXPECT_EQ((uint8)pwm, aSteps[nStep].au8Curs[i]);
+      // Get pins for current signal target
+      rte::intensity8_255 pwm_rte;
+      rte::intensity8_255 pwm_hal;
+      // Read PWM for that pin
+      rte::ifc_onboard_target_duty_cycles::readElement(target_pos, pwm_rte);
+      pwm_hal = hal::stubs::analogWrite[target_pos++];
+      log << std::setw(3) << (int)pwm_rte << ", ";
+      EXPECT_EQ((uint8)pwm_rte, aSteps[nStep].au8Curs[i]);
+      EXPECT_EQ((uint8)pwm_hal, aSteps[nStep].au8Curs[i]);
     }
     log << std::endl;
   }
@@ -462,6 +468,7 @@ void do_signal_test_all(
   hal::stubs::analogRead[aSteps[0].nPin] = aSteps[0].nAdc;
   hal::stubs::millis = aSteps[0].ms;
   hal::stubs::micros = 1000U * hal::stubs::millis;
+  hal::init_gpio();
 
   // Here we go
   rte::start();
@@ -503,11 +510,14 @@ void do_signal_test_all(
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
       // Get pins for current signal target
-      rte::intensity8_255 pwm;
+      rte::intensity8_255 pwm_rte;
+      rte::intensity8_255 pwm_hal;
       // Read PWM for that pin
-      rte::ifc_onboard_target_duty_cycles::readElement(target_pos++, pwm);
-      log << std::setw(3) << (int)pwm << ", ";
-      EXPECT_EQ((uint8)pwm, aSteps[nStep].au8Curs[i]);
+      rte::ifc_onboard_target_duty_cycles::readElement(target_pos, pwm_rte);
+      pwm_hal = hal::stubs::analogWrite[target_pos++];
+      log << std::setw(3) << (int)pwm_rte << ", ";
+      EXPECT_EQ((uint8)pwm_rte, aSteps[nStep].au8Curs[i]);
+      EXPECT_EQ((uint8)pwm_hal, aSteps[nStep].au8Curs[i]);
     }
     log << std::endl;
   }
@@ -652,7 +662,8 @@ void do_signal_dcc_test_aspects_2_3(
   // Initialize
   hal::stubs::millis = kFirstTime_ms;
   hal::stubs::micros = 1000U * hal::stubs::millis;
-  
+  hal::init_gpio();
+
   // Here we go
   rte::start();
 
@@ -690,10 +701,13 @@ void do_signal_dcc_test_aspects_2_3(
     uint8 target_pos = rte::calm.signals.at(signal_pos).first_target.idx;
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
-      rte::intensity8_255 pwm;
-      rte::ifc_onboard_target_duty_cycles::readElement(target_pos++, pwm);
-      log << std::setw(3) << (int)pwm << ", ";
-      EXPECT_EQ((uint8)pwm, aSteps[nStep].au8Curs[i]);
+      rte::intensity8_255 pwm_rte;
+      rte::intensity8_255 pwm_hal;
+      rte::ifc_onboard_target_duty_cycles::readElement(target_pos, pwm_rte);
+      pwm_hal = hal::stubs::analogWrite[target_pos++];
+      log << std::setw(3) << (int)pwm_rte << ", ";
+      EXPECT_EQ((uint8)pwm_rte, aSteps[nStep].au8Curs[i]);
+      EXPECT_EQ((uint8)pwm_hal, aSteps[nStep].au8Curs[i]);
     }
     log << std::endl;
   }
