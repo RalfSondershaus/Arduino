@@ -13,6 +13,18 @@ TARGET_MCU_VARIANT   = mega
 TARGET_MCU_DEVICE    = atmega2560
 endif
 
+ifeq ($(ARG_TARGET_ECU),nano)
+TARGET_MCU_FAMILY    = avr
+TARGET_MCU_VARIANT   = nano
+TARGET_MCU_DEVICE    = atmega328p
+endif
+
+ifeq ($(ARG_TARGET_ECU),nano4)
+TARGET_MCU_FAMILY    = arm
+TARGET_MCU_VARIANT   = nano4
+TARGET_MCU_DEVICE    = cortexm4
+endif
+
 ifeq ($(ARG_TARGET_ECU),uno)
 TARGET_MCU_FAMILY    = avr
 TARGET_MCU_VARIANT   = uno
@@ -124,7 +136,7 @@ endif
 CFLAGS := $(CFLAGS)               \
         -c                        \
         -g                        \
-        -O3                       \
+        -O2                       \
         -w                        \
         -std=gnu++17              \
         -fpermissive              \
