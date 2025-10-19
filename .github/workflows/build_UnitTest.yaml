@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - master
-      - fix_Ut_Sstream_Formatted_input_char_array
-      - feature-dcc-addressing
-      - feature-bit-extractor-in-ISR
+      - develop
   pull_request:
     branches:
       - master
+      - develop
 
 jobs:
   build:
