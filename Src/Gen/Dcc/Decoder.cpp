@@ -47,14 +47,14 @@ namespace dcc
   uint32 ul_Fetch_Count;
 
   // ---------------------------------------------------
-  /// Interrupt service routine: a falling or rising edge has triggered this interrupt.
+  /// This function is called by the ISR when a falling or rising edge has triggered the interrupt.
   ///
   /// Pushes a 0, 1, or invalid into the underlying bit stream.
   ///
   /// @note Average run time 27 usec @ATmega2560 @16 MHz with gcc -Os
   /// @note Average run time 14 usec @ATmega2560 @16 MHz with gcc -O3
   // ---------------------------------------------------
-  ISR(ISR_Dcc)
+  void ISR_Dcc(void) noexcept
   {
     static bool bFirstCall = true;
     static unsigned long prev = 0;

@@ -45,6 +45,18 @@ TARGET_MCU_VARIANT   = x64
 TARGET_MCU_DEVICE    = x64
 endif
 
+ifeq ($(ARG_TARGET_ECU),linux32)
+TARGET_MCU_FAMILY    = x86
+TARGET_MCU_VARIANT   = x86
+TARGET_MCU_DEVICE    = x86
+endif
+
+ifeq ($(ARG_TARGET_ECU),linux64)
+TARGET_MCU_FAMILY    = x64
+TARGET_MCU_VARIANT   = x64
+TARGET_MCU_DEVICE    = x64
+endif
+
 # ---------------------------------------------------
 # Target file extension
 # ---------------------------------------------------
@@ -52,12 +64,24 @@ ifeq ($(TARGET_MCU_FAMILY),avr)
 TARGET_FILENAME_EXT := hex
 endif
 
-ifeq ($(TARGET_MCU_FAMILY),x86)
+ifeq ($(TARGET_MCU_FAMILY),arm)
+TARGET_FILENAME_EXT := hex
+endif
+
+ifeq ($(ARG_TARGET_ECU),win32)
 TARGET_FILENAME_EXT := exe
 endif
 
-ifeq ($(TARGET_MCU_FAMILY),x64)
+ifeq ($(ARG_TARGET_ECU),win64)
 TARGET_FILENAME_EXT := exe
+endif
+
+ifeq ($(ARG_TARGET_ECU),linux32)
+TARGET_FILENAME_EXT :=
+endif
+
+ifeq ($(ARG_TARGET_ECU),linux64)
+TARGET_FILENAME_EXT :=
 endif
 
 # ---------------------------------------------------
@@ -78,6 +102,7 @@ C_INCLUDES_PLATFORM := -I$(PATH_SRC_GEN)/Platform                               
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Supported target MCUs with AVR_GCC:
 # - ARG_TARGET_ECU mega
+# - ARG_TARGET_ECU nano
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ifeq ($(ARG_COMPILER),avr_gcc)
 CC := $(AVRGCC)
@@ -97,12 +122,20 @@ C_INCLUDES_PLATFORM := $(C_INCLUDES_PLATFORM)                                \
 
 # ---------------------------------------------------
 # Add compiler #defines for the target
+# 10608 means Arduino Version 1.6.8
 # ---------------------------------------------------
 ifeq ($(TARGET_MCU_VARIANT),mega)
 C_DEFINES := $(C_DEFINES)           \
             -DF_CPU=16000000L       \
             -DARDUINO=10608         \
             -DARDUINO_AVR_MEGA2560  \
+            -DARDUINO_ARCH_AVR
+
+else ifeq ($(TARGET_MCU_VARIANT),nano)
+C_DEFINES := $(C_DEFINES)           \
+            -DF_CPU=16000000L       \
+            -DARDUINO=10608         \
+            -DARDUINO_AVR_NANO      \
             -DARDUINO_ARCH_AVR
 
 else
@@ -113,8 +146,14 @@ endif
 # Compiler flags. See also https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
 # Remark: Use -v flag to make gcc show its configuration including include pathes
 #
+# -flto This option runs the standard link-time optimizer. When invoked with source code, it 
+#       generates GIMPLE (one of GCC’s internal representations) and writes it to special ELF 
+#       sections in the object file.
 # -g    Produce debugging information in the operating system�s native format (stabs, COFF, XCOFF, or DWARF). GDB can work with this debugging information.
 # -M    Instead of outputting the result of preprocessing, output a rule suitable for make describing the dependencies of the main source file. 
+# -MM   Like -M but do not mention header files that are found in system header directories, nor header files that are included, directly or indirectly, from such a header.
+# -MF file When used with -M or -MM, specifies a file to write the dependencies to. If no -MF switch is given the preprocessor sends the rules to the same place it would send preprocessed output.
+# -MD   -MD is equivalent to -M -MF file, except that -E is not implied.
 # -O1   Optimize. Optimizing compilation takes somewhat more time, and a lot more memory for a large function. (Same as -O)
 # -O2   Optimize even more. GCC performs nearly all supported optimizations that do not involve a space-speed tradeoff. 
 # -O3   Optimize yet more. -O3 turns on all optimizations specified by -O2 and also turns on more optimization flags.
@@ -129,24 +168,56 @@ endif
 # -std=c++17    The 2017 ISO C++ standard plus amendments.
 # -v    Print (on standard error output) the commands executed to run the stages of compilation.
 # --version Display the version number and copyrights of the invoked GCC.
-# -Wall This enables all the warnings about constructions that some users consider questionable, and that are easy to avoid (or modify to prevent the warning), even in conjunction with macros.
+# -Wall    This enables all the warnings about constructions that some users consider questionable, 
+#          and that are easy to avoid (or modify to prevent the warning), even in conjunction with
+#          macros.
+# -w       Inhibit all warning messages
+# -Werror  Turn all warnings into errors
 # -fverbose-asm
+# -fpermissive  Downgrade some required diagnostics about nonconformant code from errors to warnings. 
+#              Thus, using -fpermissive allows some nonconforming code to compile.
+# -fdata-sections
+# -ffunction-sections Place each function or data item into its own section in the output file if 
+#                     the target supports arbitrary sections. The name of the function or the name 
+#                     of the data item determines the section’s name in the output file.
+#                     Use these options on systems where the linker can perform optimizations to 
+#                     improve locality of reference in the instruction space. Most systems using 
+#                     the ELF object format have linkers with such optimizations.
+# -mmcu=mcu Specify the AVR instruction set architecture (ISA) or device type.
 # ---------------------------------------------------
-# We need C++17 for std::string_view
+
+# Default optimization
+CFLAGS_OPT  := $(CFLAGS_OPT) \
+               -O2
+
+# Customizable, special optimizations
+CFLAGS_OPT0 := $(CFLAGS_OPT0) \
+               -O0
+CFLAGS_OPT1 := $(CFLAGS_OPT1) \
+               -O1
+CFLAGS_OPT2 := $(CFLAGS_OPT2) \
+               -O2
+CFLAGS_OPT3 := $(CFLAGS_OPT3) \
+               -O3
+CFLAGS_OPT4 := $(CFLAGS_OPT4) \
+               -Os
+
+# Flags for C and C++ files
 CFLAGS := $(CFLAGS)               \
-        -c                        \
-        -g                        \
-        -O2                       \
-        -w                        \
-        -std=gnu++17              \
-        -fpermissive              \
+        -Wall                     \
+        -Werror                   \
         -fno-exceptions           \
         -ffunction-sections       \
         -fdata-sections           \
-        -fno-threadsafe-statics   \
         -MMD                      \
         -flto                     \
         -mmcu=$(TARGET_MCU_DEVICE)
+
+# Flags for C++ files only
+# We need C++17 for std::string_view
+CPPFLAGS := $(CPPFLAGS) \
+        -std=gnu++17              \
+        -fno-threadsafe-statics
 
 # ---------------------------------------------------
 # Print compiler version flags
@@ -228,14 +299,18 @@ OBJCOPYFLAGS =  -O ihex \
 # -V                Disable automatic verify check when uploading data.
 # -x extended_param Pass extended_param to the chosen programmer implementation as an extended parameter.
 # -----------------------------------------------------------------------
+ifeq ($(TARGET_MCU_VARIANT),mega)
+AVRDUDE_MCU = m2560
+else ifeq ($(TARGET_MCU_VARIANT),nano)
+AVRDUDE_MCU = m328
+endif
 AVRDUDE_FLAGS = -C$(PATH_AVRDUDE)/avrdude.conf      \
                 -v                                  \
                 -V                                  \
-                -p m2560                            \
+                -p $(AVRDUDE_MCU)                   \
                 -c wiring                           \
-                -P COM3                             \
+                -P $(COM_PORT)                      \
                 -D
-
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -390,7 +465,7 @@ OBJ_FILENAME_EXT := obj
 # GCC
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Supported targets with GCC:
-# - ARG_TARGET_ECU win32
+# - TARGET_MCU_FAMILY x86
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 else ifeq ($(ARG_COMPILER),gcc)
 CC := $(GCC)

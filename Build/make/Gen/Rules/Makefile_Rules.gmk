@@ -4,33 +4,56 @@
 # batch operator > redirects standard output to a file
 # batch operator 2> redirects standard output and error output to a file
 #
-# To ignore errors in a recipe line, write a �-� at the beginning of the line�s text 
-# (after the initial tab). The �-� is discarded before the line is passed to the shell for execution
+# To ignore errors in a recipe line, write a '-' at the beginning of the line's text 
+# (after the initial tab). The '-' is discarded before the line is passed to the shell for execution
 #
 # Remove source file prefixes ./../ in order to make VS find the source files:
 # $(SED) s:./../::
+
+# avr-size options
+#
+#  -A|-B|-C  --format={sysv|berkeley|avr}  Select output style (default is berkeley)
+#            --mcu=<avrmcu>            MCU name for AVR format only
+#            --mlist-devices           List all supported MCUs
+#  -o|-d|-x  --radix={8|10|16}         Display numbers in octal, decimal or hex
+#  -t        --totals                  Display the total sizes (Berkeley only)
+#            --common                  Display total size for *COM* syms
+#            --target=<bfdname>        Set the binary file format
+#            @<file>                   Read options from <file>
+#  -h        --help                    Display this information
+#  -v        --version                 Display the program's version
 
 # ---------------------------------------------------
 # AVR GCC
 # ---------------------------------------------------
 ifeq ($(ARG_COMPILER),avr_gcc)
+
+get_flags_opt =\
+$(if $(filter $(notdir $(1)),$(notdir $(FILES_PRJ_OPT0))),$(CFLAGS_OPT0),\
+$(if $(filter $(notdir $(1)),$(notdir $(FILES_PRJ_OPT1))),$(CFLAGS_OPT1),\
+$(if $(filter $(notdir $(1)),$(notdir $(FILES_PRJ_OPT2))),$(CFLAGS_OPT2),\
+$(if $(filter $(notdir $(1)),$(notdir $(FILES_PRJ_OPT3))),$(CFLAGS_OPT3),\
+$(if $(filter $(notdir $(1)),$(notdir $(FILES_PRJ_OPT4))),$(CFLAGS_OPT4),$(CFLAGS_OPT))))))
+
 $(TARGET_FILENAME_BASE).elf: $(FILES_O)
 	@echo +++++ linking $(basename $@).elf +++++
 	@$(CC) $(LFLAGS) $(FILES_O) -o $(basename $@).elf
+	@echo +++++ size of $(basename $@).elf +++++
+	$(SIZE) -C --mcu=$(TARGET_MCU_DEVICE) $(TARGET_FILENAME_BASE).elf
 
 $(TARGET_FILENAME_BASE).hex: $(TARGET_FILENAME_BASE).elf
 	@echo +++++ converting $(basename $@).elf into $(basename $@).hex +++++
 	@$(OBJCOPY) $(OBJCOPYFLAGS) $(basename $@).elf $(basename $@).hex
 
 $(PATH_OBJ)/%.o: %.c
-	@echo +++++ compile $< to $@
-	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
+	@echo +++++ compile $< to $@ with option $(call get_flags_opt,$(basename $(@F)))
+	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) $(call get_flags_opt,$(basename $(@F))) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
 	@-$(CAT) $(PATH_ERR)/$(basename $(@F)).err | $(SED) s:./../::
 	# @-$(AWK) -f $(subst /,\,$(PATH_BUILD_MAKE)/gccerror.awk) $(PATH_ERR)/$(basename $(@F)).err
 
 $(PATH_OBJ)/%.o: %.cpp
-	@echo +++++ compile $< to $@
-	@-$(CC) $(CFLAGS) $(C_INCLUDES) $(C_DEFINES) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
+	@echo +++++ compile $< to $@ with option $(call get_flags_opt,$(basename $(@F)))
+	@-$(CC) $(CFLAGS) $(CPPFLAGS) $(C_INCLUDES) $(C_DEFINES) $(call get_flags_opt,$(basename $(@F))) -c $< -o $@ 2> $(PATH_ERR)/$(basename $(@F)).err
 	@-$(CAT) $(PATH_ERR)/$(basename $(@F)).err | $(SED) s:./../::
 	# @-$(AWK) -f $(PATH_BUILD_MAKE)/gccerror.awk $(PATH_ERR)/$(basename $(@F)).err
 
