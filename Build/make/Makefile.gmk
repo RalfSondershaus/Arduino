@@ -331,11 +331,11 @@ PrintCompiler:
 Directories:
 ifeq ($(wildcard $(PATH_OBJ)/*),)
 	@echo +++++ creating folder $(PATH_OBJ)
-	@-$(MKDIR) $(PATH_OBJ)
+	@-$(MKDIR) -p $(PATH_OBJ)
 endif
 ifeq ($(wildcard $(PATH_BIN)/*),)
 	@echo +++++ creating folder $(PATH_BIN)
-	@-$(MKDIR) $(PATH_BIN)
+	@-$(MKDIR) -p $(PATH_BIN)
 endif
 
 .PHONY: GenerateGitVersion
