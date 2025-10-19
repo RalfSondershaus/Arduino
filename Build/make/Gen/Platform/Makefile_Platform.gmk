@@ -77,11 +77,11 @@ TARGET_FILENAME_EXT := exe
 endif
 
 ifeq ($(ARG_TARGET_ECU),linux32)
-TARGET_FILENAME_EXT :=
+TARGET_FILENAME_EXT := out
 endif
 
 ifeq ($(ARG_TARGET_ECU),linux64)
-TARGET_FILENAME_EXT :=
+TARGET_FILENAME_EXT := out
 endif
 
 # ---------------------------------------------------
@@ -464,8 +464,8 @@ OBJ_FILENAME_EXT := obj
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # GCC
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Supported targets with GCC:
-# - TARGET_MCU_FAMILY x86
+# Supported ECUs with GCC:
+# - ARG_TARGET_ECU win32
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 else ifeq ($(ARG_COMPILER),gcc)
 CC := $(GCC)
@@ -483,15 +483,31 @@ C_INCLUDES_COMPILER =
 # ---------------------------------------------------
 # Add compiler #defines for the target.
 # ---------------------------------------------------
-ifeq ($(TARGET_MCU_FAMILY),x86)
+ifeq ($(ARG_TARGET_ECU),win32)
 C_DEFINES := $(C_DEFINES)  \
              -D WIN32      \
              -D _DEBUG     \
              -D _CONSOLE   \
              -D _UNICODE   \
              -D UNICODE
+
+else ifeq ($(ARG_TARGET_ECU),win64)
+C_DEFINES := $(C_DEFINES)  \
+             -D WIN64      \
+             -D _DEBUG     \
+             -D _CONSOLE   \
+             -D _UNICODE   \
+             -D UNICODE
+
+else ifeq ($(ARG_TARGET_ECU),linux32)
+C_DEFINES := $(C_DEFINES)
+
+else ifeq ($(ARG_TARGET_ECU),linux64)
+C_DEFINES := $(C_DEFINES)
+
 else
-$(error ------ Invalid build command line parameter ARG_TARGET_ECU $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: x86) ------
+
+$(error ------ Invalid build command line parameter ARG_TARGET_ECU $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: win32,win64,linux32,linux64) ------
 endif
 
 # ---------------------------------------------------
