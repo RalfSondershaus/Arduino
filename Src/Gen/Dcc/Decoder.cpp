@@ -51,8 +51,12 @@ namespace dcc
   ///
   /// Pushes a 0, 1, or invalid into the underlying bit stream.
   ///
-  /// @note Average run time 27 usec @ATmega2560 @16 MHz with gcc -Os
-  /// @note Average run time 14 usec @ATmega2560 @16 MHz with gcc -O3
+  /// @note Average run time 34 usec @ATmega2560 @16 MHz with gcc -O3
+  ///       Size 1342 bytes with gcc -O3
+  /// @note Average run time 35 usec @ATmega2560 @16 MHz with gcc -O2
+  ///       Size 1276 bytes with gcc -O2
+  /// @note Average run time 52 usec @ATmega2560 @16 MHz with gcc -Os
+  ///       Size 370 bytes with gcc -Os
   // ---------------------------------------------------
   void ISR_Dcc(void) noexcept
   {
