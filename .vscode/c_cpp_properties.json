@@ -16,7 +16,8 @@
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "ARDUINO"
             ],
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "g++.exe",
