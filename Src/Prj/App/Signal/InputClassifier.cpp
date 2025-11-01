@@ -19,7 +19,6 @@
  */
 
 #include "InputClassifier.h"
-#include "Cfg_Prj.h"
 #include <Rte/Rte.h>
 // #include <Util/Logger.h>
 
@@ -31,8 +30,6 @@ namespace signal
   // -----------------------------------------------------------------------------------
   void InputClassifier::init()
   {
-    const cal::classifier_array_cal_type * pCal = rte::ifc_cal_input_classifier::call();
-    classifiers.set_config(pCal);
     // log.start(1000);
   }
 
@@ -58,16 +55,5 @@ namespace signal
     //   log << " " << static_cast<int>(*it);
     // }
     // log.end();
-  }
-
-  /**
-   * @brief 
-   * 
-   */
-  rte::ret_type InputClassifier::set_config(uint8 classifier_pos)
-  {
-    const cal::classifier_array_cal_type * pCal = rte::ifc_cal_input_classifier::call();
-    classifiers.set_config(pCal, classifier_pos);
-    return rte::ret_type::OK;
   }
 }
