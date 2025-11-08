@@ -21,16 +21,16 @@
  */
 
 #include <Rte/Rte.h>
-#include "InputCommand.h"
+#include <InputCommand.h>
 
 namespace signal
 {
-  InputCommand::cmd_type InputCommand::getCmd(cal::input_type in)
+  uint8 InputCommand::getCmd(struct signal::input in)
   {
-    cmd_type cmd = rte::kInvalidCmd;
+    uint8 cmd = signal::kInvalidCmd;
     using size_type = rte::classified_values_array::size_type;
 
-    if (in.type == cal::input_type::eAdc)
+    if (in.type == signal::input::kAdc)
     {
       const size_type pos = static_cast<size_type>(in.idx);
       if (rte::ifc_classified_values::boundaryCheck(pos))
@@ -38,7 +38,7 @@ namespace signal
         rte::ifc_classified_values::readElement(pos, cmd);
       }
     }
-    else if (in.type == cal::input_type::eDcc)
+    else if (in.type == signal::input::kDcc)
     { 
       const size_type pos = static_cast<size_type>(in.idx);
       if (rte::ifc_dcc_commands::boundaryCheck(pos))

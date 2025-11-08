@@ -27,6 +27,7 @@
 #include <Hal/Gpio.h>
 #include <Hal/Timer.h>
 #include <Rte/Rte.h>
+#include <Rte/Rte_Cfg_Cod.h>
 #include <InputClassifier.h>
 #include <Util/Array.h>
 #include <Util/String.h>
@@ -180,7 +181,6 @@ void do_signal_test_red_green(
   using signal_target_array = util::array<uint8, cfg::kNrSignalTargets>;
   using size_type = signal_target_array::size_type;
   using time_type = classifier_array_type::classifier_type::time_type;
-  using cmd_type = rte::cmd_type;
 
   uint8 tmp;
 
@@ -189,69 +189,69 @@ void do_signal_test_red_green(
     time_type ms; // [ms] current time
     int nPin;      // input pin for AD value
     int nAdc;     // current AD value for pin
-    cmd_type cmd; // expected value: command on RTE
+    uint8 cmd; // expected value: command on RTE
     signal_target_array au8Curs; // expected value: target onboard duty cycles
   } step_type;
 
   const step_type aSteps[] =
   {
-      {   0,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
-    , {  10,  input_pin,             0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
-    , {  20,  input_pin,             0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
-    , {  30,  input_pin,             0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
-    , {  40,  input_pin,             0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
-    , {  50,  input_pin,             0, rte::kInvalidCmd, { 16,  16,   0,   0,   0 } }
-    , {  60,  input_pin,             0, rte::kInvalidCmd, { 27,  27,   0,   0,   0 } }
-    , {  70,  input_pin,             0, rte::kInvalidCmd, { 48,  48,   0,   0,   0 } }
-    , {  80,  input_pin,             0, rte::kInvalidCmd, { 82,  82,   0,   0,   0 } }
-    , {  90,  input_pin,             0, rte::kInvalidCmd, {145, 145,   0,   0,   0 } }
-    , { 100,  input_pin,             0, rte::kInvalidCmd, {250, 250,   0,   0,   0 } }
-    , { 510,  input_pin, cal::kGreenLo, rte::kInvalidCmd, {255, 255,   0,   0,   0 }}
-    , { 560,  input_pin, cal::kGreenLo,                1, {145, 145,   0,   0,   0 }}
-    , { 570,  input_pin, cal::kGreenLo,                1, { 84,  84,   0,   0,   0 }}
-    , { 580,  input_pin, cal::kGreenLo,                1, { 48,  48,   0,   0,   0 }}
-    , { 590,  input_pin, cal::kGreenLo,                1, { 28,  28,   0,   0,   0 }}
-    , { 600,  input_pin, cal::kGreenLo,                1, { 16,  16,   0,   0,   0 }}
-    , { 610,  input_pin, cal::kGreenLo,                1, {  9,   9,   0,   0,   0 }}
-    , { 620,  input_pin, cal::kGreenLo,                1, {  5,   5,   0,   0,   0 }}
-    , { 630,  input_pin, cal::kGreenLo,                1, {  3,   3,   0,   0,   0 }}
-    , { 640,  input_pin, cal::kGreenLo,                1, {  2,   2,   0,   0,   0 }}
-    , { 650,  input_pin, cal::kGreenLo,                1, {  0,   0,   0,   0,   0 }}
-    , { 660,  input_pin, cal::kGreenLo,                1, {  0,   0,   2,   0,   0 }}
-    , { 670,  input_pin, cal::kGreenLo,                1, {  0,   0,   3,   0,   0 }}
-    , { 680,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   5,   0,   0 } }
-    , { 690,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   9,   0,   0 } }
-    , { 700,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  16,   0,   0 } }
-    , { 710,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  27,   0,   0 } }
-    , { 720,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  48,   0,   0 } }
-    , { 730,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  82,   0,   0 } }
-    , { 740,  input_pin,             0, rte::kInvalidCmd, {  0,   0, 145,   0,   0 } }
-    , { 750,  input_pin,             0, rte::kInvalidCmd, {  0,   0, 250,   0,   0 } }
-    , { 760,  input_pin,   cal::kRedLo, rte::kInvalidCmd, {  0,   0, 255,   0,   0 } }
-    , { 810,  input_pin,   cal::kRedLo,                0, {  0,   0, 145,   0,   0 } }
-    , { 820,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  84,   0,   0 } }
-    , { 830,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  48,   0,   0 } }
-    , { 840,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  28,   0,   0 } }
-    , { 850,  input_pin,             0, rte::kInvalidCmd, {  0,   0,  16,   0,   0 } }
-    , { 860,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   9,   0,   0 } }
-    , { 870,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   5,   0,   0 } }
-    , { 880,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   3,   0,   0 } }
-    , { 890,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   2,   0,   0 } }
-    , { 900,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
-    , { 910,  input_pin,             0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
-    , { 920,  input_pin,             0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
-    , { 930,  input_pin,             0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
-    , { 940,  input_pin,             0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
-    , { 950,  input_pin,             0, rte::kInvalidCmd, { 16,  16,   0,   0,   0 } }
-    , { 960,  input_pin,             0, rte::kInvalidCmd, { 27,  27,   0,   0,   0 } }
-    , { 970,  input_pin,             0, rte::kInvalidCmd, { 48,  48,   0,   0,   0 } }
-    , { 980,  input_pin,             0, rte::kInvalidCmd, { 82,  82,   0,   0,   0 } }
-    , { 990,  input_pin,             0, rte::kInvalidCmd, {145, 145,   0,   0,   0 } }
-    , {1000,  input_pin,             0, rte::kInvalidCmd, {250, 250,   0,   0,   0 } }
+      {   0,  input_pin,             0, signal::kInvalidCmd, {  0,   0,   0,   0,   0 } }
+    , {  10,  input_pin,             0, signal::kInvalidCmd, {  2,   2,   0,   0,   0 } }
+    , {  20,  input_pin,             0, signal::kInvalidCmd, {  3,   3,   0,   0,   0 } }
+    , {  30,  input_pin,             0, signal::kInvalidCmd, {  5,   5,   0,   0,   0 } }
+    , {  40,  input_pin,             0, signal::kInvalidCmd, {  9,   9,   0,   0,   0 } }
+    , {  50,  input_pin,             0, signal::kInvalidCmd, { 16,  16,   0,   0,   0 } }
+    , {  60,  input_pin,             0, signal::kInvalidCmd, { 27,  27,   0,   0,   0 } }
+    , {  70,  input_pin,             0, signal::kInvalidCmd, { 48,  48,   0,   0,   0 } }
+    , {  80,  input_pin,             0, signal::kInvalidCmd, { 82,  82,   0,   0,   0 } }
+    , {  90,  input_pin,             0, signal::kInvalidCmd, {145, 145,   0,   0,   0 } }
+    , { 100,  input_pin,             0, signal::kInvalidCmd, {250, 250,   0,   0,   0 } }
+    , { 510,  input_pin, cal::kGreenLo, signal::kInvalidCmd, {255, 255,   0,   0,   0 }}
+    , { 560,  input_pin, cal::kGreenLo,                    1, {145, 145,   0,   0,   0 }}
+    , { 570,  input_pin, cal::kGreenLo,                    1, { 84,  84,   0,   0,   0 }}
+    , { 580,  input_pin, cal::kGreenLo,                    1, { 48,  48,   0,   0,   0 }}
+    , { 590,  input_pin, cal::kGreenLo,                    1, { 28,  28,   0,   0,   0 }}
+    , { 600,  input_pin, cal::kGreenLo,                    1, { 16,  16,   0,   0,   0 }}
+    , { 610,  input_pin, cal::kGreenLo,                    1, {  9,   9,   0,   0,   0 }}
+    , { 620,  input_pin, cal::kGreenLo,                    1, {  5,   5,   0,   0,   0 }}
+    , { 630,  input_pin, cal::kGreenLo,                    1, {  3,   3,   0,   0,   0 }}
+    , { 640,  input_pin, cal::kGreenLo,                    1, {  2,   2,   0,   0,   0 }}
+    , { 650,  input_pin, cal::kGreenLo,                    1, {  0,   0,   0,   0,   0 }}
+    , { 660,  input_pin, cal::kGreenLo,                    1, {  0,   0,   2,   0,   0 }}
+    , { 670,  input_pin, cal::kGreenLo,                    1, {  0,   0,   3,   0,   0 }}
+    , { 680,  input_pin,             0, signal::kInvalidCmd, {  0,   0,   5,   0,   0 } }
+    , { 690,  input_pin,             0, signal::kInvalidCmd, {  0,   0,   9,   0,   0 } }
+    , { 700,  input_pin,             0, signal::kInvalidCmd, {  0,   0,  16,   0,   0 } }
+    , { 710,  input_pin,             0, signal::kInvalidCmd, {  0,   0,  27,   0,   0 } }
+    , { 720,  input_pin,             0, signal::kInvalidCmd, {  0,   0,  48,   0,   0 } }
+    , { 730,  input_pin,             0, signal::kInvalidCmd, {  0,   0,  82,   0,   0 } }
+    , { 740,  input_pin,             0, signal::kInvalidCmd, {  0,   0, 145,   0,   0 } }
+    , { 750,  input_pin,             0, signal::kInvalidCmd, {  0,   0, 250,   0,   0 } }
+    , { 760,  input_pin,   cal::kRedLo, signal::kInvalidCmd, {  0,   0, 255,   0,   0 } }
+    , { 810,  input_pin,   cal::kRedLo,                    0, {  0,   0, 145,   0,   0 } }
+    , { 820,  input_pin,             0, signal::kInvalidCmd, {  0,   0,  84,   0,   0 } }
+    , { 830,  input_pin,             0, signal::kInvalidCmd, {  0,   0,  48,   0,   0 } }
+    , { 840,  input_pin,             0, signal::kInvalidCmd, {  0,   0,  28,   0,   0 } }
+    , { 850,  input_pin,             0, signal::kInvalidCmd, {  0,   0,  16,   0,   0 } }
+    , { 860,  input_pin,             0, signal::kInvalidCmd, {  0,   0,   9,   0,   0 } }
+    , { 870,  input_pin,             0, signal::kInvalidCmd, {  0,   0,   5,   0,   0 } }
+    , { 880,  input_pin,             0, signal::kInvalidCmd, {  0,   0,   3,   0,   0 } }
+    , { 890,  input_pin,             0, signal::kInvalidCmd, {  0,   0,   2,   0,   0 } }
+    , { 900,  input_pin,             0, signal::kInvalidCmd, {  0,   0,   0,   0,   0 } }
+    , { 910,  input_pin,             0, signal::kInvalidCmd, {  2,   2,   0,   0,   0 } }
+    , { 920,  input_pin,             0, signal::kInvalidCmd, {  3,   3,   0,   0,   0 } }
+    , { 930,  input_pin,             0, signal::kInvalidCmd, {  5,   5,   0,   0,   0 } }
+    , { 940,  input_pin,             0, signal::kInvalidCmd, {  9,   9,   0,   0,   0 } }
+    , { 950,  input_pin,             0, signal::kInvalidCmd, { 16,  16,   0,   0,   0 } }
+    , { 960,  input_pin,             0, signal::kInvalidCmd, { 27,  27,   0,   0,   0 } }
+    , { 970,  input_pin,             0, signal::kInvalidCmd, { 48,  48,   0,   0,   0 } }
+    , { 980,  input_pin,             0, signal::kInvalidCmd, { 82,  82,   0,   0,   0 } }
+    , { 990,  input_pin,             0, signal::kInvalidCmd, {145, 145,   0,   0,   0 } }
+    , {1000,  input_pin,             0, signal::kInvalidCmd, {250, 250,   0,   0,   0 } }
   };
 
   classifier_array_type classifiers;
-  cal::input_type in;
+  struct signal::input in;
   size_t nStep;
 
   // Initialize
@@ -264,20 +264,20 @@ void do_signal_test_red_green(
   rte::start();
 
   // Initialize EEPROM with ROM default values
-  rte::ifc_cal_set_defaults::call();
+  rte::ifc_cal_set_defaults();
   // And now activate signal kSignalPos
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
+  rte::set_cv(cal::cv::kSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
   // ... with first output pin first_output_pin
-  tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, first_output_pin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + signal_pos, tmp);
+  tmp = cal::signal::make_signal_first_output(cal::signal::kOnboard, first_output_pin);
+  rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, tmp);
   // ... with ADC input pin input_pin
-  tmp = cal::signal::make_signal_input(cal::signal::values::kInputType_ADC, input_pin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + signal_pos, tmp);
+  tmp = cal::signal::make_signal_input(cal::signal::kAdc, input_pin);
+  rte::set_cv(cal::cv::kSignalInputBase + signal_pos, tmp);
   // ... with classifier type classifier_type
   tmp = classifier_type;
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + signal_pos, tmp);
+  rte::set_cv(cal::cv::kSignalInputClassifierTypeBase + signal_pos, tmp);
 
-  in.type = cal::input_type::eAdc;
+  in.type = cal::signal::kAdc;
   in.idx = signal_pos;
 
   for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
@@ -287,18 +287,18 @@ void do_signal_test_red_green(
     hal::stubs::micros = 1000U * hal::stubs::millis;
     rte::exec();
     printRte();
-    rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
+    uint8 cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
-    uint8 target_pos = rte::calm.signals.at(signal_pos).first_target.idx;
+    uint8 target_pin = cal::signal::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
       // Get pins for current signal target
-      rte::intensity8_255 pwm_rte;
-      rte::intensity8_255 pwm_hal;
+      util::intensity8_255 pwm_rte;
+      util::intensity8_255 pwm_hal;
       // Read PWM for that pin
-      rte::ifc_onboard_target_duty_cycles::readElement(target_pos, pwm_rte);
-      pwm_hal = hal::stubs::analogWrite[target_pos++];
+      rte::ifc_onboard_target_duty_cycles::readElement(target_pin, pwm_rte);
+      pwm_hal = hal::stubs::analogWrite[target_pin++];
       log << std::setw(3) << (int)pwm_rte << ", ";
       EXPECT_EQ((uint8)pwm_rte, aSteps[nStep].au8Curs[i]);
       EXPECT_EQ((uint8)pwm_hal, aSteps[nStep].au8Curs[i]);
@@ -418,24 +418,23 @@ void do_signal_test_all(
   using signal_target_array = util::array<uint8, cfg::kNrSignalTargets>;
   using size_type = signal_target_array::size_type;
   using time_type = classifier_array_type::classifier_type::time_type;
-  using cmd_type = rte::cmd_type;
 
   typedef struct
   {
     time_type ms; // [ms] current time
     int nPin;      // input pin for AD value
     int nAdc;     // current AD value for pin
-    cmd_type cmd; // expected value: command on RTE
+    uint8 cmd; // expected value: command on RTE
     signal_target_array au8Curs; // expected value: target onboard duty cycles
   } step_type;
 
   const step_type aSteps[] =
   {
-      {   0,  input_pin,             0, rte::kInvalidCmd, {  0,   0,   0,   0,   0 } }
-    , {  10,  input_pin,             0, rte::kInvalidCmd, {  2,   2,   0,   0,   0 } }
-    , {  20,  input_pin,             0, rte::kInvalidCmd, {  3,   3,   0,   0,   0 } }
-    , {  30,  input_pin,             0, rte::kInvalidCmd, {  5,   5,   0,   0,   0 } }
-    , {  40,  input_pin,             0, rte::kInvalidCmd, {  9,   9,   0,   0,   0 } }
+      {   0,  input_pin,             0, signal::kInvalidCmd, {  0,   0,   0,   0,   0 } }
+    , {  10,  input_pin,             0, signal::kInvalidCmd, {  2,   2,   0,   0,   0 } }
+    , {  20,  input_pin,             0, signal::kInvalidCmd, {  3,   3,   0,   0,   0 } }
+    , {  30,  input_pin,             0, signal::kInvalidCmd, {  5,   5,   0,   0,   0 } }
+    , {  40,  input_pin,             0, signal::kInvalidCmd, {  9,   9,   0,   0,   0 } }
     , {  50,  input_pin,             0,                4, {  5,   5,   0,   0,   0 } }
     , {  60,  input_pin,             0,                4, {  3,   3,   0,   0,   0 } }
     , {  70,  input_pin,             0,                4, {  2,   2,   0,   0,   0 } }
@@ -460,7 +459,7 @@ void do_signal_test_all(
   };
 
   classifier_array_type classifiers;
-  cal::input_type in;
+  struct signal::input in;
   size_t nStep;
   uint8 tmp;
 
@@ -475,24 +474,26 @@ void do_signal_test_all(
 
   // Initialize EEPROM with ROM default values (in case another unit test changed 
   // coding data before)
-  rte::ifc_cal_set_defaults::call();
+  rte::ifc_cal_set_defaults();
   // And now activate signal signal_pos
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
+  rte::set_cv(cal::cv::kSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
   // ... with first output pin first_output_pin
-  tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, first_output_pin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + signal_pos, tmp);
+  tmp = cal::signal::make_signal_first_output(cal::signal::kOnboard, first_output_pin);
+  rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, tmp);
   // ... with ADC input pin input_pin
-  tmp = cal::signal::make_signal_input(cal::signal::values::kInputType_ADC, input_pin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + signal_pos, tmp);
+  tmp = cal::signal::make_signal_input(cal::signal::kAdc, input_pin);
+  rte::set_cv(cal::cv::kSignalInputBase + signal_pos, tmp);
   // ... with classifier type classifier_type
   tmp = classifier_type;
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + signal_pos, tmp);
+  rte::set_cv(cal::cv::kSignalInputClassifierTypeBase + signal_pos, tmp);
   // Classifier type 0 shall identify class 4 for AD value 0, so set limits accordingly.
-  rte::ifc_cal_set_cv::call(cal::cv::eClassifierType1LoLimitBase + 4, 0);
-  rte::ifc_cal_set_cv::call(cal::cv::eClassifierType1HiLimitBase + 4, 255);
+  // + 1 to skip debounce time
+  // + 4 for class 4
+  rte::set_cv(cal::cv::kClassifierBase + 1 + 4, 0);
+  rte::set_cv(cal::cv::kClassifierBase + 1 + 4, 255);
 
   // Prepare RTE call to get command for signal_pos
-  in.type = cal::input_type::eAdc;
+  in.type = cal::signal::kAdc;
   in.idx = signal_pos;
 
   for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
@@ -503,18 +504,18 @@ void do_signal_test_all(
     rte::exec();
     printRte();
     // Get command for kClassifierPos
-    rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
+    uint8 cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
-    uint8 target_pos = rte::calm.signals.at(signal_pos).first_target.idx;
+    uint8 target_pin = cal::signal::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
       // Get pins for current signal target
-      rte::intensity8_255 pwm_rte;
-      rte::intensity8_255 pwm_hal;
+      util::intensity8_255 pwm_rte;
+      util::intensity8_255 pwm_hal;
       // Read PWM for that pin
-      rte::ifc_onboard_target_duty_cycles::readElement(target_pos, pwm_rte);
-      pwm_hal = hal::stubs::analogWrite[target_pos++];
+      rte::ifc_onboard_target_duty_cycles::readElement(target_pin, pwm_rte);
+      pwm_hal = hal::stubs::analogWrite[target_pin++];
       log << std::setw(3) << (int)pwm_rte << ", ";
       EXPECT_EQ((uint8)pwm_rte, aSteps[nStep].au8Curs[i]);
       EXPECT_EQ((uint8)pwm_hal, aSteps[nStep].au8Curs[i]);
@@ -602,7 +603,6 @@ void do_signal_dcc_test_aspects_2_3(
   using signal_target_array = util::array<uint8, cfg::kNrSignalTargets>;
   using size_type = signal_target_array::size_type;
   using time_type = classifier_array_type::classifier_type::time_type;
-  using cmd_type = rte::cmd_type;
 
   uint8 tmp;
 
@@ -611,7 +611,7 @@ void do_signal_dcc_test_aspects_2_3(
     time_type ms; // [ms] current time
     uint8 byte1;
     uint8 byte2;
-    cmd_type cmd; // expected value: command on RTE
+    uint8 cmd; // expected value: command on RTE
     signal_target_array au8Curs; // expected value: target onboard duty cycles
   } step_type;
 
@@ -656,7 +656,7 @@ void do_signal_dcc_test_aspects_2_3(
         , { 320,  byte0, 0b11110010, 2, {  0,   0, 255, 255,   0 } }
     };
   classifier_array_type classifiers;
-  cal::input_type in;
+  struct signal::input in;
   size_t nStep;
 
   // Initialize
@@ -668,17 +668,17 @@ void do_signal_dcc_test_aspects_2_3(
   rte::start();
 
   // Initialize EEPROM with ROM default values
-  rte::ifc_cal_set_defaults::call();
+  rte::ifc_cal_set_defaults();
   // And now activate signal signal_pos
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
+  rte::set_cv(cal::cv::kSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
   // ... with first output pin first_output_pin
-  tmp = cal::signal::make_signal_first_output(cal::signal::values::kOutputType_Onboard, first_output_pin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + signal_pos, tmp);
+  tmp = cal::signal::make_signal_first_output(cal::signal::kOnboard, first_output_pin);
+  rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, tmp);
   // ... with DCC input
-  tmp = cal::signal::make_signal_input(cal::signal::values::kInputType_DCC, 0);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + signal_pos, tmp);
+  tmp = cal::signal::make_signal_input(cal::signal::kDcc, 0);
+  rte::set_cv(cal::cv::kSignalInputBase + signal_pos, tmp);
 
-  in.type = cal::input_type::eDcc;
+  in.type = cal::signal::kDcc;
   in.idx = signal_pos;
 
   for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
@@ -695,16 +695,16 @@ void do_signal_dcc_test_aspects_2_3(
     hal::stubs::micros = 1000U * hal::stubs::millis;
     rte::exec();
     printRte();
-    rte::cmd_type cmd = rte::ifc_rte_get_cmd::call(in);
+    uint8 cmd = rte::ifc_rte_get_cmd::call(in);
     log << std::setw(3) << (int)cmd << " - ";
     EXPECT_EQ(cmd, aSteps[nStep].cmd);
-    uint8 target_pos = rte::calm.signals.at(signal_pos).first_target.idx;
+    uint8 target_pin = cal::signal::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
     for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
     {
-      rte::intensity8_255 pwm_rte;
-      rte::intensity8_255 pwm_hal;
-      rte::ifc_onboard_target_duty_cycles::readElement(target_pos, pwm_rte);
-      pwm_hal = hal::stubs::analogWrite[target_pos++];
+      util::intensity8_255 pwm_rte;
+      util::intensity8_255 pwm_hal;
+      rte::ifc_onboard_target_duty_cycles::readElement(target_pin, pwm_rte);
+      pwm_hal = hal::stubs::analogWrite[target_pin++];
       log << std::setw(3) << (int)pwm_rte << ", ";
       EXPECT_EQ((uint8)pwm_rte, aSteps[nStep].au8Curs[i]);
       EXPECT_EQ((uint8)pwm_hal, aSteps[nStep].au8Curs[i]);

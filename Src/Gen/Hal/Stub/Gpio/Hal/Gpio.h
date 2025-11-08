@@ -41,15 +41,18 @@
 // TODO Check if these #defines can be used from WinArduino.h
 #define INPUT 0x0
 #define OUTPUT 0x1
+#define INPUT_PULLUP 0x2
 
 #define HIGH 0x1
 #define LOW  0x0
 
 namespace hal
 {
+    static constexpr uint8_t kNrDigitalPins = 70;
+
     namespace stubs
     {
-        constexpr int kNrPins = 60;
+        constexpr int kNrPins = kNrDigitalPins;
 
         extern util::array<uint8, kNrPins> pinMode;
         extern util::array<uint8, kNrPins> digitalWrite;
@@ -70,6 +73,40 @@ namespace hal
      * @brief Initialize GPIO stubs with 0
      */
     void init_gpio();
+
+    /**
+     * @brief Configuration structure for GPIO pins.
+     * 
+     * @note The size of pin_array is kNrDigitalPins.
+     */
+    struct GpioConfig
+    {
+        using pin_array = util::array<uint8_t, kNrDigitalPins>;
+        /**
+         * @brief Array of pin modes for each GPIO pin.
+         * 
+         * Possible values for each pin mode are:
+         * - INPUT
+         * - OUTPUT
+         * - INPUT_PULLUP
+         */
+        pin_array pin_modes;
+    };
+
+    /**
+     * @brief Setup GPIO pins according to the provided configuration.
+     * @param config The GPIO configuration.
+     * 
+     * This function sets the pin modes for all GPIO pins based on the provided configuration.
+     * Each pin's mode is set using the Arduino pinMode function.
+     */
+    inline void setup_gpio_pins(const struct GpioConfig& config)
+    {
+        for (size_t pin = 0; pin < kNrDigitalPins; pin++)
+        {
+            pinMode(pin, config.pin_modes[pin]);
+        }
+    }
 }
 
 #endif // HAL_GPIO_H

@@ -71,9 +71,10 @@ namespace signal
     for (auto it = ramps_onboard.begin(); it != ramps_onboard.end(); it++)
     {
       const intensity16_type intensity16{ it->step() };
-      const intensity8_255_type intensity{ rte::convert<intensity8_255_type, intensity16_type>(intensity16) };
+      const intensity8_255_type intensity{ util::convert<intensity8_255_type, intensity16_type>(intensity16) };
       const intensity8_255_type pwm{ aunIntensity2Pwm[intensity] };
       rte::ifc_onboard_target_duty_cycles::writeElement(pos, pwm);
+      hal::analogWrite(pos, static_cast<int>(pwm));
       pos++;
     }
   }
@@ -87,19 +88,19 @@ namespace signal
   /// @param intensity [0x0000 - 0x8000] Target intensity with 0x0000 = 0%, 0x8000 = 100%
   /// @param slope [(0x0000 - 0x8000)/ms] Slope / speed
   // -----------------------------------------------------------------------------------
-  LedRouter::ret_type LedRouter::setIntensityAndSpeed(const target_type tgt, const intensity16_type intensity, const speed16_ms_type slope)
+  LedRouter::ret_type LedRouter::setIntensityAndSpeed(const struct signal::target tgt, const intensity16_type intensity, const speed16_ms_type slope)
   {
     switch (tgt.type)
     {
-    case target_type::eOnboard:
+    case signal::target::kOnboard:
     {
-      if (ramps_onboard.check_boundary(tgt.idx))
+      if (ramps_onboard.check_boundary(tgt.pin))
       {
-        ramps_onboard[tgt.idx].init_from_slope(intensity, slope, kCycleTime);
+        ramps_onboard[tgt.pin].init_from_slope(intensity, slope, kCycleTime);
       }
     }
     break;
-    case target_type::eExternal:
+    case signal::target::kExternal:
       break;
     default:
       break;
@@ -114,19 +115,19 @@ namespace signal
   /// @param tgt Output port
   /// @param slope [(0x0000 - 0x8000)/ms] Slope / speed
   // -----------------------------------------------------------------------------------
-  LedRouter::ret_type LedRouter::setSpeed(const target_type tgt, const speed16_ms_type slope)
+  LedRouter::ret_type LedRouter::setSpeed(const struct signal::target tgt, const speed16_ms_type slope)
   {
     switch (tgt.type)
     {
-    case target_type::eOnboard:
+    case signal::target::kOnboard:
     {
-      if (ramps_onboard.check_boundary(tgt.idx))
+      if (ramps_onboard.check_boundary(tgt.pin))
       {
-        ramps_onboard[tgt.idx].set_slope(slope, kCycleTime);
+        ramps_onboard[tgt.pin].set_slope(slope, kCycleTime);
       }
     }
     break;
-    case target_type::eExternal:
+    case signal::target::kExternal:
       break;
     default:
       break;
@@ -140,19 +141,19 @@ namespace signal
   /// @param tgt Output port
   /// @param intensity [0x0000 - 0x8000] Target intensity with 0x0000 = 0%, 0x8000 = 100%
   // -----------------------------------------------------------------------------------
-  LedRouter::ret_type LedRouter::setIntensity(const target_type tgt, const intensity16_type intensity)
+  LedRouter::ret_type LedRouter::setIntensity(const struct signal::target tgt, const intensity16_type intensity)
   {
     switch (tgt.type)
     {
-    case target_type::eOnboard:
+    case signal::target::kOnboard:
     {
-      if (ramps_onboard.check_boundary(tgt.idx))
+      if (ramps_onboard.check_boundary(tgt.pin))
       {
-        ramps_onboard[tgt.idx].set_tgt(intensity);
+        ramps_onboard[tgt.pin].set_tgt(intensity);
       }
     }
     break;
-    case target_type::eExternal:
+    case signal::target::kExternal:
       break;
     default:
       break;

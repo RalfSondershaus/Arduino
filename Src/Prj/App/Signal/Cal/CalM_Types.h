@@ -1,5 +1,5 @@
 /**
- * @file Cal/CalM_Type.h
+ * @file Cal/CalM_Types.h
  *
  * @brief Project specific calibration types.
  *
@@ -18,10 +18,10 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CALM_TYPE_H_
-#define CALM_TYPE_H_
+#ifndef CALM_TYPES_H_
+#define CALM_TYPES_H_
 
-#include <Cal/CalM_Type_Prj.h>
+#include <Cal/CalM_Types_Prj.h>
 
 /**
  * @brief For type safety: a CV
@@ -32,4 +32,4 @@ struct CV
     uint8 val;
 };
 
-#endif // CALM_TYPE_H_
+#endif // CALM_TYPES_H_

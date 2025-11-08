@@ -41,45 +41,6 @@
 
 namespace util
 {
-    #if 0
-    namespace cal
-    {
-        /**
-         * @brief Get the debounce time [ms]
-         * 
-         * @return debounce time [ms]
-         */
-        uint16 get_debounce_time_ms();
-
-        template <int NrClasses>
-        struct classifier
-        {
-            uint8 debounce_time;                     ///< [10 ms] Debounce time until a class is classified: 0 sec ... 2.55 sec
-            util::array<uint8, NrClasses> lo_limits; ///< Lower limits for classes [0, 255]. Needs to be upscaled to match the AD value resolution.
-            util::array<uint8, NrClasses> hi_limits; ///< Upper limits for classes [0, 255]. Needs to be upscaled to match the AD value resolution.
-        };
-
-        template <int NrClasses>
-        struct classifier_array_element
-        {
-            using classifier_type = classifier<NrClasses>;
-
-            uint8 pin;                                   ///< Pin of AD channel (such as A0)
-            util::ptr<const classifier_type> limits_ptr; ///< Pointer to debounce and limits.
-                                                         ///< A pointer is used because it can be shared between classifiers.
-        };
-
-        /// Coding data for an array of classifiers
-        template <int NrClassifiers, int NrClasses>
-        struct classifier_array
-        {
-            using classifier_array_element_type = classifier_array_element<NrClasses>;
-
-            util::array<classifier_array_element_type, NrClassifiers> classifiers; ///< pin, debounce and limits
-        };
-    } // namespace cal
-     #endif
-
     /**
      * @brief Template class for classifying analog input values into discrete classes.
      * 

@@ -7,19 +7,12 @@
             "description": "Select project name",
             "default": "Ut_String",
             "options": [ 
-                "UnitTest/Gen/Util/Ut_Fix_Deque",
-                "UnitTest/Gen/Util/Ut_Fix_Queue",
-                "UnitTest/Gen/Util/Ut_Packet",
-                "UnitTest/Gen/Util/Ut_PacketExtractor",
-                "UnitTest/Gen/Util/Ut_Ramp",
-                "UnitTest/Gen/Util/Ut_Sstream",
                 "Ut_Bitset",
+                "Ut_InputClassifier",
                 "Ut_String",
                 "Ut_Signal_Com",
                 "Ut_Signal",
                 "Ut_Sstream",
-                "UnitTest/Gen/Util/Ut_String_view",
-                "UnitTest/Gen/Util/Ut_Vector",
             ]
         }
     ],

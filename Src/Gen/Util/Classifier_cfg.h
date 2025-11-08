@@ -52,14 +52,14 @@ namespace util
          * @param classifier_type Classifier type index which selects the calibration limits to be used
          * @return debounce time [ms]
          */
-        inline uint16 get_debounce_time_ms(uint8 classifier_type) { (void)classifier_type; return 10U; }
+        static inline uint16 get_debounce_time_ms(uint8 classifier_type) { (void)classifier_type; return 10U; }
 
         /**
          * @brief Get the classifier type which selects the calibration limits to be used
          * @param idx In an array of classifiers, the index of the classifier
          * @return uint8 Classifier type for classifier at index idx
          */
-        inline uint8 get_classifier_type(uint8 idx) { (void)idx; return 0; }
+        static inline uint8 get_classifier_type(uint8 idx) { (void)idx; return 0; }
 
         /**
          * @brief Get the default lower limit for the given class
@@ -67,7 +67,7 @@ namespace util
          * @param classifier_type Classifier type index which selects the calibration limits to be used
          * @return uint8 Lower limit for the class
          */
-        uint8 get_lo_limit(uint8 classifier_type, uint8 class_idx) 
+        static inline uint8 get_lo_limit(uint8 classifier_type, uint8 class_idx) 
         { 
             (void)classifier_type; 
             (void)class_idx;
@@ -80,7 +80,7 @@ namespace util
          * @param classifier_type Classifier type index which selects the calibration limits to be used
          * @return uint8 Upper limit for the class
          */
-        static uint8 get_hi_limit(uint8 classifier_type, uint8 class_idx)
+        static inline uint8 get_hi_limit(uint8 classifier_type, uint8 class_idx)
         {
             (void)classifier_type;
             (void)class_idx;
@@ -92,7 +92,7 @@ namespace util
          * @param idx In an array of classifiers, the index of the classifier
          * @return uint8 Upper limit for the class
          */
-        inline uint8 get_pin(uint8 idx) { (void)idx; return 0; }
+        static inline uint8 get_pin(uint8 idx) { (void)idx; return 0; }
 
     } // namespace classifier_cal
 

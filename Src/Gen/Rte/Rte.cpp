@@ -25,8 +25,8 @@
 #include <Util/String_view.h>
 #include <Util/Timer.h>
 #include <Rte/Rte.h>
-#include <Rte/Rte_Type_Ifc.h>
-#include <Rte/Rte_Type_Runable.h>
+#include <Rte/Rte_Types_Ifc.h>
+#include <Rte/Rte_Types_Runable.h>
 
 namespace rte
 {

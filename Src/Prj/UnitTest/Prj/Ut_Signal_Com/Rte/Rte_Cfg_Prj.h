@@ -24,7 +24,7 @@
 
 
 #include <InputClassifier.h>
- #include <Cal/CalM.h>
+#include <Cal/CalM.h>
 #include <Com/ComR.h>
 
 RTE_DEF_START
@@ -53,7 +53,7 @@ RTE_DEF_PORT_CS(Ifc_Cal_Signal             , ifc_cal_signal              , calm,
 RTE_DEF_PORT_CS(Ifc_Cal_Set_CV             , ifc_cal_set_cv              , calm, &cal::CalM::set_cv)
 RTE_DEF_PORT_CS(Ifc_Cal_Get_CV             , ifc_cal_get_cv              , calm, &cal::CalM::get_cv)
 RTE_DEF_PORT_CS(Ifc_Cal_Set_Defaults       , ifc_cal_set_defaults        , calm, &cal::CalM::set_defaults)
-RTE_DEF_PORT_CS(Ifc_Rte_UpdateConfigForClassifier, ifc_rte_update_config_for_classifier, input_classifier, &signal::InputClassifier::set_config)
+//RTE_DEF_PORT_CS(Ifc_Rte_UpdateConfigForClassifier, ifc_rte_update_config_for_classifier, input_classifier, &signal::InputClassifier::set_config)
 RTE_DEF_PORT_CS_END
 
 RTE_DEF_END

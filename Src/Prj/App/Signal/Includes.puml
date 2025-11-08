@@ -1,0 +1,24 @@
+@startuml
+package "InputClassifier.cpp" {
+    class InputClassifier
+}
+
+package "InputClassifier.h" {
+    
+    class InputClassifier
+}
+package "Rte.h" {
+    
+}
+[InputClassifier.cpp] --> [InputClassifier.h]
+[InputClassifier.cpp] --> [Rte.h]
+
+package "RTE Dependencies" {
+    [ifc_classified_values]
+    [ifc_ad_values]
+}
+
+[Rte.h] --> [ifc_classified_values]
+[Rte.h] --> [ifc_ad_values]
+
+@enduml

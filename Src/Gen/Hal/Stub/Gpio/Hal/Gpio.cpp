@@ -48,6 +48,5 @@ namespace hal
         stubs::digitalRead.fill(0);
         stubs::analogWrite.fill(0);
         stubs::analogRead.fill(0);
-        //stubs::pin_pwm.fill(false);
     }
 }

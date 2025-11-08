@@ -20,12 +20,13 @@
 
 #include <Cfg_Prj.h>
 #include <Platform_Limits.h>
-#include <Cal/CalM_Type.h>
+#include <Cal/CalM_Types.h>
 #include <Com/AsciiCom.h>
 #include <Util/Sstream.h>
 #include <Util/String_view.h>
 #include <Util/Timer.h>
 #include <Rte/Rte.h>
+#include <Rte/Rte_Cfg_Cod.h>
 
 namespace com
 {
@@ -345,10 +346,8 @@ namespace com
             if (value < platform::numeric_limits<uint8>::max_())
             {
                 new_cv.val = static_cast<uint8>(value);
-                if (rte::ifc_cal_set_cv::call(new_cv.id, new_cv.val) == rte::ret_type::OK)
-                {
-                    ret = eOK;
-                }
+                rte::set_cv(new_cv.id, new_cv.val);
+                ret = eOK;
             }
             else
             {
@@ -385,8 +384,9 @@ namespace com
         // (and if the last element doesn't have trailing white spaces).
         if (!st.fail())
         {
-            if (rte::ifc_cal_get_cv::call(cv.id, &cv.val) == rte::ret_type::OK)
+            if (rte::is_cv_id_valid(cv.id))
             {
+                cv.val = rte::get_cv(cv.id);
                 util::basic_string<4, char> tmp;
                 util::to_string(static_cast<int>(cv.val), tmp);
                 response.append(" ");
@@ -602,7 +602,7 @@ namespace com
         (void)st;
         (void)response;
 
-        return (rte::ifc_cal_set_defaults::call() == rte::ret_type::OK) ? eOK : eERR_EEPROM;
+        return rte::ifc_cal_set_defaults() ? eOK : eERR_EEPROM;
     }
 
 } // namespace com
