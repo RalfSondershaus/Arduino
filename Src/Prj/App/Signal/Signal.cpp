@@ -40,11 +40,11 @@ namespace signal
         uint8 aspect_cur;
         size_t pos;
         util::intensity16 intensity;
-        struct signal_cal::signal_aspect signal_asp;
+        struct signal::signal_aspect signal_asp;
 
         const uint8 signal_id = signal_cal::get_signal_id(signal_idx);
 
-        uint8 cmd = signal_rte::get_cmd(signal_cal::get_input(signal_idx));
+        uint8 cmd = signal_rte::get_cmd(signal_cal::get_input_cmd(signal_idx));
 
         // switch on RED if a valid command hasn't been received since system start.
         if ((!signal_rte::isValid(cmd)) && (isInitialState(aspect_tgt)))

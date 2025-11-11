@@ -24,9 +24,11 @@
 #define CAL_H_
 
 #include <Std_Types.h>
+#include <Prj_Types.h>
 #include <Cfg_Prj.h>
 #include <Cal/CalM_Types.h>
 #include <Cal/CalM_config.h>
+#include <Hal/Gpio.h>
 #include <Util/Array.h>
 
 namespace cal
@@ -35,11 +37,25 @@ namespace cal
     class CalM
     {
     public:
-        /// @brief An invalid classifier type. A valid type is any of 0 ... cfg::kNrUserDefinedClassifierTypes
-        static constexpr uint8 kInvalidClassifierType = 255;
+        /**
+         * @brief EEPROM data buffer
+         * 
+         * Holds all calibration data read from or to be written to EEPROM.
+         */
+        util::array<uint8, eeprom::kSizeOfData> eeprom_data_buffer;
 
-        util::array<uint8, eeprom::kSizeOfData> eeprom_data_buffer; ///< EEPROM data buffer
+        /**
+         * @brief Built-in signal outputs
+         */
+        static const uint8 ROM_CONST_VAR built_in_signal_outputs[cal::cv::kSignalLength * cfg::kNrBuiltInSignals];
 
+        /**
+         * @brief GPIO configuration
+         * 
+         * Each pin's mode is set using the Arduino pinMode function.
+         */
+        static hal::GpioConfig gpio_cfg;
+        
     protected:
 
         /**
@@ -120,6 +136,22 @@ namespace cal
             if (is_cv_id_valid(cv_id))
             {
                 eeprom_data_buffer[cv_id] = val;
+                if (cv_id >= cv::kSignalInputBase &&
+                    cv_id < cv::kSignalInputBase + cfg::kNrSignals)
+                {
+                    // reconfigure input pin if input CV changed
+                    configure_pins();
+                }
+                else if (cv_id >= cv::kSignalFirstOutputBase &&
+                    cv_id < cv::kSignalFirstOutputBase + cfg::kNrSignals)
+                {
+                    // reconfigure input pin if input CV changed
+                    configure_pins();
+                }
+                else
+                {
+                    // no action required
+                }
             }
         }
 
@@ -158,6 +190,159 @@ namespace cal
          * @return false Validation failed
          */
         bool update();
+        /** @} */
+
+        /**
+         * @defgroup Signal helpers
+         * @{
+         */
+        struct signal_aspect
+        {
+            uint8 num_targets;                                ///< Number of outputs (LEDs)
+            uint8 aspect; ///< A bit per output, max. 8 outputs: 0 = 0%, 1 = 100%, LSB = 1st output, MSB = 8th output
+            uint8 blink;  ///< A bit per output, max. 8 outputs: 0 = no blinking, 1 = blinking
+            uint8 change_over_time_10ms;                     ///< [10 ms] dim time if aspect changes
+            uint8 change_over_time_blink_10ms;               ///< [10 ms] dim time for blinking effects
+        };
+
+        /**
+         * @brief Get the signal id which selects the change over time and aspects to be used
+         *
+         * @param signal_idx Signal index in the array of signals (0 ... cfg::kNrSignals-1)
+         * @return uint8 Signal id (eSignalNotUsed, eFirstBuiltInSignalId, ..., eFirstUserDefinedSignalID, ...)
+         */
+        uint8 get_signal_id(uint8 signal_idx)
+        {
+            const uint16 idx = (signal_idx < cfg::kNrSignals) ? signal_idx : 0;
+            return get_cv(cal::cv::kSignalIDBase + idx);
+        }
+
+        /**
+         * @brief Check if the signal id is a valid user-defined signal id
+         * 
+         * @param signal_id Signal id to be checked
+         * @return true signal id is a valid user-defined signal id
+         * @return false signal id is not a valid user-defined signal id
+         */
+        bool is_built_in(uint8 signal_id) noexcept 
+        { 
+            return (signal_id >= cal::values::kFirstBuiltInSignalID) &&
+                (signal_id < cal::values::kFirstBuiltInSignalID + cfg::kNrBuiltInSignals);
+        }
+
+        /**
+         * @brief Check if the signal id is a valid built-in signal id
+         * 
+         * @param signal_id Signal id to be checked
+         * @return true signal id is a valid built-in signal id
+         * @return false signal id is not a valid built-in signal id
+         */
+        bool is_user_defined(uint8 signal_id) noexcept 
+        { 
+            return (signal_id >= cal::values::kFirstUserDefinedSignalID) &&
+                (signal_id < cal::values::kFirstUserDefinedSignalID + cfg::kNrUserDefinedSignals);
+        }
+        /**
+         * @brief Returns the zero based index of signal id to be used for array indexing
+         * 
+         * @param id signal id
+         * @return uint8 zero based index of the signal id
+         * 
+         * @note Use for built in signal ids only.
+         */
+        static inline uint8 zero_based_built_in(uint8 signal_id)  { return signal_id - cal::values::kFirstBuiltInSignalID; }
+
+        /**
+         * @brief Returns the zero based index of signal id to be used for array indexing
+         * 
+         * @param id signal id
+         * @return uint8 uint8 zero based index of the signal id
+         * 
+         * @note Use for built in signal ids only.
+         */
+        static inline uint8 zero_based_user_defined(uint8 signal_id) { return signal_id - cal::values::kFirstUserDefinedSignalID; }
+
+        /** @brief Get the signal aspect for a user-defined signal ID
+         * 
+         * @param signal_id Signal id (user-defined)
+         * @param cmd Command index (0 ... cfg::kNrSignalAspects-1)
+         * @param aspect Output: signal aspect configuration
+         */
+        void get_signal_aspect(uint8 signal_id, uint8 cmd, signal::signal_aspect& aspect);
+
+        /**
+         * @brief Get the number of outputs for the signal
+         * @param signal_id Signal id
+         * @return uint8 Number of outputs
+         * 
+         * @note Returns 0 if signal id is invalid
+         */
+        uint8 get_number_of_outputs(uint8 signal_id)
+        {
+            uint8 num_targets;
+            if (is_user_defined(signal_id))
+            {
+                uint16 index = zero_based_user_defined(signal_id);
+                index = cal::cv::kUserDefinedSignalBase + index * cal::cv::kSignalLength;
+                num_targets = util::bits::masked_shift(
+                    get_cv(index),
+                    cal::values::bitmask::kNumberOfOutputs,
+                    cal::values::bitshift::kNumberOfOutputs);
+            }
+            else if (is_built_in(signal_id))
+            {
+                uint16 index = zero_based_built_in(signal_id);
+                num_targets = util::bits::masked_shift(
+                    ROM_READ_BYTE(&built_in_signal_outputs[index]),
+                    cal::values::bitmask::kNumberOfOutputs,
+                    cal::values::bitshift::kNumberOfOutputs);
+            }
+            else
+            {
+                num_targets = 0U;
+            }
+            return num_targets;
+        }
+
+        /**
+         * @brief Get the input configuration for the signal
+         * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+         * @return uint8 CV value for input configuration
+         */
+        signal::input_cal get_input(uint8 signal_idx)
+        {
+            const uint8 cv_value = get_cv(cal::cv::kSignalInputBase + signal_idx);
+            struct signal::input_cal input;
+            input.type = util::bits::masked_shift(
+                            cv_value,
+                            cal::values::bitmask::kInputType,
+                            cal::values::bitshift::kInputType);
+            input.pin = util::bits::masked_shift(
+                            cv_value,
+                            cal::values::bitmask::kAdcPin,
+                            cal::values::bitshift::kAdcPin);
+            return input;
+        }
+        /**
+         * @brief Get the input configuration for the signal
+         * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+         * @return uint8 CV value for input configuration
+         */
+        inline struct signal::target get_first_output(uint8 signal_idx)
+        {
+            struct signal::target output = get_cv(cal::cv::kSignalFirstOutputBase + signal_idx);
+            return output;
+        }
+        /** @} */
+
+        /**
+         * @defgroup General helpers
+         * @{
+         */
+        inline bool is_output_pin(uint8 pin)
+        {
+            return (gpio_cfg.pin_modes.check_boundary(pin) && (gpio_cfg.pin_modes[pin] == OUTPUT));
+        }
         /** @} */
     };
 

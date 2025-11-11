@@ -65,7 +65,7 @@ namespace cal
     /**
      * @brief Bit masks, bit shifts and values for signal configuration
      */
-    namespace signal
+    namespace values
     {
         constexpr uint8 kDcc = 0; /**< DCC input type */
         constexpr uint8 kAdc = 1; /**< ADC input type */
@@ -99,46 +99,46 @@ namespace cal
         /** @brief Create a CV for signal input value. */
         constexpr uint8 make_signal_input(uint8 input_type, uint8 input_pin) noexcept
         {
-            return (input_type << cal::signal::bitshift::kInputType) |
-                   (input_pin << cal::signal::bitshift::kAdcPin);
+            return (input_type << cal::values::bitshift::kInputType) |
+                   (input_pin << cal::values::bitshift::kAdcPin);
         }
         /** @brief Create a CV for signal first output value. */
         constexpr uint8 make_signal_first_output(uint8 output_type, uint8 output_pin) noexcept
         {
-            return (output_type << cal::signal::bitshift::kFirstOutputType) |
-                   (output_pin << cal::signal::bitshift::kFirstOutputPin);
+            return (output_type << cal::values::bitshift::kFirstOutputType) |
+                   (output_pin << cal::values::bitshift::kFirstOutputPin);
         }
         /** @brief Extract the signal input type from a CV. */
         constexpr uint8 extract_signal_input_type(uint8 cv_value) noexcept
         {
             return util::bits::masked_shift(
                 cv_value,
-                cal::signal::bitmask::kInputType,
-                cal::signal::bitshift::kInputType);
+                cal::values::bitmask::kInputType,
+                cal::values::bitshift::kInputType);
         }
         /** @brief Extract the signal input pin from a CV. */
         constexpr uint8 extract_signal_input_pin(uint8 cv_value) noexcept
         {
             return util::bits::masked_shift(
                 cv_value,
-                cal::signal::bitmask::kAdcPin,
-                cal::signal::bitshift::kAdcPin);
+                cal::values::bitmask::kAdcPin,
+                cal::values::bitshift::kAdcPin);
         }
         /** @brief Extract the signal first output pin type from a CV. */
         constexpr uint8 extract_signal_first_output_type(uint8 cv_value) noexcept
         {
             return util::bits::masked_shift(
                 cv_value,
-                cal::signal::bitmask::kFirstOutputType,
-                cal::signal::bitshift::kFirstOutputType);
+                cal::values::bitmask::kFirstOutputType,
+                cal::values::bitshift::kFirstOutputType);
         }
         /** @brief Extract the signal first output pin from a CV. */
         constexpr uint8 extract_signal_first_output_pin(uint8 cv_value) noexcept
         {
             return util::bits::masked_shift(
                 cv_value,
-                cal::signal::bitmask::kFirstOutputPin,
-                cal::signal::bitshift::kFirstOutputPin);
+                cal::values::bitmask::kFirstOutputPin,
+                cal::values::bitshift::kFirstOutputPin);
         }
     }
 

@@ -33,7 +33,7 @@ namespace signal
   class InputCommand
   {
   public:
-    uint8 getCmd(struct signal::input in);
+    uint8 getCmd(struct signal::input_cmd in);
   };
 } // namespace signal
 

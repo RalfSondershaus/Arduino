@@ -74,12 +74,6 @@ namespace signal
   class SignalHandler
   {
   public:
-  #if 0
-    using classified_values_array = rte::classified_values_array;
-    using classified_value_type = classified_values_array::value_type;
-    using classified_values_size_type = rte::classified_values_array::size_type;
-    using cmd_type = rte::cmd_type;
-  #endif
     using signal_array_type = util::array<Signal, cfg::kNrSignals>;
     
   protected:

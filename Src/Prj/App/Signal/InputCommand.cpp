@@ -25,12 +25,12 @@
 
 namespace signal
 {
-  uint8 InputCommand::getCmd(struct signal::input in)
+  uint8 InputCommand::getCmd(struct signal::input_cmd in)
   {
     uint8 cmd = signal::kInvalidCmd;
     using size_type = rte::classified_values_array::size_type;
 
-    if (in.type == signal::input::kAdc)
+    if (in.type == signal::input_cmd::kAdc)
     {
       const size_type pos = static_cast<size_type>(in.idx);
       if (rte::ifc_classified_values::boundaryCheck(pos))
@@ -38,7 +38,7 @@ namespace signal
         rte::ifc_classified_values::readElement(pos, cmd);
       }
     }
-    else if (in.type == signal::input::kDcc)
+    else if (in.type == signal::input_cmd::kDcc)
     { 
       const size_type pos = static_cast<size_type>(in.idx);
       if (rte::ifc_dcc_commands::boundaryCheck(pos))

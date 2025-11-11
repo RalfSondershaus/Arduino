@@ -22,30 +22,39 @@
 
 #include <Cal/CalM.h>
 #include <Hal/EEPROM.h>
-#include <Hal/Gpio.h>
 #include <Rte/Rte.h>
+#include <Util/Classifier_cfg.h>
 
 namespace cal
 {
-    /// CV Name                                     CV#    CV#       Required  Default  Read
-    ///                                                    optional            Value    Only
-    /// Decoder Address LSB                         1      513       M         1        Y     LSB of accessory decoder address
-    /// Auxiliary Activation                        2      514       O                        Auxiliary activation of outputs
-    /// Time On F1                                  3      515       O
-    /// Time On F2                                  4      516       O
-    /// Time On F3                                  5      517       O
-    /// Time On F4                                  6      518       O
-    /// Manufacturer Version Info                   7      519       M
-    /// ManufacturerID                              8      520       M                  Y     Values assigned by NMRA
-    /// Decoder Address MSB                         9      521       M         0        Y     3 MSB of accessory decoder address
-    /// Bi-Directional Communication Configuration 28      540       O
-    /// Accessory Decoder Configuration            29      541       M                        similar to CV#29; for acc. decoders
-    /// Indexed Area Pointers                      31, 32                                     Index High and Low Address
-    /// Manufacturer Unique                        112-128 (17 bytes)
-    /// Manufacturer Unique                        129-256 (128 bytes)
-    /// Manufacturer Unique                        513-895 (383 bytes)
+    /** Built-in signal outputs */
+    #define CAL_BUILT_IN_SIGNAL_OUTPUTS     \
+        {                                   \
+            5,                              \
+            0b00011000, 0b00000000,         \
+            0b00000100, 0b00000000,         \
+            0b00000110, 0b00000000,         \
+            0b00011001, 0b00000000,         \
+            0b00011111, 0b00000000,         \
+            0b00011111, 0b00000000,         \
+            0b00011111, 0b00000000,         \
+            0b00011111, 0b00000000,         \
+            10, 10,                         \
+            2,                              \
+            0b00000001, 0b00000000,         \
+            0b00000010, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            10, 10                          \
+        }
 
-    // 129        Checksum
+    const uint8 ROM_CONST_VAR CalM::built_in_signal_outputs[cal::cv::kSignalLength * cfg::kNrBuiltInSignals] = CAL_BUILT_IN_SIGNAL_OUTPUTS;
+        
+    hal::GpioConfig CalM::gpio_cfg;
 
     namespace eeprom
     {
@@ -88,26 +97,33 @@ namespace cal
      */
     void CalM::configure_pins()
     {
-        // input pins
-        for (uint16 cv_id = cal::cv::kSignalInputBase; cv_id < cfg::kNrSignals; cv_id++)
+        // set all pins to an invalid state
+        util::fill(gpio_cfg.pin_modes.begin(), gpio_cfg.pin_modes.end(), 0xFF);
+
+        for (uint8_least sig_idx = 0U; sig_idx < cfg::kNrSignals; sig_idx++)
         {
-            uint8 cv_value = get_cv(cv_id);
-            if (cal::signal::extract_signal_input_type(cv_value) == cal::signal::kAdc)
+            // input pin
+            const struct signal::input_cal input = get_input(sig_idx);
+            if ((input.type == signal::input_cal::kAdc) && 
+                 util::classifier_cal::is_pin_valid(input.pin))
             {
-                uint8 adc_pin = cal::signal::extract_signal_input_pin(cv_value);
-                hal::pinMode(adc_pin, INPUT);
+                gpio_cfg.pin_modes[input.pin] = INPUT;
+                //hal::pinMode(input.pin, INPUT);
+            }
+
+            // output pins
+            const struct signal::target output = get_first_output(sig_idx);
+            if (output.type == signal::target::kOnboard)
+            {
+                const uint8 num_outputs = get_number_of_outputs(get_signal_id(sig_idx));
+                for (uint8_least pin = output.pin; pin < output.pin + num_outputs; pin++)
+                {
+                    gpio_cfg.pin_modes[pin] = OUTPUT;
+                    //hal::pinMode(pin, OUTPUT);
+                }
             }
         }
-        // output pins
-        for (uint16 cv_id = cal::cv::kSignalFirstOutputBase; cv_id < cfg::kNrSignals; cv_id++)
-        {
-            uint8 cv_value = get_cv(cv_id);
-            if (cal::signal::extract_signal_first_output_type(cv_value) == cal::signal::kOnboard)
-            {
-                uint8 adc_pin = cal::signal::extract_signal_first_output_pin(cv_value);
-                hal::pinMode(adc_pin, OUTPUT);
-            }
-        }
+        hal::configure_pins(gpio_cfg);
     }
 
     /**
@@ -168,6 +184,8 @@ namespace cal
     /**
      * @brief Initialize configuration with ROM default values and write to EEPROM.
      * 
+     * @note call @ref configure_pins() afterwards to setup pins according to calibration data
+     * 
      * @return @ref is_valid()
      */
     bool CalM::set_defaults()
@@ -213,6 +231,43 @@ namespace cal
      */
     void CalM::cycle100()
     {
+    }
+
+    void CalM::get_signal_aspect(uint8 signal_id, uint8 cmd, ::signal::signal_aspect& aspect)
+    {
+        if (is_user_defined(signal_id))
+        {
+            uint16 index = zero_based_user_defined(signal_id);
+            index = cal::cv::kUserDefinedSignalBase + index * cal::cv::kSignalLength;
+            aspect.num_targets = util::bits::masked_shift(
+                get_cv(index++),
+                cal::values::bitmask::kNumberOfOutputs,
+                cal::values::bitshift::kNumberOfOutputs);
+            aspect.aspect = get_cv(index + 2U*cmd);
+            aspect.blink = get_cv(index + 2U*cmd + 1U); index += 2U*cfg::kNrSignalAspects;
+            aspect.change_over_time_10ms = get_cv(index++);
+            aspect.change_over_time_blink_10ms = get_cv(index++);
+        }
+        else if (is_built_in(signal_id))
+        {
+            uint16 index = zero_based_built_in(signal_id);
+            aspect.num_targets = util::bits::masked_shift(
+                ROM_READ_BYTE(&built_in_signal_outputs[index++]),
+                cal::values::bitmask::kNumberOfOutputs,
+                cal::values::bitshift::kNumberOfOutputs);
+            aspect.aspect = ROM_READ_BYTE(&built_in_signal_outputs[index + 2U*cmd]);
+            aspect.blink = ROM_READ_BYTE(&built_in_signal_outputs[index + 2U*cmd + 1U]); index += 2U*cfg::kNrSignalAspects;
+            aspect.change_over_time_10ms = ROM_READ_BYTE(&built_in_signal_outputs[index++]);
+            aspect.change_over_time_blink_10ms = ROM_READ_BYTE(&built_in_signal_outputs[index++]);
+        }
+        else
+        {
+            aspect.num_targets = 0U;
+            aspect.aspect = 0U;
+            aspect.blink = 0U;
+            aspect.change_over_time_10ms = 0U;
+            aspect.change_over_time_blink_10ms = 0U;
+        }
     }
 
 } // namespace cal

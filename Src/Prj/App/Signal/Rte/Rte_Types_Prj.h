@@ -90,7 +90,7 @@ namespace rte
     // -----------------------------------------------------------------------------------
     /// CS interface for commands
     // -----------------------------------------------------------------------------------
-    using Ifc_Rte_GetCommand = rte::ifc_cs<uint8, signal::InputCommand, struct signal::input>;
+    using Ifc_Rte_GetCommand = rte::ifc_cs<uint8, signal::InputCommand, struct signal::input_cmd>;
 
     // -----------------------------------------------------------------------------------
     /// CS interface for LED intensity target values and speed target values

@@ -69,8 +69,8 @@ namespace util
         { 
             return util::bits::masked_shift(
                 rte::get_cv(cal::cv::kSignalInputClassifierTypeBase + idx),
-                cal::signal::bitmask::kClassifierType,
-                cal::signal::bitshift::kClassifierType);
+                cal::values::bitmask::kClassifierType,
+                cal::values::bitshift::kClassifierType);
         }
 
         /**
@@ -105,19 +105,37 @@ namespace util
         }
 
         /**
-         * @brief Get the pin for the given classifier index
-         * @param class_idx Class index
-         * @param classifier_type Classifier type index which selects the calibration limits to be used
-         * @return uint8 Upper limit for the class
+         * @brief Get the pin for classifier at index idx
+         * 
+         * @param idx Index of the classifier in an array of classifiers
+         * @return uint8 Pin number for the classifier at index idx (can be invalid)
          */
         static inline uint8 get_pin(uint8 idx) 
         {
-            return util::bits::masked_shift(
-                rte::get_cv(cal::cv::kSignalInputBase + idx),
-                cal::signal::bitmask::kInputType,
-                cal::signal::bitshift::kInputType);
+            uint8 pin;
+            const struct signal::input_cal input = rte::sig::get_input(idx);
+            if (input.type != signal::input_cal::kAdc)
+            {
+                pin = kInvalidPin;
+            }
+            else
+            {
+                pin = input.pin;
+            }
+            return pin;
         }
 
+        /**
+         * @brief Check if the given pin number is valid
+         * 
+         * @param pin Pin number to check
+         * @return true If the pin number is valid
+         * @return false If the pin number is invalid
+         */
+        static inline bool is_pin_valid(uint8 pin) 
+        { 
+            return (pin != kInvalidPin); 
+        }
     } // namespace classifier_cal
 
 } // namespace util
