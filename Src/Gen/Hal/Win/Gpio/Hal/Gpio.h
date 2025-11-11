@@ -41,7 +41,7 @@
 
 namespace hal
 {
-    static constexpr uint8_t kNrDigitalPins = 70;
+    static constexpr uint8_t kNrDigitalPins = 64; /**< Coding data support 6 bits only */
 
     inline void pinMode        (uint8_t pin, uint8_t mode)     { ::pinMode(pin, mode); }
     inline void digitalWrite   (uint8_t pin, uint8_t value)    { ::digitalWrite(pin, value); }
@@ -76,7 +76,7 @@ namespace hal
      * This function sets the pin modes for all GPIO pins based on the provided configuration.
      * Each pin's mode is set using the Arduino pinMode function.
      */
-    inline void setup_gpio_pins(const struct GpioConfig& config)
+    inline void configure_pins(const struct GpioConfig& config)
     {
         for (size_t pin = 0; pin < kNrDigitalPins; pin++)
         {
