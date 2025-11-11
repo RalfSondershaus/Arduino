@@ -364,15 +364,15 @@ namespace util
                     it != classifiers.end();
                     it++, it_adc++, it_cls++)
             {
-                int pin = classifier_cal::get_pin(static_cast<uint8>(it - classifiers.begin()));
-                if (pin == classifier_cal::kInvalidPin)
+                const int pin = classifier_cal::get_pin(static_cast<uint8>(it - classifiers.begin()));
+                if (!classifier_cal::is_pin_valid(pin))
                 {
                     adc_value = 0;
                     class_idx = kInvalidIndex;
                 }
                 else
                 {
-                    adc_value = get_ADC(classifier_cal::get_pin(static_cast<uint8>(it - classifiers.begin())));
+                    adc_value = get_ADC(pin);
                     // Set the classifier type for this classifier in case calibration data have changed
                     it->set_classifier_type(classifier_cal::get_classifier_type(static_cast<uint8>(it - classifiers.begin())));
                     class_idx = it->classify_debounce(static_cast<input_type>(adc_value));

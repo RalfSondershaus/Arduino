@@ -94,6 +94,15 @@ namespace util
          */
         static inline uint8 get_pin(uint8 idx) { (void)idx; return 0; }
 
+        /**
+         * @brief Check if the given pin number is valid
+         * 
+         * @param pin Pin number to check
+         * @return true If the pin number is valid
+         * @return false If the pin number is invalid
+         */
+        static inline bool is_pin_valid(uint8 pin) { return (pin != kInvalidPin); }
+
     } // namespace classifier_cal
 
 } // namespace util
