@@ -52,16 +52,26 @@ namespace cal
             10, 10                          \
         }
 
-    const uint8 ROM_CONST_VAR CalM::built_in_signal_outputs[cal::cv::kSignalLength * cfg::kNrBuiltInSignals] = CAL_BUILT_IN_SIGNAL_OUTPUTS;
-        
+    /**
+     * @brief GPIO configuration
+     */
     hal::GpioConfig CalM::gpio_cfg;
 
-    namespace eeprom
+    /**
+     * @brief Built-in signal outputs
+     */
+    const uint8 ROM_CONST_VAR CalM::built_in_signal_outputs[cal::cv::kSignalLength * cfg::kNrBuiltInSignals] = CAL_BUILT_IN_SIGNAL_OUTPUTS;
+
+    /** 
+     * @brief Default values for calibration data 
+     * 
+     * @note Defined in CalM_config.h
+     * @note Do not use namespace eeprom here to avoid confusion with cal::eeprom since some constants 
+     *       have the same name.
+     */
+    namespace default_values
     {
-        namespace default_values
-        {
-            static const uint8_t ROM_CONST_VAR init_values[] = EEPROM_INIT;
-        }
+        static const uint8 ROM_CONST_VAR init_values[] = EEPROM_INIT;
     }
 
     /**
@@ -193,7 +203,7 @@ namespace cal
         // copy default values to eeprom_data_buffer
         for (size_t i = 0; i < eeprom_data_buffer.size(); i++)
         {
-            eeprom_data_buffer[i] = ROM_READ_BYTE(&eeprom::default_values::init_values[i]);
+            eeprom_data_buffer[i] = ROM_READ_BYTE(&default_values::init_values[i]);
         }
 
         configure_pins();

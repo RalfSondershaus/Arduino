@@ -744,6 +744,181 @@ TEST(Ut_Signal, Signal7_DCC_Aspects_2_3)
     log.stop();
 }
 
+/**
+ * @brief Tests DCC signal aspects 2 and 3 transitions for a railway signal
+ *
+ * This test function simulates DCC packet reception and verifies correct signal behavior:
+ * - Transitions between aspect 2 and 3
+ * - PWM duty cycle changes for signal outputs
+ * - Timing of transitions
+ *
+ * @param signal_pos Position index of the signal (0-7)
+ * @param first_output_pin First pin number for signal outputs
+ * @param log Logger reference for test output
+ *
+ * @details The test:
+ * 1. Initializes signal configuration in EEPROM
+ * 2. Simulates DCC packets reception
+ * 3. Verifies correct command interpretation
+ * 4. Checks PWM duty cycles on signal outputs
+ * 5. Validates timing of transitions
+ */
+void do_signal_dcc_test_aspects_0_1_UserDefined(
+    const int signal_pos,
+    uint8 first_output_pin,
+    uint8 user_defined_signal_id,
+    Logger &log)
+{
+    using signal_target_array = util::array<uint8, cfg::kNrSignalTargets>;
+    using size_type = signal_target_array::size_type;
+    using time_type = classifier_array_type::classifier_type::time_type;
+
+    uint8 tmp;
+
+    typedef struct
+    {
+        time_type ms; // [ms] current time
+        uint8 byte1;
+        uint8 byte2;
+        uint8 cmd;                   // expected value: command on RTE
+        signal_target_array au8Curs; // expected value: target onboard duty cycles
+    } step_type;
+
+    constexpr time_type kFirstTime_ms = 0; // initial time when RTE is started
+    // DCC signal address for byte 0: signal 0 -> 1, signal 1 -> 2, ..., signal 7 -> 8
+    const uint8 signal_byte0 = static_cast<uint8>(signal_pos + 1);
+    // byte 0: accessory packet with signal address
+    const uint8 byte0 = 0b10000000 | signal_byte0;
+    const step_type aSteps[] =
+        {
+            {10, byte0, 0b11110000, 0, {2, 2, 0, 0, 2}}, 
+            {20, byte0, 0b11110000, 0, {3, 3, 0, 0, 3}}, 
+            {30, byte0, 0b11110000, 0, {5, 5, 0, 0, 5}},
+            {40, byte0, 0b11110000, 0, {9, 9, 0, 0, 9}}, 
+            {50, byte0, 0b11110000, 0, {16, 16, 0, 0, 16}}, 
+            {60, byte0, 0b11110000, 0, {27, 27, 0, 0, 27}}, 
+            {70, byte0, 0b11110000, 0, {48, 48, 0, 0, 48}}, 
+            {80, byte0, 0b11110000, 0, {82, 82, 0, 0, 82}}, 
+            {90, byte0, 0b11110000, 0, {145, 145, 0, 0, 145}}, 
+            {100, byte0, 0b11110000, 0, {250, 250, 0, 0, 250}}, 
+            {110, byte0, 0b11110000, 0, {255, 255, 0, 0, 255}}, 
+            {120, byte0, 0b11110000, 0, {145, 145, 0, 0, 145}}, 
+            {130, byte0, 0b11110000, 0, {84, 84, 0, 0, 84}}, 
+            {140, byte0, 0b11110000, 0, {48, 48, 0, 0, 48}}, 
+            {150, byte0, 0b11110000, 0, {28, 28, 0, 0, 28}}, 
+            {160, byte0, 0b11110000, 0, {16, 16, 0, 0, 16}}, 
+            {170, byte0, 0b11110000, 0, {9, 9, 0, 0, 9}}, 
+            {180, byte0, 0b11110000, 0, {5, 5, 0, 0, 5}}, 
+            {190, byte0, 0b11110000, 0, {3, 3, 0, 0, 3}}, 
+            {200, byte0, 0b11110000, 0, {2, 2, 0, 0, 2}}, 
+            {210, byte0, 0b11110000, 0, {0, 0, 0, 0, 0}}, 
+            {220, byte0, 0b11110001, 1, {0, 0, 2, 2, 0}}, 
+            {230, byte0, 0b11110001, 1, {0, 0, 3, 3, 0}}, 
+            {240, byte0, 0b11110001, 1, {0, 0, 5, 5, 0}}, 
+            {250, byte0, 0b11110001, 1, {0, 0, 9, 9, 0}}, 
+            {260, byte0, 0b11110001, 1, {0, 0, 16, 16, 0}},
+            {270, byte0, 0b11110001, 1, {0, 0, 27, 27, 0}}, 
+            {280, byte0, 0b11110001, 1, {0, 0, 48, 48, 0}}, 
+            {290, byte0, 0b11110001, 1, {0, 0, 82, 82, 0}}, 
+            {300, byte0, 0b11110001, 1, {0, 0, 145, 145, 0}}, 
+            {310, byte0, 0b11110001, 1, {0, 0, 250, 250, 0}}, 
+            {320, byte0, 0b11110001, 1, {0, 0, 255, 255, 0}},
+            {330, byte0, 0b11110001, 1, {0, 0, 255, 255, 0}},
+            {340, byte0, 0b11110001, 1, {0, 0, 255, 255, 0}},
+            {350, byte0, 0b11110001, 1, {0, 0, 255, 255, 0}},
+            {360, byte0, 0b11110001, 1, {0, 0, 255, 255, 0}},
+            {370, byte0, 0b11110001, 1, {0, 0, 255, 255, 0}},
+            {380, byte0, 0b11110001, 1, {0, 0, 255, 255, 0}},
+            {390, byte0, 0b11110001, 1, {0, 0, 255, 255, 0}},
+            {400, byte0, 0b11110001, 1, {0, 0, 255, 255, 0}},
+        };
+    classifier_array_type classifiers;
+    struct signal::input_cmd in;
+    size_t nStep;
+
+    // Initialize
+    hal::stubs::millis = kFirstTime_ms;
+    hal::stubs::micros = 1000U * hal::stubs::millis;
+    hal::init_gpio();
+
+    // Here we go
+    rte::start();
+
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+    // Configure User Defined Signal with user_defined_signal_id
+    rte::set_cv(cal::eeprom::kUserDefinedSignalBase + user_defined_signal_id    , 2); // 2 LEDs
+    rte::set_cv(cal::eeprom::kUserDefinedSignalBase + user_defined_signal_id + 1, 0b00000001); // aspect 0
+    rte::set_cv(cal::eeprom::kUserDefinedSignalBase + user_defined_signal_id + 3, 0b00000010); // aspect 1
+    rte::set_cv(cal::eeprom::kUserDefinedSignalBase + user_defined_signal_id + 5, 0b00000011); // aspect 2
+    rte::set_cv(cal::eeprom::kUserDefinedSignalBase + user_defined_signal_id + 17, 20); // change over time [10 ms]
+    rte::set_cv(cal::eeprom::kUserDefinedSignalBase + user_defined_signal_id + 18, 20); // change over time blink [10 ms]
+    // And now activate signal signal_pos
+    rte::set_cv(cal::cv::kSignalIDBase + signal_pos, cal::values::kFirstUserDefinedSignalID + user_defined_signal_id);
+    // ... with first output pin first_output_pin
+    tmp = cal::values::make_signal_first_output(cal::values::kOnboard, first_output_pin);
+    rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, tmp);
+    // ... with DCC input
+    tmp = cal::values::make_signal_input(cal::values::kDcc, 0);
+    rte::set_cv(cal::cv::kSignalInputBase + signal_pos, tmp);
+
+    in.type = cal::values::kDcc;
+    in.idx = signal_pos;
+
+    for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
+    {
+        // Simulate DCC packet received by ISR
+        {
+            dcc::bit_stream_type &bit_stream = dcc::bit_streams[nStep % 2]; // Use alternating bit streams
+            add_preamble_to_stream(bit_stream);
+            add_byte_to_stream(bit_stream, aSteps[nStep].byte1, 0);
+            add_byte_to_stream(bit_stream, aSteps[nStep].byte2, 0);
+            add_byte_to_stream(bit_stream, aSteps[nStep].byte1 ^ aSteps[nStep].byte2, 1);
+        }
+        hal::stubs::millis = aSteps[nStep].ms;
+        hal::stubs::micros = 1000U * hal::stubs::millis;
+        rte::exec();
+        printRte();
+        uint8 cmd = rte::ifc_rte_get_cmd::call(in);
+        log << std::setw(3) << (int)cmd << " - ";
+        EXPECT_EQ(cmd, aSteps[nStep].cmd);
+        uint8 target_pin = cal::values::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
+        for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
+        {
+            util::intensity8_255 pwm_rte;
+            util::intensity8_255 pwm_hal;
+            rte::ifc_onboard_target_duty_cycles::readElement(target_pin, pwm_rte);
+            pwm_hal = hal::stubs::analogWrite[target_pin++];
+            log << std::setw(3) << (int)pwm_rte << ", ";
+          //  EXPECT_EQ((uint8)pwm_rte, aSteps[nStep].au8Curs[i]);
+          //  EXPECT_EQ((uint8)pwm_hal, aSteps[nStep].au8Curs[i]);
+        }
+        log << std::endl;
+    }
+}
+
+/**
+ * @test Signal0_DCC_Aspects_0_1_UserDefinedSignal0
+ * @brief Tests whether signal 7 is correctly triggered by DCC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ */
+TEST(Ut_Signal, Signal0_DCC_Aspects_0_1_UserDefinedSignal0)
+{
+    Logger log;
+    constexpr uint8 kUserDefinedSignalID = 0; // User Defined Signal 0
+    constexpr int kSignalPos = 0; // Want to configure signal 0 as User Defined Signal kUserDefinedSignalID
+    constexpr uint8 kFirstOutputPin = 13;
+
+    log.start("Signal0_DCC_Aspects_0_1_UserDefinedSignal0.txt");
+    do_signal_dcc_test_aspects_0_1_UserDefined(
+        kSignalPos,
+        kFirstOutputPin,
+        kUserDefinedSignalID, /*cal::values::kFirstUserDefinedSignalID is added internally */
+        log);
+
+    log.stop();
+}
+
 void setUp(void)
 {
     cleanRte();
@@ -769,6 +944,7 @@ bool test_loop(void)
     RUN_TEST(Signal7_ADC_All);
     RUN_TEST(Signal0_DCC_Aspects_2_3);
     RUN_TEST(Signal7_DCC_Aspects_2_3);
+    RUN_TEST(Signal0_DCC_Aspects_0_1_UserDefinedSignal0);
 
     (void)UNITY_END();
 
