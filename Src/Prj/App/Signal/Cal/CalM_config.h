@@ -107,8 +107,8 @@ namespace cal
     kDccAddressingMode,                                                                                                 /* CV 39 */                           \
     cfg::kNrSignals,                                                                                                    /* CV 40 */                           \
     cfg::kNrBuiltInSignals,                                                                                             /* CV 41 */                           \
-    cal::values::kSignalNotUsed, cal::values::kSignalNotUsed, cal::values::kSignalNotUsed, cal::values::kSignalNotUsed, /* CV 42 - 45 (signal IDs) */         \
-    cal::values::kSignalNotUsed, cal::values::kSignalNotUsed, cal::values::kSignalNotUsed, cal::values::kSignalNotUsed, /* CV 46 - 49 (signal IDs) */         \
+    cal::constants::kSignalNotUsed, cal::constants::kSignalNotUsed, cal::constants::kSignalNotUsed, cal::constants::kSignalNotUsed, /* CV 42 - 45 (signal IDs) */         \
+    cal::constants::kSignalNotUsed, cal::constants::kSignalNotUsed, cal::constants::kSignalNotUsed, cal::constants::kSignalNotUsed, /* CV 46 - 49 (signal IDs) */         \
     0, 0, 0, 0, 0, 0, 0, 0,                                                                                             /* CV 50 - 57 (signal output pins) */ \
     0, 0, 0, 0, 0, 0, 0, 0,                                                                                             /* CV 58 - 65 (signal inputs) */      \
     0, 0, 0, 0, 0, 0, 0, 0,                                                                                             /* CV 66 - 73 (signal classifiers) */ \

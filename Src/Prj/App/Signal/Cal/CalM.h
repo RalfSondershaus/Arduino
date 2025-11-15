@@ -226,8 +226,8 @@ namespace cal
          */
         bool is_built_in(uint8 signal_id) noexcept 
         { 
-            return (signal_id >= cal::values::kFirstBuiltInSignalID) &&
-                (signal_id < cal::values::kFirstBuiltInSignalID + cfg::kNrBuiltInSignals);
+            return (signal_id >= cal::constants::kFirstBuiltInSignalID) &&
+                (signal_id < cal::constants::kFirstBuiltInSignalID + cfg::kNrBuiltInSignals);
         }
 
         /**
@@ -239,8 +239,8 @@ namespace cal
          */
         bool is_user_defined(uint8 signal_id) noexcept 
         { 
-            return (signal_id >= cal::values::kFirstUserDefinedSignalID) &&
-                (signal_id < cal::values::kFirstUserDefinedSignalID + cfg::kNrUserDefinedSignals);
+            return (signal_id >= cal::constants::kFirstUserDefinedSignalID) &&
+                (signal_id < cal::constants::kFirstUserDefinedSignalID + cfg::kNrUserDefinedSignals);
         }
         /**
          * @brief Returns the zero based index of signal id to be used for array indexing
@@ -250,7 +250,7 @@ namespace cal
          * 
          * @note Use for built in signal ids only.
          */
-        static inline uint8 zero_based_built_in(uint8 signal_id)  { return signal_id - cal::values::kFirstBuiltInSignalID; }
+        static inline uint8 zero_based_built_in(uint8 signal_id)  { return signal_id - cal::constants::kFirstBuiltInSignalID; }
 
         /**
          * @brief Returns the zero based index of signal id to be used for array indexing
@@ -260,7 +260,7 @@ namespace cal
          * 
          * @note Use for built in signal ids only.
          */
-        static inline uint8 zero_based_user_defined(uint8 signal_id) { return signal_id - cal::values::kFirstUserDefinedSignalID; }
+        static inline uint8 zero_based_user_defined(uint8 signal_id) { return signal_id - cal::constants::kFirstUserDefinedSignalID; }
 
         /** @brief Get the signal aspect for a user-defined signal ID
          * 
@@ -286,16 +286,16 @@ namespace cal
                 index = cal::cv::kUserDefinedSignalBase + index * cal::cv::kSignalLength;
                 num_targets = util::bits::masked_shift(
                     get_cv(index),
-                    cal::values::bitmask::kNumberOfOutputs,
-                    cal::values::bitshift::kNumberOfOutputs);
+                    cal::constants::bitmask::kNumberOfOutputs,
+                    cal::constants::bitshift::kNumberOfOutputs);
             }
             else if (is_built_in(signal_id))
             {
                 uint16 index = zero_based_built_in(signal_id);
                 num_targets = util::bits::masked_shift(
                     ROM_READ_BYTE(&built_in_signal_outputs[index]),
-                    cal::values::bitmask::kNumberOfOutputs,
-                    cal::values::bitshift::kNumberOfOutputs);
+                    cal::constants::bitmask::kNumberOfOutputs,
+                    cal::constants::bitshift::kNumberOfOutputs);
             }
             else
             {
@@ -315,12 +315,12 @@ namespace cal
             struct signal::input_cal input;
             input.type = util::bits::masked_shift(
                             cv_value,
-                            cal::values::bitmask::kInputType,
-                            cal::values::bitshift::kInputType);
+                            cal::constants::bitmask::kInputType,
+                            cal::constants::bitshift::kInputType);
             input.pin = util::bits::masked_shift(
                             cv_value,
-                            cal::values::bitmask::kAdcPin,
-                            cal::values::bitshift::kAdcPin);
+                            cal::constants::bitmask::kAdcPin,
+                            cal::constants::bitshift::kAdcPin);
             return input;
         }
         /**

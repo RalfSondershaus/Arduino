@@ -27,7 +27,11 @@
 
 namespace cal
 {
-    /** Built-in signal outputs */
+    /** 
+     * Built-in signal outputs 
+     * 
+     * @note Adjust unit test Ut_Signal/Test.cpp if this definition changes.
+     */
     #define CAL_BUILT_IN_SIGNAL_OUTPUTS     \
         {                                   \
             5,                              \
@@ -118,7 +122,6 @@ namespace cal
                  util::classifier_cal::is_pin_valid(input.pin))
             {
                 gpio_cfg.pin_modes[input.pin] = INPUT;
-                //hal::pinMode(input.pin, INPUT);
             }
 
             // output pins
@@ -129,7 +132,6 @@ namespace cal
                 for (uint8_least pin = output.pin; pin < output.pin + num_outputs; pin++)
                 {
                     gpio_cfg.pin_modes[pin] = OUTPUT;
-                    //hal::pinMode(pin, OUTPUT);
                 }
             }
         }
@@ -251,8 +253,8 @@ namespace cal
             index = cal::cv::kUserDefinedSignalBase + index * cal::cv::kSignalLength;
             aspect.num_targets = util::bits::masked_shift(
                 get_cv(index++),
-                cal::values::bitmask::kNumberOfOutputs,
-                cal::values::bitshift::kNumberOfOutputs);
+                cal::constants::bitmask::kNumberOfOutputs,
+                cal::constants::bitshift::kNumberOfOutputs);
             aspect.aspect = get_cv(index + 2U*cmd);
             aspect.blink = get_cv(index + 2U*cmd + 1U); index += 2U*cfg::kNrSignalAspects;
             aspect.change_over_time_10ms = get_cv(index++);
@@ -260,11 +262,11 @@ namespace cal
         }
         else if (is_built_in(signal_id))
         {
-            uint16 index = zero_based_built_in(signal_id);
+            uint16 index = zero_based_built_in(signal_id) * cal::cv::kSignalLength;
             aspect.num_targets = util::bits::masked_shift(
                 ROM_READ_BYTE(&built_in_signal_outputs[index++]),
-                cal::values::bitmask::kNumberOfOutputs,
-                cal::values::bitshift::kNumberOfOutputs);
+                cal::constants::bitmask::kNumberOfOutputs,
+                cal::constants::bitshift::kNumberOfOutputs);
             aspect.aspect = ROM_READ_BYTE(&built_in_signal_outputs[index + 2U*cmd]);
             aspect.blink = ROM_READ_BYTE(&built_in_signal_outputs[index + 2U*cmd + 1U]); index += 2U*cfg::kNrSignalAspects;
             aspect.change_over_time_10ms = ROM_READ_BYTE(&built_in_signal_outputs[index++]);

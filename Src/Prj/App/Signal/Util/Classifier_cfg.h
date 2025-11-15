@@ -69,8 +69,8 @@ namespace util
         { 
             return util::bits::masked_shift(
                 rte::get_cv(cal::cv::kSignalInputClassifierTypeBase + idx),
-                cal::values::bitmask::kClassifierType,
-                cal::values::bitshift::kClassifierType);
+                cal::constants::bitmask::kClassifierType,
+                cal::constants::bitshift::kClassifierType);
         }
 
         /**

@@ -116,10 +116,10 @@ TEST(Ut_Signal, InputClassifier1)
   // And now activate signal kSignalPos
   rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos, kBuiltInSignalIDAusfahrsignal);
   // ... with first output pin kFirstOutputPin
-  tmp = cal::values::make_signal_first_output(cal::values::values::kOutputType_Onboard, kFirstOutputPin);
+  tmp = cal::constants::make_signal_first_output(cal::constants::values::kOutputType_Onboard, kFirstOutputPin);
   rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos, tmp);
   // ... with ADC input pin kInputPin
-  tmp = cal::values::make_signal_input(cal::values::values::kInputType_ADC, kInputPin);
+  tmp = cal::constants::make_signal_input(cal::constants::values::kInputType_ADC, kInputPin);
   rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos, tmp);
   // ... with classifier type kClassifierType
   tmp = kClassifierType;
@@ -128,10 +128,10 @@ TEST(Ut_Signal, InputClassifier1)
   // And now activate signal kSignalPos+1
   rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos + 1, kBuiltInSignalIDAusfahrsignal);
   // ... with first output pin kFirstOutputPin+8
-  tmp = cal::values::make_signal_first_output(cal::values::values::kOutputType_Onboard, kFirstOutputPin + 8);
+  tmp = cal::constants::make_signal_first_output(cal::constants::values::kOutputType_Onboard, kFirstOutputPin + 8);
   rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos + 1, tmp);
   // ... with ADC input pin kInputPin+1
-  tmp = cal::values::make_signal_input(cal::values::values::kInputType_ADC, kInputPin+1);
+  tmp = cal::constants::make_signal_input(cal::constants::values::kInputType_ADC, kInputPin+1);
   rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos + 1, tmp);
   // ... with classifier type kClassifierType
   tmp = kClassifierType;

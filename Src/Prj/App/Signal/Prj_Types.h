@@ -49,9 +49,9 @@ namespace signal
      */
     struct input_cmd
     {
-        static constexpr uint8 kDcc = cal::values::kDcc; /**< DCC input type */
-        static constexpr uint8 kAdc = cal::values::kAdc; /**< ADC input type */
-        static constexpr uint8 kDig = cal::values::kDig; /**< Digital input type */
+        static constexpr uint8 kDcc = cal::constants::kDcc; /**< DCC input type */
+        static constexpr uint8 kAdc = cal::constants::kAdc; /**< ADC input type */
+        static constexpr uint8 kDig = cal::constants::kDig; /**< Digital input type */
 
         uint8 type; ///< Type of command source [kDcc, kAdc, kDig]
         uint8 idx;  ///< Index of the input element on RTE
@@ -64,9 +64,9 @@ namespace signal
      */
     struct input_cal
     {
-        static constexpr uint8 kDcc = cal::values::kDcc; /**< DCC input type */
-        static constexpr uint8 kAdc = cal::values::kAdc; /**< ADC input type */
-        static constexpr uint8 kDig = cal::values::kDig; /**< Digital input type */
+        static constexpr uint8 kDcc = cal::constants::kDcc; /**< DCC input type */
+        static constexpr uint8 kAdc = cal::constants::kAdc; /**< ADC input type */
+        static constexpr uint8 kDig = cal::constants::kDig; /**< Digital input type */
 
         uint8 type; ///< Type of command source [kDcc, kAdc, kDig]
         uint8 pin;  ///< Index of the input element on RTE
@@ -77,8 +77,8 @@ namespace signal
      */
     struct target
     {
-        static constexpr uint8 kOnboard = cal::values::kOnboard;   ///< Onboard output type
-        static constexpr uint8 kExternal = cal::values::kExternal; ///< External output type
+        static constexpr uint8 kOnboard = cal::constants::kOnboard;   ///< Onboard output type
+        static constexpr uint8 kExternal = cal::constants::kExternal; ///< External output type
 
         /** Constructor from CV value*/
         target(uint8 v)
@@ -89,20 +89,20 @@ namespace signal
         /** Convert to CV value*/
         explicit operator uint8() const 
         { 
-            return util::bits::lshift(type, cal::values::bitshift::kFirstOutputType) |
-                   util::bits::lshift(pin, cal::values::bitshift::kFirstOutputPin); 
+            return util::bits::lshift(type, cal::constants::bitshift::kFirstOutputType) |
+                   util::bits::lshift(pin, cal::constants::bitshift::kFirstOutputPin); 
         }
 
         /** Assignment from CV value*/
         struct target operator=(const uint8 v)
         {
-            pin = util::bits::masked_shift(v, cal::values::bitmask::kFirstOutputPin, cal::values::bitshift::kFirstOutputPin);
-            type = util::bits::masked_shift(v, cal::values::bitmask::kFirstOutputType, cal::values::bitshift::kFirstOutputType);
+            pin = util::bits::masked_shift(v, cal::constants::bitmask::kFirstOutputPin, cal::constants::bitshift::kFirstOutputPin);
+            type = util::bits::masked_shift(v, cal::constants::bitmask::kFirstOutputType, cal::constants::bitshift::kFirstOutputType);
             return *this;
         }
 
-        uint8 pin : (cal::values::bitshift::kFirstOutputType);       ///< output pin number
-        uint8 type : (8U - cal::values::bitshift::kFirstOutputType); ///< type of target (kOnboard, kExternal)
+        uint8 pin : (cal::constants::bitshift::kFirstOutputType);       ///< output pin number
+        uint8 type : (8U - cal::constants::bitshift::kFirstOutputType); ///< type of target (kOnboard, kExternal)
     };
 
 }

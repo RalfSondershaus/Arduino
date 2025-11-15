@@ -39,6 +39,11 @@ namespace rte
 
     static inline bool ifc_cal_set_defaults()           { return calm.set_defaults(); }
 
+    /**
+     * @brief Namespace for signal-related RTE functions
+     * 
+     * @note Use namespace name 'sig' to avoid confusion with namespace 'signal'
+     */
     namespace sig
     {
         /**

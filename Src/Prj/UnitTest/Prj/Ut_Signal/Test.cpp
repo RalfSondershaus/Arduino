@@ -40,6 +40,33 @@
 
 #include <Cal/CalM_config.h>
 
+/**
+ * @brief Built-in signal aspects configuration for testing
+ */
+#define CAL_BUILT_IN_SIGNAL_OUTPUTS     \
+    {                                   \
+        5,                              \
+        0b00011000, 0b00000000,         \
+        0b00000100, 0b00000000,         \
+        0b00000110, 0b00000000,         \
+        0b00011001, 0b00000000,         \
+        0b00011111, 0b00000000,         \
+        0b00011111, 0b00000000,         \
+        0b00011111, 0b00000000,         \
+        0b00011111, 0b00000000,         \
+        10, 10,                         \
+        2,                              \
+        0b00000001, 0b00000000,         \
+        0b00000010, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        10, 10                          \
+    }
+
 typedef util::classifier_array<cfg::kNrClassifiers, cfg::kNrClassifierClasses> classifier_array_type;
 
 static constexpr uint8 kBuiltInSignalIDAusfahrsignal = 1;
@@ -164,13 +191,13 @@ TEST(Ut_Signal, CalM_get_signal_id)
     EXPECT_EQ(rte::get_cv(cal::cv::kSignalIDBase + signal_pos), kBuiltInSignalIDAusfahrsignal);
     EXPECT_EQ(rte::sig::get_signal_id(signal_pos), kBuiltInSignalIDAusfahrsignal);
     // ... with first output pin first_output_pin
-    rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, cal::values::make_signal_first_output(cal::values::kOnboard, first_output_pin));
+    rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output_pin));
     EXPECT_EQ(rte::sig::get_first_output(signal_pos).pin, first_output_pin);
-    EXPECT_EQ(rte::sig::get_first_output(signal_pos).type, cal::values::kOnboard);
+    EXPECT_EQ(rte::sig::get_first_output(signal_pos).type, cal::constants::kOnboard);
     // ... with ADC input pin input_pin
-    rte::set_cv(cal::cv::kSignalInputBase + signal_pos, cal::values::make_signal_input(cal::values::kAdc, input_pin));
-    EXPECT_EQ(rte::get_cv(cal::cv::kSignalInputBase + signal_pos), static_cast<uint8>(cal::values::kAdc << 6 | (input_pin & 0x3F)));
-    EXPECT_EQ(rte::sig::get_input(signal_pos).type, cal::values::kAdc);
+    rte::set_cv(cal::cv::kSignalInputBase + signal_pos, cal::constants::make_signal_input(cal::constants::kAdc, input_pin));
+    EXPECT_EQ(rte::get_cv(cal::cv::kSignalInputBase + signal_pos), static_cast<uint8>(cal::constants::kAdc << 6 | (input_pin & 0x3F)));
+    EXPECT_EQ(rte::sig::get_input(signal_pos).type, cal::constants::kAdc);
     EXPECT_EQ(rte::sig::get_input(signal_pos).pin, input_pin);
     // ... with classifier type classifier_type
     rte::set_cv(cal::cv::kSignalInputClassifierTypeBase + signal_pos, classifier_type);
@@ -258,16 +285,16 @@ void do_signal_test_red_green(
     // And now activate signal kSignalPos
     rte::set_cv(cal::cv::kSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
     // ... with first output pin first_output_pin
-    tmp = cal::values::make_signal_first_output(cal::values::kOnboard, first_output_pin);
+    tmp = cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output_pin);
     rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, tmp);
     // ... with ADC input pin input_pin
-    tmp = cal::values::make_signal_input(cal::values::kAdc, input_pin);
+    tmp = cal::constants::make_signal_input(cal::constants::kAdc, input_pin);
     rte::set_cv(cal::cv::kSignalInputBase + signal_pos, tmp);
     // ... with classifier type classifier_type
     tmp = classifier_type;
     rte::set_cv(cal::cv::kSignalInputClassifierTypeBase + signal_pos, tmp);
 
-    in.type = cal::values::kAdc;
+    in.type = cal::constants::kAdc;
     in.idx = signal_pos;
 
     for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
@@ -280,7 +307,7 @@ void do_signal_test_red_green(
         uint8 cmd = rte::ifc_rte_get_cmd::call(in);
         log << std::setw(3) << (int)cmd << " ";
         EXPECT_EQ(cmd, aSteps[nStep].cmd);
-        uint8 target_pin = cal::values::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
+        uint8 target_pin = cal::constants::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
         for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
         {
             // Get pins for current signal target
@@ -467,10 +494,10 @@ void do_signal_test_all(
     // And now activate signal signal_pos
     rte::set_cv(cal::cv::kSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
     // ... with first output pin first_output_pin
-    tmp = cal::values::make_signal_first_output(cal::values::kOnboard, first_output_pin);
+    tmp = cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output_pin);
     rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, tmp);
     // ... with ADC input pin input_pin
-    tmp = cal::values::make_signal_input(cal::values::kAdc, input_pin);
+    tmp = cal::constants::make_signal_input(cal::constants::kAdc, input_pin);
     rte::set_cv(cal::cv::kSignalInputBase + signal_pos, tmp);
     // ... with classifier type classifier_type
     tmp = classifier_type;
@@ -482,7 +509,7 @@ void do_signal_test_all(
     rte::set_cv(cal::cv::kClassifierBase + 1 + 4 + cfg::kNrClassifierClasses, 255);
 
     // Prepare RTE call to get command for signal_pos
-    in.type = cal::values::kAdc;
+    in.type = cal::constants::kAdc;
     in.idx = signal_pos;
 
     for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
@@ -496,7 +523,7 @@ void do_signal_test_all(
         uint8 cmd = rte::ifc_rte_get_cmd::call(in);
         log << std::setw(3) << (int)cmd << " ";
         EXPECT_EQ(cmd, aSteps[nStep].cmd);
-        uint8 target_pin = cal::values::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
+        uint8 target_pin = cal::constants::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
         for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
         {
             // Get pins for current signal target
@@ -661,13 +688,13 @@ void do_signal_dcc_test_aspects_2_3(
     // And now activate signal signal_pos
     rte::set_cv(cal::cv::kSignalIDBase + signal_pos, kBuiltInSignalIDAusfahrsignal);
     // ... with first output pin first_output_pin
-    tmp = cal::values::make_signal_first_output(cal::values::kOnboard, first_output_pin);
+    tmp = cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output_pin);
     rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, tmp);
     // ... with DCC input
-    tmp = cal::values::make_signal_input(cal::values::kDcc, 0);
+    tmp = cal::constants::make_signal_input(cal::constants::kDcc, 0);
     rte::set_cv(cal::cv::kSignalInputBase + signal_pos, tmp);
 
-    in.type = cal::values::kDcc;
+    in.type = cal::constants::kDcc;
     in.idx = signal_pos;
 
     for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
@@ -687,7 +714,7 @@ void do_signal_dcc_test_aspects_2_3(
         uint8 cmd = rte::ifc_rte_get_cmd::call(in);
         log << std::setw(3) << (int)cmd << " - ";
         EXPECT_EQ(cmd, aSteps[nStep].cmd);
-        uint8 target_pin = cal::values::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
+        uint8 target_pin = cal::constants::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
         for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
         {
             util::intensity8_255 pwm_rte;
@@ -876,15 +903,15 @@ void do_signal_dcc_test_aspects_0_1_UserDefined(
     rte::set_cv(cal::eeprom::kUserDefinedSignalBase + user_defined_signal_id + 17, 20); // change over time [10 ms]
     rte::set_cv(cal::eeprom::kUserDefinedSignalBase + user_defined_signal_id + 18, 20); // change over time blink [10 ms]
     // And now activate signal signal_pos
-    rte::set_cv(cal::cv::kSignalIDBase + signal_pos, cal::values::kFirstUserDefinedSignalID + user_defined_signal_id);
+    rte::set_cv(cal::cv::kSignalIDBase + signal_pos, cal::constants::kFirstUserDefinedSignalID + user_defined_signal_id);
     // ... with first output pin first_output_pin
-    tmp = cal::values::make_signal_first_output(cal::values::kOnboard, first_output_pin);
+    tmp = cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output_pin);
     rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, tmp);
     // ... with DCC input
-    tmp = cal::values::make_signal_input(cal::values::kDcc, 0);
+    tmp = cal::constants::make_signal_input(cal::constants::kDcc, 0);
     rte::set_cv(cal::cv::kSignalInputBase + signal_pos, tmp);
 
-    in.type = cal::values::kDcc;
+    in.type = cal::constants::kDcc;
     in.idx = signal_pos;
 
     for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
@@ -904,7 +931,7 @@ void do_signal_dcc_test_aspects_0_1_UserDefined(
         uint8 cmd = rte::ifc_rte_get_cmd::call(in);
         log << std::setw(3) << (int)cmd << " - ";
         EXPECT_EQ(cmd, aSteps[nStep].cmd);
-        uint8 target_pin = cal::values::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
+        uint8 target_pin = cal::constants::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
         for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
         {
             util::intensity8_255 pwm_rte;
@@ -935,10 +962,222 @@ TEST(Ut_Signal, Signal0_DCC_Aspects_0_1_UserDefinedSignal0)
     do_signal_dcc_test_aspects_0_1_UserDefined(
         kSignalPos,
         kFirstOutputPin,
-        kUserDefinedSignalID, /*cal::values::kFirstUserDefinedSignalID is added internally */
+        kUserDefinedSignalID, /*cal::constants::kFirstUserDefinedSignalID is added internally */
         log);
 
     log.stop();
+}
+
+/**
+ * @brief Tests getting and setting signal IDs in calibration variables
+ * 
+ * This test verifies that signal IDs can be correctly retrieved and modified
+ * in the calibration variables stored in EEPROM. It checks that the default 
+ * value is 'not used', and that setting a built-in signal ID works as expected.
+ */
+TEST(Ut_Signal, Rte_get_signal_id)
+{
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+
+    for (int signal_pos = 0; signal_pos < cfg::kNrSignals; signal_pos++)
+    {
+        const uint16 cv_id = cal::cv::kSignalIDBase + signal_pos;
+        uint8 signal_id;
+        signal_id = rte::get_cv(cv_id);
+        EXPECT_EQ(signal_id, cal::constants::kSignalNotUsed);
+        
+        rte::set_cv(cv_id, cal::constants::kFirstBuiltInSignalID);
+        signal_id = rte::get_cv(cv_id);
+        EXPECT_EQ(signal_id, cal::constants::kFirstBuiltInSignalID);
+        
+        rte::set_cv(cv_id, cal::constants::kSignalNotUsed);
+        signal_id = rte::get_cv(cv_id);
+        EXPECT_EQ(signal_id, cal::constants::kSignalNotUsed);
+    }
+}
+
+/**
+ * @brief Tests whether signal IDs are correctly identified as built-in signals
+ * 
+ * This test verifies that the function rte::sig::is_built_in correctly identifies
+ * built-in signal IDs. It checks all built-in signal IDs and ensures that IDs outside this 
+ * range are not identified as built-in.
+ */
+TEST(Ut_Signal, Rte_sig_is_built_in)
+{
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+    uint8 signal_id;
+    for (signal_id = cal::constants::kFirstBuiltInSignalID; 
+         signal_id < cal::constants::kFirstBuiltInSignalID + cfg::kNrBuiltInSignals; 
+         signal_id++)
+    {
+        EXPECT_EQ(rte::sig::is_built_in(signal_id), true);
+    }
+    // one past the last built-in signal ID
+    EXPECT_EQ(rte::sig::is_built_in(signal_id), false);
+    // one before the first built-in signal ID
+    EXPECT_EQ(rte::sig::is_built_in(cal::constants::kFirstBuiltInSignalID - 1U), false);
+}
+
+/**
+ * @brief Tests whether signal IDs are correctly identified as user-defined signals
+ * 
+ * This test verifies that the function rte::sig::is_user_defined correctly identifies
+ * user-defined signal IDs. It checks all user-defined signal IDs and ensures that IDs outside this 
+ * range are not identified as user-defined.
+ */
+TEST(Ut_Signal, Rte_sig_is_user_defined)
+{
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+    uint8 signal_id;
+    // Test all user-defined signal IDs
+    for (signal_id = cal::constants::kFirstUserDefinedSignalID;
+         signal_id < cal::constants::kFirstUserDefinedSignalID + cfg::kNrUserDefinedSignals;
+         signal_id++)
+    {
+        EXPECT_EQ(rte::sig::is_user_defined(signal_id), true);
+    }
+    // one past the last user-defined signal ID
+    EXPECT_EQ(rte::sig::is_user_defined(signal_id), false);
+    // one before the first user-defined signal ID
+    EXPECT_EQ(rte::sig::is_user_defined(cal::constants::kFirstUserDefinedSignalID - 1U), false);
+}
+
+/**
+ * @brief Tests getting signal aspects for built-in and user-defined signals
+ * 
+ * This test verifies that the function rte::sig::get_signal_aspect correctly retrieves
+ * the signal aspects for both built-in and user-defined signals. It checks that the
+ * aspects match the expected default values for built-in signals and that user-defined
+ * signals return default values of zero when not configured. 
+ * It also tests setting and retrieving custom aspects for user-defined signals.
+ */
+TEST(Ut_Signal, Rte_sig_get_signal_aspect)
+{
+    const uint8 built_in_signal_outputs[cal::cv::kSignalLength * cfg::kNrBuiltInSignals] = CAL_BUILT_IN_SIGNAL_OUTPUTS;
+    struct signal::signal_aspect aspect;
+    
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+
+    // Test for all signals
+    uint8 signal_id;
+    for (signal_id = cal::constants::kFirstBuiltInSignalID; 
+         signal_id < cal::constants::kFirstBuiltInSignalID + cfg::kNrBuiltInSignals; 
+         signal_id++)
+    {
+        uint8 cmd;
+        // Test all aspects for built-in signals
+        for (cmd = 0; cmd < cfg::kNrSignalAspects; cmd++)
+        {
+            uint16 pos = signal_id - cal::constants::kFirstBuiltInSignalID;
+            rte::sig::get_signal_aspect(signal_id, cmd, aspect);
+            EXPECT_EQ(aspect.num_targets                , built_in_signal_outputs[pos * cal::cv::kSignalLength + 0]);
+            EXPECT_EQ(aspect.aspect                     , built_in_signal_outputs[pos * cal::cv::kSignalLength + 1 + cmd * 2]);
+            EXPECT_EQ(aspect.blink                      , built_in_signal_outputs[pos * cal::cv::kSignalLength + 1 + cmd * 2 + 1]);
+            EXPECT_EQ(aspect.change_over_time_10ms      , built_in_signal_outputs[pos * cal::cv::kSignalLength + 17]);
+            EXPECT_EQ(aspect.change_over_time_blink_10ms, built_in_signal_outputs[pos * cal::cv::kSignalLength + 18]);
+        }
+    }
+
+    for (signal_id = cal::constants::kFirstUserDefinedSignalID; 
+         signal_id < cal::constants::kFirstUserDefinedSignalID + cfg::kNrUserDefinedSignals; 
+         signal_id++)
+    {
+        uint8 cmd;
+        const uint16 pos = signal_id - cal::constants::kFirstUserDefinedSignalID;
+        // Test all aspects for user-defined signals
+        for (cmd = 0; cmd < cfg::kNrSignalAspects; cmd++)
+        {
+            // By default, aspect should be 0 (startup/default)
+            rte::sig::get_signal_aspect(signal_id, cmd, aspect);
+            EXPECT_EQ(aspect.num_targets                , static_cast<uint8>(0));
+            EXPECT_EQ(aspect.aspect                     , static_cast<uint8>(0));
+            EXPECT_EQ(aspect.blink                      , static_cast<uint8>(0));
+            EXPECT_EQ(aspect.change_over_time_10ms      , static_cast<uint8>(0));
+            EXPECT_EQ(aspect.change_over_time_blink_10ms, static_cast<uint8>(0));
+            rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 0, 2); // 2 LEDs
+            rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 1 + cmd * 2 + 0, 0b00000010); // aspect for cmd
+            rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 1 + cmd * 2 + 1, 0b00000100); // blink for cmd
+            rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 17, 20); // change over time [10 ms]
+            rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 18, 20); // change over time blink [10 ms]
+            // Just set aspect for cmd, others remain 0
+            for (uint8 cmd2 = 0; cmd2 < cfg::kNrSignalAspects; cmd2++)
+            {
+                rte::sig::get_signal_aspect(signal_id, cmd2, aspect);
+                EXPECT_EQ(aspect.num_targets                , static_cast<uint8>(2));
+                EXPECT_EQ(aspect.aspect                     , (cmd == cmd2) ? static_cast<uint8>(0b00000010) : static_cast<uint8>(0b00000000));
+                EXPECT_EQ(aspect.blink                      , (cmd == cmd2) ? static_cast<uint8>(0b00000100) : static_cast<uint8>(0b00000000));
+                EXPECT_EQ(aspect.change_over_time_10ms      , static_cast<uint8>(20));
+                EXPECT_EQ(aspect.change_over_time_blink_10ms, static_cast<uint8>(20));
+            }
+            rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 0, 0); // default to 0 LEDs
+            rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 1 + cmd * 2 + 0, 0b00000000); // default aspect for cmd
+            rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 1 + cmd * 2 + 1, 0b00000000); // default blink for cmd
+            rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 17, 0); // default change over time [10 ms]
+            rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 18, 0); // default change over time blink [10 ms]
+        }
+    }
+}
+
+TEST(Ut_Signal, Rte_sig_get_input)
+{
+    uint8 signal_pos;
+    
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+
+    for (signal_pos = 0; signal_pos < cfg::kNrSignals; signal_pos++)
+    {
+        const uint16 cv_id = cal::cv::kSignalInputBase + signal_pos;
+        uint8 input_type;
+        uint8 input_pin;
+        // Test setting and getting input types and indexes
+        for (input_type = 0; input_type < 4; input_type++)
+        {
+            for (input_pin = 0; input_pin < 8; input_pin++)
+            {
+                uint8 tmp = cal::constants::make_signal_input(input_type, input_pin);
+                rte::set_cv(cv_id, tmp);
+                struct signal::input_cal read_back = rte::sig::get_input(signal_pos);
+                EXPECT_EQ(read_back.type, input_type);
+                EXPECT_EQ(read_back.pin, input_pin);
+            }
+        }
+    }
+}
+
+/**
+ * @brief Tests getting the first output pin configuration for signals
+ * 
+ * This test verifies that the function rte::sig::get_first_output correctly retrieves
+ * the first output pin configuration for all signals. It tests setting various
+ * first output pin values and ensures that the retrieved values match the set values.
+ */
+TEST(Ut_Signal, Rte_sig_get_first_output)
+{
+    uint8 signal_pos;
+
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+
+    for (signal_pos = 0; signal_pos < cfg::kNrSignals; signal_pos++)
+    {
+        const uint16 cv_id = cal::cv::kSignalFirstOutputBase + signal_pos;
+        uint8 first_output;
+        ;
+        // Test setting and getting first output pin
+        for (first_output = 0; first_output < 32; first_output++)
+        {
+            uint8 tmp = cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output);
+            rte::set_cv(cv_id, tmp);
+            struct signal::target read_back = rte::sig::get_first_output(signal_pos);
+            EXPECT_EQ(read_back.pin, first_output);
+        }
+    }
 }
 
 void setUp(void)
@@ -967,6 +1206,13 @@ bool test_loop(void)
     RUN_TEST(Signal0_DCC_Aspects_2_3);
     RUN_TEST(Signal7_DCC_Aspects_2_3);
     RUN_TEST(Signal0_DCC_Aspects_0_1_UserDefinedSignal0);
+
+    RUN_TEST(Rte_get_signal_id);
+    RUN_TEST(Rte_sig_is_built_in);
+    RUN_TEST(Rte_sig_is_user_defined);
+    RUN_TEST(Rte_sig_get_signal_aspect);
+    RUN_TEST(Rte_sig_get_input);
+    RUN_TEST(Rte_sig_get_first_output);
 
     (void)UNITY_END();
 
