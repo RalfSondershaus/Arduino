@@ -20,13 +20,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y git make gcc-avr avr-libc
-
-      - name: Clone Repository
-        run: git clone https://github.com/RalfSondershaus/Arduino arduino
-
-      - name: Navigate to Repository
-        run: cd arduino
+          sudo apt install -y make gcc-avr avr-libc
 
       - name: Run Build Script App/DccSniffer
         run: ./Build/build.sh App/DccSniffer mega avr_gcc arduino none rebuild
