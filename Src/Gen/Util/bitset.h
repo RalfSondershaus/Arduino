@@ -119,7 +119,7 @@ namespace util
     template <typename W1, typename W2>
     constexpr W2 apply_mask_as(W1 w, W1 mask) { return static_cast<W2>(w & mask); }
 
-    /// @brief Extracts a bitfield from w at position pos with length nr_bits. (1) right shift by pos. (2) mask
+    /// @brief Extracts a bitfield from w by (1) right shifting by pos, then (2) applying the mask to isolate nr_bits.
     /// @tparam W The word type (must be unsigned).
     /// @param w Input value.
     /// @param pos Starting bit position.
