@@ -146,7 +146,7 @@ void PrintBin(const PacketType& pkt)
   i += n;
   pcBuf[i] = 0x00;
 
-  hal::serial::println((const char *)pcBuf);
+  hal::serial::println(reinterpret_cast<const char*>(pcBuf));
 }
 
 // ---------------------------------------------------
