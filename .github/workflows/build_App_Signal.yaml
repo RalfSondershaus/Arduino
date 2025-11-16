@@ -14,6 +14,8 @@ on:
   release:
     types:
       - published     # When a release is published
+      - draft         # When a release is created as a draft
+      - prereleased   # When a prerelease is created
     branches:
       - master
 
