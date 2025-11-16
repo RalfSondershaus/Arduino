@@ -3,7 +3,7 @@
  *
  * @author Ralf Sondershaus
  *
- * @brief  
+ * @brief Calibration manager implementation
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
