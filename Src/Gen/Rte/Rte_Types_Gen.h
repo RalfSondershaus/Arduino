@@ -1,5 +1,5 @@
 /**
- * @file Gen/Rte/Rte_Type_Gen.h
+ * @file Gen/Rte/Rte_Types_Gen.h
  *
  * @brief Defines generic types for RTE
  *
