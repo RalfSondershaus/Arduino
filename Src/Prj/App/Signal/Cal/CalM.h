@@ -139,13 +139,13 @@ namespace cal
                 if (cv_id >= cv::kSignalInputBase &&
                     cv_id < cv::kSignalInputBase + cfg::kNrSignals)
                 {
-                    // reconfigure input pin if input CV changed
+                    // reconfigure pins if input CV changed
                     configure_pins();
                 }
                 else if (cv_id >= cv::kSignalFirstOutputBase &&
                     cv_id < cv::kSignalFirstOutputBase + cfg::kNrSignals)
                 {
-                    // reconfigure input pin if input CV changed
+                    // reconfigure pins if input CV changed
                     configure_pins();
                 }
                 else
