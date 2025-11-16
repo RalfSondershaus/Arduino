@@ -1,5 +1,5 @@
 /**
- * @file Cal/CalM_Type_Prj.h
+ * @file Cal/CalM_Types_Prj.h
  *
  * @brief Defines project specific calibration types.
  *
