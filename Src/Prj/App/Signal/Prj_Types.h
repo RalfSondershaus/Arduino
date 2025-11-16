@@ -1,5 +1,5 @@
 /**
- * @file Gen/Util/Gen_Types.h
+ * @file Prj/App/Signal/Prj_Types.h
  *
  * @brief Defines generic types that can be useful in various modules
  *
