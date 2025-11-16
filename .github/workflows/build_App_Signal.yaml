@@ -27,13 +27,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y git make gcc-avr avr-libc
-
-      - name: Clone Repository
-        run: git clone https://github.com/RalfSondershaus/Arduino arduino
-
-      - name: Navigate to Repository
-        run: cd arduino
+          sudo apt install -y make gcc-avr avr-libc
 
       - name: Run Build Script App/Signal
         run: ./Build/build.sh App/Signal mega avr_gcc arduino none rebuild
@@ -47,6 +41,8 @@ jobs:
   build_release:
     if: ${{ github.event_name == 'release' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -55,13 +51,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y git make gcc-avr avr-libc
-
-      - name: Clone Repository
-        run: git clone https://github.com/RalfSondershaus/Arduino arduino
-
-      - name: Navigate to Repository
-        run: cd arduino
+          sudo apt install -y make gcc-avr avr-libc
 
       - name: Run Build Script App/Signal
         run: ./Build/build.sh App/Signal mega avr_gcc arduino none rebuild
@@ -69,17 +59,12 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-output
+          name: signal-release-${{ github.event.release.tag_name }}
           path: Build/Bin/
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
         with:
-          # The upload URL is extracted from the release event
-          upload_url: ${{ github.event.release.upload_url }}
-          # Note: "working-directory" works for run-steps only, so we use full pathes here
-          asset_path: ./Build/bin/Signal.hex
-          asset_name: Signal.hex
-          asset_content_type: application/octet-stream
+          files: |
+            Build/Bin/Signal.hex
+            Build/Bin/Signal.elf
