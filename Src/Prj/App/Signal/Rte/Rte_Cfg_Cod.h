@@ -34,7 +34,7 @@ namespace rte
     extern cal::CalM calm;
 
     static inline uint8 get_cv(uint16 cv)               { return calm.get_cv(cv); }
-    static inline void set_cv(uint16 cv_id, uint8 val)  { return calm.set_cv(cv_id, val); }
+    static inline void set_cv(uint16 cv_id, uint8 val)  { calm.set_cv(cv_id, val); }
     static inline bool is_cv_id_valid(uint16 cv_id)     { return calm.is_cv_id_valid(cv_id); }
 
     static inline bool ifc_cal_set_defaults()           { return calm.set_defaults(); }
