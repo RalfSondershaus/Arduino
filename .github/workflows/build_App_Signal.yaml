@@ -70,5 +70,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            Build/Bin/Signal.hex
-            Build/Bin/Signal.elf
+            Build/Bin/Signal/Signal.hex
+            Build/Bin/Signal/Signal.elf
