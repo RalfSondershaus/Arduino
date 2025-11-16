@@ -128,7 +128,7 @@ namespace util
     template <typename W>
     constexpr W bitfield_at(W w, size_t pos, size_t nr_bits) { return static_cast<W>((w >> pos) & bit_mask_n<W>(nr_bits)); }
 
-    /// @brief Extracts a bitfield from w by applying (1) the mask and (2) the shift.
+    /// @brief Extracts a bitfield from w by (1) applying the mask to isolate bits, then (2) right shifting by shift positions.
     /// @tparam W The word type (must be unsigned).
     /// @param w Input value.
     /// @param mask The bit mask to be applied
