@@ -1,5 +1,5 @@
 /**
- * @file Prj/Signal/Rte_Type_Prj.h
+ * @file Prj/Signal/Rte_Types_Prj.h
  *
  * @brief Defines project specific types for the RTE.
  *
