@@ -170,9 +170,9 @@ static void printRte()
 }
 
 /**
- * @test Signal0_ADC_Green_Red
- * @brief Tests whether signal 0 is correctly triggered by ADC input values
- *        and whether the corresponding PWM outputs are set correctly.
+ * @test CalM_get_signal_id
+ * @brief Tests whether signal configuration CVs can be set and read correctly
+ *        and whether the signal ID, first output and input pin are returned correctly.
  */
 TEST(Ut_Signal, CalM_get_signal_id)
 {
@@ -211,6 +211,26 @@ TEST(Ut_Signal, CalM_get_signal_id)
 
 #endif
 }
+
+/**
+ * @test CalM_update_cv_id
+ * @brief Tests whether updating a CV causes the new value to be written to EEPROM.
+ *        This test initializes the EEPROM with default values, sets a specific CV,
+ *        and verifies that the EEPROM contains the updated value.
+ */
+TEST(Ut_Signal, CalM_update_cv_id)
+{
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+    for (size_t i = 0; i < rte::calm.eeprom_data_buffer.size(); i++)
+    {
+        EXPECT_EQ(hal::eeprom::read(static_cast<int>(i)), rte::calm.eeprom_data_buffer[i]);
+    }
+    // Now set CV for signal ID and verify EEPROM is updated
+    rte::set_cv(cal::cv::kSignalIDBase + 0, kBuiltInSignalIDAusfahrsignal);
+    EXPECT_EQ(hal::eeprom::read(cal::cv::kSignalIDBase + 0), kBuiltInSignalIDAusfahrsignal);
+}
+
 
 /**
  * @brief Performs integration testing of signal processing using time-based test sequences
@@ -1198,6 +1218,7 @@ bool test_loop(void)
     UNITY_BEGIN();
 
     RUN_TEST(CalM_get_signal_id);
+    RUN_TEST(CalM_update_cv_id);
     RUN_TEST(Signal0_ADC_Green_Red);
     RUN_TEST(Signal1_ADC_Green_Red);
     RUN_TEST(Signal7_ADC_Green_Red);

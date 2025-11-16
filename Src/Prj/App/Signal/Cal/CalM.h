@@ -152,6 +152,8 @@ namespace cal
                 {
                     // no action required
                 }
+                // save to EEPROM
+                update(cv_id);
             }
         }
 
@@ -190,6 +192,13 @@ namespace cal
          * @return false Validation failed
          */
         bool update();
+        /**
+         * @brief Save a CV to EEPROM if a value differs from the value already stored in the EEPROM.
+         *
+         * @return true Validation successful
+         * @return false Validation failed
+         */
+        void update(uint16 cv_id);
         /** @} */
 
         /**

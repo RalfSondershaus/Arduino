@@ -30,18 +30,6 @@
 using AsciiCom = com::AsciiCom;
 using string_type = AsciiCom::string_type;
 
-/**
- * @brief Stub function
- * 
- * @param classifier_pos 
- * @return rte::ret_type 
- */
-rte::ret_type signal::InputClassifier::set_config(uint8 classifier_pos) 
-{
-    (void) classifier_pos;
-    return rte::ret_type::OK;
-}
-
 template<> void EXPECT_EQ<string_type>(string_type actual, string_type expected) { TEST_ASSERT_EQUAL_STRING(expected.c_str(), actual.c_str()); }
 
 //-------------------------------------------------------------------------
@@ -51,12 +39,12 @@ TEST(Ut_Signal_Com, AsciiCom_process_SET_CV_SignalIDs)
   string_type telegram = "SET_CV 42 1";
   string_type response;
   asciiCom.process(telegram, response);
-  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalIDBase + 0], static_cast<uint8>(1));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalIDBase + 0], static_cast<uint8>(1));
   EXPECT_EQ(response, string_type("OK SET_CV 42 1"));
 
   telegram = "SET_CV 43 1";
   asciiCom.process(telegram, response);
-  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalIDBase + 1], static_cast<uint8>(1));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalIDBase + 1], static_cast<uint8>(1));
   EXPECT_EQ(response, string_type("OK SET_CV 43 1"));
 }
 
@@ -67,14 +55,14 @@ TEST(Ut_Signal_Com, AsciiCom_process_INIT)
   string_type telegram = "INIT";
   string_type response;
   asciiCom.process(telegram, response);
-  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eDecoderAddressLSB], cal::kAddressLSB);
-  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eDecoderAddressMSB], cal::kAddressMSB);
-  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eManufacturerVersionID], cal::kManufacturerVersionID);
-  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eManufacturerID], cal::kManufacturerID);
-  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eConfiguration], cal::kConfiguration);
-  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eManufacturerCVStructureID], cal::kManufacturerCVStructureID);
-  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalIDBase + 0], cal::kSignalNotUsed);
-  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::eSignalIDBase + 1], cal::kSignalNotUsed);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kDecoderAddressLSB], cal::kAddressLSB);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kDecoderAddressMSB], cal::kAddressMSB);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kManufacturerVersionID], cal::kManufacturerVersionID);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kManufacturerID], cal::kManufacturerID);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kConfiguration], cal::kConfiguration);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kManufacturerCVStructureID], cal::kManufacturerCVStructureID);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalIDBase + 0], cal::constants::kSignalNotUsed);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalIDBase + 1], cal::constants::kSignalNotUsed);
   EXPECT_EQ(response, string_type("OK"));
 }
 

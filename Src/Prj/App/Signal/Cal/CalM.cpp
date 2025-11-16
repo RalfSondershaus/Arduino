@@ -215,6 +215,17 @@ namespace cal
     }
 
     /**
+     * @brief Save a CV to EEPROM if a value differs from the value already stored in the EEPROM.
+     *
+     * @return true Validation successful
+     * @return false Validation failed
+     */
+    void CalM::update(uint16 cv_id)
+    {
+        hal::eeprom::update(static_cast<int>(cv_id), eeprom_data_buffer[cv_id]);
+    }
+
+    /**
      * @brief Initialize the calibration manager
      * 
      * Init runable called once at system startup.
