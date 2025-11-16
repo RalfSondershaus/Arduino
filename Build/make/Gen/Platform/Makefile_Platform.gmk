@@ -531,6 +531,14 @@ endif
 # -v    Print (on standard error output) the commands executed to run the stages of compilation.
 # --version Display the version number and copyrights of the invoked GCC.
 # -Wall This enables all the warnings about constructions that some users consider questionable, and that are easy to avoid (or modify to prevent the warning), even in conjunction with macros.
+#
+# Preprocessor output is stored in the object files (.o) with the following syntax (https://gcc.gnu.org/onlinedocs/cpp/Preprocessor-Output.html):
+# # linenum filename flags
+# The flags have the following meaning:
+# - 1 indicates the start of a new file.
+# - 2 indicates returning to a file (after having included another file).
+# - 3 indicates that the text following comes from a system header file, so certain warnings should be suppressed.
+# - 4 indicates that the text following should be treated as C.
 # ---------------------------------------------------
 # We need C++17 for std::string_view
 CFLAGS := $(CFLAGS)     \

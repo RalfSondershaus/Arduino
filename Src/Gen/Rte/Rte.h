@@ -25,7 +25,7 @@
 #define RTE_H_
 
 #include <Std_Types.h>
-#include <Rte/Rte_Type.h>
+#include <Rte/Rte_Types.h>
 
 namespace rte
 {

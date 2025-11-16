@@ -23,10 +23,10 @@
 
 #include <Dcc/Decoder.h>
 #include <Dcc/Filter.h>
-#include <Rte/Rte_Type.h>
+#include <Rte/Rte_Types.h>
 #include <Util/Array.h>
 #include <Util/Timer.h>
-#include <Cal/CalM_Type.h>
+#include <Cal/CalM_Types.h>
 
 namespace signal
 {

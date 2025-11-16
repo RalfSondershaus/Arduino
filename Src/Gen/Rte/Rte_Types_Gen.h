@@ -1,7 +1,7 @@
 /**
- * @file Cal/CalM_Type.h
+ * @file Gen/Rte/Rte_Types_Gen.h
  *
- * @brief Project specific calibration types.
+ * @brief Defines generic types for RTE
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -18,18 +18,14 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CALM_TYPE_H_
-#define CALM_TYPE_H_
+#ifndef RTE_TYPE_GEN_H_
+#define RTE_TYPE_GEN_H_
 
-#include <Cal/CalM_Type_Prj.h>
+#include <Std_Types.h>
 
-/**
- * @brief For type safety: a CV
- */
-struct CV
+namespace rte
 {
-    uint16 id;
-    uint8 val;
-};
+    using ret_type = ifc_base::ret_type;
+} // namespace rte
 
-#endif // CALM_TYPE_H_
+#endif // RTE_TYPE_GEN_H_

@@ -1,7 +1,7 @@
 /**
- * @file Signal/CddLed.h
+ * @file Gen/Rte/Rte_Types.h
  *
- * @brief Driver for LEDs
+ * @brief Include generic types and project specific types (if available).
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -18,33 +18,16 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CDD_LED_H_
-#define CDD_LED_H_
+#ifndef RTE_TYPES_H_
+#define RTE_TYPES_H_
 
-#include <Rte/Rte_Type.h>
+/// Call a member function of an object (instance of a class).
+/// We use this macro because AVR GCC doesn't seem to support std::invoke.
+#define CALL_MEMBER_FUNC(obj,ptrToMemberFunc)  ((obj).*(ptrToMemberFunc))
 
-namespace cdd
-{
-  // -----------------------------------------------------------------------------------
-  /// 
-  // -----------------------------------------------------------------------------------
-  class CddLed
-  {
-  public:
-    using intensity8_type = rte::intensity8;
-    using intensity16_type = rte::intensity16;
+#include <Rte/Rte_Types_Ifc.h>
+#include <Rte/Rte_Types_Runable.h>
+#include <Rte/Rte_Types_Gen.h>
+#include <Rte/Rte_Types_Prj.h>
 
-  protected:
-    void writeOutputs();
-
-  public:
-    CddLed() = default;
-
-    /// Runables
-    void init();
-    void cycle();
-
-  };
-} // namespace cdd
-
-#endif // CDD_LED_H_
+#endif // RTE_TYPES_H_

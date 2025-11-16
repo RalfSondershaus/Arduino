@@ -385,6 +385,18 @@ TEST(Ut_Ramp, do_ramp_16bit_10_0x0_0x8000_0x0100_set_and_step)
   }
 }
 
+TEST(Ut_Ramp, do_mul_overflow)
+{
+    static uint16_t src[] = { 0U, 127U, 128U, 255U };
+    static uint16_t dst[] = { 0U, 16319U, 16448U, 32768U };
+
+    for (size_t i = 0; i < sizeof(src)/sizeof(src[0]); i++)
+    {
+      uint16_t r16 = (src[i] * 32768U) / 255U;
+      EXPECT_EQ(r16, dst[i]);
+    }
+}
+
 void setUp(void)
 {
 }
@@ -415,6 +427,7 @@ bool test_loop(void)
   RUN_TEST(do_ramp_16bit_20_0x0_0x8000_0x1000);
   RUN_TEST(do_ramp_16bit_20_0x0_0x8000_0x8000);
   RUN_TEST(do_ramp_16bit_10_0x0_0x8000_0x0100_set_and_step);
+    RUN_TEST(do_mul_overflow);
 
   (void) UNITY_END();
 
