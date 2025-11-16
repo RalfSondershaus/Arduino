@@ -21,7 +21,7 @@
 #include <Signal.h>
 #include <Signal_cfg.h>
 #include <Util/bitset.h>
-#include <Util/intensity.h>
+#include <Util/Intensity.h>
 
 namespace signal
 {
