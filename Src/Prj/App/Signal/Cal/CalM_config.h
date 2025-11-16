@@ -70,6 +70,7 @@ namespace cal
     constexpr uint8 kChangeOverTime = 10;
     constexpr uint8 kChangeOverTimeBlink = 0;
 
+/// Converts ADC values (0-1023) to classifier limit values (0-255) by dividing by 4.
 #define V2P(v)  ((v) / 4U)
 
     constexpr uint8 kAdDebounce = 5; ///< [10 ms] Debounce time
