@@ -1168,7 +1168,6 @@ TEST(Ut_Signal, Rte_sig_get_first_output)
     {
         const uint16 cv_id = cal::cv::kSignalFirstOutputBase + signal_pos;
         uint8 first_output;
-        ;
         // Test setting and getting first output pin
         for (first_output = 0; first_output < 32; first_output++)
         {
