@@ -90,9 +90,9 @@ namespace util
         }
 
         /**
-         * @brief Get the default upper limit for the given class
+         * @brief Get the pin number for the classifier at the given index
          * @param idx In an array of classifiers, the index of the classifier
-         * @return uint8 Upper limit for the class
+         * @return uint8 Pin number for the classifier at index idx
          */
         inline uint8 get_pin(uint8 idx) { return pins[idx]; }
 
