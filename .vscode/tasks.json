@@ -27,6 +27,7 @@
                 "UnitTest/Gen/Util/Ut_InputClassifier",
                 "UnitTest/Gen/Util/Ut_Ramp",
                 "UnitTest/Gen/Util/Ut_Sstream",
+                "UnitTest/Gen/Util/Ut_Sstream_Performance",
                 "UnitTest/Gen/Util/Ut_String",
                 "UnitTest/Gen/Util/Ut_String_view",
                 "UnitTest/Gen/Util/Ut_Vector",

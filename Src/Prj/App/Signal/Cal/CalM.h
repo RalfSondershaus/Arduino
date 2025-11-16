@@ -24,251 +24,336 @@
 #define CAL_H_
 
 #include <Std_Types.h>
+#include <Prj_Types.h>
 #include <Cfg_Prj.h>
-#include <Cal/CalM_Type.h>
-#include <Rte/Rte_Type.h>
+#include <Cal/CalM_Types.h>
+#include <Cal/CalM_config.h>
+#include <Hal/Gpio.h>
 #include <Util/Array.h>
 
 namespace cal
 {
 
-  class CalM
-  {
-  public:
-    /// @brief User-defined coding data for signals
-    util::array<output_type, cfg::kNrUserDefinedSignals> user_defined_signal_outputs;
-    /// @brief User-defined classifiers
-    util::array<classifier_type, cfg::kNrUserDefinedClassifierTypes> user_defined_classifier_types;
-
-    /**
-     * @defgroup Type safety
-     * @{
-     * Use these types for type safety.
-     */
-    struct Pin
+    class CalM
     {
-        uint8 val;
+    public:
+        /**
+         * @brief EEPROM data buffer
+         * 
+         * Holds all calibration data read from or to be written to EEPROM.
+         */
+        util::array<uint8, eeprom::kSizeOfData> eeprom_data_buffer;
+
+        /**
+         * @brief Built-in signal outputs
+         */
+        static const uint8 ROM_CONST_VAR built_in_signal_outputs[cal::cv::kSignalLength * cfg::kNrBuiltInSignals];
+
+        /**
+         * @brief GPIO configuration
+         * 
+         * Each pin's mode is set using the Arduino pinMode function.
+         */
+        static hal::GpioConfig gpio_cfg;
+        
+    protected:
+
+        /**
+         * @brief Returns true if eeprom::eManufacturerID is not EEPROM initial value (FF)
+         *
+         * @return true ManufacturerID in EEPROM is valid
+         * @return false ManufacturerID in EEPROM is invalid
+         */
+        bool is_valid();
+
+        /**
+         * @brief Returns a checksum for calibration data
+         *
+         * @return uint8 The checksum.
+         */
+        uint8 calc_checksum();
+
+    public:
+        CalM();
+
+        /**
+         * @brief Initialize calibration manager
+         * 
+         *  Init runable called once at system startup.
+         */
+        void init();
+
+        /**
+         * @brief Runable 100 ms
+         * 
+         * Cycle function called every 100 ms.
+         */
+        void cycle100();
+
+        /**
+         * @brief configure output and input pins according to calibration data
+         */
+        void configure_pins();
+
+        /**
+         * @brief Check if a CV is valid
+         * 
+         * @param cv_id CV ID
+         * @return true CV ID is valid
+         * @return false CV ID is not valid
+         */
+        bool is_cv_id_valid(uint16 cv_id)
+        {
+            return eeprom_data_buffer.check_boundary(cv_id);
+        }
+
+        /**
+         * @brief Get a CV
+         *
+         * @param cv_id [in] CV ID
+         * @return uint8 CV value
+         */
+        uint8 get_cv(uint16 cv_id)
+        {
+            if (is_cv_id_valid(cv_id))
+            {
+                return eeprom_data_buffer[cv_id];
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        /**
+         * @brief Set a CV if CV ID is valid.
+         * 
+         * @param cv_id [in] CV ID
+         * @param val [in] CV value
+         */
+        void set_cv(uint16 cv_id, uint8 val)
+        {
+            if (is_cv_id_valid(cv_id))
+            {
+                eeprom_data_buffer[cv_id] = val;
+                if (cv_id >= cv::kSignalInputBase &&
+                    cv_id < cv::kSignalInputBase + cfg::kNrSignals)
+                {
+                    // reconfigure pins if input CV changed
+                    configure_pins();
+                }
+                else if (cv_id >= cv::kSignalFirstOutputBase &&
+                    cv_id < cv::kSignalFirstOutputBase + cfg::kNrSignals)
+                {
+                    // reconfigure pins if input CV changed
+                    configure_pins();
+                }
+                else
+                {
+                    // no action required
+                }
+                // save to EEPROM
+                update(cv_id);
+            }
+        }
+
+        /**
+         * @defgroup EEPROM access
+         * @{
+         */
+        /**
+         * @brief Read all configurations from EEPROM and compare CV 9 (manufacturer ID) against initial
+         * value (default EEPORM value if never written before).
+         *
+         * @return true CV 9 has been written
+         * @return false CV 9 has not been written
+         */
+        bool read_all();
+        /**
+         * @brief Store all configurations to EEPROM.
+         *
+         * @return true CV 9 has been written successfully
+         * @return false CV 9 has not been written
+         */
+        bool write_all();
+        /**
+         * @brief Initialize configuration with ROM default values and write to EEPROM.
+         *
+         * @return true CV 9 has been written successfully
+         * @return false CV 9 has not been written
+         */
+        bool set_defaults();
+        /**
+         * @brief Save data to EEPROM if a value differs from the value already stored in the EEPROM.
+         *
+         * Validate the data after write.
+         *
+         * @return true Validation successful
+         * @return false Validation failed
+         */
+        bool update();
+        /**
+         * @brief Save a CV to EEPROM if a value differs from the value already stored in the EEPROM.
+         *
+         * @return true Validation successful
+         * @return false Validation failed
+         */
+        void update(uint16 cv_id);
+        /** @} */
+
+        /**
+         * @defgroup Signal helpers
+         * @{
+         */
+        struct signal_aspect
+        {
+            uint8 num_targets;                                ///< Number of outputs (LEDs)
+            uint8 aspect; ///< A bit per output, max. 8 outputs: 0 = 0%, 1 = 100%, LSB = 1st output, MSB = 8th output
+            uint8 blink;  ///< A bit per output, max. 8 outputs: 0 = no blinking, 1 = blinking
+            uint8 change_over_time_10ms;                     ///< [10 ms] dim time if aspect changes
+            uint8 change_over_time_blink_10ms;               ///< [10 ms] dim time for blinking effects
+        };
+
+        /**
+         * @brief Get the signal id which selects the change over time and aspects to be used
+         *
+         * @param signal_idx Signal index in the array of signals (0 ... cfg::kNrSignals-1)
+         * @return uint8 Signal id (eSignalNotUsed, eFirstBuiltInSignalId, ..., eFirstUserDefinedSignalID, ...)
+         */
+        uint8 get_signal_id(uint8 signal_idx)
+        {
+            const uint16 idx = (signal_idx < cfg::kNrSignals) ? signal_idx : 0;
+            return get_cv(cal::cv::kSignalIDBase + idx);
+        }
+
+        /**
+         * @brief Check if the signal id is a valid user-defined signal id
+         * 
+         * @param signal_id Signal id to be checked
+         * @return true signal id is a valid user-defined signal id
+         * @return false signal id is not a valid user-defined signal id
+         */
+        bool is_built_in(uint8 signal_id) noexcept 
+        { 
+            return (signal_id >= cal::constants::kFirstBuiltInSignalID) &&
+                (signal_id < cal::constants::kFirstBuiltInSignalID + cfg::kNrBuiltInSignals);
+        }
+
+        /**
+         * @brief Check if the signal id is a valid built-in signal id
+         * 
+         * @param signal_id Signal id to be checked
+         * @return true signal id is a valid built-in signal id
+         * @return false signal id is not a valid built-in signal id
+         */
+        bool is_user_defined(uint8 signal_id) noexcept 
+        { 
+            return (signal_id >= cal::constants::kFirstUserDefinedSignalID) &&
+                (signal_id < cal::constants::kFirstUserDefinedSignalID + cfg::kNrUserDefinedSignals);
+        }
+        /**
+         * @brief Returns the zero based index of signal id to be used for array indexing
+         * 
+         * @param id signal id
+         * @return uint8 zero based index of the signal id
+         * 
+         * @note Use for built in signal ids only.
+         */
+        static inline uint8 zero_based_built_in(uint8 signal_id)  { return signal_id - cal::constants::kFirstBuiltInSignalID; }
+
+        /**
+         * @brief Returns the zero based index of signal id to be used for array indexing
+         * 
+         * @param id signal id
+         * @return uint8 uint8 zero based index of the signal id
+         * 
+         * @note Use for built in signal ids only.
+         */
+        static inline uint8 zero_based_user_defined(uint8 signal_id) { return signal_id - cal::constants::kFirstUserDefinedSignalID; }
+
+        /** @brief Get the signal aspect for a user-defined signal ID
+         * 
+         * @param signal_id Signal id (user-defined)
+         * @param cmd Command index (0 ... cfg::kNrSignalAspects-1)
+         * @param aspect Output: signal aspect configuration
+         */
+        void get_signal_aspect(uint8 signal_id, uint8 cmd, signal::signal_aspect& aspect);
+
+        /**
+         * @brief Get the number of outputs for the signal
+         * @param signal_id Signal id
+         * @return uint8 Number of outputs
+         * 
+         * @note Returns 0 if signal id is invalid
+         */
+        uint8 get_number_of_outputs(uint8 signal_id)
+        {
+            uint8 num_targets;
+            if (is_user_defined(signal_id))
+            {
+                uint16 index = zero_based_user_defined(signal_id);
+                index = cal::cv::kUserDefinedSignalBase + index * cal::cv::kSignalLength;
+                num_targets = util::bits::masked_shift(
+                    get_cv(index),
+                    cal::constants::bitmask::kNumberOfOutputs,
+                    cal::constants::bitshift::kNumberOfOutputs);
+            }
+            else if (is_built_in(signal_id))
+            {
+                uint16 index = zero_based_built_in(signal_id);
+                num_targets = util::bits::masked_shift(
+                    ROM_READ_BYTE(&built_in_signal_outputs[index]),
+                    cal::constants::bitmask::kNumberOfOutputs,
+                    cal::constants::bitshift::kNumberOfOutputs);
+            }
+            else
+            {
+                num_targets = 0U;
+            }
+            return num_targets;
+        }
+
+        /**
+         * @brief Get the input configuration for the signal
+         * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+         * @return uint8 CV value for input configuration
+         */
+        signal::input_cal get_input(uint8 signal_idx)
+        {
+            const uint8 cv_value = get_cv(cal::cv::kSignalInputBase + signal_idx);
+            struct signal::input_cal input;
+            input.type = util::bits::masked_shift(
+                            cv_value,
+                            cal::constants::bitmask::kInputType,
+                            cal::constants::bitshift::kInputType);
+            input.pin = util::bits::masked_shift(
+                            cv_value,
+                            cal::constants::bitmask::kAdcPin,
+                            cal::constants::bitshift::kAdcPin);
+            return input;
+        }
+        /**
+         * @brief Get the input configuration for the signal
+         * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+         * @return uint8 CV value for input configuration
+         */
+        inline struct signal::target get_first_output(uint8 signal_idx)
+        {
+            struct signal::target output = get_cv(cal::cv::kSignalFirstOutputBase + signal_idx);
+            return output;
+        }
+        /** @} */
+
+        /**
+         * @defgroup General helpers
+         * @{
+         */
+        inline bool is_output_pin(uint8 pin)
+        {
+            return (gpio_cfg.pin_modes.check_boundary(pin) && (gpio_cfg.pin_modes[pin] == OUTPUT));
+        }
+        /** @} */
     };
-    struct SignalId
-    {
-        uint8 val;
-    };
-    /** @} */
-
-    /// @brief An invalid classifier type. A valid type is any of 0 ... cfg::kNrUserDefinedClassifierTypes
-    static constexpr uint8 kInvalidClassifierType = 255;
-
-    static constexpr Pin kInvalidPin = Pin { cal::kInvalidPin };
-
-    /// coding data for signals
-    signal_cal_type signals;
-    classifier_array_cal_type classifier_array;
-    led_cal_type leds;
-    base_cv_cal_type base_cv;
-
-  protected:
-    /// Calc data for leds from signals
-    void calc_leds();
-
-    bool is_user_defined(SignalId signal_id) const noexcept 
-    { 
-        return (signal_id.val >= kFirstUserDefinedSignalID) && 
-               (signal_id.val <  user_defined_signal_outputs.max_size());
-    }
-    util::ptr<const cal::output_type> getBuiltInSignal(SignalId signal_id);
-    util::ptr<const cal::output_type> getUserDefinedSignal(SignalId signal_id);
-
-    uint8 find_classifier_type(util::ptr<const classifier_type> limits_ptr);
-
-    /**
-     * @defgroup Helper functions to update configuration.
-     * @{
-     */
-    void set_first_target(cal::signal_type& sig_type, uint8 raw_val);
-    void set_output(signal_type& sig_type, CalM::SignalId signal_id);
-    /**
-     * @note Digital inputs are not supported yet.
-     */
-    void set_input_and_classifier(
-        uint8 signal_pos,
-        classifier_array_element_type& classifier_array_element,
-        signal_type& sig_type,
-        uint8 signal_input_raw_val, 
-        uint8 classifier_type_raw_val);
-    /** @} */
-
-    /**
-     * @defgroup EEPROM access
-     * @{
-     */
-    /** Read data from EEPROM */
-    bool read_all();
-    void read_signals();
-    void read_classifiers();
-    void read_base_CV();
-
-    /** Save data to EEPROM if a value differs from the value already stored in the EEPROM */
-    void update_signals();
-    void update_user_defined_classifiers();
-    void update_base_CV();
-    /** @} */
-
-    /**
-     * @defgroup Initializer from ROM
-     * @{
-     * Initialize data structures and EEPROM with default values from ROM
-     */
-    void init_signals();
-    void init_user_defined_classifiers();
-    void init_base_CV();
-    /** @} */
-
-    /**
-     * @brief Returns true if eeprom::eManufacturerID is not EEPROM initial value (FF)
-     * 
-     * @return true ManufacturerID in EEPROM is valid
-     * @return false ManufacturerID in EEPROM is invalid
-     */
-    bool is_valid();
-
-    /**
-     * @brief Returns a checksum for calibration data
-     * 
-     * @return uint8 The checksum.
-     */
-    uint8 calc_checksum();
-  public:
-    CalM();
-
-    /// Init runable
-    void init();
-    /// Runable 100 ms
-    void cycle100();
-
-    /**
-     * @defgroup Server functions
-     * @{
-     */
-    /** @brief Read access to coding parameters */ 
-    const signal_cal_type *           get_signal()             { return &signals; }
-    const classifier_array_cal_type * get_classifiers_array()  { return &classifier_array; }
-    const led_cal_type *              get_leds()               { return &leds; }
-    const base_cv_cal_type *          get_base_cv()            { return &base_cv; }
-
-    /**
-     * @brief Set the first target of signal @ref signal_pos.
-     * 
-     * @param signal_pos Index of the signal [0 ... cfg::kNrSignals). 
-     * @param first_target The first target (output pin number and type - internal/external)
-     * @param do_update If true, values are stored in EEPROM
-     * @return rte::ret_type E_OK Values are update successfully.
-     * @return rte::ret_type E_NOK Index out of bounds.
-     * 
-     * @note If do_update is false, EEPROM is not updated. You can use @ref update() to store
-     *       data in EEPROM later.
-     */
-    rte::ret_type set_signal_first_target(
-        uint8 signal_pos, 
-        const target_type& first_target, 
-        bool do_update = false);
-
-    /**
-     * @brief Set the signal id of signal @ref signal_pos.
-     * 
-     * @param signal_pos Index of the signal [0 ... cfg::kNrSignals). 
-     * @param signal_id The signal ID that shall be used (1 ... 127: built-in, 128 ... 255: user defined)
-     * @param do_update If true, values are stored in EEPROM
-     * @return rte::ret_type E_OK Values are update successfully.
-     * @return rte::ret_type E_NOK Index out of bounds.
-     * 
-     * @note If do_update is false, EEPROM is not updated. You can use @ref update() to store
-     *       data in EEPROM later.
-     */
-    rte::ret_type set_signal_id(uint8 signal_pos, const uint8 signal_id, bool do_update = false);
-
-    /**
-     * @brief Server function: Configure signal @ref signal_pos to use an ADC pin and a
-     *        classifier as input. If do_update is true, data is stored in EEPROM.
-     * 
-     * @param signal_pos Index of the signal [0 ... cfg::kNrSignals). It is the position
-     *                   of the classified values on RTE.
-     * @param adc_pin ADC pin number
-     * @param classifier_type The classifier type.
-     * @param do_update If true, values are stored in EEPROM.
-     * @return rte::ret_type E_OK Values are update successfully.
-     * @return rte::ret_type E_NOK Index out of bounds.
-     * 
-     * @note If do_update is false, EEPROM is not updated. You can use @ref update() to store
-     *       data in EEPROM later.
-     */
-    rte::ret_type set_signal_input_classifier(uint8 signal_pos, 
-                                              const uint8 adc_pin, 
-                                              const uint8 classifier_type_val,
-                                              bool do_update = false);
-
-    /**
-     * @brief Server function: Configure signal @ref signal_pos to use a DCC commands as input. 
-     *        If do_update is true, data is stored in EEPROM.
-     * 
-     * @param signal_pos Index of the signal [0 ... cfg::kNrSignals).
-     * @param do_update If true, values are stored in EEPROM.
-     * @return rte::ret_type E_OK Values are update successfully.
-     * @return rte::ret_type E_NOK Index out of bounds.
-     * 
-     * @note If do_update is false, EEPROM is not updated. You can use @ref update() to store
-     *       data in EEPROM later.
-     */
-    rte::ret_type set_signal_input_dcc(uint8 signal_pos, 
-                                       bool do_update = false);
-    /**
-    * @brief Set the base CVs
-    * 
-    * @param new_base_cv The base CVs
-    * @param do_update If true, values are stored in EEPROM.
-    * @return rte::ret_type OK success.
-    */
-    rte::ret_type set_base_cv(const base_cv_cal_type& new_base_cv, bool do_update = false);
-    
-    /**
-     * @brief Get a CV
-     * 
-     * @param cv_id [in] CV ID
-     * @param val [out] The CV value
-     * @return rte::ret_type OK CV value was read successfully.
-     * @return rte::ret_type NOK CV with invalid id.
-     */
-    rte::ret_type get_cv(uint16 cv_id, uint8 *val);
-
-    /**
-     * @brief Set a CV
-     * 
-     * @param cv_id CV ID
-     * @param val The new value for the CV
-     * @return rte::ret_type OK CV value was updated in EEPROM successfully. Internal structures 
-     *         were updated.
-     * @return rte::ret_type NOK CV with invalid id.
-     */
-    rte::ret_type set_cv(uint16 cv_id, uint8 val);
-
-    /**
-     * @brief initialize EEPROM with ROM default values
-     * 
-     * @return rte::ret_type OK success.
-     * @return rte::ret_type NOK Data validation ok (written manufacturer ID invalid)
-     */
-    rte::ret_type set_defaults();
-    
-    /**
-     * @brief Save data to EEPROM if a value differs from the value already stored in the EEPROM.
-     * 
-     * Validate the data after write.
-     * 
-     * @return true Validation successful
-     * @return false Validation failed
-     */
-    bool update();
-    /** @} */
-  };
 
 } // namespace cal
 

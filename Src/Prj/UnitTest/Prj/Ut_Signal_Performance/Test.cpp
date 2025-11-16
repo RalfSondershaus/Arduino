@@ -37,9 +37,9 @@
 
 #define PRINT_RTE     0
 
-#include <Cal/CalM_config.h>
+static constexpr uint8 kBuiltInSignalIDAusfahrsignal = 1;
 
-typedef util::input_classifier<cfg::kNrClassifiers, cfg::kNrClassifierClasses> classifier_array_type;
+#include <Cal/CalM_config.h>
 
 // ---------------------------------------------------------------------------
 /// Set elements of RTE arrays to 0
@@ -66,9 +66,9 @@ static void cleanRte()
 // ---------------------------------------------------------------------------
 /// Print elements of RTE to serial interface or stdout
 // ---------------------------------------------------------------------------
+#if PRINT_RTE == 1
 static void printRte()
 {
-#if PRINT_RTE == 1
   rte::classified_values_array classified_array;
   rte::onboard_target_array onboard_targets;
 
@@ -92,8 +92,8 @@ static void printRte()
   }
   Serial.println();
 #endif // ARDUINO
-#endif // PRINT_RTE
 }
+#endif // PRINT_RTE
 
 // ------------------------------------------------------------------------------------------------
 /// 
@@ -102,9 +102,41 @@ TEST(Ut_Signal, InputClassifier1)
 {
   signal::InputClassifier classifier;
   constexpr int nrRep = 1000;
+  constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
+  constexpr uint8 kFirstOutputPin = 13;
+  constexpr uint8 kInputPin = 54;
+  constexpr uint8 kClassifierType = 0;
 
   uint32 t1;
   uint32 td;
+  uint8 tmp;
+
+  // Initialize EEPROM with ROM default values
+  rte::ifc_cal_set_defaults::call();
+  // And now activate signal kSignalPos
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos, kBuiltInSignalIDAusfahrsignal);
+  // ... with first output pin kFirstOutputPin
+  tmp = cal::constants::make_signal_first_output(cal::constants::values::kOutputType_Onboard, kFirstOutputPin);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos, tmp);
+  // ... with ADC input pin kInputPin
+  tmp = cal::constants::make_signal_input(cal::constants::values::kInputType_ADC, kInputPin);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos, tmp);
+  // ... with classifier type kClassifierType
+  tmp = kClassifierType;
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + kSignalPos, tmp);
+
+  // And now activate signal kSignalPos+1
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos + 1, kBuiltInSignalIDAusfahrsignal);
+  // ... with first output pin kFirstOutputPin+8
+  tmp = cal::constants::make_signal_first_output(cal::constants::values::kOutputType_Onboard, kFirstOutputPin + 8);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos + 1, tmp);
+  // ... with ADC input pin kInputPin+1
+  tmp = cal::constants::make_signal_input(cal::constants::values::kInputType_ADC, kInputPin+1);
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos + 1, tmp);
+  // ... with classifier type kClassifierType
+  tmp = kClassifierType;
+  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + kSignalPos + 1, tmp);
+
   t1 = micros();
   for (int i = 0; i < nrRep; i++)
   {
@@ -117,8 +149,8 @@ TEST(Ut_Signal, InputClassifier1)
   t1 = micros();
   for (int i = 0; i < nrRep; i++)
   {
-    hal::stubs::analogRead[cal::kClassifierPin0]++;
-    hal::stubs::analogRead[cal::kClassifierPin1]++;
+    hal::stubs::analogRead[kInputPin  ]++;
+    hal::stubs::analogRead[kInputPin+1]++;
     classifier.cycle();
   }
   td = micros() - t1;
@@ -137,10 +169,9 @@ TEST(Ut_Signal, LedRouter_OneRamp)
 
   signal::LedRouter ledr;
   constexpr int nrRep = 1000;
-  target_type tgt { .type = target_type::eOnboard, .idx = 0 };
+  target_type tgt{target_type::eOnboard, 0};
   const intensity16_type kTgtInt { intensity16_type::kIntensity_100 };
   const speed16_ms_type kTgtSpd { 1 };
-
   uint32 t1;
   uint32 td;
   t1 = micros();
@@ -176,10 +207,13 @@ TEST(Ut_Signal, LedRouter_AllRamps)
   using speed16_ms_type = signal::LedRouter::speed16_ms_type;
   signal::LedRouter ledr;
   constexpr int nrRep = 1000;
-  target_type tgt { .type = target_type::eOnboard, .idx = 0 };
+  target_type tgt;
   const intensity16_type kTgtInt { intensity16_type::kIntensity_100 };
   const speed16_ms_type kTgtSpd { 1 };
   rte::intensity8_255 intensity8_255;
+
+  tgt.type = target_type::eOnboard; 
+  tgt.idx = 0;
 
   uint32 t1;
   uint32 td;
@@ -221,14 +255,21 @@ TEST(Ut_Signal, ISR_Dcc1)
   signal::LedRouter ledr;
   constexpr int nrRep = 400; // shall not exceed kTimeBufferSize
   uint32 t1;
+  uint32 t2;
   uint32 td;
 
-  t1 = micros();
+  td = 0;
   for (int i = 0; i < nrRep; i++)
   {
+    t1 = micros();
     dcc::ISR_Dcc();
+    t2 = micros() - t1;
+    td += t2;
+    if (t2 < 92)
+    {
+      delayMicroseconds(92 - t2); // simulate time between interrupts
+    }
   }
-  td = micros() - t1;
   hal::serial::print("ISR_Dcc1 ");
   hal::serial::println(td / nrRep);
   

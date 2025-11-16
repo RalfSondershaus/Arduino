@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - master
-      - feature-dcc-addressing
+      - develop
   pull_request:
     branches:
       - master
-      - feature-bit-extractor-in-ISR
+      - develop
 jobs:
   build:
     runs-on: ubuntu-latest

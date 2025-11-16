@@ -1,7 +1,7 @@
 /**
- * @file Gen/Rte/Rte_Type.h
+ * @file Cal/CalM_Types.h
  *
- * @brief Include generic types and project specific types (if available).
+ * @brief Project specific calibration types.
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
@@ -18,16 +18,18 @@
  * See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef RTE_TYPE_H_
-#define RTE_TYPE_H_
+#ifndef CALM_TYPES_H_
+#define CALM_TYPES_H_
 
-/// Call a member function of an object (instance of a class).
-/// We use this macro because AVR GCC doesn't seem to support std::invoke.
-#define CALL_MEMBER_FUNC(obj,ptrToMemberFunc)  ((obj).*(ptrToMemberFunc))
+#include <Cal/CalM_Types_Prj.h>
 
-#include <Rte/Rte_Type_Ifc.h>
-#include <Rte/Rte_Type_Runable.h>
-#include <Rte/Rte_Type_Gen.h>
-#include <Rte/Rte_Type_Prj.h>
+/**
+ * @brief For type safety: a CV
+ */
+struct CV
+{
+    uint16 id;
+    uint8 val;
+};
 
-#endif // RTE_TYPE_H_
+#endif // CALM_TYPES_H_

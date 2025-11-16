@@ -22,7 +22,32 @@
 #include <Rte/Rte.h>
 #include <Hal/Gpio.h>
 #include <Hal/Serial.h>
-#include <Cal/CalM_config.h>
+#include <Cal/CalM_Types.h>
+#include <Util/bitset.h>
+#include <Rte/Rte_Cfg_Cod.h>
+
+namespace signal_cal
+{
+    /**
+     * @brief Returns the DCC output address from the decoder configuration.
+     * 
+     * @return uint16 DCC output address
+     */
+    static inline uint16 calc_output_address()
+    {
+        return (util::bits::apply_mask_as<uint16,uint16>(rte::get_cv(cal::cv::kDecoderAddressLSB), cal::base_cv::bitmask::kCV1_address_LSB)) |
+               (util::bits::apply_mask_as<uint16,uint16>(rte::get_cv(cal::cv::kDecoderAddressMSB), cal::base_cv::bitmask::kCV9_address_MSB) << 8);
+    }
+    /**
+     * @brief Get CV29 (configuration)
+     * 
+     * @return uint8 CV29 (configuration)
+     */
+    static inline uint8 get_cv29()
+    {
+        return rte::get_cv(cal::cv::kConfiguration);
+    }
+}
 
 namespace signal
 {
@@ -61,23 +86,6 @@ namespace signal
             return true;
         }
         return false;
-    }
-
-    // --------------------------------------------------------------------------
-    /// @brief Returns true if the coding data are valid.
-    // --------------------------------------------------------------------------
-    static inline bool is_valid(const cal::base_cv_cal_type *cal_ptr)
-    {
-        return cal_ptr != nullptr;
-    }
-
-    // --------------------------------------------------------------------------
-    /// @brief Returns the DCC output address
-    // --------------------------------------------------------------------------
-    static inline uint16 calc_output_address(const cal::base_cv_cal_type *cal_ptr)
-    {
-        return (static_cast<uint16>(cal_ptr->CV1_address_LSB & cal::kMaskCV1_address_LSB)) |
-               (static_cast<uint16>(cal_ptr->CV9_address_MSB & cal::kMaskCV9_address_MSB) << 6);
     }
 
     /**
@@ -194,20 +202,15 @@ namespace signal
     // --------------------------------------------------------------------------
     void DccDecoder::init()
     {
-        const cal::base_cv_cal_type *cal_ptr = rte::ifc_cal_base_cv::call();
-
         hal::pinMode(kBlinkLedPin, OUTPUT);
 
         decoder.init(kIntPin);
 
-        if (is_valid(cal_ptr))
-        {
-            first_output_address = calc_output_address(cal_ptr);
-            pass_accessory_filter.set_lo(first_output_address);
-            pass_accessory_filter.set_hi(first_output_address + cfg::kNrAddresses);
-            pass_accessory_filter.set_cv29(cal_ptr->CV29_configuration);
-            decoder.set_filter(pass_accessory_filter);
-        }
+        first_output_address = signal_cal::calc_output_address();
+        pass_accessory_filter.set_lo(first_output_address);
+        pass_accessory_filter.set_hi(first_output_address + cfg::kNrAddresses);
+        pass_accessory_filter.set_cv29(signal_cal::get_cv29());
+        decoder.set_filter(pass_accessory_filter);
     }
 
     // --------------------------------------------------------------------------
@@ -215,66 +218,57 @@ namespace signal
     // --------------------------------------------------------------------------
     void DccDecoder::cycle()
     {
-        const cal::base_cv_cal_type *cal_ptr = rte::ifc_cal_base_cv::call();
-
-        if (is_valid(cal_ptr))
+        // recalculate address because coding data might have changed.
+        // TBD: Can be optimized if CalM informs about coding data changes or 
+        // if DCC address is publicly available.
+        first_output_address = signal_cal::calc_output_address();
+        if ((pass_accessory_filter.get_lo() != first_output_address) ||
+            (pass_accessory_filter.get_hi() != (first_output_address + cfg::kNrAddresses)) ||
+            (pass_accessory_filter.get_cv29() != signal_cal::get_cv29()))
         {
-            // recalculate address because coding data might have changed.
-            // TBD: Can be optimized if CalM informs about coding data changes or 
-            // if DCC address is publicly available.
-            first_output_address = calc_output_address(cal_ptr);
-            if ((pass_accessory_filter.get_lo() != first_output_address) ||
-                (pass_accessory_filter.get_hi() != (first_output_address + cfg::kNrAddresses)) ||
-                (pass_accessory_filter.get_cv29() != cal_ptr->CV29_configuration))
-            {
-                hal::serial::println("Update filter");
-                pass_accessory_filter.set_lo(first_output_address);
-                pass_accessory_filter.set_hi(first_output_address + cfg::kNrAddresses);
-                pass_accessory_filter.set_cv29(cal_ptr->CV29_configuration);
-                decoder.set_filter(pass_accessory_filter);
-            }
-
-            if (decoder.isrOverflow())
-            {
-                hal::serial::println("ISR OVERFLOW");
-            }
-
-            if (decoder.fifoOverflow())
-            {
-                hal::serial::println("FIFO OVERFLOW");
-            }
-
-            decoder.fetch();
-            while (!decoder.empty())
-            {
-                packet_type &pkt = decoder.front();
-                hal::serial::print("Packet type=");
-                hal::serial::print(static_cast<uint8>(pkt.get_type()));
-                hal::serial::print(" Packet address=");
-                hal::serial::println(pkt.get_address(get_cv29()));
-                if (pass_accessory_filter.filter(pkt))
-                {
-                    packet_received(pkt);
-                }
-
-                decoder.pop();
-            }
-            if (toggle_led_pin(kBlinkLedPeriodValid_ms))
-            {
-#if 0
-        hal::serial::print("[");
-        hal::serial::print(hal::micros());
-        hal::serial::print("]");
-        hal::serial::print(" isr=");
-        hal::serial::print(decoder.getNrInterrupts());
-        hal::serial::print(" packets=");
-        hal::serial::println(decoder.getPacketCount());
-#endif
-            }
+            hal::serial::println("Update filter");
+            pass_accessory_filter.set_lo(first_output_address);
+            pass_accessory_filter.set_hi(first_output_address + cfg::kNrAddresses);
+            pass_accessory_filter.set_cv29(signal_cal::get_cv29());
+            decoder.set_filter(pass_accessory_filter);
         }
-        else
+
+        if (decoder.isrOverflow())
         {
-            toggle_led_pin(kBlinkLedPeriodInvalid_ms);
+            hal::serial::println("ISR OVERFLOW");
+        }
+
+        if (decoder.fifoOverflow())
+        {
+            hal::serial::println("FIFO OVERFLOW");
+        }
+
+        decoder.fetch();
+        while (!decoder.empty())
+        {
+            packet_type &pkt = decoder.front();
+            hal::serial::print("Packet type=");
+            hal::serial::print(static_cast<uint8>(pkt.get_type()));
+            hal::serial::print(" Packet address=");
+            hal::serial::println(pkt.get_address(get_cv29()));
+            if (pass_accessory_filter.filter(pkt))
+            {
+                packet_received(pkt);
+            }
+
+            decoder.pop();
+        }
+        if (toggle_led_pin(kBlinkLedPeriodValid_ms))
+        {
+#if 0
+            hal::serial::print("[");
+            hal::serial::print(hal::micros());
+            hal::serial::print("]");
+            hal::serial::print(" isr=");
+            hal::serial::print(decoder.getNrInterrupts());
+            hal::serial::print(" packets=");
+            hal::serial::println(decoder.getPacketCount());
+#endif
         }
     }
 

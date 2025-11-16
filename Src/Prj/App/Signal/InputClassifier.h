@@ -24,8 +24,6 @@
 #define SIGNAL_INPUT_CLASSIFIER_H_
 
 #include "Cfg_Prj.h"
-#include <Rte/Rte_Type.h>
-#include <Cal/CalM_Type.h>
 #include <Util/Array.h>
 #include <Util/Classifier.h>
 
@@ -38,7 +36,6 @@ namespace signal
   {
   public:
     using classifier_array_type = util::classifier_array<cfg::kNrClassifiers, cfg::kNrClassifierClasses>;
-    using cal_const_pointer = const cal::classifier_array_cal_type *;
     using classified_values_array_type = classifier_array_type::classified_values_array_type;
     
   protected:
@@ -55,11 +52,6 @@ namespace signal
     /// @brief Cyclic runable
     /// @note Average run time 85 usec @ATmega2560 @16 MHz
     void cycle();
-
-    /**
-     * @brief CS Interface: call this function when coding parameters have been changed.
-     */
-    rte::ret_type set_config(uint8 classifier_pos);
   };
 } // namespace signal
 

@@ -21,7 +21,8 @@
 #ifndef LED_ROUTER_H_
 #define LED_ROUTER_H_
 
-#include <Rte/Rte_Type.h>
+#include <Rte/Rte_Types.h>
+#include <Util/Intensity.h>
 #include <Util/Ramp.h>
 #include <Util/Array.h>
 
@@ -54,14 +55,12 @@ namespace signal
   class LedRouter
   {
   public:
-    using intensity8_type = rte::intensity8;
-    using intensity8_255_type = rte::intensity8_255;
-    using intensity16_type = rte::intensity16;
-    using speed16_ms_type = rte::speed16_ms_t;
+    using intensity8_type = util::intensity8;
+    using intensity8_255_type = util::intensity8_255;
+    using intensity16_type = util::intensity16;
+    using speed16_ms_type = util::speed16_ms;
     using ramp_base_type = intensity16_type::base_type;
     using ret_type = rte::ret_type;
-    using cmd_type = rte::cmd_type;
-    using target_type = rte::target_type;
 
     typedef util::ramp<ramp_base_type> ramp_type;
     typedef util::array<ramp_type, cfg::kNrOnboardTargets> ramp_onboard_array_type;
@@ -99,13 +98,13 @@ namespace signal
     /// @param intensity Target intensity
     /// @param slope Target slope (speed) to reach the target intensity
     /// @return rte::ifc_base::OK
-    ret_type setIntensityAndSpeed(const target_type tgt, const intensity16_type intensity, const speed16_ms_type slope);
+    ret_type setIntensityAndSpeed(const struct signal::target tgt, const intensity16_type intensity, const speed16_ms_type slope);
     /// Server function: Set the slope / speed to reach the target intensity but do not change the target intensity.
     /// @param tgt Output port
     /// @param slope [%/ms] Slope / speed
-    ret_type setSpeed(const target_type tgt, const speed16_ms_type slope);
+    ret_type setSpeed(const struct signal::target tgt, const speed16_ms_type slope);
     /// Server function: Set the target intensity but do not change the current speed.
-    ret_type setIntensity(const target_type tgt, const intensity16_type intensity);
+    ret_type setIntensity(const struct signal::target tgt, const intensity16_type intensity);
 
   };
 } // namespace signal

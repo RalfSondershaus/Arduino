@@ -24,6 +24,10 @@
 #ifndef UTIL_LOCALE_FACETS_H
 #define UTIL_LOCALE_FACETS_H
 
+#ifdef CFG_PROFILING
+#include <Hal/Timer.h>
+#endif
+
 #include <Std_Types.h>
 #include <Platform_Limits.h>
 #include <Util/Ios_base.h>  // util::ios_base
@@ -31,6 +35,11 @@
 #include <Util/String.h>    // util::char_traits
 #include <Util/Locale.h>    // util::locale::facet
 #include <Util/Array.h>
+
+#ifdef CFG_PROFILING
+extern uint32 td_ext_1;
+extern uint32 td_ext_2;
+#endif
 
 namespace util
 {
@@ -360,8 +369,17 @@ namespace util
       int nBase;
       util::tStringError strerr;
 
+#ifdef CFG_PROFILING
+      uint32 t1 = hal::micros();
+#endif
       nBase = put_integer(acBuf, kMaxIntDigits, start, end, str.flags(), str.getloc());
+#ifdef CFG_PROFILING
+      td_ext_1 += hal::micros() - t1;
+#endif
 
+#ifdef CFG_PROFILING
+      uint32 t2 = hal::micros();
+#endif
       // On success, convert integer
       if (acBuf[0] != 0)
       {
@@ -389,6 +407,9 @@ namespace util
         state |= ios_base::eofbit;
       }
 
+#ifdef CFG_PROFILING
+      td_ext_2 += hal::micros() - t2;
+#endif
       return start;
     }
 

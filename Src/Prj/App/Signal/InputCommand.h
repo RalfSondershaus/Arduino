@@ -23,8 +23,7 @@
 #ifndef SIGNAL_INPUT_COMMAND_H_
 #define SIGNAL_INPUT_COMMAND_H_
 
-#include <Rte/Rte_Type.h>
-#include <Cal/CalM_Type.h>
+#include <Prj_Types.h>
 
 namespace signal
 {
@@ -34,9 +33,7 @@ namespace signal
   class InputCommand
   {
   public:
-    using cmd_type = rte::cmd_type;
-
-    cmd_type getCmd(cal::input_type in);
+    uint8 getCmd(struct signal::input_cmd in);
   };
 } // namespace signal
 

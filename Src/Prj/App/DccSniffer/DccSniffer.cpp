@@ -135,7 +135,7 @@ void PrintBin(const PacketType& pkt)
 {
   size_type i;
   // Response byte + length + kMaxNrBytes + 0
-  char pcBuf[PacketType::kMaxNrBytes + 3];
+  uint8 pcBuf[PacketType::kMaxNrBytes + 3];
 
   const size_type n = pkt.getNrBytes();
 
@@ -146,7 +146,7 @@ void PrintBin(const PacketType& pkt)
   i += n;
   pcBuf[i] = 0x00;
 
-  hal::serial::println(pcBuf);
+  hal::serial::println(reinterpret_cast<const char*>(pcBuf));
 }
 
 // ---------------------------------------------------

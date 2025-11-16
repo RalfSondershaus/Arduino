@@ -14,11 +14,15 @@
 #define OS_TYPE_H
 
 #include <Arduino.h>
+#include <avr/interrupt.h> /* ISR macro */
 
 /* Interrupt handling */
  
 /* Macro for interrupt service routines */
+/* avr-gcc ISR macro is already defined in avr\include\avr\interrupt.h */
+#ifndef ISR
 #define ISR(handler)  void handler(void)
+#endif /* ISR */
 
 /* Enable / disable interrupts */
 /* We rely on Arduino implementation, that is, on functions noInterrupts() and interrupts() */

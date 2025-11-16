@@ -2,9 +2,8 @@
 # Project specific Makefile for Signal
 #
 
-# Files
-FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/CddLed          \
-            $(PATH_SRC_PRJ_PROJECT)/DccDecoder      \
+# All files
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/DccDecoder      \
             $(PATH_SRC_PRJ_PROJECT)/InputClassifier \
             $(PATH_SRC_PRJ_PROJECT)/InputCommand    \
             $(PATH_SRC_PRJ_PROJECT)/LedRouter       \
@@ -18,3 +17,11 @@ FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/CddLed          \
             $(PATH_SRC_GEN)/Util/Locale             \
             $(PATH_SRC_GEN)/Dcc/Decoder             \
             $(PATH_SRC_GEN)/Rte/Rte
+
+# For search only, file must also be in FILES_PRJ.
+FILES_PRJ_OPT4 = \
+            $(PATH_SRC_PRJ_PROJECT)/Com/AsciiCom    \
+            $(PATH_SRC_PRJ_PROJECT)/Cal/CalM        \
+            $(PATH_SRC_PRJ_PROJECT)/Com/ComR        \
+            $(PATH_SRC_PRJ_PROJECT)/Com/AsciiCom    \
+            $(PATH_SRC_PRJ_PROJECT)/Com/SerAsciiTP  \
