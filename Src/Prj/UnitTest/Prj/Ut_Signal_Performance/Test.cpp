@@ -169,13 +169,9 @@ TEST(Ut_Signal, LedRouter_OneRamp)
 
   signal::LedRouter ledr;
   constexpr int nrRep = 1000;
-  target_type tgt;
+  target_type tgt{target_type::eOnboard, 0};
   const intensity16_type kTgtInt { intensity16_type::kIntensity_100 };
   const speed16_ms_type kTgtSpd { 1 };
-
-  tgt.type = target_type::eOnboard; 
-  tgt.idx = 0;
-
   uint32 t1;
   uint32 td;
   t1 = micros();
