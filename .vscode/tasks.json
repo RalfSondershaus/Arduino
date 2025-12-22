@@ -8,6 +8,7 @@
             "options": [
                 "App/BlinkSample",
                 "App/DccSniffer",
+                "App/FireFlicker",
                 "App/Signal",
             ]
         },
@@ -36,7 +37,17 @@
                 "UnitTest/Prj/Ut_Signal_LedRouter",
                 "UnitTest/Prj/Ut_Signal_Com",
             ]
-        }
+        },
+        {
+            "id": "TargetEcu",
+            "type": "pickString",
+            "description": "Select target",
+            "default": "Mega",
+            "options": [
+                { "label": "Mega", "value": "mega" },
+                { "label": "Nano", "value": "nano" },
+            ]
+        },
     ],
     "tasks": [
         {
@@ -45,7 +56,7 @@
             "command": ".\\Build\\build.bat",
             "args": [
                 "${input:AppProjectName}",
-                "mega",
+                "${input:TargetEcu}",
                 "avr_gcc",
                 "arduino",
                 "none",
@@ -67,7 +78,7 @@
             "command": ".\\Build\\build.bat",
             "args": [
                 "${input:AppProjectName}",
-                "mega",
+                "${input:TargetEcu}",
                 "avr_gcc",
                 "arduino",
                 "none",
@@ -90,7 +101,7 @@
             "command": ".\\Build\\build.bat",
             "args": [
                 "${input:AppProjectName}",
-                "mega",
+                "${input:TargetEcu}",
                 "avr_gcc",
                 "arduino",
                 "none",
@@ -172,7 +183,7 @@
             "command": ".\\Build\\Build.bat",
             "args": [
                 "${input:UnitTestProjectName}",
-                "mega",
+                "${input:TargetEcu}",
                 "avr_gcc",
                 "arduino",
                 "unity",
@@ -192,7 +203,7 @@
             "command": ".\\Build\\Build.bat",
             "args": [
                 "${input:UnitTestProjectName}",
-                "mega",
+                "${input:TargetEcu}",
                 "avr_gcc",
                 "arduino",
                 "unity",
@@ -212,7 +223,7 @@
             "command": ".\\Build\\Build.bat",
             "args": [
                 "${input:UnitTestProjectName}",
-                "mega",
+                "${input:TargetEcu}",
                 "avr_gcc",
                 "arduino",
                 "unity",

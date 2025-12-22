@@ -6,16 +6,26 @@
 
 # ---------------------------------------------------
 # Target MCU
+# See also Arduino's board.txt
+# TARGET_MCU_FAMILY     is used to define ARDUINO_ARCH_xxx and to define output file extension
+# TARGET_MCU_F_CPU      is used to define F_CPU
+# TARGET_MCU_BOARD      is used to define ARDUINO_xxx, e.g., ARDUINO_AVR_MEGA2560
+# TARGET_MCU_VARIANT    is the path to pins_arduino.h
+# TARGET_MCU_DEVICE     is used for compiler -mmcu
 # ---------------------------------------------------
 ifeq ($(ARG_TARGET_ECU),mega)
 TARGET_MCU_FAMILY    = avr
+TARGET_MCU_F_CPU     = 16000000L
+TARGET_MCU_BOARD     = AVR_MEGA2560
 TARGET_MCU_VARIANT   = mega
 TARGET_MCU_DEVICE    = atmega2560
 endif
 
 ifeq ($(ARG_TARGET_ECU),nano)
 TARGET_MCU_FAMILY    = avr
-TARGET_MCU_VARIANT   = nano
+TARGET_MCU_F_CPU     = 16000000L
+TARGET_MCU_BOARD     = AVR_NANO
+TARGET_MCU_VARIANT   = eightanaloginputs
 TARGET_MCU_DEVICE    = atmega328p
 endif
 
@@ -124,23 +134,11 @@ C_INCLUDES_PLATFORM := $(C_INCLUDES_PLATFORM)                                \
 # Add compiler #defines for the target
 # 10608 means Arduino Version 1.6.8
 # ---------------------------------------------------
-ifeq ($(TARGET_MCU_VARIANT),mega)
 C_DEFINES := $(C_DEFINES)           \
-            -DF_CPU=16000000L       \
+            -DF_CPU=$(TARGET_MCU_F_CPU)       \
             -DARDUINO=10608         \
-            -DARDUINO_AVR_MEGA2560  \
-            -DARDUINO_ARCH_AVR
-
-else ifeq ($(TARGET_MCU_VARIANT),nano)
-C_DEFINES := $(C_DEFINES)           \
-            -DF_CPU=16000000L       \
-            -DARDUINO=10608         \
-            -DARDUINO_AVR_NANO      \
-            -DARDUINO_ARCH_AVR
-
-else
-$(error ------ Invalid build command line parameter ARG_TARGET_ECU $(ARG_TARGET_ECU) for ARG_COMPILER $(ARG_COMPILER). Supported: mega) ------
-endif
+            -DARDUINO_$(TARGET_MCU_BOARD)  \
+            -DARDUINO_ARCH_$(toupper $(TARGET_MCU_FAMILY))
 
 # ---------------------------------------------------
 # Compiler flags. See also https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
@@ -299,16 +297,16 @@ OBJCOPYFLAGS =  -O ihex \
 # -V                Disable automatic verify check when uploading data.
 # -x extended_param Pass extended_param to the chosen programmer implementation as an extended parameter.
 # -----------------------------------------------------------------------
-ifeq ($(TARGET_MCU_VARIANT),mega)
+ifeq ($(ARG_TARGET_ECU),mega)
 AVRDUDE_MCU = m2560
-else ifeq ($(TARGET_MCU_VARIANT),nano)
-AVRDUDE_MCU = m328
+else ifeq ($(ARG_TARGET_ECU),nano)
+AVRDUDE_MCU = m328p
 endif
 AVRDUDE_FLAGS = -C$(PATH_AVRDUDE)/avrdude.conf      \
                 -v                                  \
                 -V                                  \
                 -p $(AVRDUDE_MCU)                   \
-                -c wiring                           \
+                -c arduino                           \
                 -P $(COM_PORT)                      \
                 -D
 

@@ -28,6 +28,7 @@
 # ---------------------------------------------------
 ifeq ($(ARG_COMPILER),avr_gcc)
 
+# Returns the compiler flags for optimization
 get_flags_opt =\
 $(if $(filter $(notdir $(1)),$(notdir $(FILES_PRJ_OPT0))),$(CFLAGS_OPT0),\
 $(if $(filter $(notdir $(1)),$(notdir $(FILES_PRJ_OPT1))),$(CFLAGS_OPT1),\

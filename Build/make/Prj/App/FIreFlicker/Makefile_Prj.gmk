@@ -3,6 +3,6 @@
 #
 
 # Files
-FILES_PRJ = $(PATH_PRJ_PROJECT)/FireFlicker
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/FireFlicker
 
 -include $(PATH_TMP)/FireFlicker.d
