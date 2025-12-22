@@ -53,6 +53,7 @@ C_INCLUDES_BSW := -I$(PATH_SRC_ARDUINO_CORE)                    \
                   -I$(PATH_SRC_GEN)/Hal/Arduino/Eeprom          \
                   -I$(PATH_SRC_GEN)/Hal/Arduino/Gpio            \
                   -I$(PATH_SRC_GEN)/Hal/Arduino/Interrupt       \
+                  -I$(PATH_SRC_GEN)/Hal/Arduino/Random          \
                   -I$(PATH_SRC_GEN)/Hal/Arduino/Serial          \
                   -I$(PATH_SRC_GEN)/Hal/Arduino/Timer           \
                   -I$(PATH_SRC_GEN)/Hal/Arduino/Unity
@@ -80,6 +81,7 @@ C_INCLUDES_BSW := -I$(PATH_SRC_WIN_CORE)                    \
                   -I$(PATH_SRC_GEN)/Os/Win/$(ARG_COMPILER)  \
                   -I$(PATH_SRC_GEN)/Hal/Win/Eeprom          \
                   -I$(PATH_SRC_GEN)/Hal/Win/Gpio            \
+                  -I$(PATH_SRC_GEN)/Hal/Win/Random          \
                   -I$(PATH_SRC_GEN)/Hal/Win/Timer
 
 endif

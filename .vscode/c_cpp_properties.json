@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/Src/Prj/UnitTest/Prj/Ut_Signal",
                 "${workspaceFolder}/Src/Prj/UnitTest/Gen/Util/Ut_InputClassifier",
+                "${workspaceFolder}/Src/Prj/App/FireFlicker",
                 "${workspaceFolder}/Src/Prj/App/Signal",
                 "${workspaceFolder}/Src/Prj/App/Signal/**",
                 "${workspaceFolder}/Src/Gen/**",
