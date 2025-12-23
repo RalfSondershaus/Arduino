@@ -30,7 +30,7 @@ namespace cfg
     /**
      * @brief Manufacturer version ID (for CV 7)
      */
-    constexpr uint8 kManufacturerVersionID = 0x01;  /* v0.1 */
+    constexpr uint8 kManufacturerVersionID = 0x20;  /* v2.0 */
     /** 
      * @brief Maximum number of signals 
      */
@@ -51,7 +51,7 @@ namespace cfg
 
     constexpr uint8 kNrUserDefinedClassifierTypes = 2; ///< Number of user defineable classifier types (in EEPROM)
     constexpr uint8 kNrUserDefinedSignals = 2;         ///< Number of user defineable signal IDs (in EEPROM)
-    constexpr uint8 kNrBuiltInSignals = 2;             ///< Number of built in signal IDs (in ROM)
+    constexpr uint8 kNrBuiltInSignals = 3;             ///< Number of built in signal IDs (in ROM)
 
     constexpr int kNrOnboardTargets = 54;  ///< We support up to 54 onboard LED targets (some of them with PWM))
     constexpr int kNrExternalTargets = 32; ///< We support up to 32 external outputs (such as 4 shift registers with 8 bit each)

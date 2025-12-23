@@ -2,7 +2,8 @@
 /**
  * @file App/Signal/Signal_cfg.h
  *
- * @brief Configuration header file for Signal class
+ * @brief Configuration header file for Signal class. Implements inline functions to access
+ *        interfaces for calibration and RTE.
  *
  * @note This file must be included in Signal.cpp only
  * @note All functions in this file are defined as inline to allow compile-time optimization
@@ -78,6 +79,26 @@ namespace signal_cal
     {
         return rte::sig::get_first_output(signal_idx);
     }
+    /**
+     * @brief Return true if the output pin order is inverse, e.g. pins 13, 12, 11, 10 instead 
+     *        of 13, 14, 15, 16
+     * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+     * @return true Output pin order is inverse
+     * @return false Output pin order is normal
+     */
+    static inline bool is_output_pin_order_inverse(uint8 signal_idx) { return rte::sig::is_output_pin_order_inverse(signal_idx); }
+    /**
+     * @brief Returns the output pin step size (1 or 2).
+     * 
+     * Step size 1, increasing order means, e.g., 13, 14, 15, 16
+     * Step size 2, increasing order means, e.g., 13, 15, 17, 19
+     * Step size 1, decreasing (inverse) order means, e.g., 13, 12, 11, 10
+     * Step size 2, decreasing (inverse) order means, e.g., 13, 11, 9, 7
+     * 
+     * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+     * @return 1 or 2 Output pin step size
+     */
+    static inline uint8 get_output_pin_step_size(uint8 signal_idx) { return rte::sig::get_output_pin_step_size(signal_idx); }
 } // namespace signal_cal
 
 namespace signal_rte

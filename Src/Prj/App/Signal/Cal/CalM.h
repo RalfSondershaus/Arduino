@@ -136,14 +136,20 @@ namespace cal
             if (is_cv_id_valid(cv_id))
             {
                 eeprom_data_buffer[cv_id] = val;
-                if (cv_id >= cv::kSignalInputBase &&
-                    cv_id < cv::kSignalInputBase + cfg::kNrSignals)
+                if ((cv_id >= cv::kSignalInputBase) &&
+                    (cv_id < cv::kSignalInputBase + cfg::kNrSignals))
                 {
                     // reconfigure pins if input CV changed
                     configure_pins();
                 }
-                else if (cv_id >= cv::kSignalFirstOutputBase &&
-                    cv_id < cv::kSignalFirstOutputBase + cfg::kNrSignals)
+                else if ((cv_id >= cv::kSignalFirstOutputBase) &&
+                         (cv_id < cv::kSignalFirstOutputBase + cfg::kNrSignals))
+                {
+                    // reconfigure pins if input CV changed
+                    configure_pins();
+                }
+                else if ((cv_id >= cv::kSignalOutputConfigBase) &&
+                         (cv_id < cv::kSignalOutputConfigBase + cfg::kNrSignals))
                 {
                     // reconfigure pins if input CV changed
                     configure_pins();
@@ -341,6 +347,31 @@ namespace cal
         {
             struct signal::target output = get_cv(cal::cv::kSignalFirstOutputBase + signal_idx);
             return output;
+        }
+        /**
+         * @brief Return true if the output pin order is inverse
+         * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+         * @return true Output pin order is inverse
+         * @return false Output pin order is normal
+         */
+        inline bool is_output_pin_order_inverse(uint8 signal_idx)
+        {
+            uint8 output_config = get_cv(cal::cv::kSignalOutputConfigBase + signal_idx);
+            // A 1 in bit kOutputPinOrder means inverse order
+            return (output_config & cal::constants::bitmask::kOutpoutPinOrder) != 0U;
+        }
+        /**
+         * @brief Returns the output pin step size, e.g. 13, 14, 15, 16 (step size 1) or 
+         *        13, 15, 17, 19 (step size 2). Or 13, 12, 11, 10 (step size 1, inverse order) or
+         *        13, 11, 9, 7 (step size 2, inverse order)
+         * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+         * @return 1 or 2 Output pin step size
+         */
+        inline uint8 get_output_pin_step_size(uint8 signal_idx)
+        {
+            uint8 output_config = get_cv(cal::cv::kSignalOutputConfigBase + signal_idx);
+            // A 1 in bit kOutpoutPinStepSize means step size of 2, else step size of 1
+            return ((output_config & cal::constants::bitmask::kOutpoutPinStepSize) != 0U) ? 2 : 1;
         }
         /** @} */
 
