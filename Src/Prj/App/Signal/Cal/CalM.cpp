@@ -33,7 +33,8 @@ namespace cal
      * @note Adjust unit test Ut_Signal/Test.cpp if this definition changes.
      */
     #define CAL_BUILT_IN_SIGNAL_OUTPUTS     \
-        {                                   \
+        {   /* Ausfahrsignal */             \
+            /* red red green yellow white */\
             5,                              \
             0b00011000, 0b00000000,         \
             0b00000100, 0b00000000,         \
@@ -44,15 +45,29 @@ namespace cal
             0b00011111, 0b00000000,         \
             0b00011111, 0b00000000,         \
             10, 10,                         \
+            /* Blocksignal */               \
+            /* red green */                 \
             2,                              \
+            0b00000010, 0b00000000,         \
             0b00000001, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            0b00000011, 0b00000000,         \
+            10, 10,                         \
+            /* Einfahrsignal */             \
+            /* red red green yellow */      \
+            4,                              \
+            0b00001100, 0b00000000,         \
             0b00000010, 0b00000000,         \
             0b00000011, 0b00000000,         \
-            0b00000011, 0b00000000,         \
-            0b00000011, 0b00000000,         \
-            0b00000011, 0b00000000,         \
-            0b00000011, 0b00000000,         \
-            0b00000011, 0b00000000,         \
+            0b00001111, 0b00000000,         \
+            0b00001111, 0b00000000,         \
+            0b00001111, 0b00000000,         \
+            0b00001111, 0b00000000,         \
+            0b00001111, 0b00000000,         \
             10, 10                          \
         }
 
@@ -125,13 +140,17 @@ namespace cal
             }
 
             // output pins
-            const struct signal::target output = get_first_output(sig_idx);
+            struct signal::target output = get_first_output(sig_idx);
+            const sint8 pin_inc = is_output_pin_order_inverse(sig_idx) ? 
+                                 -get_output_pin_step_size(sig_idx) : 
+                                  get_output_pin_step_size(sig_idx);
             if (output.type == signal::target::kOnboard)
             {
                 const uint8 num_outputs = get_number_of_outputs(get_signal_id(sig_idx));
-                for (uint8_least pin = output.pin; pin < output.pin + num_outputs; pin++)
+                for (uint8_least pin_idx = 0; pin_idx < num_outputs; pin_idx++)
                 {
-                    gpio_cfg.pin_modes[pin] = OUTPUT;
+                    gpio_cfg.pin_modes[output.pin] = OUTPUT;
+                    output.pin = static_cast<uint8>(static_cast<sint8>(output.pin) + pin_inc);
                 }
             }
         }
