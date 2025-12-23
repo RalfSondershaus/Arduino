@@ -55,15 +55,29 @@
         0b00011111, 0b00000000,         \
         0b00011111, 0b00000000,         \
         10, 10,                         \
+        /* Blocksignal */               \
+        /* red green */                 \
         2,                              \
+        0b00000010, 0b00000000,         \
         0b00000001, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        0b00000011, 0b00000000,         \
+        10, 10,                         \
+        /* Einfahrsignal */             \
+        /* red red green yellow */      \
+        4,                              \
+        0b00001100, 0b00000000,         \
         0b00000010, 0b00000000,         \
         0b00000011, 0b00000000,         \
-        0b00000011, 0b00000000,         \
-        0b00000011, 0b00000000,         \
-        0b00000011, 0b00000000,         \
-        0b00000011, 0b00000000,         \
-        0b00000011, 0b00000000,         \
+        0b00001111, 0b00000000,         \
+        0b00001111, 0b00000000,         \
+        0b00001111, 0b00000000,         \
+        0b00001111, 0b00000000,         \
+        0b00001111, 0b00000000,         \
         10, 10                          \
     }
 
@@ -202,6 +216,12 @@ TEST(Ut_Signal, CalM_get_signal_id)
     // ... with classifier type classifier_type
     rte::set_cv(cal::cv::kSignalInputClassifierTypeBase + signal_pos, classifier_type);
     EXPECT_EQ(util::classifier_cal::get_classifier_type(signal_pos), classifier_type);
+    // ... with inverse output pin order
+    rte::set_cv(cal::cv::kSignalOutputConfigBase + signal_pos, 1U); // set inverse order bit
+    EXPECT_EQ(rte::sig::is_output_pin_order_inverse(signal_pos), true);
+    // .. with step size 2
+    rte::set_cv(cal::cv::kSignalOutputConfigBase + signal_pos, 0b00000010); // set step size to 2
+    EXPECT_EQ(rte::sig::get_output_pin_step_size(signal_pos), static_cast<uint8>(2U));
 #if 0
   Logger log;
   constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
@@ -231,6 +251,159 @@ TEST(Ut_Signal, CalM_update_cv_id)
     EXPECT_EQ(hal::eeprom::read(cal::cv::kSignalIDBase + 0), kBuiltInSignalIDAusfahrsignal);
 }
 
+/**
+ * @test CalM_is_output_pin_step_size_1
+ * @brief Tests whether updating a CV for output pin configuration to step size 1 causes the new 
+ *        value to be written to EEPROM and interpreted correctly.
+ *        This test initializes the EEPROM with default values, sets a specific CV,
+ *        verifies that the EEPROM contains the updated value, and verifies that the output pins
+ *        are correctly identified.
+ */
+TEST(Ut_Signal, CalM_is_output_pin_step_size_1)
+{
+    const uint8 first_output_pin = 13;
+    const uint8 first_output = cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output_pin);
+    const uint8 signal_idx = 0;
+    const uint8 expected_num_targets = 5;
+    const uint8 cmd = 0; // helper variable to call get_signal_aspect
+    struct signal::signal_aspect signal_asp;
+
+    const uint8 signal_id = rte::sig::get_signal_id(signal_idx);
+
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+    // Now set CV for signal ID and verify EEPROM is updated
+    rte::set_cv(cal::cv::kSignalIDBase + signal_idx, kBuiltInSignalIDAusfahrsignal);
+    rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_idx, first_output);
+    EXPECT_EQ(hal::eeprom::read(cal::cv::kSignalFirstOutputBase + signal_idx), first_output);
+    EXPECT_EQ(rte::sig::get_first_output(signal_idx).pin, first_output_pin);
+    rte::sig::get_signal_aspect(signal_id, cmd, signal_asp);
+    EXPECT_EQ(signal_asp.num_targets, expected_num_targets);
+    for (size_t i = 0U; i < expected_num_targets; i++)
+    {
+        EXPECT_EQ(rte::sig::is_output_pin(first_output_pin + i), true);
+    }
+}
+
+/**
+ * @test CalM_is_output_pin_step_size_2
+ * @brief Tests whether updating a CV for output pin configuration to step size 2 causes the new 
+ *        value to be written to EEPROM and interpreted correctly.
+ *        This test initializes the EEPROM with default values, sets a specific CV,
+ *        verifies that the EEPROM contains the updated value, and verifies that the output pins
+ *        are correctly identified.
+ */
+TEST(Ut_Signal, CalM_is_output_pin_step_size_2)
+{
+    const uint8 first_output_pin = 13;
+    const uint8 first_output = cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output_pin);
+    const uint8 signal_idx = 0;
+    const uint8 expected_num_targets = 5;
+    const uint8 cmd = 0; // helper variable to call get_signal_aspect
+    struct signal::signal_aspect signal_asp;
+
+    const uint8 signal_id = rte::sig::get_signal_id(signal_idx);
+
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+    // Now set CVs for signal ID, first output, and output config and verify EEPROM is updated
+    rte::set_cv(cal::cv::kSignalIDBase + signal_idx, kBuiltInSignalIDAusfahrsignal);
+    rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_idx, first_output);
+    rte::set_cv(cal::cv::kSignalOutputConfigBase + signal_idx, 0b00000010); // set step size to 2
+    EXPECT_EQ(hal::eeprom::read(cal::cv::kSignalFirstOutputBase + signal_idx), first_output);
+    EXPECT_EQ(hal::eeprom::read(cal::cv::kSignalOutputConfigBase + signal_idx), static_cast<uint8>(0b00000010));
+    EXPECT_EQ(rte::sig::get_first_output(signal_idx).pin, first_output_pin);
+    const uint8 step_size = rte::sig::get_output_pin_step_size(signal_idx);
+    EXPECT_EQ(step_size, static_cast<uint8>(2U));
+    rte::sig::get_signal_aspect(signal_id, cmd, signal_asp);
+    EXPECT_EQ(signal_asp.num_targets, expected_num_targets);
+    for (size_t i = 0U; i < expected_num_targets; i++)
+    {
+        EXPECT_EQ(rte::sig::is_output_pin(static_cast<uint8>(first_output_pin + i * step_size)), true);
+    }
+}
+
+/**
+ * @test CalM_is_output_pin_step_size_m1
+ * @brief Tests whether updating a CV for output pin configuration to step size -1 causes the new 
+ *        value to be written to EEPROM and interpreted correctly.
+ *        This test initializes the EEPROM with default values, sets a specific CV,
+ *        verifies that the EEPROM contains the updated value, and verifies that the output pins
+ *        are correctly identified.
+ */
+TEST(Ut_Signal, CalM_is_output_pin_step_size_m1)
+{
+    const uint8 first_output_pin = 13;
+    const uint8 first_output = cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output_pin);
+    const uint8 signal_idx = 0;
+    const uint8 expected_num_targets = 5;
+    const uint8 cmd = 0; // helper variable to call get_signal_aspect
+    struct signal::signal_aspect signal_asp;
+
+    const uint8 signal_id = rte::sig::get_signal_id(signal_idx);
+
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+    // Now set CVs for signal ID, first output, and output config and verify EEPROM is updated
+    rte::set_cv(cal::cv::kSignalIDBase + signal_idx, kBuiltInSignalIDAusfahrsignal);
+    rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_idx, first_output);
+    rte::set_cv(cal::cv::kSignalOutputConfigBase + signal_idx, 0b00000001); // set inverse order
+    EXPECT_EQ(hal::eeprom::read(cal::cv::kSignalFirstOutputBase + signal_idx), first_output);
+    EXPECT_EQ(hal::eeprom::read(cal::cv::kSignalOutputConfigBase + signal_idx), static_cast<uint8>(0b00000001));
+    EXPECT_EQ(rte::sig::get_first_output(signal_idx).pin, first_output_pin);
+    rte::sig::get_signal_aspect(signal_id, cmd, signal_asp);
+    EXPECT_EQ(signal_asp.num_targets, expected_num_targets);
+    // adjust pin increment according to pin order configuration
+    const sint8 pin_inc = rte::sig::is_output_pin_order_inverse(signal_idx) ? 
+                         -rte::sig::get_output_pin_step_size(signal_idx) : 
+                          rte::sig::get_output_pin_step_size(signal_idx);
+    EXPECT_EQ(pin_inc, static_cast<sint8>(-1));
+    for (size_t i = 0U; i < expected_num_targets; i++)
+    {
+        EXPECT_EQ(rte::sig::is_output_pin(static_cast<uint8>(first_output_pin + i * pin_inc)), true);
+    }
+}
+
+/**
+ * @test CalM_is_output_pin_step_size_m2
+ * @brief Tests whether updating a CV for output pin configuration to step size -2 causes the new 
+ *        value to be written to EEPROM and interpreted correctly.
+ *        This test initializes the EEPROM with default values, sets a specific CV,
+ *        verifies that the EEPROM contains the updated value, and verifies that the output pins
+ *        are correctly identified.
+ */
+TEST(Ut_Signal, CalM_is_output_pin_step_size_m2)
+{
+    const uint8 first_output_pin = 13;
+    const uint8 first_output = cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output_pin);
+    const uint8 signal_idx = 0;
+    const uint8 expected_num_targets = 5;
+    const uint8 cmd = 0; // helper variable to call get_signal_aspect
+    struct signal::signal_aspect signal_asp;
+
+    const uint8 signal_id = rte::sig::get_signal_id(signal_idx);
+
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+    // Now set CVs for signal ID, first output, and output config and verify EEPROM is updated
+    rte::set_cv(cal::cv::kSignalIDBase + signal_idx, kBuiltInSignalIDAusfahrsignal);
+    rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_idx, first_output);
+    rte::set_cv(cal::cv::kSignalOutputConfigBase + signal_idx, 0b00000011); // set step size to 2 and inverse order
+    EXPECT_EQ(hal::eeprom::read(cal::cv::kSignalFirstOutputBase + signal_idx), first_output);
+    EXPECT_EQ(hal::eeprom::read(cal::cv::kSignalOutputConfigBase + signal_idx), static_cast<uint8>(0b00000011));
+    EXPECT_EQ(rte::sig::get_first_output(signal_idx).pin, first_output_pin);
+    rte::sig::get_signal_aspect(signal_id, cmd, signal_asp);
+    EXPECT_EQ(signal_asp.num_targets, expected_num_targets);
+    // adjust pin increment according to pin order configuration
+    const sint8 pin_inc = rte::sig::is_output_pin_order_inverse(signal_idx) ? 
+                         -rte::sig::get_output_pin_step_size(signal_idx) : 
+                          rte::sig::get_output_pin_step_size(signal_idx);
+    EXPECT_EQ(pin_inc, static_cast<sint8>(-2));
+    for (size_t i = 0U; i < expected_num_targets; i++)
+    {
+        EXPECT_EQ(rte::sig::is_output_pin(static_cast<uint8>(first_output_pin + i * pin_inc)), true);
+    }
+}
 
 /**
  * @brief Performs integration testing of signal processing using time-based test sequences
@@ -266,6 +439,7 @@ void do_signal_test_red_green(
     uint8 first_output_pin,
     uint8 input_pin,
     uint8 classifier_type,
+    sint8 step_size,
     Logger &log)
 {
     using signal_target_array = util::array<uint8, cfg::kNrSignalTargets>;
@@ -313,7 +487,18 @@ void do_signal_test_red_green(
     // ... with classifier type classifier_type
     tmp = classifier_type;
     rte::set_cv(cal::cv::kSignalInputClassifierTypeBase + signal_pos, tmp);
-
+    // ... with inverse output pin order and/or step size
+    tmp = 0U;
+    if (step_size < 0)
+    {
+        tmp = 0b00000001U; // set inverse order bit
+    }
+    // ... with step size 2
+    if ((step_size == -2) || (step_size == 2))
+    {
+        tmp |= 0b00000010U; // set step size to 2
+    } 
+    rte::set_cv(cal::cv::kSignalOutputConfigBase + signal_pos, tmp);
     in.type = cal::constants::kAdc;
     in.idx = signal_pos;
 
@@ -335,7 +520,8 @@ void do_signal_test_red_green(
             util::intensity8_255 pwm_hal;
             // Read PWM for that pin
             rte::ifc_onboard_target_duty_cycles::readElement(target_pin, pwm_rte);
-            pwm_hal = hal::stubs::analogWrite[target_pin++];
+            pwm_hal = hal::stubs::analogWrite[target_pin];
+            target_pin = static_cast<uint8>(target_pin + step_size);
             log << std::setw(3) << (int)pwm_rte << ", ";
             EXPECT_EQ((uint8)pwm_rte, aSteps[nStep].au8Curs[i]);
             EXPECT_EQ((uint8)pwm_hal, aSteps[nStep].au8Curs[i]);
@@ -345,75 +531,336 @@ void do_signal_test_red_green(
 }
 
 /**
- * @test Signal0_ADC_Green_Red
+ * @test Signal0_ADC_Green_Red_StepSize_1
  * @brief Tests whether signal 0 is correctly triggered by ADC input values
  *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size 1 for output pins.
  */
-TEST(Ut_Signal, Signal0_ADC_Green_Red)
+TEST(Ut_Signal, Signal0_ADC_Green_Red_StepSize_1)
 {
     Logger log;
     constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
     constexpr uint8 kFirstOutputPin = 13;
     constexpr uint8 kInputPin = 54;
     constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = 1;
 
-    log.start("Signal0_ADC_Green_Red.txt");
+    log.start("Signal0_ADC_Green_Red_StepSize_1.txt");
 
     do_signal_test_red_green(
         kSignalPos,
         kFirstOutputPin,
         kInputPin,
         kClassifierType,
+        kStepSize,
         log);
 
     log.stop();
 }
 
 /**
- * @test Signal1_ADC_Green_Red
+ * @test Signal1_ADC_Green_Red_StepSize_1
  * @brief Tests whether signal 1 is correctly triggered by ADC input values
  *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size 1 for output pins.
  */
-TEST(Ut_Signal, Signal1_ADC_Green_Red)
+TEST(Ut_Signal, Signal1_ADC_Green_Red_StepSize_1)
 {
     Logger log;
     constexpr int kSignalPos = 1; // Need to configure signal 1 as Ausfahrsignal
     constexpr uint8 kFirstOutputPin = 20;
     constexpr uint8 kInputPin = 55;
     constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = 1;
 
-    log.start("Signal1_ADC_Green_Red.txt");
+    log.start("Signal1_ADC_Green_Red_StepSize_1.txt");
 
     do_signal_test_red_green(
         kSignalPos,
         kFirstOutputPin,
         kInputPin,
         kClassifierType,
+        kStepSize,
         log);
 
     log.stop();
 }
 
 /**
- * @test Signal7_ADC_Green_Red
+ * @test Signal7_ADC_Green_Red_StepSize_1
  * @brief Tests whether signal 7 is correctly triggered by ADC input values
  *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size 1 for output pins.
  */
-TEST(Ut_Signal, Signal7_ADC_Green_Red)
+TEST(Ut_Signal, Signal7_ADC_Green_Red_StepSize_1)
 {
     Logger log;
     constexpr int kSignalPos = 7; // Need to configure signal 7 as Ausfahrsignal
     constexpr uint8 kFirstOutputPin = 20;
     constexpr uint8 kInputPin = 55;
     constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = 1;
 
-    log.start("Signal7_ADC_Green_Red.txt");
+    log.start("Signal7_ADC_Green_Red_StepSize_1.txt");
 
     do_signal_test_red_green(
         kSignalPos,
         kFirstOutputPin,
         kInputPin,
         kClassifierType,
+        kStepSize,
+        log);
+
+    log.stop();
+}
+
+/**
+ * @test Signal0_ADC_Green_Red_StepSize_2
+ * @brief Tests whether signal 0 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size 2 for output pins.
+ */
+TEST(Ut_Signal, Signal0_ADC_Green_Red_StepSize_2)
+{
+    Logger log;
+    constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 13;
+    constexpr uint8 kInputPin = 54;
+    constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = 2;
+
+    log.start("Signal0_ADC_Green_Red_StepSize_2.txt");
+
+    do_signal_test_red_green(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        kStepSize,
+        log);
+
+    log.stop();
+}
+
+/**
+ * @test Signal1_ADC_Green_Red_StepSize_2
+ * @brief Tests whether signal 1 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size 2 for output pins.
+ */
+TEST(Ut_Signal, Signal1_ADC_Green_Red_StepSize_2)
+{
+    Logger log;
+    constexpr int kSignalPos = 1; // Need to configure signal 1 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 20;
+    constexpr uint8 kInputPin = 55;
+    constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = 2;
+
+    log.start("Signal1_ADC_Green_Red_StepSize_2.txt");
+
+    do_signal_test_red_green(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        kStepSize,
+        log);
+
+    log.stop();
+}
+
+/**
+ * @test Signal7_ADC_Green_Red_StepSize_2
+ * @brief Tests whether signal 1 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ *       Uses step size 2 for output pins.
+ */
+TEST(Ut_Signal, Signal7_ADC_Green_Red_StepSize_2)
+{
+    Logger log;
+    constexpr int kSignalPos = 7; // Need to configure signal 7 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 20;
+    constexpr uint8 kInputPin = 55;
+    constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = 2;
+
+    log.start("Signal7_ADC_Green_Red_StepSize_2.txt");
+
+    do_signal_test_red_green(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        kStepSize,
+        log);
+
+    log.stop();
+}
+
+/**
+ * @test Signal0_ADC_Green_Red_StepSize_m1
+ * @brief Tests whether signal 0 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size -1 for output pins.
+ */
+TEST(Ut_Signal, Signal0_ADC_Green_Red_StepSize_m1)
+{
+    Logger log;
+    constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 13;
+    constexpr uint8 kInputPin = 54;
+    constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = -1;
+
+    log.start("Signal0_ADC_Green_Red_StepSize_m1.txt");
+
+    do_signal_test_red_green(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        kStepSize,
+        log);
+
+    log.stop();
+}
+
+/**
+ * @test Signal1_ADC_Green_Red_StepSize_m1
+ * @brief Tests whether signal 0 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size -2 for output pins.
+ */
+TEST(Ut_Signal, Signal1_ADC_Green_Red_StepSize_m1)
+{
+    Logger log;
+    constexpr int kSignalPos = 1; // Need to configure signal 1 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 20;
+    constexpr uint8 kInputPin = 55;
+    constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = -1;
+
+    log.start("Signal1_ADC_Green_Red_StepSize_m1.txt");
+
+    do_signal_test_red_green(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        kStepSize,
+        log);
+
+    log.stop();
+}
+
+/**
+ * @test Signal7_ADC_Green_Red_StepSize_m1
+ * @brief Tests whether signal 7 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size -2 for output pins.
+ */
+TEST(Ut_Signal, Signal7_ADC_Green_Red_StepSize_m1)
+{
+    Logger log;
+    constexpr int kSignalPos = 7; // Need to configure signal 7 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 20;
+    constexpr uint8 kInputPin = 55;
+    constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = -1;
+
+    log.start("Signal1_ADC_Green_Red_StepSize_m1.txt");
+
+    do_signal_test_red_green(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        kStepSize,
+        log);
+
+    log.stop();
+}
+
+/**
+ * @test Signal0_ADC_Green_Red_StepSize_m2
+ * @brief Tests whether signal 0 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size -2 for output pins.
+ */
+TEST(Ut_Signal, Signal0_ADC_Green_Red_StepSize_m2)
+{
+    Logger log;
+    constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 13;
+    constexpr uint8 kInputPin = 54;
+    constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = -2;
+
+    log.start("Signal0_ADC_Green_Red_StepSize_m2.txt");
+
+    do_signal_test_red_green(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        kStepSize,
+        log);
+
+    log.stop();
+}
+
+/**
+ * @test Signal1_ADC_Green_Red_StepSize_m2
+ * @brief Tests whether signal 1 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size -2 for output pins.
+ */
+TEST(Ut_Signal, Signal1_ADC_Green_Red_StepSize_m2)
+{
+    Logger log;
+    constexpr int kSignalPos = 1; // Need to configure signal 1 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 20;
+    constexpr uint8 kInputPin = 55;
+    constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = -2;
+
+    log.start("Signal1_ADC_Green_Red_StepSize_m2.txt");
+
+    do_signal_test_red_green(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        kStepSize,
+        log);
+
+    log.stop();
+}
+
+/**
+ * @test Signal7_ADC_Green_Red_StepSize_m2
+ * @brief Tests whether signal 7 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size -2 for output pins.
+ */
+TEST(Ut_Signal, Signal7_ADC_Green_Red_StepSize_m2)
+{
+    Logger log;
+    constexpr int kSignalPos = 7; // Need to configure signal 7 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 20;
+    constexpr uint8 kInputPin = 55;
+    constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = -2;
+
+    log.start("Signal7_ADC_Green_Red_StepSize_m2.txt");
+
+    do_signal_test_red_green(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        kStepSize,
         log);
 
     log.stop();
@@ -1218,9 +1665,19 @@ bool test_loop(void)
 
     RUN_TEST(CalM_get_signal_id);
     RUN_TEST(CalM_update_cv_id);
-    RUN_TEST(Signal0_ADC_Green_Red);
-    RUN_TEST(Signal1_ADC_Green_Red);
-    RUN_TEST(Signal7_ADC_Green_Red);
+    RUN_TEST(CalM_is_output_pin_step_size_1);
+    RUN_TEST(CalM_is_output_pin_step_size_2);
+    RUN_TEST(CalM_is_output_pin_step_size_m1);
+    RUN_TEST(CalM_is_output_pin_step_size_m2);
+    RUN_TEST(Signal0_ADC_Green_Red_StepSize_1);
+    RUN_TEST(Signal1_ADC_Green_Red_StepSize_1);
+    RUN_TEST(Signal7_ADC_Green_Red_StepSize_1);
+    RUN_TEST(Signal0_ADC_Green_Red_StepSize_2);
+    RUN_TEST(Signal1_ADC_Green_Red_StepSize_2);
+    RUN_TEST(Signal7_ADC_Green_Red_StepSize_2);
+    RUN_TEST(Signal0_ADC_Green_Red_StepSize_m1);
+    RUN_TEST(Signal1_ADC_Green_Red_StepSize_m1);
+    RUN_TEST(Signal7_ADC_Green_Red_StepSize_m1);
     RUN_TEST(Signal0_ADC_All);
     RUN_TEST(Signal7_ADC_All);
     RUN_TEST(Signal0_DCC_Aspects_2_3);

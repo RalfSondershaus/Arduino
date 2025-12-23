@@ -52,6 +52,7 @@ namespace cal
         constexpr uint16 kSignalFirstOutputBase = 50;
         constexpr uint16 kSignalInputBase = 58;
         constexpr uint16 kSignalInputClassifierTypeBase = 66;
+        constexpr uint16 kSignalOutputConfigBase = 74;
         constexpr uint16 kClassifierBase = 112; // Number of classifiers: cfg::kNrClassifiers
                                                 // with number of classes: cfg::kNrClassifierClasses
         constexpr uint16 kUserDefinedSignalBase = 134;
@@ -86,6 +87,8 @@ namespace cal
             constexpr uint8 kAdcPin = 0b00111111;          /**< ADC pin mask */
             constexpr uint8 kClassifierType = 0b00000011;  /**< Classifier type mask */
             constexpr uint8 kNumberOfOutputs = 0b00001111;  /**< Number of outputs mask */
+            constexpr uint8 kOutpoutPinOrder = 0b00000001;  /**< Output pin order mask */
+            constexpr uint8 kOutpoutPinStepSize = 0b00000010;  /**< Output pin step size mask*/
         }
         namespace bitshift
         {
@@ -95,6 +98,8 @@ namespace cal
             constexpr uint8 kAdcPin = 0;          /**< ADC pin shift */
             constexpr uint8 kClassifierType = 0;  /**< Classifier type shift */
             constexpr uint8 kNumberOfOutputs = 0;  /**< Number of outputs shift */
+            constexpr uint8 kOutpoutPinOrder = 0;  /**< Output pin order shift */
+            constexpr uint8 kOutpoutPinStepSize = 1;  /**< Output pin step size shift */
         }
         /** @brief Create a CV for signal input value. */
         constexpr uint8 make_signal_input(uint8 input_type, uint8 input_pin) noexcept

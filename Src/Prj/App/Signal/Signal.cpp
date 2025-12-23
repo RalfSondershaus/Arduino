@@ -89,6 +89,13 @@ namespace signal
 
         // write intensity and speed to RTE
         struct signal::target tgt = signal_cal::get_first_output(signal_idx);
+        // adjust pin increment according to pin order configuration
+        const sint8 pin_inc = signal_cal::is_output_pin_order_inverse(signal_idx) ? 
+                             -signal_cal::get_output_pin_step_size(signal_idx) : 
+                              signal_cal::get_output_pin_step_size(signal_idx);
+        // range [-128 .. 127], pin is 6 bits uint8 [0 .. 64]
+        sint8 pin = tgt.pin;
+
         for (pos = 0U; pos < signal_asp.num_targets; pos++)
         {
             // MSB of aspect is index 0 in target intensity array
@@ -113,15 +120,21 @@ namespace signal
                 // log << " (" << cal_getTarget(pCal, pos).idx << ": " << intensity << ")";
                 //  boundary check is performed in signal_rte::ifc_rte_set_intensity_and_speed
                 signal_rte::set_intensity_and_speed(tgt, intensity, speed);
-                tgt.pin++;
             }
             else
             {
                 // log << " (" << cal_getTarget(pCal, pos).idx << ": " << intensity << ")";
                 //  boundary check is performed in rte::ifc_rte_set_intensity
                 signal_rte::set_intensity(tgt, intensity);
-                tgt.pin++;
             }
+            // next output pin
+            pin += pin_inc;
+            // handle wrap around
+            if (pin < 0)
+            {
+                pin = 0;
+            }
+            tgt.pin = static_cast<uint8>(pin);
         }
 
         last_dim_time_10ms = signal_asp.change_over_time_10ms;
