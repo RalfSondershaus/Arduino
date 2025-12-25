@@ -13,15 +13,26 @@ Each signal can be controlled by a DCC command.
 
 ## Features
 
-- Arduino Mega: Up to six signals
+- Arduino Mega: Up to eight signals
 - Configuration of two user-defined signals
-- Two built-in signals:
+- Three built-in signals:
   - Ausfahrsignal
   - Blocksignal
-- Configuration of input buttons
+  - Einfahrsignal
+- Configuration of input buttons, e.g., analog inputs and digital inputs
 - Configuration of DCC commands
 
-## Getting Started
+## How to flash binaries
+
+1. Download the release assest `Signal.hex`
+2. Install avrdude.
+3. Run avrdude
+   ```
+   avrdude -C avrdude.conf -v -V -p m2560 -c arduino -P COMx -D
+   ```
+   > Remark: We are using `avrdude.conf` that is installed with avrdude.
+
+## How to build
 
 1. Clone the repository to your Arduino project directory.
 2. Install avr_gcc and avrdude
@@ -39,11 +50,11 @@ Each signal can be controlled by a DCC command.
 
 ## Configuration
 
-The application can be configured via a serial interface using a Ascii protocol. With a serial 
-terminal such as HTerm or the Visual Studio Code Terminal, you can send messages to the application 
-and receive messages from it.
+The application can be configured via a serial interface, e.g., USB, using a Ascii protocol. 
+With a serial terminal such as HTerm or the Visual Studio Code Terminal, you can send messages to 
+the application and receive messages from it.
 
-Note: The maximal length of a message is 64 characters.
+> Note: The maximal length of a message is 64 characters.
 
 ### Supported Commands
 
@@ -63,9 +74,9 @@ These commands are used to output internal data structures to the terminal.
 
 | Command | Description                | Example Usage         |
 |----------------|----------------------------|----------------------|
-| `MON_LIST` | Print available RTE ports (`ifc-name`) via serial interface. | `MON_LIST` Prints the available interfaces to the terminal. |
-| `MON_START cycle-time ifc-name [id-first id-nr]` | Start to print current values of `ifc-name`. Currently, just one RTE port can be printed at one time. Cycle time is `cycle-time` [ms]. `id-first` and `id-nr` are optional and define the span of an array that is to be transmitted [`id-first`, `id-first + id-nr`]. | `MON_START 100 ifc_ad_values`<br>read AD values of the classifiers. |
-| `MON_STOP` | Stop to print RTE port. | `MON_STOP` Stops to print to the terminal. |
+| `MON_LIST` | Print available RTE ports (`ifc-name`) via serial interface. | `MON_LIST`<br>Prints the available interfaces to the terminal. |
+| `MON_START cycle-time ifc-name [id-first id-nr]` | Start to print current values of `ifc-name`. Currently, just one RTE port can be printed at one time. Cycle time is `cycle-time` [ms]. `id-first` and `id-nr` are optional and define the span of an array that is to be transmitted [`id-first`, `id-first + id-nr`]. | `MON_START 100 ifc_ad_values`<br>Reads and prints AD values of the classifiers every 100 ms. |
+| `MON_STOP` | Stop to print the RTE port. | `MON_STOP`<br>Stops to print to the terminal. |
 
 #### List of CVs
 
@@ -73,31 +84,31 @@ Version 1.0
 
 |CV|Bit pattern|R/W|Default value|Val. Range MEGA|Val. Range NANO|Supp. MEGA|Supp. NANO|Comment|
 |--|-----------|---|-------------|---------------|---------------|----------|----------|-------|
-|1|0b11111111|R+W|1|0 - 255|0 - 255|Y|Y|"CV 29 Bit 6 = 1: CV1 contains the eight least significant bits of the Output Address, i. e. Output Address modulo 256. CV 29 Bit 6 = 0: Decoder Address LSB, bits 0 - 5 of accessory decoder address"|
+|1|0b11111111|R+W|1|0 - 255|0 - 255|Y|Y|If CV 29 Bit 6 = 1: CV1 contains the eight least significant bits of the Output Address, i. e. Output Address modulo 256.<br><br>If CV 29 Bit 6 = 0: Decoder Address LSB, bits 0 - 5 of accessory decoder address"|
 |2|0b11111111||0|||N|N|"Auxiliary Activation, Auxiliary activation of outputs, Bits 1-8 = Auxiliary activation: = ""0"" output is not activated by an auxiliary input, ""1"" output can be activated by an auxiliary input"|
 |3|0b11111111||0|||N|N|Time On F1|
 |4|0b11111111||0|||N|N|Time On F2|
 |5|0b11111111||0|||N|N|Time On F3|
 |6|0b11111111||0|||N|N|Time On F4|
-|7|0x11110000|R|0|||Y|Y|Manufacturer Version ID: Major ID: v0.1, 0xFF = invalid data (e.g. never programmed)|
-||0b00001111|R|1|||Y|Y|Manufacturer Version ID: Minor ID: v0.1|
+|7|0x11110000|R|0|||Y|Y|Manufacturer Version ID: major ID, 0xFF = invalid data (e.g. never programmed)|
+||0b00001111|R|1|||Y|Y|Manufacturer Version ID: minor ID|
 |8|0b11111111|R|83|||Y|Y|Manufacturer ID: 'S'|
-|9|0b00000111|R+W|0|0 - 7|0 - 7|Y|Y|"CV 29 Bit 6 = 1: contains the three most significant bits of the Output Address, i. e. Output Address divided by 256. CV 29 Bit 6 = 0: Decoder Address MSB, bits 6 - 8 of accessory decoder address"|
+|9|0b00000111|R+W|0|0 - 7|0 - 7|Y|Y|If CV 29 Bit 6 = 1: contains the three most significant bits of the Output Address, i. e. Output Address divided by 256.<br><br>If CV 29 Bit 6 = 0: Decoder Address MSB, bits 6 - 8 of accessory decoder address|
 |10 - 27|||0|||N|N|Reserved by NMRA for future use|
 |28|||0|||N|N|Bi-Directional Communication Configuration (RailCom)|
-|29|0b00000001|R|0|0|0|N|N|"Configuration| Reserved for future use"|
+|29|0b00000001|R|0|0|0|N|N|Configuration|
 ||0b00000010|R|0|0|0|N|N|Reserved for future use|
 ||0b00000100|R|0|0|0|N|N|Reserved for future use|
 ||0b00001000|R|0|0|0|N|N|Bi-Directional Communications (0 = disabled, 1 = enabled)|
 ||0b00010000|R|0|0|0|N|N|Reserved for future use|
-||0b00100000|R|0|0|0|N|N|Decoder Type (0 = Basic Accessory, 1 = Extended Accessory)|
-||0b01000000|R|1|1|1|N|N|Addressing Method (0 = Decoder Address Method, 1 = Output Address Method) Defines how CV1 and CV9 are interpreted|
-||0b10000000|W|0|1|1|Y|Y|Accessory Decoder (0 = Multifunction Decoder, 1 = Accessory Decoder)|
+||0b00100000|R|1|1|1|N|N|Decoder Type (0 = Basic Accessory, 1 = Extended Accessory)|
+||0b01000000|R+W|1|1|1|N|N|Addressing Method (0 = Decoder Address Method, 1 = Output Address Method) Defines how CV1 and CV9 are interpreted|
+||0b10000000|R|1|1|1|Y|Y|Accessory Decoder (0 = Multifunction Decoder, 1 = Accessory Decoder)|
 |30|||0|||N|N|Reserved by NMRA for future use|
 |31|||0|||N|N|Indexed Area Pointers, Index High and Low Address|
 |32|||0|||N|N|Indexed Area Pointers, Index High and Low Address|
-|33|0x11110000|R|0|1|1|Y|Y|Manufacturer CV structure version ID: Major ID v0.1. Change major ID if the change is not backwards compatible.|
-||0b00001111|R|1|0|0|Y|Y|Manufacturer CV structure version ID v1.0, minor ID. Change minor ID if the change is backwards compatible.|
+|33|0x11110000|R|0|1|1|Y|Y|Manufacturer CV structure version ID: major ID. Change major ID if the change is not backwards compatible.|
+||0b00001111|R|1|0|0|Y|Y|Manufacturer CV structure version ID: minor ID. Change minor ID if the change is backwards compatible.|
 |39|0b00000001|R+W|1|N/A|N/A|N|N|DCC addressing mode, 0 = ROCO, 1 = RCN-213|
 |40|0b11111111|R|8|0 - 8|0 - 4|Y|Y|Maximum number of signals|
 |41|0b11111111|R|2|2|2|Y|Y|Number of built-in signal-IDs|
@@ -110,37 +121,37 @@ Version 1.0
 |48|0b11111111|R+W|0|0 - 8||Y|N|Signal-ID of signal 7|
 |49|0b11111111|R+W|0|0 - 8||Y|N|Signal-ID of signal 8|
 |50|0b11000000|R+W|0|0-1|0-1|Y|Y|Signal 1: First output is internal pin (0), external (1)|
-||0b00111111|R+W|0|3 - 53||||Signal 1: First output pin number|
+||0b00111111|R+W|0|0 - 53||||Signal 1: First output pin number|
 |51|0b11000000|R+W|0|0-1|0-1|Y|Y|Signal 2: First output is internal pin (0), external (1)|
-||0b00111111|R+W|0|3 - 53||Y|Y|Signal 2: First output pin number|
+||0b00111111|R+W|0|0 - 53||Y|Y|Signal 2: First output pin number|
 |52|0b11000000|R+W|0|0-1|0-1|Y|Y|Signal 3: First output is internal pin (0), external (1)|
-||0b00111111|R+W|0|3 - 53||Y|Y|Signal 3: First output pin number|
+||0b00111111|R+W|0|0 - 53||Y|Y|Signal 3: First output pin number|
 |53|0b11000000|R+W|0|0-1|0-1|Y|Y|Signal 4: First output is internal pin (0), external (1)|
-||0b00111111|R+W|0|3 - 53||Y|Y|Signal 4: First output pin number|
+||0b00111111|R+W|0|0 - 53||Y|Y|Signal 4: First output pin number|
 |54|0b11000000|R+W|0|0-1|0-1|Y|N|Signal 5: First output is internal pin (0), external (1)|
-||0b00111111|R+W|0|3 - 53||Y|N|Signal 5: First output pin number|
+||0b00111111|R+W|0|0 - 53||Y|N|Signal 5: First output pin number|
 |55|0b11000000|R+W|0|0-1|0-1|Y|N|Signal 6: First output is internal pin (0), external (1)|
-||0b00111111|R+W|0|3 - 53||Y|N|Signal 6: First output pin number|
+||0b00111111|R+W|0|0 - 53||Y|N|Signal 6: First output pin number|
 |56|0b11000000|R+W|0|0-1|0-1|Y|N|Signal 7: First output is internal pin (0), external (1)|
-||0b00111111|R+W|0|3 - 53||Y|N|Signal 7: First output pin number|
+||0b00111111|R+W|0|0 - 53||Y|N|Signal 7: First output pin number|
 |57|0b11000000|R+W|0|0-1|0-1|Y|N|Signal 8: First output is internal pin (0), external (1)|
-||0b00111111|R+W|0|3 - 53||Y|N|Signal 8: First output pin number|
+||0b00111111|R+W|0|0 - 53||Y|N|Signal 8: First output pin number|
 |58|0b11000000|R+W|0|0 - 2|0 - 2|Y|Y|Signal 1: Input is DCC (0) or ADC Pin (1) or Digital Input Pin (2)|
-||0b00111111|R+W|0|3 - 53||Y|Y|Signal 1: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53). Not used for DCC because DCC address is calculated from Decoder Address + Signal ID|
+||0b00111111|R+W|0|0 - 53||Y|Y|Signal 1: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53). Not used for DCC because DCC address is calculated from Decoder Address + Signal ID|
 |59|0b11000000|R+W|0|0 - 2|0 - 2|Y|Y|Signal 2: Input is DCC (0) or ADC Pin (1) or Digital Input Pin (2)|
-||0b00111111|R+W|0|3 - 53||Y|Y|Signal 2: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
+||0b00111111|R+W|0|0 - 53||Y|Y|Signal 2: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
 |60|0b11000000|R+W|0|0 - 2|0 - 2|Y|Y|Signal 3: Input is DCC (0) or ADC Pin (1) or Digital Input Pin (2)|
-||0b00111111|R+W|0|3 - 53||Y|Y|Signal 3: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
+||0b00111111|R+W|0|0 - 53||Y|Y|Signal 3: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
 |61|0b11000000|R+W|0|0 - 2|0 - 2|Y|Y|Signal 4: Input is DCC (0) or ADC Pin (1) or Digital Input Pin (2)|
-||0b00111111|R+W|0|3 - 53||Y|Y|Signal 4: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
+||0b00111111|R+W|0|0 - 53||Y|Y|Signal 4: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
 |62|0b11000000|R+W|0|0 - 2|0 - 2|Y|N|Signal 5: Input is DCC (0) or ADC Pin (1) or Digital Input Pin (2)|
-||0b00111111|R+W|0|3 - 53||Y|N|Signal 5: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
+||0b00111111|R+W|0|0 - 53||Y|N|Signal 5: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
 |63|0b11000000|R+W|0|0 - 2|0 - 2|Y|N|Signal 6: Input is DCC (0) or ADC Pin (1) or Digital Input Pin (2)|
-||0b00111111|R+W|0|3 - 53||Y|N|Signal 6: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
+||0b00111111|R+W|0|0 - 53||Y|N|Signal 6: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
 |64|0b11000000|R+W|0|0 - 2|0 - 2|Y|N|Signal 7: Input is DCC (0) or ADC Pin (1) or Digital Input Pin (2)|
-||0b00111111|R+W|0|3 - 53||Y|N|Signal 7: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
+||0b00111111|R+W|0|0 - 53||Y|N|Signal 7: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
 |65|0b11000000|R+W|0|0 - 2|0 - 2|Y|N|Signal 8: Input is DCC (0) or ADC Pin (1) or Digital Input Pin (2)|
-||0b00111111|R+W|0|3 - 53||Y|N|Signal 8: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
+||0b00111111|R+W|0|0 - 53||Y|N|Signal 8: ADC Pin (0 - 15) or First Digital Input Pin (3 - 53)|
 |66|0b11111100|R+W|0|0|0 - 1|Y|Y|Signal 1: Reserved for future use|
 ||0b00000011|R+W|0|0 - 1|0|Y|Y|Signal 1: If input is ADC Pin: which (user defined) classifier type|
 |67|0b11000000|R+W|0|0|0 - 1|Y|Y|Signal 2: Reserved for future use|
@@ -157,30 +168,45 @@ Version 1.0
 ||0b00111111|R+W|0|0|0|Y|Y|Signal 7: If input is ADC Pin: which classifier type|
 |73|0b11000000|R+W|0|0 - 1|0 - 1|Y|Y|Signal 8: Reserved for future use|
 ||0b00111111|R+W|0|0|0|Y|Y|Signal 8: If input is ADC Pin: which classifier type|
-|… 81|||0||||||
+|74|0b00000001|R+W|0|0 - 1|0 - 1|Y|Y|Signal 1: <br>0 = Output pin order is increasing.<br>1 = Output pin order is decreasing|
+||0b00000010|R+W|0|0 - 1|0 - 1|Y|Y|Signal 1: <br>0 = Output pin step size is 1. <br>1 = Output pin step size is 2.|
+|75|0b00000001|R+W|0|0 - 1|0 - 1|Y|Y|Signal 2: <br>0 = Output pin order is increasing. <br>1 = Output pin order is decreasing|
+||0b00000010|R+W|0|0 - 1|0 - 1|Y|Y|Signal 2: <br>0 = Output pin step size is 1. <br>1 = Output pin step size is 2.|
+|76|0b00000001|R+W|0|0 - 1|0 - 1|Y|Y|Signal 3: <br>0 = Output pin order is increasing. <br>1 = Output pin order is decreasing|
+||0b00000010|R+W|0|0 - 1|0 - 1|Y|Y|Signal 3: <br>0 = Output pin step size is 1. <br>1 = Output pin step size is 2.|
+|77|0b00000001|R+W|0|0 - 1|0 - 1|Y|Y|Signal 4: <br>0 = Output pin order is increasing. <br>1 = Output pin order is decreasing|
+||0b00000010|R+W|0|0 - 1|0 - 1|Y|Y|Signal 4: <br>0 = Output pin step size is 1. <br>1 = Output pin step size is 2.|
+|78|0b00000001|R+W|0|0 - 1|0 - 1|Y|N|Signal 5: <br>0 = Output pin order is increasing. <br>1 = Output pin order is decreasing|
+||0b00000010|R+W|0|0 - 1|0 - 1|Y|N|Signal 5: <br>0 = Output pin step size is 1. <br>1 = Output pin step size is 2.|
+|79|0b00000001|R+W|0|0 - 1|0 - 1|Y|N|Signal 6: <br>0 = Output pin order is increasing. <br>1 = Output pin order is decreasing|
+||0b00000010|R+W|0|0 - 1|0 - 1|Y|N|Signal 6: <br>0 = Output pin step size is 1. <br>1 = Output pin step size is 2.|
+|80|0b00000001|R+W|0|0 - 1|0 - 1|Y|N|Signal 7: <br>0 = Output pin order is increasing. <br>1 = Output pin order is decreasing|
+||0b00000010|R+W|0|0 - 1|0 - 1|Y|N|Signal 7: <br>0 = Output pin step size is 1. <br>1 = Output pin step size is 2.|
+|81|0b00000001|R+W|0|0 - 1|0 - 1|Y|N|Signal 8: <br>0 = Output pin order is increasing. <br>1 = Output pin order is decreasing|
+||0b00000010|R+W|0|0 - 1|0 - 1|Y|N|Signal 8: <br>0 = Output pin step size is 1. <br>1 = Output pin step size is 2.|
 |82 - 111|||0|||||Reserved by NMRA for future use|
 |112|0b11111111|R+W|5|0 - 255|0 - 255|Y|Y|Classifier type 1: Debounce time until a class is classified: 0 sec ... 2.55 sec  [10 ms]|
-|113|0b11111111|R+W|45|0 - 255|0 - 255|Y|Y|Lower limit for class 0 (default: AD value 182)|
-|114|0b11111111|R+W|148|0 - 255|0 - 255|Y|Y|Lower limit for class 1 (default: AD value 595)|
-|115|0b11111111|R+W|97|0 - 255|0 - 255|Y|Y|Lower limit for class 2 (default: AD value 389)|
-|116|0b11111111|R+W|34|0 - 255|0 - 255|Y|Y|Lower limit for class 3 (default: AD value 137)|
-|117|0b11111111|R+W|255|0 - 255|0 - 255|Y|Y|Lower limit for class 4 (default: AD value 1023)|
-|118|0b11111111|R+W|50|0 - 255|0 - 255|Y|Y|Upper limit for class 0 (default: AD value 202)|
-|119|0b11111111|R+W|153|0 - 255|0 - 255|Y|Y|Upper limit for class 1 (default: AD value 615)|
-|120|0b11111111|R+W|102|0 - 255|0 - 255|Y|Y|Upper limit for class 2 (default: AD value 409)|
-|121|0b11111111|R+W|39|0 - 255|0 - 255|Y|Y|Upper limit for class 3 (default: AD value 157)|
-|122|0b11111111|R+W|0|0 - 255|0 - 255|Y|Y|Upper limit for class 4 (default: AD value 0)|
+|113|0b11111111|R+W|45|0 - 255|0 - 255|Y|Y|[4 LSB] Lower limit for class 0 (default: AD value 182)|
+|114|0b11111111|R+W|148|0 - 255|0 - 255|Y|Y|[4 LSB] Lower limit for class 1 (default: AD value 595)|
+|115|0b11111111|R+W|97|0 - 255|0 - 255|Y|Y|[4 LSB] Lower limit for class 2 (default: AD value 389)|
+|116|0b11111111|R+W|34|0 - 255|0 - 255|Y|Y|[4 LSB] Lower limit for class 3 (default: AD value 137)|
+|117|0b11111111|R+W|255|0 - 255|0 - 255|Y|Y|[4 LSB] Lower limit for class 4 (default: AD value 1023)|
+|118|0b11111111|R+W|50|0 - 255|0 - 255|Y|Y|[4 LSB] Upper limit for class 0 (default: AD value 202)|
+|119|0b11111111|R+W|153|0 - 255|0 - 255|Y|Y|[4 LSB] Upper limit for class 1 (default: AD value 615)|
+|120|0b11111111|R+W|102|0 - 255|0 - 255|Y|Y|[4 LSB] Upper limit for class 2 (default: AD value 409)|
+|121|0b11111111|R+W|39|0 - 255|0 - 255|Y|Y|[4 LSB] Upper limit for class 3 (default: AD value 157)|
+|122|0b11111111|R+W|0|0 - 255|0 - 255|Y|Y|[4 LSB] Upper limit for class 4 (default: AD value 0)|
 |123|0b11111111|R+W|5|0 - 255|0 - 255|Y|Y|Classifier type 2: Debounce time until a class is classified: 0 sec ... 2.55 sec  [10 ms]|
-|124|0b11111111|R+W|45|0 - 255|0 - 255|Y|Y|Lower limit for class 0|
-|125|0b11111111|R+W|148|0 - 255|0 - 255|Y|Y|Lower limit for class 1|
-|126|0b11111111|R+W|97|0 - 255|0 - 255|Y|Y|Lower limit for class 2|
-|127|0b11111111|R+W|34|0 - 255|0 - 255|Y|Y|Lower limit for class 3|
-|128|0b11111111|R+W|255|0 - 255|0 - 255|Y|Y|Lower limit for class 4|
-|129|0b11111111|R+W|50|0 - 255|0 - 255|Y|Y|Upper limit for class 0|
-|130|0b11111111|R+W|153|0 - 255|0 - 255|Y|Y|Upper limit for class 1|
-|131|0b11111111|R+W|102|0 - 255|0 - 255|Y|Y|Upper limit for class 2|
-|132|0b11111111|R+W|39|0 - 255|0 - 255|Y|Y|Upper limit for class 3|
-|133|0b11111111|R+W|0|0 - 255|0 - 255|Y|Y|Upper limit for class 4|
+|124|0b11111111|R+W|45|0 - 255|0 - 255|Y|Y|[4 LSB] Lower limit for class 0|
+|125|0b11111111|R+W|148|0 - 255|0 - 255|Y|Y|[4 LSB] Lower limit for class 1|
+|126|0b11111111|R+W|97|0 - 255|0 - 255|Y|Y|[4 LSB] Lower limit for class 2|
+|127|0b11111111|R+W|34|0 - 255|0 - 255|Y|Y|[4 LSB] Lower limit for class 3|
+|128|0b11111111|R+W|255|0 - 255|0 - 255|Y|Y|[4 LSB] Lower limit for class 4|
+|129|0b11111111|R+W|50|0 - 255|0 - 255|Y|Y|[4 LSB] Upper limit for class 0|
+|130|0b11111111|R+W|153|0 - 255|0 - 255|Y|Y|[4 LSB] Upper limit for class 1|
+|131|0b11111111|R+W|102|0 - 255|0 - 255|Y|Y|[4 LSB] Upper limit for class 2|
+|132|0b11111111|R+W|39|0 - 255|0 - 255|Y|Y|[4 LSB] Upper limit for class 3|
+|133|0b11111111|R+W|0|0 - 255|0 - 255|Y|Y|[4 LSB] Upper limit for class 4|
 |134|0b11110000|R|0|0|0|Y|Y|User-defined Signal-ID 128: Reserved|
 ||0b00001111|R+W|0|1 - 8|1 - 8|Y|Y|User-defined Signal-ID 128: Number of outputs (LEDs)|
 |135|0b11111111|R+W|0|0 - 255|0 - 255|Y|Y|User-defined Signal-ID 128: Aspect 0 (one bit per output LED)|
