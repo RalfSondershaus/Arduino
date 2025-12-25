@@ -16,8 +16,6 @@ on:
       - published     # When a release is published
       - draft         # When a release is created as a draft
       - prereleased   # When a prerelease is created
-    branches:
-      - master
 
 jobs:
   build:
@@ -67,7 +65,7 @@ jobs:
           path: Build/Bin/
 
       - name: Upload Release Assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.4.0
         with:
           files: |
             Build/Bin/Signal/Signal.hex
