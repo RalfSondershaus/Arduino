@@ -85,7 +85,7 @@ Version 1.0
 |CV|Bit pattern|R/W|Default value|Val. Range MEGA|Val. Range NANO|Supp. MEGA|Supp. NANO|Comment|
 |--|-----------|---|-------------|---------------|---------------|----------|----------|-------|
 |1|0b11111111|R+W|1|0 - 255|0 - 255|Y|Y|If CV 29 Bit 6 = 1: CV1 contains the eight least significant bits of the Output Address, i. e. Output Address modulo 256.<br><br>If CV 29 Bit 6 = 0: Decoder Address LSB, bits 0 - 5 of accessory decoder address"|
-|2|0b11111111||0|||N|N|"Auxiliary Activation, Auxiliary activation of outputs, Bits 1-8 = Auxiliary activation: = ""0"" output is not activated by an auxiliary input, ""1"" output can be activated by an auxiliary input"|
+|2|0b11111111||0|||N|N|Auxiliary Activation, Auxiliary activation of outputs, Bits 1-8 = Auxiliary activation: = "0" output is not activated by an auxiliary input, "1" output can be activated by an auxiliary input|
 |3|0b11111111||0|||N|N|Time On F1|
 |4|0b11111111||0|||N|N|Time On F2|
 |5|0b11111111||0|||N|N|Time On F3|
@@ -101,9 +101,9 @@ Version 1.0
 ||0b00000100|R|0|0|0|N|N|Reserved for future use|
 ||0b00001000|R|0|0|0|N|N|Bi-Directional Communications (0 = disabled, 1 = enabled)|
 ||0b00010000|R|0|0|0|N|N|Reserved for future use|
-||0b00100000|R|0|0|0|N|N|Decoder Type (0 = Basic Accessory, 1 = Extended Accessory)|
-||0b01000000|R+W|1|1|1|Y|Y|Addressing Method (0 = Decoder Address Method, 1 = Output Address Method) Defines how CV1 and CV9 are interpreted|
-||0b10000000|R|1|1|1|N|N|Accessory Decoder (0 = Multifunction Decoder, 1 = Accessory Decoder)|
+||0b00100000|R|0|0|0|N|N|Decoder Type<br>0 = Basic Accessory<br>1 = Extended Accessory|
+||0b01000000|R+W|1|1|1|Y|Y|Addressing Method<br>0 = Decoder Address Method<br>1 = Output Address Method<br>Defines how CV1 and CV9 are interpreted|
+||0b10000000|R|1|1|1|N|N|Accessory Decoder<br>0 = Multifunction Decoder<br>1 = Accessory Decoder|
 |30|||0|||N|N|Reserved by NMRA for future use|
 |31|||0|||N|N|Indexed Area Pointers, Index High and Low Address|
 |32|||0|||N|N|Indexed Area Pointers, Index High and Low Address|
