@@ -101,9 +101,9 @@ Version 1.0
 ||0b00000100|R|0|0|0|N|N|Reserved for future use|
 ||0b00001000|R|0|0|0|N|N|Bi-Directional Communications (0 = disabled, 1 = enabled)|
 ||0b00010000|R|0|0|0|N|N|Reserved for future use|
-||0b00100000|R|1|1|1|N|N|Decoder Type (0 = Basic Accessory, 1 = Extended Accessory)|
-||0b01000000|R+W|1|1|1|N|N|Addressing Method (0 = Decoder Address Method, 1 = Output Address Method) Defines how CV1 and CV9 are interpreted|
-||0b10000000|R|1|1|1|Y|Y|Accessory Decoder (0 = Multifunction Decoder, 1 = Accessory Decoder)|
+||0b00100000|R|0|0|0|N|N|Decoder Type (0 = Basic Accessory, 1 = Extended Accessory)|
+||0b01000000|R+W|1|1|1|Y|Y|Addressing Method (0 = Decoder Address Method, 1 = Output Address Method) Defines how CV1 and CV9 are interpreted|
+||0b10000000|R|1|1|1|N|N|Accessory Decoder (0 = Multifunction Decoder, 1 = Accessory Decoder)|
 |30|||0|||N|N|Reserved by NMRA for future use|
 |31|||0|||N|N|Indexed Area Pointers, Index High and Low Address|
 |32|||0|||N|N|Indexed Area Pointers, Index High and Low Address|
