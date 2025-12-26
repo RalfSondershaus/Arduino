@@ -25,12 +25,19 @@ Each signal can be controlled by a DCC command.
 ## How to flash binaries
 
 1. Download the release assest `Signal.hex`
-2. Install avrdude.
-3. Run avrdude
+2. Install avrdude (https://github.com/avrdudes/avrdude)
+3. Install required drivers
+   - E.g., if your Arduino variant is using a CH340 chip, install the respective driver.
+4. Run avrdude
    ```
-   avrdude -C avrdude.conf -v -V -p m2560 -c arduino -P COMx -D
+   avrdude -C avrdude.conf -v -V -p m2560 -c wiring -P COMx -D -U flash:w:Signal.hex:i
    ```
    > Remark: We are using `avrdude.conf` that is installed with avrdude.
+
+   > Remark: Option `-c` is the programmer-id. For Arduino Mega, the value needs to be `wiring`, 
+     for Arduino Nano, it needs to be `arduino`.
+
+   > Remark: Tested with `avrdude v8.1`
 
 ## How to build
 
