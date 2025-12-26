@@ -299,14 +299,16 @@ OBJCOPYFLAGS =  -O ihex \
 # -----------------------------------------------------------------------
 ifeq ($(ARG_TARGET_ECU),mega)
 AVRDUDE_MCU = m2560
+AVRDUDE_PROTOCOL = wiring
 else ifeq ($(ARG_TARGET_ECU),nano)
 AVRDUDE_MCU = m328p
+AVRDUDE_PROTOCOL = arduino
 endif
 AVRDUDE_FLAGS = -C$(PATH_AVRDUDE)/avrdude.conf      \
                 -v                                  \
                 -V                                  \
                 -p $(AVRDUDE_MCU)                   \
-                -c arduino                           \
+                -c $(AVRDUDE_PROTOCOL)              \
                 -P $(COM_PORT)                      \
                 -D
 
