@@ -33,11 +33,58 @@
 
 namespace util
 {
-  // --------------------------------------------------------------------------
-  /// The class template basic_string_view describes an object that can refer 
-  /// to a constant contiguous sequence of CharT with the first element of the 
-  /// sequence at position zero.
-  // --------------------------------------------------------------------------
+    /**
+     * @class basic_string_view
+     * @brief A lightweight, non-owning view of a contiguous sequence of characters.
+     * 
+     * @tparam CharT The character type (e.g., char, wchar_t)
+     * @tparam Traits Character traits type (e.g., std::char_traits<CharT>)
+     * 
+     * @details
+     * This class provides a read-only view into a character sequence without owning the underlying data.
+     * It is similar to std::string_view from C++17 and offers efficient string operations without copying.
+     * 
+     * Key Features:
+     * - Non-owning: Does not allocate or manage memory
+     * - Lightweight: Contains only a pointer and size
+     * - Efficient: No copying of character data
+     * - Immutable: Provides only const access to the underlying data
+     * 
+     * @note The underlying character array must remain valid for the lifetime of the string_view.
+     *       The view does not manage the lifetime of the pointed-to data.
+     * 
+     * @warning The character sequence is not required to be null-terminated.
+     * 
+     * @example
+     * @code
+     * // Create from string literal
+     * basic_string_view<char> view1("Hello, World!");
+     * 
+     * // Create from pointer and length
+     * const char* str = "Example";
+     * basic_string_view<char> view2(str, 4); // "Exam"
+     * 
+     * // Substring operations
+     * auto sub = view1.substr(7, 5); // "World"
+     * 
+     * // Search operations
+     * size_t pos = view1.find("World"); // Returns 7
+     * 
+     * // Comparison
+     * if (view1.starts_with("Hello")) {
+     *     // Do something
+     * }
+     * 
+     * // Iteration
+     * for (auto ch : view1) {
+     *     // Process each character
+     * }
+     * 
+     * // Modify view boundaries
+     * view1.remove_prefix(7); // Now view is "World!"
+     * view1.remove_suffix(1); // Now view is "World"
+     * @endcode
+     */
   template<class CharT, class Traits = char_traits<CharT> >
   class basic_string_view
   {
@@ -145,7 +192,7 @@ namespace util
     const_pointer data() const noexcept { return begin(); }
 
     /// Return true if the index is valid (within boundaries)
-    bool check_boundary(size_t pos) const { return (pos >= static_cast<size_t>(0)) && (pos < size()); }
+    bool check_boundary(size_t pos) const { return pos < size(); }
 
     /// Capacity
 
@@ -194,7 +241,47 @@ namespace util
       return basic_string_view(data() + pos, rcount);
     }
 
-    /// Compares two character sequences.
+    /**
+     * @brief Compares two character sequences lexicographically.
+     * 
+     * Performs a lexicographical comparison between this string view and the provided
+     * character sequence using the character traits comparison function. The comparison
+     * is performed character by character up to the length of the shorter sequence.
+     * If all compared characters are equal, the result is determined by comparing the
+     * lengths of the sequences.
+     * 
+     * @param v The string view to compare with this string view.
+     * @return int Comparison result:
+     *         - Negative value (typically -1) if this view is lexicographically less than v
+     *         - Zero (0) if both views are equal in content and length
+     *         - Positive value (typically 1) if this view is lexicographically greater than v
+     * 
+     * @note The comparison uses the traits_type::compare function for character comparison.
+     * @note Time complexity: O(min(n, m)) where n and m are the sizes of the two views.
+     * @note This function is constexpr and noexcept, making it suitable for compile-time
+     *       evaluation and guaranteeing no exceptions will be thrown.
+     * 
+     * @par Example Usage:
+     * @code
+     * basic_string_view<char> sv1("apple");
+     * basic_string_view<char> sv2("banana");
+     * basic_string_view<char> sv3("apple");
+     * basic_string_view<char> sv4("app");
+     * 
+     * int result1 = sv1.compare(sv2);  // Returns negative value (sv1 < sv2)
+     * int result2 = sv1.compare(sv3);  // Returns 0 (sv1 == sv3)
+     * int result3 = sv2.compare(sv1);  // Returns positive value (sv2 > sv1)
+     * int result4 = sv1.compare(sv4);  // Returns positive value (sv1 > sv4, same prefix but sv1 is longer)
+     * 
+     * // Using comparison result in conditional statements
+     * if (sv1.compare(sv2) < 0) {
+     *     // sv1 comes before sv2 in lexicographical order
+     * }
+     * @endcode
+     * 
+     * @see compare(size_type, size_type, basic_string_view) for substring comparison
+     * @see operator==, operator<, operator> for operator-based comparisons
+     */
     constexpr int compare(basic_string_view v) const noexcept
     {
       int res = traits_type::compare(data(), v.data(), util::min_(size(), v.size()));
@@ -213,7 +300,7 @@ namespace util
     constexpr int compare(size_type pos1, size_type count1, const_pointer s ) const { return substr(pos1, count1).compare(basic_string_view(s)); }
     constexpr int compare(size_type pos1, size_type count1, const_pointer s, size_type count2) const { return substr(pos1, count1).compare(basic_string_view(s, count2)); }
 
-    constexpr bool starts_with(basic_string_view sv) const noexcept { return basic_string_view(data(), util::min_(size(), sv.size())) == sv; }
+    constexpr bool starts_with(basic_string_view sv) const noexcept { return basic_string_view(data(), util::min_(size(), sv.size())).compare(sv) == 0; }
     constexpr bool starts_with(value_type ch) const noexcept        { return !empty() && traits_type::eq(front(), ch); }
     constexpr bool starts_with(const_pointer s) const               { return starts_with(basic_string_view(s)); }
 

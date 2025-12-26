@@ -49,6 +49,48 @@ TEST(Ut_Signal_Com, AsciiCom_process_SET_CV_SignalIDs)
 }
 
 //-------------------------------------------------------------------------
+TEST(Ut_Signal_Com, AsciiCom_process_SET_SIGNAL_ONB_ADC)
+{
+  AsciiCom asciiCom;
+  string_type telegram = "SET_SIGNAL 0 1 ONB 10 -1 ADC 54";
+  string_type response;
+  asciiCom.process(telegram, response);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalIDBase + 0], static_cast<uint8>(1));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalFirstOutputBase + 0], cal::constants::make_signal_first_output(cal::constants::kOnboard, 10U));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalOutputConfigBase + 0], static_cast<uint8>(1));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalInputBase + 0], cal::constants::make_signal_input(cal::constants::kAdc, 54U));
+  EXPECT_EQ(response, string_type("OK SET_SIGNAL 0 1 ONB 10 -1 ADC 54"));
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Signal_Com, AsciiCom_process_SET_SIGNAL_ONB_DCC)
+{
+  AsciiCom asciiCom;
+  string_type telegram = "SET_SIGNAL 0 1 ONB 10 -1 DCC 54";
+  string_type response;
+  asciiCom.process(telegram, response);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalIDBase + 0], static_cast<uint8>(1));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalFirstOutputBase + 0], cal::constants::make_signal_first_output(cal::constants::kOnboard, 10U));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalOutputConfigBase + 0], static_cast<uint8>(1));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalInputBase + 0], cal::constants::make_signal_input(cal::constants::kDcc, 54U));
+  EXPECT_EQ(response, string_type("OK SET_SIGNAL 0 1 ONB 10 -1 DCC 54"));
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Signal_Com, AsciiCom_process_SET_SIGNAL_EXT_DIG)
+{
+  AsciiCom asciiCom;
+  string_type telegram = "SET_SIGNAL 0 1 EXT 10 2 DIG 22";
+  string_type response;
+  asciiCom.process(telegram, response);
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalIDBase + 0], static_cast<uint8>(1));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalFirstOutputBase + 0], cal::constants::make_signal_first_output(cal::constants::kExternal, 10U));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalOutputConfigBase + 0], static_cast<uint8>(2));
+  EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalInputBase + 0], cal::constants::make_signal_input(cal::constants::kDig, 22U));
+  EXPECT_EQ(response, string_type("OK SET_SIGNAL 0 1 EXT 10 2 DIG 22"));
+}
+
+//-------------------------------------------------------------------------
 TEST(Ut_Signal_Com, AsciiCom_process_INIT)
 {
   AsciiCom asciiCom;
@@ -63,7 +105,7 @@ TEST(Ut_Signal_Com, AsciiCom_process_INIT)
   EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kManufacturerCVStructureID], cal::kManufacturerCVStructureID);
   EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalIDBase + 0], cal::constants::kSignalNotUsed);
   EXPECT_EQ(hal::eeprom::stubs::elements[cal::eeprom::kSignalIDBase + 1], cal::constants::kSignalNotUsed);
-  EXPECT_EQ(response, string_type("OK"));
+  EXPECT_EQ(response, string_type("OK INIT"));
 }
 
 void setUp(void)
@@ -83,6 +125,9 @@ bool test_loop(void)
   UNITY_BEGIN();
 
   RUN_TEST(AsciiCom_process_SET_CV_SignalIDs);
+  RUN_TEST(AsciiCom_process_SET_SIGNAL_ONB_ADC);
+  RUN_TEST(AsciiCom_process_SET_SIGNAL_ONB_DCC);
+  RUN_TEST(AsciiCom_process_SET_SIGNAL_EXT_DIG);
   RUN_TEST(AsciiCom_process_INIT);
 
   UNITY_END();

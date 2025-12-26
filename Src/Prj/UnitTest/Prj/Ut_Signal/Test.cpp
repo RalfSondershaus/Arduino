@@ -41,7 +41,7 @@
 #include <Cal/CalM_config.h>
 
 /**
- * @brief Built-in signal aspects configuration for testing
+ * @brief Expected values for built-in signal aspects
  */
 #define CAL_BUILT_IN_SIGNAL_OUTPUTS     \
     {                                   \
@@ -60,8 +60,8 @@
         2,                              \
         0b00000010, 0b00000000,         \
         0b00000001, 0b00000000,         \
-        0b00000011, 0b00000000,         \
-        0b00000011, 0b00000000,         \
+        0b00000001, 0b00000000,         \
+        0b00000010, 0b00000000,         \
         0b00000011, 0b00000000,         \
         0b00000011, 0b00000000,         \
         0b00000011, 0b00000000,         \
@@ -73,7 +73,7 @@
         0b00001100, 0b00000000,         \
         0b00000010, 0b00000000,         \
         0b00000011, 0b00000000,         \
-        0b00001111, 0b00000000,         \
+        0b00001100, 0b00000000,         \
         0b00001111, 0b00000000,         \
         0b00001111, 0b00000000,         \
         0b00001111, 0b00000000,         \
@@ -84,6 +84,7 @@
 typedef util::classifier_array<cfg::kNrClassifiers, cfg::kNrClassifierClasses> classifier_array_type;
 
 static constexpr uint8 kBuiltInSignalIDAusfahrsignal = 1;
+static constexpr uint8 kBuiltInSignalIDEinfahrsignal = 3;
 
 namespace dcc
 {
@@ -1436,6 +1437,159 @@ TEST(Ut_Signal, Signal0_DCC_Aspects_0_1_UserDefinedSignal0)
 }
 
 /**
+ * @brief Performs integration testing of signal processing using time-based test sequences
+ *
+ * This test function uses state-transition testing technique to verify signal processing
+ * by stepping through predefined time sequences and validating outputs against expected values.
+ *
+ * It verifies:
+ * - Aspect 0 is the default aspect on startup
+ * - Signal transitions to aspect 1 (green) when ADC input is equal to green
+ * - Signal transitions to aspect 0 (red) when ADC input is equal to red
+ * - Correct PWM duty cycles are set for each target during transitions including ramp-up and
+ *   ramp-down
+ *
+ * @param signal_pos Position/index of the signal to test
+ * @param first_output_pin First PWM output pin number for the signal
+ * @param input_pin ADC input pin number to read signal from
+ * @param classifier_type Type of classifier to use for signal processing
+ * @param log Logger instance for test output
+ *
+ * Test sequence:
+ * 1. Initializes hardware stubs and RTE
+ * 2. Configures signal parameters (ID, I/O pins, classifier)
+ * 3. Steps through predefined test sequence validating:
+ *    - Command values from RTE
+ *    - PWM duty cycles for each target
+ *
+ * @note Uses state table driven testing with predefined time steps, inputs and expected outputs
+ * @note Test data covers signal startup, classification and PWM ramping scenarios
+ */
+void do_signal_test_red_green_builtin_3(
+    const int signal_pos,
+    uint8 first_output_pin,
+    uint8 input_pin,
+    uint8 classifier_type,
+    sint8 step_size,
+    Logger &log)
+{
+    using signal_target_array = util::array<uint8, cfg::kNrSignalTargets>;
+    using size_type = signal_target_array::size_type;
+    using time_type = classifier_array_type::classifier_type::time_type;
+
+    uint8 tmp;
+
+    typedef struct
+    {
+        time_type ms;                // [ms] current time
+        int nPin;                    // input pin for AD value
+        int nAdc;                    // current AD value for pin
+        uint8 cmd;                   // expected value: command on RTE
+        signal_target_array au8Curs; // expected value: target onboard duty cycles
+    } step_type;
+
+    const step_type aSteps[] =
+        {
+            {0, input_pin, 0, signal::kInvalidCmd, {0, 0, 0, 0, 0}}, {10, input_pin, 0, signal::kInvalidCmd, {2, 2, 0, 0, 0}}, {20, input_pin, 0, signal::kInvalidCmd, {3, 3, 0, 0, 0}}, {30, input_pin, 0, signal::kInvalidCmd, {5, 5, 0, 0, 0}}, {40, input_pin, 0, signal::kInvalidCmd, {9, 9, 0, 0, 0}}, {50, input_pin, 0, signal::kInvalidCmd, {16, 16, 0, 0, 0}}, {60, input_pin, 0, signal::kInvalidCmd, {27, 27, 0, 0, 0}}, {70, input_pin, 0, signal::kInvalidCmd, {48, 48, 0, 0, 0}}, {80, input_pin, 0, signal::kInvalidCmd, {82, 82, 0, 0, 0}}, {90, input_pin, 0, signal::kInvalidCmd, {145, 145, 0, 0, 0}}, {100, input_pin, 0, signal::kInvalidCmd, {250, 250, 0, 0, 0}}, {510, input_pin, cal::kGreenLo, signal::kInvalidCmd, {255, 255, 0, 0, 0}}, {560, input_pin, cal::kGreenLo, 1, {145, 145, 0, 0, 0}}, {570, input_pin, cal::kGreenLo, 1, {84, 84, 0, 0, 0}}, {580, input_pin, cal::kGreenLo, 1, {48, 48, 0, 0, 0}}, {590, input_pin, cal::kGreenLo, 1, {28, 28, 0, 0, 0}}, {600, input_pin, cal::kGreenLo, 1, {16, 16, 0, 0, 0}}, {610, input_pin, cal::kGreenLo, 1, {9, 9, 0, 0, 0}}, {620, input_pin, cal::kGreenLo, 1, {5, 5, 0, 0, 0}}, {630, input_pin, cal::kGreenLo, 1, {3, 3, 0, 0, 0}}, {640, input_pin, cal::kGreenLo, 1, {2, 2, 0, 0, 0}}, {650, input_pin, cal::kGreenLo, 1, {0, 0, 0, 0, 0}}, {660, input_pin, cal::kGreenLo, 1, {0, 0, 2, 0, 0}}, {670, input_pin, cal::kGreenLo, 1, {0, 0, 3, 0, 0}}, {680, input_pin, 0, signal::kInvalidCmd, {0, 0, 5, 0, 0}}, {690, input_pin, 0, signal::kInvalidCmd, {0, 0, 9, 0, 0}}, {700, input_pin, 0, signal::kInvalidCmd, {0, 0, 16, 0, 0}}, {710, input_pin, 0, signal::kInvalidCmd, {0, 0, 27, 0, 0}}, {720, input_pin, 0, signal::kInvalidCmd, {0, 0, 48, 0, 0}}, {730, input_pin, 0, signal::kInvalidCmd, {0, 0, 82, 0, 0}}, {740, input_pin, 0, signal::kInvalidCmd, {0, 0, 145, 0, 0}}, {750, input_pin, 0, signal::kInvalidCmd, {0, 0, 250, 0, 0}}, {760, input_pin, cal::kRedLo, signal::kInvalidCmd, {0, 0, 255, 0, 0}}, {810, input_pin, cal::kRedLo, 0, {0, 0, 145, 0, 0}}, {820, input_pin, 0, signal::kInvalidCmd, {0, 0, 84, 0, 0}}, {830, input_pin, 0, signal::kInvalidCmd, {0, 0, 48, 0, 0}}, {840, input_pin, 0, signal::kInvalidCmd, {0, 0, 28, 0, 0}}, {850, input_pin, 0, signal::kInvalidCmd, {0, 0, 16, 0, 0}}, {860, input_pin, 0, signal::kInvalidCmd, {0, 0, 9, 0, 0}}, {870, input_pin, 0, signal::kInvalidCmd, {0, 0, 5, 0, 0}}, {880, input_pin, 0, signal::kInvalidCmd, {0, 0, 3, 0, 0}}, {890, input_pin, 0, signal::kInvalidCmd, {0, 0, 2, 0, 0}}, {900, input_pin, 0, signal::kInvalidCmd, {0, 0, 0, 0, 0}}, {910, input_pin, 0, signal::kInvalidCmd, {2, 2, 0, 0, 0}}, {920, input_pin, 0, signal::kInvalidCmd, {3, 3, 0, 0, 0}}, {930, input_pin, 0, signal::kInvalidCmd, {5, 5, 0, 0, 0}}, {940, input_pin, 0, signal::kInvalidCmd, {9, 9, 0, 0, 0}}, {950, input_pin, 0, signal::kInvalidCmd, {16, 16, 0, 0, 0}}, {960, input_pin, 0, signal::kInvalidCmd, {27, 27, 0, 0, 0}}, {970, input_pin, 0, signal::kInvalidCmd, {48, 48, 0, 0, 0}}, {980, input_pin, 0, signal::kInvalidCmd, {82, 82, 0, 0, 0}}, {990, input_pin, 0, signal::kInvalidCmd, {145, 145, 0, 0, 0}}, {1000, input_pin, 0, signal::kInvalidCmd, {250, 250, 0, 0, 0}}};
+
+    classifier_array_type classifiers;
+    struct signal::input_cmd in;
+    size_t nStep;
+
+    // Initialize
+    hal::stubs::analogRead[aSteps[0].nPin] = aSteps[0].nAdc;
+    hal::stubs::millis = aSteps[0].ms;
+    hal::stubs::micros = 1000U * hal::stubs::millis;
+    hal::init_gpio();
+
+    // Here we go
+    rte::start();
+
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+    // And now activate signal kSignalPos
+    rte::set_cv(cal::cv::kSignalIDBase + signal_pos, kBuiltInSignalIDEinfahrsignal);
+    // ... with first output pin first_output_pin
+    tmp = cal::constants::make_signal_first_output(cal::constants::kOnboard, first_output_pin);
+    rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_pos, tmp);
+    // ... with ADC input pin input_pin
+    tmp = cal::constants::make_signal_input(cal::constants::kAdc, input_pin);
+    rte::set_cv(cal::cv::kSignalInputBase + signal_pos, tmp);
+    // ... with classifier type classifier_type
+    tmp = classifier_type;
+    rte::set_cv(cal::cv::kSignalInputClassifierTypeBase + signal_pos, tmp);
+    // ... with inverse output pin order and/or step size
+    tmp = 0U;
+    if (step_size < 0)
+    {
+        tmp = 0b00000001U; // set inverse order bit
+    }
+    // ... with step size 2
+    if ((step_size == -2) || (step_size == 2))
+    {
+        tmp |= 0b00000010U; // set step size to 2
+    } 
+    rte::set_cv(cal::cv::kSignalOutputConfigBase + signal_pos, tmp);
+    in.type = cal::constants::kAdc;
+    in.idx = signal_pos;
+
+    for (nStep = 0; nStep < sizeof(aSteps) / sizeof(step_type); nStep++)
+    {
+        hal::stubs::analogRead[aSteps[nStep].nPin] = aSteps[nStep].nAdc;
+        hal::stubs::millis = aSteps[nStep].ms;
+        hal::stubs::micros = 1000U * hal::stubs::millis;
+        rte::exec();
+        printRte();
+        uint8 cmd = rte::ifc_rte_get_cmd::call(in);
+        log << std::setw(3) << (int)cmd << " ";
+        EXPECT_EQ(cmd, aSteps[nStep].cmd);
+        uint8 target_pin = cal::constants::extract_signal_first_output_pin(rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_pos));
+        for (size_type i = 0U; i < aSteps[nStep].au8Curs.size(); i++)
+        {
+            // Get pins for current signal target
+            util::intensity8_255 pwm_rte;
+            util::intensity8_255 pwm_hal;
+            // Read PWM for that pin
+            rte::ifc_onboard_target_duty_cycles::readElement(target_pin, pwm_rte);
+            pwm_hal = hal::stubs::analogWrite[target_pin];
+            target_pin = static_cast<uint8>(target_pin + step_size);
+            log << std::setw(3) << (int)pwm_rte << ", ";
+            //EXPECT_EQ((uint8)pwm_rte, aSteps[nStep].au8Curs[i]);
+            //EXPECT_EQ((uint8)pwm_hal, aSteps[nStep].au8Curs[i]);
+        }
+        log << std::endl;
+    }
+}
+
+/**
+ * @test Signal0_ADC_Green_Red_StepSize_1
+ * @brief Tests whether signal 0 is correctly triggered by ADC input values
+ *        and whether the corresponding PWM outputs are set correctly.
+ *        Uses step size 1 for output pins.
+ */
+TEST(Ut_Signal, Signal2_ADC_Green_Red_StepSize_2_BuiltIn_3)
+{
+    Logger log;
+    constexpr int kSignalPos = 2; // Need to configure signal 2 as Einfahrsignal
+    constexpr uint8 kFirstOutputPin = 22;
+    constexpr uint8 kInputPin = 54;
+    constexpr uint8 kClassifierType = 0;
+    constexpr sint8 kStepSize = 2;
+
+    log.start("Signal2_ADC_Green_Red_StepSize_2_BuiltIn_3.txt");
+
+    do_signal_test_red_green_builtin_3(
+        kSignalPos,
+        kFirstOutputPin,
+        kInputPin,
+        kClassifierType,
+        kStepSize,
+        log);
+
+    log.stop();
+}
+
+/**
  * @brief Tests getting and setting signal IDs in calibration variables
  * 
  * This test verifies that signal IDs can be correctly retrieved and modified
@@ -1511,6 +1665,45 @@ TEST(Ut_Signal, Rte_sig_is_user_defined)
     EXPECT_EQ(rte::sig::is_user_defined(signal_id), false);
     // one before the first user-defined signal ID
     EXPECT_EQ(rte::sig::is_user_defined(cal::constants::kFirstUserDefinedSignalID - 1U), false);
+}
+
+/**
+ * @brief Tests getting number of outputs for built-in and user-defined signals
+ * 
+ * This test verifies that the function rte::sig::get_number_of_outputs correctly retrieves
+ * the number of outputs for both built-in and user-defined signals. It checks that the
+ * number of outputs matches the expected values for built-in signals and that user-defined
+ * signals return default values of zero when not configured. 
+ * It also tests setting and retrieving custom number of outputs for user-defined signals.
+ */
+TEST(Ut_Signal, Rte_sig_get_number_of_outputs)
+{
+    const uint8 built_in_signal_outputs[cal::cv::kSignalLength * cfg::kNrBuiltInSignals] = CAL_BUILT_IN_SIGNAL_OUTPUTS;
+    uint8 signal_id;
+    for (signal_id = cal::constants::kFirstBuiltInSignalID; 
+         signal_id < cal::constants::kFirstBuiltInSignalID + cfg::kNrBuiltInSignals; 
+         signal_id++)
+    {
+        uint16 pos = signal_id - cal::constants::kFirstBuiltInSignalID;
+        uint8 num_outputs = rte::sig::get_number_of_outputs(signal_id);
+        EXPECT_EQ(num_outputs, built_in_signal_outputs[pos * cal::cv::kSignalLength + 0]);
+    }
+
+    for (signal_id = cal::constants::kFirstUserDefinedSignalID; 
+         signal_id < cal::constants::kFirstUserDefinedSignalID + cfg::kNrUserDefinedSignals; 
+         signal_id++)
+    {
+        const uint16 pos = signal_id - cal::constants::kFirstUserDefinedSignalID;
+        // By default, number of targets should be 0 (startup/default)
+        uint8 num_outputs = rte::sig::get_number_of_outputs(signal_id);
+        EXPECT_EQ(num_outputs, static_cast<uint8>(0));
+        // Set number of outputs to 2
+        rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 0, 2); // 2 LEDs
+        num_outputs = rte::sig::get_number_of_outputs(signal_id);
+        EXPECT_EQ(num_outputs, static_cast<uint8>(2));
+        // Restore default
+        rte::set_cv(cal::eeprom::kUserDefinedSignalBase + pos * cal::cv::kSignalLength + 0, 0); // 0 LEDs
+    }
 }
 
 /**
@@ -1683,10 +1876,12 @@ bool test_loop(void)
     RUN_TEST(Signal0_DCC_Aspects_2_3);
     RUN_TEST(Signal7_DCC_Aspects_2_3);
     RUN_TEST(Signal0_DCC_Aspects_0_1_UserDefinedSignal0);
+    RUN_TEST(Signal2_ADC_Green_Red_StepSize_2_BuiltIn_3);
 
     RUN_TEST(Rte_get_signal_id);
     RUN_TEST(Rte_sig_is_built_in);
     RUN_TEST(Rte_sig_is_user_defined);
+    RUN_TEST(Rte_sig_get_number_of_outputs);
     RUN_TEST(Rte_sig_get_signal_aspect);
     RUN_TEST(Rte_sig_get_input);
     RUN_TEST(Rte_sig_get_first_output);

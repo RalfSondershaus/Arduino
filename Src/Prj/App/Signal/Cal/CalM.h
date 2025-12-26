@@ -307,6 +307,7 @@ namespace cal
             else if (is_built_in(signal_id))
             {
                 uint16 index = zero_based_built_in(signal_id);
+                index = index * cal::cv::kSignalLength;
                 num_targets = util::bits::masked_shift(
                     ROM_READ_BYTE(&built_in_signal_outputs[index]),
                     cal::constants::bitmask::kNumberOfOutputs,

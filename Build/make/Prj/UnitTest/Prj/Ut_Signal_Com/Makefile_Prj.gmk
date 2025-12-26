@@ -7,6 +7,7 @@
 
 # Files
 FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                \
+            $(PATH_SRC_PRJ)/App/Signal/Debug            \
             $(PATH_SRC_PRJ)/App/Signal/Cal/CalM         \
             $(PATH_SRC_PRJ)/App/Signal/Com/AsciiCom     \
             $(PATH_SRC_PRJ)/App/Signal/Com/ComR         \
