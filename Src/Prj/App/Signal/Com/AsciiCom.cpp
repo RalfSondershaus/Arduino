@@ -22,6 +22,7 @@
 #include <Platform_Limits.h>
 #include <Cal/CalM_Types.h>
 #include <Com/AsciiCom.h>
+#include <Debug.h>
 #include <Util/Sstream.h>
 #include <Util/String_view.h>
 #include <Util/Timer.h>
@@ -52,21 +53,17 @@ namespace com
         eERR_EEPROM, ///< EEPROM update failure
         eINV_CV_ID,  ///< SET_CV with an invalid CV id
         eCV_VALUE_OUT_OF_RANGE, ///< SET_CV with an invalid CV value
-        // eINV_SIGNAL_ID,             ///< SIGNAL ID invalid
-        // eINV_SIGNAL_CMD,
-        // eINV_SIGNAL_ASPECTS,
-        // eINV_SIGNAL_BLINKS,
-        // eINV_SIGNAL_TARGETS,
-        // eINV_SIGNAL_INPUT,
-        // eINV_SIGNAL_CHANGEOVERTIME,
-        // eINV_SIGNAL_DB_AUSFAHRSIGNAL,
-        // eINV_SIGNAL_DB_BLOCKSIGNAL,
-        // eINV_CLASSIFIER_CMD,
-        // eINV_CLASSIFIER_PIN,
-        // eINV_CLASSIFIER_LIMITS,
-        // eINV_CLASSIFIER_DEBOUNCE,
+        eINV_SIGNAL_IDX,    ///< SET_SIGNAL with an invalid signal index
+        eINV_SIGNAL_ID,     ///< SET_SIGNAL with an invalid signal id
+        eINV_FIRST_OUTPUT_TYPE, ///< SET_SIGNAL with an invalid first output type
+        eINV_OUTPUT_CONFIG_STEP_SIZE,   ///< SET_SIGNAL with an invalid output step size config
+        eINV_INPUT_TYPE,    ///< SET_SIGNAL with an invalid input type
+        eINV_OUTPUT_PIN,     ///< SET_SIGNAL with an invalid output pin
+        eINV_INPUT_PIN,      ///< SET_SIGNAL with an invalid input pin
+        eINV_PARAM,           ///< Generic invalid parameter
         eINV_MONITOR_START_PARAM,
         eINV_MONITOR_START_IFC_NAME,
+        eINV_VERBOSE_LEVEL,
         eERR_UNKNOWN
     } tRetType;
 
@@ -78,22 +75,18 @@ namespace com
             "ERR: Invalid command", // eINV_CMD
             "ERR: EEPROM failure",  // eERR_EEPROM
             "ERR: Invalid CV ID",   // eINV_CV_ID
-            "ERR: CV value is out of range",   // eCV_VALUE_OUT_OF_RANGE
-            // "ERR: Signal id invalid",               // eINV_SIGNAL_ID
-            // "ERR: Unknown signal sub command",      // eINV_SIGNAL_CMD
-            // "ERR: Unknown signal aspects",          // eINV_SIGNAL_ASPECTS
-            // "ERR: Unknown signal blinks",           // eINV_SIGNAL_BLINKS
-            // "ERR: Unknown signal targets",          // eINV_SIGNAL_TARGETS
-            // "ERR: Unknown signal input",            // eINV_SIGNAL_INPUT
-            // "ERR: Unknown signal change over time", // eINV_SIGNAL_CHANGEOVERTIME
-            // "ERR: Unknown signal DB Ausfahrsignal", // eINV_SIGNAL_DB_AUSFAHRSIGNAL
-            // "ERR: Unknown signal DB Blocksignal",   // eINV_SIGNAL_DB_BLOCKSIGNAL
-            // "ERR: Unknown classifier sub command: GET_CLASSIFIER id [LIMITS slot-id,PIN,DEBOUNCE]",  // eINV_CLASSIFIER_CMD
-            // "ERR: Unknown classifier pin: GET_CLASSIFIER id PIN",                            // eINV_CLASSIFIER_PIN
-            // "ERR: Unknown classifier limits: GET_CLASSIFIER id LIMITS slot_id",              // eINV_CLASSIFIER_LIMITS
-            // "ERR: Unknown classifier debounce",     // eINV_CLASSIFIER_DEBOUNCE
+            "ERR: CV value is out of range",        // eCV_VALUE_OUT_OF_RANGE
+            "ERR: Invalid signal index",            // eINV_SIGNAL_IDX
+            "ERR: Invalid signal id",               // eINV_SIGNAL_ID
+            "ERR: Invalid first output type",       // eINV_FIRST_OUTPUT_TYPE
+            "ERR: Invalid output step size config", // eINV_OUTPUT_CONFIG_STEP_SIZE
+            "ERR: Invalid input type",              // eINV_INPUT_TYPE
+            "ERR: Invalid output pin",              // eINV_OUTPUT_PIN
+            "ERR: Invalid input pin",               // eINV_INPUT_PIN
+            "ERR: Invalid parameter",               // eINV_PARAM
             "ERR: Unknown monitor start parameter: MONITOR_START cycle-time ifc-name",      // eINV_MONITOR_START_PARAM
             "ERR: Unknown monitor start interface name: MONITOR_START cycle-time ifc-name", // eINV_MONITOR_START_IFC_NAME
+            "ERR: Invalid verbose level: SET_VERBOSE 0 ... 3",                              // eINV_VERBOSE_LEVEL
             "ERR: unknown error"                                                            // has to be the last element
     };
 
@@ -107,9 +100,15 @@ namespace com
     static tRetType process_monitor_start(stringstream_type &st, string_type &response);
     static tRetType process_monitor_stop(stringstream_type &st, string_type &response);
     static tRetType process_set_defaults(stringstream_type &st, string_type &response);
+    
+    static tRetType process_set_signal(stringstream_type &st, string_type &response);
+    static tRetType process_get_signal(stringstream_type &st, string_type &response);
 
     static bool output_monitor_list(string_type &response);
     static bool output_port_data(port_type &pm, string_type &response);
+
+    static tRetType process_set_verbose(stringstream_type &st, string_type &response);
+    static tRetType process_get_pin_config(stringstream_type &st, string_type &response);
 
     static bool doOutputPortList = false;
     static port_type portMonitor;
@@ -127,13 +126,18 @@ namespace com
     static constexpr util::streamsize kMaxLenToken = 20;
 
     // Max Length of strings: kMaxLenToken
-    const util::array<tCommands, 6> commands =
+    const util::array<tCommands, 10> commands =
         {{{"SET_CV", process_set_cv},
           {"GET_CV", process_get_cv},
           {"MON_LIST", process_monitor_list},
           {"MON_START", process_monitor_start},
           {"MON_STOP", process_monitor_stop},
-          {"INIT", process_set_defaults}}};
+          {"INIT", process_set_defaults},
+          {"SET_VERBOSE", process_set_verbose},
+          {"SET_SIGNAL", process_set_signal},
+          {"GET_SIGNAL", process_get_signal},
+          {"GET_PIN_CONFIG", process_get_pin_config}
+        }};
 
     // -----------------------------------------------------------------------------------
     /// Process the telegram from AsciiTP.
@@ -163,7 +167,7 @@ namespace com
     }
 
     // -----------------------------------------------------------------------------------
-    /// SET_SIGNAL ...
+    ///
     // -----------------------------------------------------------------------------------
     void AsciiCom::process(const string_type &telegram, string_type &response)
     {
@@ -359,6 +363,274 @@ namespace com
     }
 
     /**
+     * @brief Implements command SET_SIGNAL idx id [ONB,EXT] output_pin step_size [ADC,DIG,DCC] input_pin
+     *
+     * Sets for the signal at position signal_idx the following CVs:
+     * - `cal::cv::kSignalIDBase + idx` to id
+     * - `cal::cv::kSignalFirstOutputBase + idx` to [0 for ONB, 1 for EXT] and output_pin
+     * - `cal::cv::kSignalOutputConfigBase + idx` to step_size (inverse is determined by the sign of step_size)
+     * - `cal::cv::kSignalInputBase + idx` to [0 = DCC, 1 = ADC, 2 = DIG] and input_pin
+     * 
+     * Example: `SET_SIGNAL 0 1 ONB 10 -1 ADC 54`
+     * Sets signal at index 0 to:
+     * - signal id 1
+     * - first output type 0 (onboard output), first output pin 10
+     * - step size -1 (inverse is determined by the sign of step size)
+     * - input type 1 (ADC input), input pin 54
+     * 
+     * @param st [in] Contains the command string, get pointer points to first element after "SET_SIGNAL".
+     * @param response [out] The response is stored here, it contains the command parameters.
+     * @return tRetType eOK
+     * @return tRetType eINV_CMD Ill-formed command or signal id is out-of-bounds
+     * @return tRetType eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
+     * 
+     */
+    static tRetType process_set_signal(stringstream_type &st, string_type &response)
+    {
+        tRetType ret = eINV_CMD;
+        uint16 signal_idx;
+        uint16 signal_id;
+        uint16 output_type;
+        uint16 first_output_pin;
+        sint16 step_size;
+        uint16 input_type;
+        uint16 input_pin;
+        uint8 tmp;
+        char output_type_str[4]; // ONB / EXT plus terminating null
+        char input_type_str[4]; // ADC / DIG / DCC plus terminating null
+
+        // The response shall contain the command parameters
+        response.append(st.str());
+
+        // Use uint16 here to ensure numeric values are extracted correctly.
+        // If uint8 is used, the extraction may interpret the value as a character instead of a 
+        // number.
+        st >> signal_idx;
+        st >> signal_id;
+        st >> util::setw(4) >> output_type_str;
+        st >> first_output_pin;
+        st >> step_size;
+        st >> util::setw(4) >> input_type_str;
+        st >> input_pin;
+
+        // Do not check for eof() since eof() is true after extracting the last element
+        // (and if the last element doesn't have trailing white spaces).
+        if (!st.fail())
+        {
+            // Convert output type string to constant
+            if (util::string_view(output_type_str).compare("ONB") == 0)
+            {
+                output_type = cal::constants::kOnboard;
+            }
+            else if (util::string_view(output_type_str).compare("EXT") == 0)
+            {
+                output_type = cal::constants::kExternal;
+            }
+            else
+            {
+                output_type = 255; // invalid
+            }
+
+            // Convert input type string to constant
+            if (util::string_view(input_type_str).compare("ADC") == 0)
+            {
+                input_type = cal::constants::kAdc;
+            }
+            else if (util::string_view(input_type_str).compare("DIG") == 0)
+            {
+                input_type = cal::constants::kDig;
+            }
+            else if (util::string_view(input_type_str).compare("DCC") == 0)
+            {
+                input_type = cal::constants::kDcc;
+            }
+            else
+            {
+                input_type = 255; // invalid
+            }
+
+            // Validate parameters
+            if (signal_idx >= cfg::kNrSignals)
+            {
+                ret = eINV_SIGNAL_IDX;
+            }
+            else if (!rte::sig::is_built_in(signal_id) && !rte::sig::is_user_defined(signal_id))    
+            {
+                ret = eINV_SIGNAL_ID;
+            }
+            else if ((output_type != cal::constants::kOnboard) && (output_type != cal::constants::kExternal))
+            {
+                ret = eINV_FIRST_OUTPUT_TYPE;
+            }
+            else if ((step_size < -2) || (step_size > 2) || (step_size == 0))
+            {
+                ret = eINV_OUTPUT_CONFIG_STEP_SIZE;
+            }
+            else if (input_type > cal::constants::kDig)
+            {
+                ret = eINV_INPUT_TYPE;
+            }
+            else if (first_output_pin >= platform::numeric_limits<uint8>::max_())
+            {
+                ret = eINV_OUTPUT_PIN;
+            }
+            else if (input_pin >= platform::numeric_limits<uint8>::max_())
+            {
+                ret = eINV_INPUT_PIN;
+            }
+            else
+            {
+                rte::set_cv(cal::cv::kSignalIDBase + signal_idx, static_cast<uint8>(signal_id));
+                // ... with first output pin first_output_pin
+                tmp = cal::constants::make_signal_first_output(output_type, first_output_pin);
+                rte::set_cv(cal::cv::kSignalFirstOutputBase + signal_idx, tmp);
+                // ... with ADC input pin input_pin
+                tmp = cal::constants::make_signal_input(input_type, input_pin);
+                rte::set_cv(cal::cv::kSignalInputBase + signal_idx, tmp);
+                // ... with inverse output pin order and/or step size
+                tmp = 0U;
+                if (step_size < 0)
+                {
+                    tmp = 0b00000001U; // set inverse order bit
+                }
+                // ... with step size 2
+                if ((step_size == -2) || (step_size == 2))
+                {
+                    tmp |= 0b00000010U; // set step size to 2
+                } 
+                rte::set_cv(cal::cv::kSignalOutputConfigBase + signal_idx, tmp);
+                // ... leave classifier type unchanged
+
+                ret = eOK;
+            }
+        }
+
+        return ret;
+    }
+
+    /**
+     * @brief Implements command GET_SIGNAL idx
+     *
+     * @param st Contains the command string, get pointer points to first element after "GET_SIGNAL".
+     * @param response [out] The response is stored here, it contains the command parameters.
+     * @return tRetType eOK
+     * @return tRetType eINV_CMD Ill-formed command or signal index is out-of-bounds
+     * @return tRetType eINV_SIGNAL_IDX signal index is out-of-bounds
+     */
+    static tRetType process_get_signal(stringstream_type &st, string_type &response)
+    {
+        tRetType ret = eINV_CMD;
+        uint16 signal_idx;
+        uint16 signal_id;
+        uint16 output_type;
+        uint16 first_output_pin;
+        sint16 step_size;
+        uint16 input_type;
+        uint16 input_pin;
+        uint8 tmp;
+
+        // The response shall contain the command parameters
+        response.append(st.str());
+
+        // Use uint16 here to ensure numeric values are extracted correctly.
+        // If uint8 is used, the extraction may interpret the value as a character instead of a 
+        // number.
+        st >> signal_idx;
+        // Do not check for eof() since eof() is true after extracting the last element
+        // (and if the last element doesn't have trailing white spaces).
+        if (!st.fail())
+        {
+            // Validate parameters
+            if (signal_idx >= cfg::kNrSignals)
+            {
+                ret = eINV_SIGNAL_IDX;
+            }
+            else
+            {
+                util::basic_string<4, char> tmp_str;
+
+                signal_id = rte::get_cv(cal::cv::kSignalIDBase + signal_idx);
+                // ... with first output pin first_output_pin
+                tmp = cal::constants::make_signal_first_output(output_type, first_output_pin);
+                tmp = rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_idx);
+                output_type = cal::constants::extract_signal_first_output_type(tmp);
+                first_output_pin = cal::constants::extract_signal_first_output_pin(tmp);
+                // ... with ADC input pin input_pin
+                tmp = rte::get_cv(cal::cv::kSignalInputBase + signal_idx);
+                input_type = cal::constants::extract_signal_input_type(tmp);
+                input_pin = cal::constants::extract_signal_input_pin(tmp);
+                // ... with inverse output pin order and/or step size
+                tmp = rte::get_cv(cal::cv::kSignalOutputConfigBase + signal_idx);
+                // GET_SIGNAL idx id [ONB,EXT] output_pin step_size [ADC,DIG,DCC] input_pin
+                response.append(" ");
+                util::to_string(static_cast<int>(signal_id), tmp_str);
+                response.append(tmp_str);
+                response.append(" ");
+                // output type
+                if (output_type == cal::constants::kOnboard)
+                {
+                    response.append("ONB");
+                }
+                else // cal::constants::kExternal
+                {
+                    response.append("EXT");
+                }
+                response.append(" ");
+                // first output pin
+                util::to_string(static_cast<int>(first_output_pin), tmp_str);
+                response.append(tmp_str);
+                response.append(" ");
+                // step size
+                if (util::bits::test<uint8>(tmp, 0)) // inverse order bit
+                {
+                    if (util::bits::test<uint8>(tmp, 1)) // step size 2
+                    {
+                        step_size = -2;
+                    }
+                    else
+                    {
+                        step_size = -1;
+                    }
+                }
+                else
+                {
+                    if (util::bits::test<uint8>(tmp, 1)) // step size 2
+                    {
+                        step_size = 2;
+                    }
+                    else
+                    {
+                        step_size = 1;
+                    }
+                }
+                util::to_string(static_cast<int>(step_size), tmp_str);
+                response.append(tmp_str);
+                response.append(" ");
+                // input type
+                if (input_type == cal::constants::kAdc)
+                {
+                    response.append("ADC");
+                }
+                else if (input_type == cal::constants::kDig)
+                {
+                    response.append("DIG");
+                }
+                else // cal::constants::kDcc
+                {
+                    response.append("DCC");
+                }
+                response.append(" ");
+                // input pin
+                util::to_string(static_cast<int>(input_pin), tmp_str);
+                response.append(tmp_str);
+                ret = eOK;
+            }
+        }
+
+        return ret;
+    }
+
+    /**
      * @brief Implements command GET_CV <cv_id>
      *
      * @param st Contains the command string, get pointer points to first element after "GET_CV".
@@ -498,7 +770,7 @@ namespace com
             pm.timer.increment(portMonitor.unCycleTime);
             response.clear();
             util::to_string(hal::micros(), tmp);
-            response.append("[").append(tmp).append("] ");
+            response.append("[").append(tmp).append(" us] ");
             response.append(pm.pPortData->szName);
             response.append(":");
             for (i = portMonitor.unFirstIdx; i < portMonitor.unFirstIdx + portMonitor.unNrIdx; i++)
@@ -602,7 +874,67 @@ namespace com
         (void)st;
         (void)response;
 
+        // The response shall contain the command
+        response.append(st.str());
+
         return rte::ifc_cal_set_defaults() ? eOK : eERR_EEPROM;
+    }
+
+    static tRetType process_set_verbose(stringstream_type &st, string_type &response)
+    {
+        uint16 value;
+        tRetType ret = eINV_VERBOSE_LEVEL;
+
+        // The response shall contain the command parameters
+        response.append(st.str());
+
+        st >> value;
+        // Do not check for eof() since eof() is true after extracting the last element
+        // (and if the last element doesn't have trailing white spaces).
+        if (!st.fail())
+        {
+            if (value <= debug::kVeryDetailed)
+            {
+                debug::enable(static_cast<uint8>(value));
+                ret = eOK;
+            }
+        }
+
+        return ret;
+    }
+
+    /**
+     * @brief GET_PIN_CONFIG <pin> 
+     * 
+     * @param st 
+     * @param response 
+     * @return tRetType 
+     */
+    static tRetType process_get_pin_config(stringstream_type &st, string_type &response)
+    {
+        uint16 pin;
+        tRetType ret = eINV_CMD;
+
+        // The response shall contain the command parameters
+        response.append(st.str());
+
+        st >> pin;
+        // Do not check for eof() since eof() is true after extracting the last element
+        // (and if the last element doesn't have trailing white spaces).
+        if (!st.fail())
+        {
+            if (pin < cfg::kNrOnboardTargets)
+            {
+                rte::sig::is_output_pin(pin) ? response.append(" OUTPUT") : response.append(" INPUT");
+                ret = eOK;
+            }
+            else
+            {
+                ret = eINV_PARAM;
+            }
+        }
+
+        return ret;
     }
 
 } // namespace com
