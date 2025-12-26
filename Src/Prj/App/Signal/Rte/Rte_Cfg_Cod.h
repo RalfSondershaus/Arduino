@@ -126,6 +126,22 @@ namespace rte
          * @return false Pin is not configured as an output
          */
         static inline bool is_output_pin(uint8 pin) { return calm.is_output_pin(pin); }
+
+        /**
+         * @brief Get the number of outputs for the signal.
+         * 
+         * @note The parameter signal_id is the signal ID as read from CV (not the signal index).
+         * @note For built-in signals, the number of outputs is defined in the ROM constant array
+         *       built_in_signal_outputs[].
+         * @note For user-defined signals, the number of outputs is 0 by default and can be set
+         *       using CVs.
+         * @note If the signal ID is invalid or not used, the number of outputs is 0.
+         * @note The maximum number of outputs is defined by cfg::kNrSignalTargets.
+         * 
+         * @param signal_id Signal id
+         * @return uint8 Number of outputs for the signal
+         */
+        static inline uint8 get_number_of_outputs(uint8 signal_id) { return calm.get_number_of_outputs(signal_id); }
     }
 }
 

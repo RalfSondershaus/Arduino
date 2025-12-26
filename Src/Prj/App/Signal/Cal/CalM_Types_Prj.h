@@ -177,8 +177,8 @@ namespace cal
         constexpr uint8 kDecoderType_ExtendedAccessory = 0b00100000;
         constexpr uint8 kAddressingMethod_Decoder = 0b00000000;
         constexpr uint8 kAddressingMethod_OutputAddress = 0b01000000;
-        constexpr uint8 kAccessoryDecoder = 0b00000000;
-        constexpr uint8 kMultifunctionDecoder = 0b10000000;
+        constexpr uint8 kAccessoryDecoder = 0b10000000;
+        constexpr uint8 kMultifunctionDecoder = 0b00000000;
     }
 
     constexpr uint8 kRCN123 = 1; /* for CV 39 kDccAddressingMode */

@@ -24,6 +24,7 @@
 #include <Hal/EEPROM.h>
 #include <Rte/Rte.h>
 #include <Util/Classifier_cfg.h>
+#include <Debug.h>
 
 namespace cal
 {
@@ -50,8 +51,8 @@ namespace cal
             2,                              \
             0b00000010, 0b00000000,         \
             0b00000001, 0b00000000,         \
-            0b00000011, 0b00000000,         \
-            0b00000011, 0b00000000,         \
+            0b00000001, 0b00000000,         \
+            0b00000010, 0b00000000,         \
             0b00000011, 0b00000000,         \
             0b00000011, 0b00000000,         \
             0b00000011, 0b00000000,         \
@@ -63,7 +64,7 @@ namespace cal
             0b00001100, 0b00000000,         \
             0b00000010, 0b00000000,         \
             0b00000011, 0b00000000,         \
-            0b00001111, 0b00000000,         \
+            0b00001100, 0b00000000,         \
             0b00001111, 0b00000000,         \
             0b00001111, 0b00000000,         \
             0b00001111, 0b00000000,         \
@@ -129,6 +130,7 @@ namespace cal
         // set all pins to an invalid state
         util::fill(gpio_cfg.pin_modes.begin(), gpio_cfg.pin_modes.end(), 0xFF);
 
+        debug::println(debug::kDetailed, "CALL configure_pins");
         for (uint8_least sig_idx = 0U; sig_idx < cfg::kNrSignals; sig_idx++)
         {
             // input pin
@@ -149,6 +151,8 @@ namespace cal
                 const uint8 num_outputs = get_number_of_outputs(get_signal_id(sig_idx));
                 for (uint8_least pin_idx = 0; pin_idx < num_outputs; pin_idx++)
                 {
+                    debug::print(debug::kVeryDetailed, "    Configuring onboard output pin ");
+                    debug::println(debug::kVeryDetailed, output.pin);
                     gpio_cfg.pin_modes[output.pin] = OUTPUT;
                     output.pin = static_cast<uint8>(static_cast<sint8>(output.pin) + pin_inc);
                 }

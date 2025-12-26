@@ -938,7 +938,7 @@ namespace util
   {
     if (value == 0)
     {
-      str += "0";
+      str = "0";
     }
     else
     {
@@ -964,6 +964,7 @@ namespace util
       }
 
       // Reverse the buffer to get the correct string representation
+      str = "";
       for (int i = index - 1; i >= 0; --i) 
       {
         str += buffer[i];

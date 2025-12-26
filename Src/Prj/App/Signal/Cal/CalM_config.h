@@ -50,6 +50,7 @@ namespace cal
         constexpr uint16 kSignalFirstOutputBase             = cv::kSignalFirstOutputBase;
         constexpr uint16 kSignalInputBase                   = cv::kSignalInputBase;
         constexpr uint16 kSignalInputClassifierTypeBase     = cv::kSignalInputClassifierTypeBase;
+        constexpr uint16 kSignalOutputConfigBase            = cv::kSignalOutputConfigBase;
         constexpr uint16 kClassifierBase                    = cv::kClassifierBase;
         constexpr uint16 kUserDefinedSignalBase             = cv::kUserDefinedSignalBase;
         constexpr uint16 kSizeOfData                        = cv::kLastCV;
