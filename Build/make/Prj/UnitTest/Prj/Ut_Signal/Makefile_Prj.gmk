@@ -5,6 +5,7 @@
 # Files
 FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                \
             $(PATH_SRC_PRJ)/App/Signal/DccDecoder       \
+            $(PATH_SRC_PRJ)/App/Signal/Debug            \
             $(PATH_SRC_PRJ)/App/Signal/InputClassifier  \
             $(PATH_SRC_PRJ)/App/Signal/InputCommand     \
             $(PATH_SRC_PRJ)/App/Signal/LedRouter        \
