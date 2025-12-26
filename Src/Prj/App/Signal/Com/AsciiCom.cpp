@@ -551,7 +551,6 @@ namespace com
 
                 signal_id = rte::get_cv(cal::cv::kSignalIDBase + signal_idx);
                 // ... with first output pin first_output_pin
-                tmp = cal::constants::make_signal_first_output(output_type, first_output_pin);
                 tmp = rte::get_cv(cal::cv::kSignalFirstOutputBase + signal_idx);
                 output_type = cal::constants::extract_signal_first_output_type(tmp);
                 first_output_pin = cal::constants::extract_signal_first_output_pin(tmp);
