@@ -63,6 +63,14 @@ the application and receive messages from it.
 
 > Note: The maximal length of a message is 64 characters.
 
+### HTerm
+
+If you are using HTerm, we recommend to set
+- Send on enter: `CR`
+- Newline at `CR+LF`
+- Disable `Show newline characters`
+- Baud: `115200`, Data: `8`, Stop: `1`, Parity: `None`
+
 ### Supported Commands
 
 #### CVs
