@@ -66,6 +66,9 @@ These commands are used to change the configuration.
 |-------------------|----------------------------------------------|----------------|
 | `SET_CV id value` | Set the CV with id `cv_id` to `value value`. | `SET_CV 29 64` |
 | `GET_CV id`       | Get the value of the CV with id `cv_id`.     | `GET_CV 29`    |
+| `SET_SIGNAL idx id [ONB,EXT] output_pin step_size [ADC,DIG,DCC] input_pin` | Set CVs for signal `idx`<br>`42 + idx`: id<br>`50 + idx`: output type and pin<br>`58 + idx`: input type and pin<br>`74 + idx`: derived from step_size | `SET_SIGNAL 0 1 ONB 6 -1 ADC 54`    |
+| `GET_SIGNAL idx`  | Get values for signal `idx` from CVSs<br>`42 + idx`: id<br>`50 + idx`: output type and pin<br>`58 + idx`: input type and pin<br>`74 + idx`: derived from step_size | `GET_SIGNAL 0` prints the parameters as provided by `SET_SIGNAL`  |
+| `GET_PIN_CONFIG pin` | Print `output`or `input` for `pin`.       | `GET_PIN_CONFIG 10`  |
 | `INIT`            | Initialize EEPROM with default values.       | `INIT`         |
 
 #### Monitor
@@ -77,6 +80,12 @@ These commands are used to output internal data structures to the terminal.
 | `MON_LIST` | Print available RTE ports (`ifc-name`) via serial interface. | `MON_LIST`<br>Prints the available interfaces to the terminal. |
 | `MON_START cycle-time ifc-name [id-first id-nr]` | Start to print current values of `ifc-name`. Currently, just one RTE port can be printed at one time. Cycle time is `cycle-time` [ms]. `id-first` and `id-nr` are optional and define the span of an array that is to be transmitted [`id-first`, `id-first + id-nr`]. | `MON_START 100 ifc_ad_values`<br>Reads and prints AD values of the classifiers every 100 ms. |
 | `MON_STOP` | Stop to print the RTE port. | `MON_STOP`<br>Stops to print to the terminal. |
+
+#### Misc
+
+| Command           | Description                                  | Example Usage  |
+|-------------------|----------------------------------------------|----------------|
+| `SET_VERBOSE level` | Enable verbose debug messages up to `level` (0 - 3).       | `SET_VERBOSE 3`      |
 
 #### List of CVs
 
