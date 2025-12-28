@@ -26,6 +26,7 @@
 #include <Cal/CalM_config.h>
 #include <Rte/Rte.h>
 #include <Hal/EEPROM.h>
+#include <Rte/Rte_Cfg_Cod.h>
 
 using AsciiCom = com::AsciiCom;
 using string_type = AsciiCom::string_type;
@@ -91,6 +92,103 @@ TEST(Ut_Signal_Com, AsciiCom_process_SET_SIGNAL_EXT_DIG)
 }
 
 //-------------------------------------------------------------------------
+TEST(Ut_Signal_Com, AsciiCom_process_ETO_SET_SIGNAL)
+{
+  AsciiCom asciiCom;
+  uint8 cmd = 0;
+  signal::signal_aspect aspect;
+  constexpr uint8 aspect_builtin = 0b00011000;
+  constexpr uint8 dim_time_builtin = 10;
+  string_type telegram1 = "SET_SIGNAL 0 1 ONB 10 2 ADC 54";
+  string_type telegram2 = "ETO_SET_SIGNAL 0 1 5";
+  string_type telegram3 = "ETO_SET_SIGNAL 0 0";
+  string_type response;
+
+  // First activate signal idx 0 to built-in signal id 1 have a valid initial state
+  asciiCom.process(telegram1, response);
+  EXPECT_EQ(response, string_type("OK SET_SIGNAL 0 1 ONB 10 2 ADC 54"));
+  rte::sig::get_signal_aspect_for_idx(0, cmd, aspect);
+  EXPECT_EQ(aspect.aspect, aspect_builtin);
+  EXPECT_EQ(aspect.change_over_time_10ms, dim_time_builtin);
+
+  // Then set ETO signal aspect for signal idx 0: aspect 1, dim time 5
+  asciiCom.process(telegram2, response);
+  EXPECT_EQ(response, string_type("OK ETO_SET_SIGNAL 0 1 5"));
+  rte::sig::get_signal_aspect_for_idx(0, cmd, aspect);
+  EXPECT_EQ(aspect.aspect, static_cast<uint8>(1U));
+  EXPECT_EQ(aspect.change_over_time_10ms, static_cast<uint8>(5U));
+
+  // Then disable ETO signal aspect for signal idx 0
+  asciiCom.process(telegram3, response);
+  EXPECT_EQ(response, string_type("OK ETO_SET_SIGNAL 0 0"));
+  rte::sig::get_signal_aspect_for_idx(0, cmd, aspect);
+  EXPECT_EQ(aspect.aspect, aspect_builtin);
+  EXPECT_EQ(aspect.change_over_time_10ms, dim_time_builtin);
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Signal_Com, AsciiCom_process_ETO_SET_SIGNAL_OPTIONAL_DIM_TIME)
+{
+  AsciiCom asciiCom;
+  uint8 cmd = 0;
+  signal::signal_aspect aspect;
+  constexpr uint8 aspect_builtin = 0b00011000;
+  constexpr uint8 dim_time_builtin = 10;
+  string_type telegram1 = "SET_SIGNAL 0 1 ONB 10 2 ADC 54";
+  string_type telegram2 = "ETO_SET_SIGNAL 0 1";
+  string_type telegram3 = "ETO_SET_SIGNAL 0 0";
+  string_type response;
+  
+  // First activate signal idx 0 to built-in signal id 1 have a valid initial state
+  asciiCom.process(telegram1, response);
+  EXPECT_EQ(response, string_type("OK SET_SIGNAL 0 1 ONB 10 2 ADC 54"));
+  rte::sig::get_signal_aspect_for_idx(0, cmd, aspect);
+  EXPECT_EQ(aspect.aspect, aspect_builtin);
+  EXPECT_EQ(aspect.change_over_time_10ms, dim_time_builtin);
+
+  // Then set ETO signal aspect for signal idx 0: aspect 1, dim time 10 (default)
+  asciiCom.process(telegram2, response);
+  EXPECT_EQ(response, string_type("OK ETO_SET_SIGNAL 0 1"));
+  rte::sig::get_signal_aspect_for_idx(0, cmd, aspect);
+  EXPECT_EQ(aspect.aspect, static_cast<uint8>(1U));
+  EXPECT_EQ(aspect.change_over_time_10ms, static_cast<uint8>(10U));
+
+  // Then disable ETO signal aspect for signal idx 0
+  asciiCom.process(telegram3, response);
+  EXPECT_EQ(response, string_type("OK ETO_SET_SIGNAL 0 0"));
+  rte::sig::get_signal_aspect_for_idx(0, cmd, aspect);
+  EXPECT_EQ(aspect.aspect, aspect_builtin);
+  EXPECT_EQ(aspect.change_over_time_10ms, dim_time_builtin);
+}
+
+//-------------------------------------------------------------------------
+TEST(Ut_Signal_Com, AsciiCom_process_ETO_SET_SIGNAL_INVALID_IDX)
+{
+  AsciiCom asciiCom;
+  uint8 cmd = 0;
+  signal::signal_aspect aspect;
+  constexpr uint8 aspect_builtin = 0b00011000;
+  constexpr uint8 dim_time_builtin = 10;
+  string_type telegram1 = "SET_SIGNAL 0 1 ONB 10 2 ADC 54";
+  string_type telegram2 = "ETO_SET_SIGNAL 100 1";
+  string_type response;
+  
+  // First activate signal idx 0 to built-in signal id 1 have a valid initial state
+  asciiCom.process(telegram1, response);
+  EXPECT_EQ(response, string_type("OK SET_SIGNAL 0 1 ONB 10 2 ADC 54"));
+  rte::sig::get_signal_aspect_for_idx(0, cmd, aspect);
+  EXPECT_EQ(aspect.aspect, aspect_builtin);
+  EXPECT_EQ(aspect.change_over_time_10ms, dim_time_builtin);
+
+  // Then set ETO signal aspect for signal idx 0: aspect 1, dim time 10 (default)
+  asciiCom.process(telegram2, response);
+  EXPECT_EQ(response, string_type("ERR: Invalid signal index ETO_SET_SIGNAL 100 1"));
+  rte::sig::get_signal_aspect_for_idx(0, cmd, aspect);
+  EXPECT_EQ(aspect.aspect, aspect_builtin);
+  EXPECT_EQ(aspect.change_over_time_10ms, dim_time_builtin);
+}
+
+//-------------------------------------------------------------------------
 TEST(Ut_Signal_Com, AsciiCom_process_INIT)
 {
   AsciiCom asciiCom;
@@ -128,6 +226,9 @@ bool test_loop(void)
   RUN_TEST(AsciiCom_process_SET_SIGNAL_ONB_ADC);
   RUN_TEST(AsciiCom_process_SET_SIGNAL_ONB_DCC);
   RUN_TEST(AsciiCom_process_SET_SIGNAL_EXT_DIG);
+  RUN_TEST(AsciiCom_process_ETO_SET_SIGNAL);
+  RUN_TEST(AsciiCom_process_ETO_SET_SIGNAL_OPTIONAL_DIM_TIME);
+  RUN_TEST(AsciiCom_process_ETO_SET_SIGNAL_INVALID_IDX);
   RUN_TEST(AsciiCom_process_INIT);
 
   UNITY_END();

@@ -81,7 +81,7 @@ These commands are used to change the configuration.
 |-------------------|----------------------------------------------|----------------|
 | `SET_CV id value` | Set the CV with id `cv_id` to `value value`. | `SET_CV 29 64` |
 | `GET_CV id`       | Get the value of the CV with id `cv_id`.     | `GET_CV 29`    |
-| `SET_SIGNAL idx id [ONB,EXT] output_pin step_size [ADC,DIG,DCC] input_pin` | Set CVs for signal `idx`<br>`42 + idx`: id<br>`50 + idx`: output type and pin<br>`58 + idx`: input type and pin<br>`74 + idx`: derived from step_size | `SET_SIGNAL 0 1 ONB 6 -1 ADC 54`    |
+| `SET_SIGNAL idx id [ONB,EXT] output_pin step_size [ADC,DIG,DCC] input_pin` | Set CVs for signal `idx`<br>`42 + idx`: id<br>`50 + idx`: output type and pin<br>`58 + idx`: input type and pin<br>`74 + idx`: derived from step_size | `SET_SIGNAL 0 1 ONB 6 -1 ADC 54`<br>Set signal at position `0` to built-in signal `1` (Ausfahrsignal) with onboard output pins `6`, `5`, ..., `2`, and input `ADC` at pin `54` (A0).  |
 | `GET_SIGNAL idx`  | Get values for signal `idx` from CVSs<br>`42 + idx`: id<br>`50 + idx`: output type and pin<br>`58 + idx`: input type and pin<br>`74 + idx`: derived from step_size | `GET_SIGNAL 0` prints the parameters as provided by `SET_SIGNAL`  |
 | `GET_PIN_CONFIG pin` | Print `output`or `input` for `pin`.       | `GET_PIN_CONFIG 10`  |
 | `INIT`            | Initialize EEPROM with default values.       | `INIT`         |
@@ -101,6 +101,32 @@ These commands are used to output internal data structures to the terminal.
 | Command           | Description                                  | Example Usage  |
 |-------------------|----------------------------------------------|----------------|
 | `SET_VERBOSE level` | Enable verbose debug messages up to `level` (0 - 3).       | `SET_VERBOSE 3`      |
+| `ETO_SET_SIGNAL idx aspect [dim_time]` | Enables or disables the ETO signal aspect for the signal at position `idx`.<br>If `aspect` is 0, the ETO signal aspect is disabled.<br>If `aspect` is non-zero, the ETO signal aspect is enabled with the given aspect value.<br>The `dim_time` parameter is optional and sets the dimming time in units of 10 ms.      | `ETO_SET_SIGNAL 0 1 5`<br>Enables external take-over for signal at position `0` with aspect `0b00000001` and dim time 50 ms.<br>`ETO_SET_SIGNAL 0 0`<br>Disables external take-over for signal at position `0`. |
+
+#### Built-in Signals
+
+**Ausfahrsignal (id 1)**
+
+Five (5) outputs:
+  - Red
+  - Red
+  - Green
+  - Yellow
+  - White
+
+**Blocksignal (id 2)**
+
+Two (2) outputs:
+  - Red
+  - Green
+
+**Einfahrsignal (id 3)**
+
+Four (4) outputs:
+  - Red
+  - Red
+  - Green
+  - Yellow
 
 #### List of CVs
 
@@ -136,7 +162,7 @@ Version 1.0
 |39|0b00000001|R+W|1|N/A|N/A|N|N|DCC addressing mode, 0 = ROCO, 1 = RCN-213|
 |40|0b11111111|R|8|0 - 8|0 - 4|Y|Y|Maximum number of signals|
 |41|0b11111111|R|2|2|2|Y|Y|Number of built-in signal-IDs|
-|42|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 1 (0 = signal not used, 1 = Ausfahrsignal, 2 = Blocksignal, >=128 user defined signal)|
+|42|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 1 (0 = signal not used, 1 ... 127 = built-in signal, >=128 user defined signal)|
 |43|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 2|
 |44|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 3|
 |45|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 4|
