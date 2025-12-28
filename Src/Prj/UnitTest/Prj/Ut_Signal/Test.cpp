@@ -1839,6 +1839,48 @@ TEST(Ut_Signal, Rte_sig_get_first_output)
     }
 }
 
+/**
+ * @brief Tests setting external take-over signal aspects for signals
+ * 
+ * This test verifies that the function rte::sig::eto_set_signal_aspect_for_idx correctly
+ * sets and clears external take-over signal aspects for all signals. It checks that when
+ * external take-over is enabled, the specified aspect and change-over time are applied,
+ * and when disabled, the built-in aspect is restored.
+ */
+TEST(Ut_Signal, Rte_sig_eto_set_signal_aspect_for_idx)
+{
+    uint8 signal_pos;
+    static constexpr uint8 built_in_signal_aspect = 0b00001100; // Aspect for cmd 0 of Einfahrsignal
+    static constexpr uint8 built_in_signal_change_over_time = 10; 
+    static constexpr uint8 eto_aspect = 0b00000001;
+    static constexpr uint8 eto_dim_time_10ms = 5;
+    static constexpr uint8 cmd = 0;
+    signal::signal_aspect aspect;
+
+    for (signal_pos = 0; signal_pos < cfg::kNrSignals; signal_pos++)
+    {
+        // Initialize EEPROM with ROM default values
+        rte::ifc_cal_set_defaults();
+        // And now activate signal signal_pos
+        rte::set_cv(cal::cv::kSignalIDBase + signal_pos, kBuiltInSignalIDEinfahrsignal);
+        EXPECT_EQ(rte::get_cv(cal::cv::kSignalIDBase + signal_pos), kBuiltInSignalIDEinfahrsignal);
+        EXPECT_EQ(rte::sig::get_signal_id(signal_pos), kBuiltInSignalIDEinfahrsignal);
+        rte::sig::get_signal_aspect_for_idx(signal_pos, cmd, aspect);
+        EXPECT_EQ(aspect.aspect, built_in_signal_aspect);
+        EXPECT_EQ(aspect.change_over_time_10ms, built_in_signal_change_over_time);
+        // and now set external take-over aspect for signal_pos
+        rte::sig::eto_set_signal_aspect_for_idx(signal_pos, true, eto_aspect, eto_dim_time_10ms); 
+        rte::sig::get_signal_aspect_for_idx(signal_pos, cmd, aspect);
+        EXPECT_EQ(aspect.aspect, eto_aspect);
+        EXPECT_EQ(aspect.change_over_time_10ms, eto_dim_time_10ms);
+        // disable external take-over
+        rte::sig::eto_set_signal_aspect_for_idx(signal_pos, false, eto_aspect, eto_dim_time_10ms); 
+        rte::sig::get_signal_aspect_for_idx(signal_pos, cmd, aspect);
+        EXPECT_EQ(aspect.aspect, built_in_signal_aspect);
+        EXPECT_EQ(aspect.change_over_time_10ms, built_in_signal_change_over_time);
+    }
+}
+
 void setUp(void)
 {
     cleanRte();
@@ -1885,6 +1927,7 @@ bool test_loop(void)
     RUN_TEST(Rte_sig_get_signal_aspect);
     RUN_TEST(Rte_sig_get_input);
     RUN_TEST(Rte_sig_get_first_output);
+    RUN_TEST(Rte_sig_eto_set_signal_aspect_for_idx);
 
     (void)UNITY_END();
 

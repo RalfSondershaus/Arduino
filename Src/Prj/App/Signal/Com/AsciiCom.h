@@ -104,23 +104,11 @@ namespace com
      * setting and getting signal aspects, blinks, targets, input classification,
      * and change-over times, as well as configuring classifiers.
      *
-     * @section Set and get CV's
-     * @brief Commands to set and get a CV. Command to initialize EEPROM.
-     *
-     * | Command | Description | Example Usage |
-     * |---------|-------------|--------------|
-     * | `SET_CV cv_id value` | Set the CV with id `cv_id` to `value value`. | `SET_CV 29 64` |
-     * | `GET_CV cv_id`       | Get the value of the CV with id `cv_id`.     | `GET_CV 29`    |
-     * | `INIT`               | Initialize EEPROM with default values.       | `INIT`         |
-     * 
-     * @section Monitoring
-     * @brief Commands to monitor RTE
-     *
-     * | Command | Description | Example Usage |
-     * |---------|-------------|--------------|
-     * | `MON_LIST` | Print available RTE ports (`ifc-name`) via serial interface. | `MON_LIST` Prints the available interfaces to the terminal. |
-     * | `MON_START cycle-time ifc-name [id-first id-nr]` | Start to print current values of `ifc-name`. Currently, just one RTE port can be printed at one time. Cycle time is `cycle-time` [ms]. `id-first` and `id-nr` are optional and define the span of an array that is to be transmitted [`id-first`, `id-first + id-nr`]. | `MON_START 100 ifc_ad_values`<br>read AD values of the classifiers. |
-     * | `MON_STOP` | Stop to print RTE port. | `MON_STOP` |
+     * For communication, it uses ASCII-formatted telegrams where commands and parameters
+     * are separated by spaces. The class can handle various commands such as `SET_CV`,
+     * `MON_LIST`, `MON_START`, `MON_STOP`, and `INIT`. It generates appropriate responses
+     * based on the processed commands. See the readme.md documentation for telegram descriptions 
+     * and usage examples.
      */
     class AsciiCom : public Observer
     {

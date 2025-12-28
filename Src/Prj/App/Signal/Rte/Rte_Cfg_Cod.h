@@ -71,15 +71,35 @@ namespace rte
          */
         static inline bool is_user_defined(uint8 signal_id) noexcept { return calm.is_user_defined(signal_id); }
 
-        /** @brief Get the signal aspect for a user-defined signal ID
+        /** 
+         * @brief Get the signal aspect for the signal id.
          * 
-         * @param signal_id Signal id (user-defined)
+         * @param signal_id Signal id (eSignalNotUsed, eFirstBuiltInSignalId, ..., eFirstUserDefinedSignalID, ...)
          * @param cmd Command index (0 ... cfg::kNrSignalAspects-1)
          * @param aspect Output: signal aspect configuration
          */
         static inline void get_signal_aspect(uint8 signal_id, uint8 cmd, struct signal::signal_aspect& aspect)
         {
             calm.get_signal_aspect(signal_id, cmd, aspect);
+        }
+
+        /** 
+         * @brief Get the signal aspect for the signal.
+         * 
+         * This function supports external take-over functionality.
+         * Use eto_set_signal_aspect_for_idx to set or clear external take-over aspects and dim times.
+         * 
+         * @note The function name differs from CalM::get_signal_aspect to avoid confusion.
+         * CalM::get_signal_aspect uses the Signal ID signal_id as first parameter, this function 
+         * uses signal_idx.
+         * 
+         * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+         * @param cmd Command index (0 ... cfg::kNrSignalAspects-1)
+         * @param aspect Output: signal aspect configuration
+         */
+        static inline void get_signal_aspect_for_idx(uint8 signal_idx, uint8 cmd, struct signal::signal_aspect& aspect)
+        {
+            calm.get_signal_aspect_for_idx(signal_idx, cmd, aspect);
         }
 
         /**
@@ -142,6 +162,23 @@ namespace rte
          * @return uint8 Number of outputs for the signal
          */
         static inline uint8 get_number_of_outputs(uint8 signal_id) { return calm.get_number_of_outputs(signal_id); }
+
+        /**
+         * @brief Set the signal aspect for external take-over.
+         * 
+         * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+         * @param eto_active true: external take-over active for this signal, false: inactive
+         * @param aspect Signal aspect value, e.g. 0b00001101 for 4 outputs
+         * @param dim_time_10ms Dim time in 10ms units
+         */
+        static inline void eto_set_signal_aspect_for_idx(
+            uint8 signal_idx, 
+            bool eto_active, 
+            uint8 aspect, 
+            uint8 dim_time_10ms) 
+        { 
+            calm.eto_set_signal_aspect_for_idx(signal_idx, eto_active, aspect, dim_time_10ms); 
+        }
     }
 }
 

@@ -46,15 +46,20 @@ namespace signal_cal
         return rte::get_cv(cal::cv::kSignalIDBase + signal_idx);
     }
 
-    /** @brief Get the signal aspect for a user-defined signal ID
+    /** 
+     * @brief Get the signal aspect for the signal
      * 
-     * @param signal_id Signal id (user-defined)
+     * @note The function name differs from CalM::get_signal_aspect to avoid confusion.
+     * CalM::get_signal_aspect uses the Signal ID signal_id as first parameter, this function 
+     * uses signal_idx.
+     * 
+     * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
      * @param cmd Command index (0 ... cfg::kNrSignalAspects-1)
      * @param aspect Output: signal aspect configuration
      */
-    inline void get_signal_aspect(uint8 signal_id, uint8 cmd, struct signal::signal_aspect &aspect)
+    inline void get_signal_aspect_for_idx(uint8 signal_idx, uint8 cmd, struct signal::signal_aspect &aspect)
     {
-       rte::sig::get_signal_aspect(signal_id, cmd, aspect);
+       rte::sig::get_signal_aspect_for_idx(signal_idx, cmd, aspect);
     }
     /**
      * @brief Get the input configuration for the signal

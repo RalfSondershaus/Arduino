@@ -59,6 +59,26 @@ namespace cal
     protected:
 
         /**
+         * @brief Structure to hold signal aspect information for external take-over
+         */
+        struct eto_signal_aspect
+        {
+            bool  eto_active;            ///< true: external take-over active for this signal
+            uint8 aspect;                ///< A bit per output, max. 8 outputs: 0 = 0%, 1 = 100%, LSB = 1st output, MSB = 8th output
+            uint8 change_over_time_10ms; ///< [10 ms] dim time if aspect changes
+        };
+
+        /**
+         * @brief Array to hold signal aspect information for external take-over
+         */
+        using eto_signal_aspect_array = util::array<eto_signal_aspect, cfg::kNrSignals>;
+
+        /**
+         * @brief Array to hold signal aspect information for external take-over
+         */
+        eto_signal_aspect_array eto_signal_aspects;
+
+        /**
          * @brief Returns true if eeprom::eManufacturerID is not EEPROM initial value (FF)
          *
          * @return true ManufacturerID in EEPROM is valid
@@ -285,6 +305,31 @@ namespace cal
          */
         void get_signal_aspect(uint8 signal_id, uint8 cmd, signal::signal_aspect& aspect);
 
+        /** @brief Get the signal aspect for the signal
+         * 
+         * Supports external take-over functionality. Use eto_set_signal_aspect_for_idx to set
+         * or clear external take-over aspects and dim times.
+         * 
+         * @note The function name differs from CalM::get_signal_aspect to avoid confusion.
+         * 
+         * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+         * @param cmd Command index (0 ... cfg::kNrSignalAspects-1)
+         * @param aspect Output: signal aspect configuration
+         */
+        void get_signal_aspect_for_idx(uint8 signal_idx, uint8 cmd, signal::signal_aspect& aspect)
+        {
+            get_signal_aspect(get_signal_id(signal_idx), cmd, aspect);
+            if (eto_signal_aspects.check_boundary(signal_idx))
+            {
+                if (eto_signal_aspects[signal_idx].eto_active)
+                {
+                    // override aspect if external take-over active
+                    aspect.aspect = eto_signal_aspects[signal_idx].aspect;
+                    aspect.change_over_time_10ms = eto_signal_aspects[signal_idx].change_over_time_10ms;
+                }
+            }
+        }
+
         /**
          * @brief Get the number of outputs for the signal
          * @param signal_id Signal id
@@ -373,6 +418,25 @@ namespace cal
             uint8 output_config = get_cv(cal::cv::kSignalOutputConfigBase + signal_idx);
             // A 1 in bit kOutpoutPinStepSize means step size of 2, else step size of 1
             return ((output_config & cal::constants::bitmask::kOutpoutPinStepSize) != 0U) ? 2 : 1;
+        }
+        /**
+         * @brief Set the signal aspect and dim time for external take-over.
+         * 
+         * Activate external take-over if eto_active is true, else deactivate external take-over.
+         * 
+         * @param signal_idx Signal index (0 ... cfg::kNrSignals-1)
+         * @param eto_active true: external take-over active for this signal
+         * @param aspect Signal aspect value, e.g. 0b00001101 for 4 outputs
+         * @param dim_time_10ms Dim time in 10ms units
+         */
+        inline void eto_set_signal_aspect_for_idx(uint8 signal_idx, bool eto_active, uint8 aspect, uint8 dim_time_10ms) 
+        { 
+            if (eto_signal_aspects.check_boundary(signal_idx))
+            {
+                eto_signal_aspects[signal_idx].eto_active = eto_active;
+                eto_signal_aspects[signal_idx].aspect = aspect;
+                eto_signal_aspects[signal_idx].change_over_time_10ms = dim_time_10ms;
+            }               
         }
         /** @} */
 

@@ -100,6 +100,7 @@ namespace com
     static tRetType process_monitor_start(stringstream_type &st, string_type &response);
     static tRetType process_monitor_stop(stringstream_type &st, string_type &response);
     static tRetType process_set_defaults(stringstream_type &st, string_type &response);
+    static tRetType process_eto_set_signal(stringstream_type &st, string_type &response);
     
     static tRetType process_set_signal(stringstream_type &st, string_type &response);
     static tRetType process_get_signal(stringstream_type &st, string_type &response);
@@ -126,7 +127,7 @@ namespace com
     static constexpr util::streamsize kMaxLenToken = 20;
 
     // Max Length of strings: kMaxLenToken
-    const util::array<tCommands, 10> commands =
+    const util::array<tCommands, 11> commands =
         {{{"SET_CV", process_set_cv},
           {"GET_CV", process_get_cv},
           {"MON_LIST", process_monitor_list},
@@ -136,7 +137,8 @@ namespace com
           {"SET_VERBOSE", process_set_verbose},
           {"SET_SIGNAL", process_set_signal},
           {"GET_SIGNAL", process_get_signal},
-          {"GET_PIN_CONFIG", process_get_pin_config}
+          {"GET_PIN_CONFIG", process_get_pin_config},
+          {"ETO_SET_SIGNAL", process_eto_set_signal}
         }};
 
     // -----------------------------------------------------------------------------------
@@ -871,12 +873,72 @@ namespace com
     static tRetType process_set_defaults(stringstream_type &st, string_type &response)
     {
         (void)st;
-        (void)response;
 
         // The response shall contain the command
         response.append(st.str());
 
         return rte::ifc_cal_set_defaults() ? eOK : eERR_EEPROM;
+    }
+
+    /**
+     * @brief Implements command ETO_SET_SIGNAL <signal_idx> <aspect> [<dim_time_10ms>]
+     *
+     * dim_time_10ms is optional, default is 10 (100 ms)
+     * 
+     * Enables or disables the ETO signal aspect for the signal at position signal_idx.
+     * If aspect is 0, the ETO signal aspect is disabled.
+     * If aspect is non-zero, the ETO signal aspect is enabled with the given aspect value.
+     * The dim_time_10ms parameter sets the dimming time in units of 10 ms.
+     * 
+     * @param st Contains the command string, get pointer points to first element after "GET_CV".
+     * @param response [out] The response is stored here, it contains the command parameters.
+     * @return tRetType eOK
+     * @return tRetType eINV_CMD Ill-formed command or CV id is out-of-bounds
+     * @return tRetType eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
+     * 
+     */
+    static tRetType process_eto_set_signal(stringstream_type &st, string_type &response)
+    {
+        uint16 signal_idx;
+        uint16 aspect;
+        uint16 dim_time_10ms = 10; // default 100 ms
+
+        tRetType ret = eINV_CMD;
+        st >> signal_idx;
+        st >> aspect;
+
+        // The response shall contain the command
+        response.append(st.str());
+
+        // Do not check for eof() since eof() is true after extracting the last element
+        // (and if the last element doesn't have trailing white spaces).
+        if (!st.fail())
+        {
+            // dim_time_10ms is optional
+            st >> dim_time_10ms;
+            if (st.fail())
+            {
+                dim_time_10ms = 10; // default 100 ms
+            }
+
+            if (signal_idx < cfg::kNrSignals)
+            {
+                // enabled if aspect != 0, disabled if aspect == 0
+                const bool enabled = aspect != 0U;
+                rte::sig::eto_set_signal_aspect_for_idx(
+                    signal_idx, 
+                    enabled,
+                    static_cast<uint8>(aspect), 
+                    static_cast<uint8>(dim_time_10ms));
+
+                ret = eOK;
+            }
+            else
+            {
+                ret = eINV_SIGNAL_IDX;
+            }
+        }
+        return ret;
     }
 
     static tRetType process_set_verbose(stringstream_type &st, string_type &response)

@@ -74,20 +74,50 @@ namespace signal
   class SignalHandler
   {
   public:
+    /**
+     * @brief Type definition for the array of signals
+     */
     using signal_array_type = util::array<Signal, cfg::kNrSignals>;
     
   protected:
-    /// the list of cfg::kNrSignals signals
+    /**
+     * @brief The array of signals.
+     * 
+     * Each signal can be accessed via its index (0 ... cfg::kNrSignals-1).
+     */
     signal_array_type signals;
 
   public:
 
+    /**
+     * @brief Construct a new Signal Handler object
+     */
     SignalHandler()
     {}
 
-    /// RTE runables
+    /**
+     * @defgroup RTE cyclic runables
+     * @{
+     */
+    /**
+     * @brief Initialize all signals at system start
+     */
     void init();
+    /**
+     * @brief Cyclic function to be called every cycle, e.g., every 10 ms
+     * 
+     * This function reads the RTE input commands, applies them to the signals,
+     * and writes the resulting signal aspects to the RTE outputs.
+     * The signal aspects include the target intensity and dimming speed.
+     */
     void cycle();
+    /** @} */
+
+    /**
+     * @defgroup RTE server runables
+     * @{
+     */
+    /** @} */
   };
 } // namespace signal
 
