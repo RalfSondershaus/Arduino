@@ -162,7 +162,7 @@ Version 1.0
 |39|0b00000001|R+W|1|N/A|N/A|N|N|DCC addressing mode, 0 = ROCO, 1 = RCN-213|
 |40|0b11111111|R|8|0 - 8|0 - 4|Y|Y|Maximum number of signals|
 |41|0b11111111|R|2|2|2|Y|Y|Number of built-in signal-IDs|
-|42|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 1 (0 = signal not used, 1 ... 127 = reserved for built-in signals (see [Built-in Signals](#built-in-signals)), >=128 user defined signal). The ID space 1-127 is reserved for future built-in signal types; currently, 3 built-in signals are defined (CV 41).|
+|42|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 1 (0 = signal not used, 1-127 = reserved for built-in signals including future expansion (see [Built-in Signals](#built-in-signals)), >=128 user defined signal). Currently, 3 built-in signals are defined (CV 41).|
 |43|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 2|
 |44|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 3|
 |45|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 4|
