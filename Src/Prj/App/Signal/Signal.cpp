@@ -42,8 +42,6 @@ namespace signal
         util::intensity16 intensity;
         struct signal::signal_aspect signal_asp;
 
-        const uint8 signal_id = signal_cal::get_signal_id(signal_idx);
-
         uint8 cmd = signal_rte::get_cmd(signal_cal::get_input_cmd(signal_idx));
 
         // switch on RED if a valid command hasn't been received since system start.
@@ -52,7 +50,7 @@ namespace signal
             cmd = 0; // 0 means RED by default
         }
 
-        signal_cal::get_signal_aspect(signal_id, cmd, signal_asp);
+        signal_cal::get_signal_aspect_for_idx(signal_idx, cmd, signal_asp);
 
         if (signal_asp.change_over_time_10ms == 0)
         {
