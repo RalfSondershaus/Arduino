@@ -108,25 +108,25 @@ These commands are used to output internal data structures to the terminal.
 **Ausfahrsignal (id 1)**
 
 Five (5) outputs:
-  - Red
-  - Red
-  - Green
-  - Yellow
-  - White
+  1. Red
+  2. Red
+  3. Green
+  4. Yellow
+  5. White
 
 **Blocksignal (id 2)**
 
 Two (2) outputs:
-  - Red
-  - Green
+  1. Red
+  2. Green
 
 **Einfahrsignal (id 3)**
 
 Four (4) outputs:
-  - Red
-  - Red
-  - Green
-  - Yellow
+  1. Red
+  2. Red
+  3. Green
+  4. Yellow
 
 #### List of CVs
 
@@ -161,8 +161,8 @@ Version 1.0
 ||0b00001111|R|1|0|0|Y|Y|Manufacturer CV structure version ID: minor ID. Change minor ID if the change is backwards compatible.|
 |39|0b00000001|R+W|1|N/A|N/A|N|N|DCC addressing mode, 0 = ROCO, 1 = RCN-213|
 |40|0b11111111|R|8|0 - 8|0 - 4|Y|Y|Maximum number of signals|
-|41|0b11111111|R|2|2|2|Y|Y|Number of built-in signal-IDs|
-|42|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 1 (0 = signal not used, 1 ... 127 = built-in signal, >=128 user defined signal)|
+|41|0b11111111|R|3|3|3|Y|Y|Number of built-in signal-IDs|
+|42|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 1 (`0` = signal not used/disabled, `1-127`: Reserved for built-in signals (see [Built-in Signals](#built-in-signals) section and CV 41),  `128-255`: Available for user-defined signals).|
 |43|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 2|
 |44|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 3|
 |45|0b11111111|R+W|0|0 - 8||Y|Y|Signal-ID of signal 4|
