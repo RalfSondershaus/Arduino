@@ -117,8 +117,6 @@ namespace signal
      * @defgroup RTE server runables
      * @{
      */
-    void eto_set_signal_aspect(uint8 signal_idx, uint8 aspect);
-    void eto_set_dim_time(uint8 signal_idx, uint8 dim_time_10ms);
     /** @} */
   };
 } // namespace signal
