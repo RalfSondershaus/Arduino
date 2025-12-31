@@ -304,16 +304,20 @@ TEST(Ut_Signal, ISR_Dcc1)
     hal::serial::println(td / (2U*num_rep)); // two calls per half bit
     hal::serial::print("Packets ");
     hal::serial::println(dcc::decoder::get_instance().get_packet_count());
-    hal::serial::println("Calls to bit extractor states: ");
-    hal::serial::println(dcc::decoder::get_instance().get_bit_extractor_call_count(0)); // STATE_INVALID
-    hal::serial::println(dcc::decoder::get_instance().get_bit_extractor_call_count(1)); // STATE_SHORT_INIT_1
-    hal::serial::println(dcc::decoder::get_instance().get_bit_extractor_call_count(2)); // STATE_SHORT_INIT_2
-    hal::serial::println(dcc::decoder::get_instance().get_bit_extractor_call_count(3)); // STATE_LONG_INIT_1
-    hal::serial::println(dcc::decoder::get_instance().get_bit_extractor_call_count(4)); // STATE_LONG_INIT_2
-    hal::serial::println(dcc::decoder::get_instance().get_bit_extractor_call_count(5)); // STATE_SHORT_1
-    hal::serial::println(dcc::decoder::get_instance().get_bit_extractor_call_count(6)); // STATE_SHORT_2
-    hal::serial::println(dcc::decoder::get_instance().get_bit_extractor_call_count(7)); // STATE_LONG_1
-    hal::serial::println(dcc::decoder::get_instance().get_bit_extractor_call_count(8)); // STATE_LONG_2
+    hal::serial::print("sizeof(decoder) ");
+    hal::serial::println(static_cast<uint32>(sizeof(dcc::decoder)));
+    hal::serial::print("sizeof(size_t) ");
+    hal::serial::println(static_cast<uint32>(sizeof(size_t)));
+    hal::serial::print("sizeof(uint8_least) ");
+    hal::serial::println(static_cast<uint32>(sizeof(uint8_least)));
+    using my_fix_deque = util::fix_deque<uint8, 1>;
+    hal::serial::print("sizeof(fix_deque) ");
+    hal::serial::println(static_cast<uint32>(sizeof(my_fix_deque)));
+    using my_fix_queue = util::fix_queue<uint8, 1>;
+    hal::serial::print("sizeof(fix_queue) ");
+    hal::serial::println(static_cast<uint32>(sizeof(my_fix_queue)));
+    hal::serial::print("sizeof(decoder::packet_type) ");
+    hal::serial::println(static_cast<uint32>(sizeof(dcc::decoder::packet_type)));
 
     EXPECT_FALSE(dcc::decoder::get_instance().is_fifo_overflow());
     // empty the queue for the next run.

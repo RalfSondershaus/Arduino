@@ -89,11 +89,13 @@ namespace dcc
         ResumeAllInterrupts();
     }
 
+#if CFG_DCC_DECODER_DEBUG == OPT_DCC_DECODER_DEBUG_ON
     /// for debugging: number of interrupt (ISR) calls
     uint32 decoder::get_interrupt_count() const
     {
         return ISR_dcc_count;
     }
+#endif
 
 } // namespace dcc
 

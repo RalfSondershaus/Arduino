@@ -38,7 +38,7 @@ namespace dcc
         using filter_type = dcc::filter<packet_type>;
         using filter_pointer_type = util::ptr<const filter_type>;
 
-        static const size_t kMaxNrPackets = 5; ///< Maximal number of packets stored in FIFO
+        static const size_t kMaxNrPackets = CFG_DCC_DECODER_FIFO_SIZE; ///< Maximal number of packets stored in FIFO
 
     protected:
         /// Packet FIFO buffer

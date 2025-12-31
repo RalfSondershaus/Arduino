@@ -152,7 +152,7 @@ void loop()
 {
     static util::MilliTimer LedTimer;
     static util::MilliTimer DccTimer;
-
+    static uint32 last_fifo_size = 0;
     // alive LED
     if (LedTimer.timeout())
     {
@@ -168,12 +168,15 @@ void loop()
         hal::serial::print(" inv=");
         hal::serial::print(dcc::decoder::get_instance().get_invalids_count());
         hal::serial::print(" pkt=");
-        hal::serial::println(dcc::decoder::get_instance().get_packet_count());
+        hal::serial::print(dcc::decoder::get_instance().get_packet_count());
+        hal::serial::print(" fifo=");
+        hal::serial::println(last_fifo_size);
     }
 
     if (DccTimer.timeout())
     {
         dcc::decoder::get_instance().fetch();
+        last_fifo_size = static_cast<uint32>(dcc::decoder::get_instance().size());
         while (!dcc::decoder::get_instance().empty())
         {
             const packet_type &pkt = dcc::decoder::get_instance().front();
