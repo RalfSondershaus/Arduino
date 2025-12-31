@@ -170,40 +170,39 @@ TEST(Ut_Signal, InputClassifier1)
 }
 
 // ------------------------------------------------------------------------------------------------
-/// 
+///
 // ------------------------------------------------------------------------------------------------
 TEST(Ut_Signal, LedRouter_OneRamp)
 {
-  using target_type = signal::LedRouter::target_type;
-  using intensity16_type = signal::LedRouter::intensity16_type;
-  using speed16_ms_type = signal::LedRouter::speed16_ms_type;
+    using intensity16_type = signal::LedRouter::intensity16_type;
+    using speed16_ms_type = signal::LedRouter::speed16_ms_type;
 
-  signal::LedRouter ledr;
-  constexpr int nrRep = 1000;
-  target_type tgt{target_type::eOnboard, 0};
-  const intensity16_type kTgtInt { intensity16_type::kIntensity_100 };
-  const speed16_ms_type kTgtSpd { 1 };
-  uint32 t1;
-  uint32 td;
-  t1 = micros();
-  for (int i = 0; i < nrRep; i++)
-  {
-    ledr.init();
-  }
-  td = micros() - t1;
-  hal::serial::print("LedRouter::init ");
-  hal::serial::println(td / nrRep);
+    signal::LedRouter ledr;
+    constexpr int nrRep = 1000;
+    struct signal::target tgt{cal::constants::make_signal_first_output(cal::constants::kOnboard, 0)};
+    const intensity16_type kTgtInt{intensity16_type::kIntensity_100};
+    const speed16_ms_type kTgtSpd{1};
+    uint32 t1;
+    uint32 td;
+    t1 = micros();
+    for (int i = 0; i < nrRep; i++)
+    {
+        ledr.init();
+    }
+    td = micros() - t1;
+    hal::serial::print("LedRouter::init ");
+    hal::serial::println(td / nrRep);
 
-  // set target for one ramp
-  ledr.setIntensityAndSpeed(tgt, kTgtInt, kTgtSpd);
-  t1 = micros();
-  for (int i = 0; i < nrRep; i++)
-  {
-    ledr.cycle();
-  }
-  td = micros() - t1;
-  hal::serial::print("LedRouter::cycle ");
-  hal::serial::println(td / nrRep);
+    // set target for one ramp
+    ledr.setIntensityAndSpeed(tgt, kTgtInt, kTgtSpd);
+    t1 = micros();
+    for (int i = 0; i < nrRep; i++)
+    {
+        ledr.cycle();
+    }
+    td = micros() - t1;
+    hal::serial::print("LedRouter::cycle ");
+    hal::serial::println(td / nrRep);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -213,43 +212,39 @@ TEST(Ut_Signal, LedRouter_OneRamp)
 // ------------------------------------------------------------------------------------------------
 TEST(Ut_Signal, LedRouter_AllRamps)
 {
-  using target_type = signal::LedRouter::target_type;
-  using intensity16_type = signal::LedRouter::intensity16_type;
-  using speed16_ms_type = signal::LedRouter::speed16_ms_type;
-  signal::LedRouter ledr;
-  constexpr int nrRep = 1000;
-  target_type tgt;
-  const intensity16_type kTgtInt { intensity16_type::kIntensity_100 };
-  const speed16_ms_type kTgtSpd { 1 };
-  rte::intensity8_255 intensity8_255;
+    using intensity16_type = signal::LedRouter::intensity16_type;
+    using speed16_ms_type = signal::LedRouter::speed16_ms_type;
+    signal::LedRouter ledr;
+    constexpr int nrRep = 1000;
+    struct signal::target tgt(cal::constants::make_signal_first_output(cal::constants::kOnboard, 0));
+    const intensity16_type kTgtInt{intensity16_type::kIntensity_100};
+    const speed16_ms_type kTgtSpd{1};
+    util::intensity8_255 intensity8_255;
 
-  tgt.type = target_type::eOnboard; 
-  tgt.idx = 0;
+    uint32 t1;
+    uint32 td;
+    t1 = micros();
+    for (int i = 0; i < nrRep; i++)
+    {
+        ledr.init();
+    }
+    td = micros() - t1;
+    hal::serial::print("LedRouter::init ");
+    hal::serial::println(td / nrRep);
 
-  uint32 t1;
-  uint32 td;
-  t1 = micros();
-  for (int i = 0; i < nrRep; i++)
-  {
-    ledr.init();
-  }
-  td = micros() - t1;
-  hal::serial::print("LedRouter::init ");
-  hal::serial::println(td / nrRep);
-
-  // set target for all ramps
-  for (tgt.idx = 0; tgt.idx < cfg::kNrOnboardTargets; tgt.idx++)
-  {
-    ledr.setIntensityAndSpeed(tgt, kTgtInt, kTgtSpd);
-  }
-  t1 = micros();
-  for (int i = 0; i < nrRep; i++)
-  {
-    ledr.cycle();
-  }
-  td = micros() - t1;
-  hal::serial::print("LedRouter::cycle ");
-  hal::serial::println(td / nrRep);
+    // set target for all ramps
+    for (tgt.pin = 0; tgt.pin < cfg::kNrOnboardTargets; tgt.pin++)
+    {
+        ledr.setIntensityAndSpeed(tgt, kTgtInt, kTgtSpd);
+    }
+    t1 = micros();
+    for (int i = 0; i < nrRep; i++)
+    {
+        ledr.cycle();
+    }
+    td = micros() - t1;
+    hal::serial::print("LedRouter::cycle ");
+    hal::serial::println(td / nrRep);
 }
 
 namespace dcc 
