@@ -100,62 +100,73 @@ static void printRte()
 // ------------------------------------------------------------------------------------------------
 TEST(Ut_Signal, InputClassifier1)
 {
-  signal::InputClassifier classifier;
-  constexpr int nrRep = 1000;
-  constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
-  constexpr uint8 kFirstOutputPin = 13;
-  constexpr uint8 kInputPin = 54;
-  constexpr uint8 kClassifierType = 0;
+    signal::InputClassifier classifier;
+    constexpr int nrRep = 1000;
+    constexpr int kSignalPos = 0; // Need to configure signal 0 as Ausfahrsignal
+    constexpr uint8 kFirstOutputPin = 13;
+    constexpr uint8 kInputPin = 54;
+    constexpr uint8 kClassifierType = 0;
 
-  uint32 t1;
-  uint32 td;
-  uint8 tmp;
+    uint32 t1;
+    uint32 td;
+    uint8 tmp;
 
-  // Initialize EEPROM with ROM default values
-  rte::ifc_cal_set_defaults::call();
-  // And now activate signal kSignalPos
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos, kBuiltInSignalIDAusfahrsignal);
-  // ... with first output pin kFirstOutputPin
-  tmp = cal::constants::make_signal_first_output(cal::constants::values::kOutputType_Onboard, kFirstOutputPin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos, tmp);
-  // ... with ADC input pin kInputPin
-  tmp = cal::constants::make_signal_input(cal::constants::values::kInputType_ADC, kInputPin);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos, tmp);
-  // ... with classifier type kClassifierType
-  tmp = kClassifierType;
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + kSignalPos, tmp);
+    // Initialize EEPROM with ROM default values
+    rte::ifc_cal_set_defaults();
+    // And now activate signal kSignalPos
+    rte::set_cv(cal::cv::kSignalIDBase + kSignalPos, kBuiltInSignalIDAusfahrsignal);
+    EXPECT_EQ(rte::get_cv(cal::cv::kSignalIDBase + kSignalPos), kBuiltInSignalIDAusfahrsignal);
+    EXPECT_EQ(rte::sig::get_signal_id(kSignalPos), kBuiltInSignalIDAusfahrsignal);
+    // ... with first output pin first_output_pin
+    rte::set_cv(cal::cv::kSignalFirstOutputBase + kSignalPos, cal::constants::make_signal_first_output(cal::constants::kOnboard, kFirstOutputPin));
+    EXPECT_EQ(rte::sig::get_first_output(kSignalPos).pin, kFirstOutputPin);
+    EXPECT_EQ(rte::sig::get_first_output(kSignalPos).type, cal::constants::kOnboard);
+    // ... with ADC input pin input_pin
+    rte::set_cv(cal::cv::kSignalInputBase + kSignalPos, cal::constants::make_signal_input(cal::constants::kAdc, kInputPin));
+    EXPECT_EQ(rte::get_cv(cal::cv::kSignalInputBase + kSignalPos), static_cast<uint8>(cal::constants::kAdc << 6 | (kInputPin & 0x3F)));
+    EXPECT_EQ(rte::sig::get_input(kSignalPos).type, cal::constants::kAdc);
+    EXPECT_EQ(rte::sig::get_input(kSignalPos).pin, kInputPin);
+    // ... with classifier type classifier_type
+    rte::set_cv(cal::cv::kSignalInputClassifierTypeBase + kSignalPos, kClassifierType);
+    EXPECT_EQ(util::classifier_cal::get_classifier_type(kSignalPos), kClassifierType);
+    // ... with inverse output pin order
+    rte::set_cv(cal::cv::kSignalOutputConfigBase + kSignalPos, 1U); // set inverse order bit
+    EXPECT_EQ(rte::sig::is_output_pin_order_inverse(kSignalPos), true);
+    // .. with step size 2
+    rte::set_cv(cal::cv::kSignalOutputConfigBase + kSignalPos, 0b00000010); // set step size to 2
+    EXPECT_EQ(rte::sig::get_output_pin_step_size(kSignalPos), static_cast<uint8>(2U));
 
-  // And now activate signal kSignalPos+1
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalIDBase + kSignalPos + 1, kBuiltInSignalIDAusfahrsignal);
-  // ... with first output pin kFirstOutputPin+8
-  tmp = cal::constants::make_signal_first_output(cal::constants::values::kOutputType_Onboard, kFirstOutputPin + 8);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalFirstOutputBase + kSignalPos + 1, tmp);
-  // ... with ADC input pin kInputPin+1
-  tmp = cal::constants::make_signal_input(cal::constants::values::kInputType_ADC, kInputPin+1);
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputBase + kSignalPos + 1, tmp);
-  // ... with classifier type kClassifierType
-  tmp = kClassifierType;
-  rte::ifc_cal_set_cv::call(cal::cv::eSignalInputClassifierTypeBase + kSignalPos + 1, tmp);
+    // And now activate signal kSignalPos+1
+    rte::set_cv(cal::cv::kSignalIDBase + kSignalPos + 1, kBuiltInSignalIDAusfahrsignal);
+    // ... with first output pin kFirstOutputPin+8
+    tmp = cal::constants::make_signal_first_output(cal::constants::kOnboard, kFirstOutputPin + 8);
+    rte::set_cv(cal::cv::kSignalFirstOutputBase + kSignalPos + 1, tmp);
+    // ... with ADC input pin kInputPin+1
+    tmp = cal::constants::make_signal_input(cal::constants::kAdc, kInputPin + 1);
+    rte::set_cv(cal::cv::kSignalInputBase + kSignalPos + 1, tmp);
+    // ... with classifier type kClassifierType
+    tmp = kClassifierType;
+    rte::set_cv(cal::cv::kSignalInputClassifierTypeBase + kSignalPos + 1, tmp);
 
-  t1 = micros();
-  for (int i = 0; i < nrRep; i++)
-  {
-    classifier.init();
-  }
-  td = micros() - t1;
-  hal::serial::print("InputClassifier::init ");
-  hal::serial::println(td / nrRep);
+    t1 = micros();
+    for (int i = 0; i < nrRep; i++)
+    {
+        classifier.init();
+    }
+    td = micros() - t1;
+    hal::serial::print("InputClassifier::init ");
+    hal::serial::println(td / nrRep);
 
-  t1 = micros();
-  for (int i = 0; i < nrRep; i++)
-  {
-    hal::stubs::analogRead[kInputPin  ]++;
-    hal::stubs::analogRead[kInputPin+1]++;
-    classifier.cycle();
-  }
-  td = micros() - t1;
-  hal::serial::print("InputClassifier::cycle ");
-  hal::serial::println(td / nrRep);
+    t1 = micros();
+    for (int i = 0; i < nrRep; i++)
+    {
+        hal::stubs::analogRead[kInputPin]++;
+        hal::stubs::analogRead[kInputPin + 1]++;
+        classifier.cycle();
+    }
+    td = micros() - t1;
+    hal::serial::print("InputClassifier::cycle ");
+    hal::serial::println(td / nrRep);
 }
 
 // ------------------------------------------------------------------------------------------------
