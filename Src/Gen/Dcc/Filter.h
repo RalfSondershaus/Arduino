@@ -1,10 +1,10 @@
 /**
- * @file Filter.h
+ * @file filter.h
  * @author Ralf Sondershaus
  *
- * @brief DCC Filter
+ * @brief DCC filter
  *
- * Declares class dcc::Filter that can filter Dcc Packets.
+ * Declares class dcc::filter that can filter Dcc Packets.
  *
  * @copyright Copyright 2023 Ralf Sondershaus
  *
@@ -31,18 +31,18 @@
 namespace dcc
 {
     // ---------------------------------------------------------------------
-    /// Filter class
+    /// filter class
     // ---------------------------------------------------------------------
     template <class TPacket>
-    class Filter
+    class filter
     {
     public:
         using packet_type = TPacket;
 
         /**
-         * @brief Default constructor for the Filter class.
+         * @brief Default constructor for the filter class.
          */
-        Filter() = default;
+        filter() = default;
 
         /**
          * @brief Determines whether a given DCC packet passes the filter criteria.
@@ -50,11 +50,11 @@ namespace dcc
          * @param pkt The DCC packet to be evaluated.
          * @return `true` if the packet passes the filter; `false` otherwise.
          */
-        virtual bool filter(packet_type &pkt) const noexcept = 0;
+        virtual bool do_filter(packet_type &pkt) const noexcept = 0;
     };
 
     // ---------------------------------------------------------------------
-    /// This Filter class lets packets pass for a specific primary address range.
+    /// This filter class lets packets pass for a specific primary address range.
     ///
     /// 00000000              0         Broadcast address
     /// 00000001-01111111     1 - 127   Multi-Function decoders with 7 bit addresses (locomotives)
@@ -66,7 +66,7 @@ namespace dcc
     /// @tparam Packet Type of Dcc Packet such as dcc::Packet<6>
     // ---------------------------------------------------------------------
     template <class Packet>
-    class PassPrimaryAddressFilter : public Filter<Packet>
+    class pass_primary_address_filter : public filter<Packet>
     {
     protected:
         /// Lower address of the address range
@@ -76,15 +76,15 @@ namespace dcc
 
     public:
         /// The base class
-        using parent_type = Filter<Packet>;
+        using parent_type = filter<Packet>;
         /// The type for Dcc Packets
         using packet_type = typename parent_type::packet_type;
 
         /// The default constructor defines a filter that does not let any packet pass.
-        PassPrimaryAddressFilter() { invalidate(); }
+        pass_primary_address_filter() { invalidate(); }
 
         /// Construct with address range: addrLo <= address <= addrHi
-        PassPrimaryAddressFilter(uint8 addrLo, uint8 addrHi) : ucAddressLo(addrLo), ucAddressHi(addrHi) {}
+        pass_primary_address_filter(uint8 addrLo, uint8 addrHi) : ucAddressLo(addrLo), ucAddressHi(addrHi) {}
 
         /// Set the low address and high address
         void setLo(uint8 addr) noexcept { ucAddressLo = addr; }
@@ -98,7 +98,7 @@ namespace dcc
         }
 
         /// Returns true if the packet passes the filter. Returns false if the packet does not pass the filter.
-        bool filter(packet_type &pkt) const noexcept override
+        bool do_filter(packet_type &pkt) const noexcept override
         {
             const uint8 addr = pkt.get_primary_address();
             return ((addr >= ucAddressLo) && (addr <= ucAddressHi));
@@ -106,16 +106,16 @@ namespace dcc
     };
 
     // ---------------------------------------------------------------------
-    /// This Filter class lets packets pass for a specific address range.
+    /// This filter class lets packets pass for a specific address range.
     ///
     /// @tparam Packet Type of Dcc Packet such as dcc::Packet<6>
     // ---------------------------------------------------------------------
     template <class Packet>
-    class PassAddressFilter : public Filter<Packet>
+    class pass_address_filter : public filter<Packet>
     {
     public:
         /// The base class
-        using parent_type = Filter<Packet>;
+        using parent_type = filter<Packet>;
         using packet_type = typename parent_type::packet_type;
         using address_type = typename Packet::address_type;
 
@@ -131,10 +131,10 @@ namespace dcc
     public:
 
         /// The default constructor defines a filter that does not let any packet pass.
-        PassAddressFilter() { invalidate(); }
+        pass_address_filter() { invalidate(); }
 
         /// Construct with address range: addrLo <= address <= addrHi
-        PassAddressFilter(address_type addr_lo, address_type addr_hi) : lower_address(addr_lo), higher_address(addr_hi) {}
+        pass_address_filter(address_type addr_lo, address_type addr_hi) : lower_address(addr_lo), higher_address(addr_hi) {}
 
         /**
          * @brief Set the cv29. Used for address calculation.
@@ -174,7 +174,7 @@ namespace dcc
         }
 
         /// Returns true if the packet passes the filter. Returns false if the packet does not pass the filter.
-        bool filter(packet_type &pkt) const noexcept override
+        bool do_filter(packet_type &pkt) const noexcept override
         {
             const address_type addr = pkt.get_address(cv29);
             return ((addr >= lower_address) && (addr <= higher_address));
@@ -187,11 +187,11 @@ namespace dcc
     /// @tparam Packet Type of Dcc Packet such as dcc::Packet<6>
     // ---------------------------------------------------------------------
     template <class Packet>
-    class PassAccessoryAddressFilter : public Filter<Packet>
+    class pass_accessory_address_filter : public filter<Packet>
     {
     public:
         /// The base class
-        using parent_type = Filter<Packet>;
+        using parent_type = filter<Packet>;
         using packet_type = typename parent_type::packet_type;
         using address_type = typename Packet::address_type;
 
@@ -207,10 +207,10 @@ namespace dcc
     public:
 
         /// The default constructor defines a filter that does not let any packet pass.
-        PassAccessoryAddressFilter() { invalidate(); }
+        pass_accessory_address_filter() { invalidate(); }
 
         /// Construct with address range: addrLo <= address <= addrHi
-        PassAccessoryAddressFilter(address_type addr_lo, address_type addr_hi) : lower_address(addr_lo), higher_address(addr_hi) {}
+        pass_accessory_address_filter(address_type addr_lo, address_type addr_hi) : lower_address(addr_lo), higher_address(addr_hi) {}
 
         /**
          * @brief Set the cv29. Used for address calculation.
@@ -250,7 +250,7 @@ namespace dcc
         }
 
         /// Returns true if the packet passes the filter. Returns false if the packet does not pass the filter.
-        bool filter(packet_type &pkt) const noexcept override
+        bool do_filter(packet_type &pkt) const noexcept override
         {
             bool does_pass = false;
             // Check if packet is an accessory packet

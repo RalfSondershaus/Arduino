@@ -33,13 +33,9 @@ namespace signal
   class DccDecoder
   {
   protected:
-    using packet_type = dcc::Decoder::PacketType;
-    using filter_type = dcc::PassAccessoryAddressFilter<packet_type>;
+    using packet_type = dcc::decoder::packet_type;
+    using filter_type = dcc::pass_accessory_address_filter<packet_type>;
 
-    /**
-     * @brief The DCC decoder instance.
-     */
-    dcc::Decoder decoder;
     /**
      * @brief The address filter for the decoder. Only packets that pass this filter are stored 
      * in the FIFO buffer.

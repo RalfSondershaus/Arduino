@@ -8,6 +8,8 @@
                 "${workspaceFolder}/Src/Prj/App/FireFlicker",
                 "${workspaceFolder}/Src/Prj/App/Signal",
                 "${workspaceFolder}/Src/Prj/App/Signal/**",
+                "${workspaceFolder}/Src/Prj/App/DccSniffer",
+                "${workspaceFolder}/Src/Prj/App/DccSniffer/**",
                 "${workspaceFolder}/Src/Gen/**",
                 "${workspaceFolder}/Src/Gen/Test/unity/src",
                 "${workspaceFolder}/Src/Gen/Hal/Stub/Gpio",

@@ -31,7 +31,7 @@ namespace signal
     ///
     /// Intensity [0 ... 255] to PWM [0 ... 255]
     // --------------------------------------------------------------------------------------------
-    static const LedRouter::intensity8_255_type::base_type aunIntensity2Pwm[256u] =
+    static const LedRouter::intensity8_255_type::base_type ROM_CONST_VAR aunIntensity2Pwm[256u] =
         {
             /*          0    1    2    3    4    5    6    7    8    9  */
             /*   0 */ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -74,7 +74,7 @@ namespace signal
             {
                 const intensity16_type intensity16{it->step()};
                 const intensity8_255_type intensity{util::convert<intensity8_255_type, intensity16_type>(intensity16)};
-                const intensity8_255_type pwm{aunIntensity2Pwm[intensity]};
+                const intensity8_255_type pwm{ROM_READ_BYTE(&aunIntensity2Pwm[intensity])};
                 rte::ifc_onboard_target_duty_cycles::writeElement(pos, pwm);
                 hal::analogWrite(pos, static_cast<int>(pwm));
             }
