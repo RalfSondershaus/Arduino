@@ -21,7 +21,11 @@
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-                "ARDUINO"
+                "ARDUINO",
+                "F_CPU=16000000L",
+                "ARDUINO_AVR_MEGA",
+                "__AVR__",
+                "__AVR_ATmega2560__"
             ],
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "g++.exe",
