@@ -134,11 +134,20 @@ C_INCLUDES_PLATFORM := $(C_INCLUDES_PLATFORM)                                \
 # Add compiler #defines for the target
 # 10608 means Arduino Version 1.6.8
 # ---------------------------------------------------
-C_DEFINES := $(C_DEFINES)           \
-            -DF_CPU=$(TARGET_MCU_F_CPU)       \
-            -DARDUINO=10608         \
-            -DARDUINO_$(TARGET_MCU_BOARD)  \
-            -DARDUINO_ARCH_$(toupper $(TARGET_MCU_FAMILY))
+C_DEFINES := $(C_DEFINES)                   \
+            -DF_CPU=$(TARGET_MCU_F_CPU)     \
+            -DARDUINO=10608                 \
+            -DARDUINO_$(TARGET_MCU_BOARD)
+            
+ifeq ($(TARGET_MCU_FAMILY),avr)
+C_DEFINES := $(C_DEFINES)                   \
+            -DARDUINO_ARCH_AVR
+else ifeq ($(TARGET_MCU_FAMILY),arm)
+C_DEFINES := $(C_DEFINES)                   \
+            -DARDUINO_ARCH_ARM
+else
+$(error ------ Unknown TARGET_MCU_FAMILY $(TARGET_MCU_FAMILY). Supported: avr,arm) ------
+endif
 
 # ---------------------------------------------------
 # Compiler flags. See also https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
@@ -181,6 +190,9 @@ C_DEFINES := $(C_DEFINES)           \
 #                     Use these options on systems where the linker can perform optimizations to 
 #                     improve locality of reference in the instruction space. Most systems using 
 #                     the ELF object format have linkers with such optimizations.
+#                     These options ensure that every function and every global variable is placed 
+#                     into its own ELF section. Only then can the linker remove them individually 
+#                     later.
 # -mmcu=mcu Specify the AVR instruction set architecture (ISA) or device type.
 # ---------------------------------------------------
 
@@ -224,6 +236,9 @@ CCVERSIONFLAGS := --version
 
 # ---------------------------------------------------
 # Linker flags
+#
+# -Wl,--gc-sections   dead code elimination when compiled with -ffunction-sections and 
+#                     -fdata-sections
 # ---------------------------------------------------
 LFLAGS := $(LFLAGS)                   \
          -w                           \
@@ -231,6 +246,7 @@ LFLAGS := $(LFLAGS)                   \
          -g                           \
          -flto                        \
          -fuse-linker-plugin          \
+         -Wl,--gc-sections            \
          -mmcu=$(TARGET_MCU_DEVICE)   \
          -L.                          \
          -lm
