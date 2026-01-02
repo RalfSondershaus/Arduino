@@ -19,6 +19,7 @@
  */
 
 #include <Cfg_Prj.h>
+#include <Compiler.h>
 #include <Platform_Limits.h>
 #include <Cal/CalM_Types.h>
 #include <Com/AsciiCom.h>
@@ -69,25 +70,43 @@ namespace com
 
     /// For each tRetType, an error description that is transmitted after
     /// processing the command.
-    static constexpr const string_type::value_type *aRetTypeStrings[] =
+    const char ret_OK[] ROM_CONST_VAR = "OK";
+    const char ret_INV_CMD[] ROM_CONST_VAR = "ERR: Invalid command";
+    const char ret_ERR_EEPROM[] ROM_CONST_VAR = "ERR: EEPROM failure";
+    const char ret_INV_CV_ID[] ROM_CONST_VAR = "ERR: Invalid CV ID";
+    const char ret_CV_VALUE_OUT_OF_RANGE[] ROM_CONST_VAR = "ERR: CV value is out of range";
+    const char ret_INV_SIGNAL_IDX[] ROM_CONST_VAR = "ERR: Invalid signal index";
+    const char ret_INV_SIGNAL_ID[] ROM_CONST_VAR = "ERR: Invalid signal id";
+    const char ret_INV_FIRST_OUTPUT_TYPE[] ROM_CONST_VAR = "ERR: Invalid first output type";
+    const char ret_INV_OUTPUT_CONFIG_STEP_SIZE[] ROM_CONST_VAR = "ERR: Invalid output step size config";
+    const char ret_INV_INPUT_TYPE[] ROM_CONST_VAR = "ERR: Invalid input type";
+    const char ret_INV_OUTPUT_PIN[] ROM_CONST_VAR = "ERR: Invalid output pin";
+    const char ret_INV_INPUT_PIN[] ROM_CONST_VAR = "ERR: Invalid input pin";
+    const char ret_INV_PARAM[] ROM_CONST_VAR = "ERR: Invalid parameter";
+    const char ret_INV_MONITOR_START_PARAM[] ROM_CONST_VAR = "ERR: Unknown monitor start parameter: MONITOR_START cycle-time ifc-name";
+    const char ret_INV_MONITOR_START_IFC_NAME[] ROM_CONST_VAR = "ERR: Unknown monitor start interface name: MONITOR_START cycle-time ifc-name";
+    const char ret_INV_VERBOSE_LEVEL[] ROM_CONST_VAR = "ERR: Invalid verbose level: SET_VERBOSE 0 ... 3";
+    const char ret_ERR_UNKNOWN[] ROM_CONST_VAR = "ERR: unknown error";
+
+    static constexpr const string_type::value_type *aRetTypeStrings[] ROM_CONST_VAR =
         {
-            "OK",                   // eOK
-            "ERR: Invalid command", // eINV_CMD
-            "ERR: EEPROM failure",  // eERR_EEPROM
-            "ERR: Invalid CV ID",   // eINV_CV_ID
-            "ERR: CV value is out of range",        // eCV_VALUE_OUT_OF_RANGE
-            "ERR: Invalid signal index",            // eINV_SIGNAL_IDX
-            "ERR: Invalid signal id",               // eINV_SIGNAL_ID
-            "ERR: Invalid first output type",       // eINV_FIRST_OUTPUT_TYPE
-            "ERR: Invalid output step size config", // eINV_OUTPUT_CONFIG_STEP_SIZE
-            "ERR: Invalid input type",              // eINV_INPUT_TYPE
-            "ERR: Invalid output pin",              // eINV_OUTPUT_PIN
-            "ERR: Invalid input pin",               // eINV_INPUT_PIN
-            "ERR: Invalid parameter",               // eINV_PARAM
-            "ERR: Unknown monitor start parameter: MONITOR_START cycle-time ifc-name",      // eINV_MONITOR_START_PARAM
-            "ERR: Unknown monitor start interface name: MONITOR_START cycle-time ifc-name", // eINV_MONITOR_START_IFC_NAME
-            "ERR: Invalid verbose level: SET_VERBOSE 0 ... 3",                              // eINV_VERBOSE_LEVEL
-            "ERR: unknown error"                                                            // has to be the last element
+            ret_OK,                             // eOK
+            ret_INV_CMD,                        // eINV_CMD
+            ret_ERR_EEPROM,                     // eERR_EEPROM
+            ret_INV_CV_ID,                      // eINV_CV_ID
+            ret_CV_VALUE_OUT_OF_RANGE,          // eCV_VALUE_OUT_OF_RANGE
+            ret_INV_SIGNAL_IDX,                 // eINV_SIGNAL_IDX
+            ret_INV_SIGNAL_ID,                  // eINV_SIGNAL_ID
+            ret_INV_FIRST_OUTPUT_TYPE,          // eINV_FIRST_OUTPUT_TYPE
+            ret_INV_OUTPUT_CONFIG_STEP_SIZE,    // eINV_OUTPUT_CONFIG_STEP_SIZE
+            ret_INV_INPUT_TYPE,                 // eINV_INPUT_TYPE
+            ret_INV_OUTPUT_PIN,                 // eINV_OUTPUT_PIN
+            ret_INV_INPUT_PIN,                  // eINV_INPUT_PIN
+            ret_INV_PARAM,                      // eINV_PARAM
+            ret_INV_MONITOR_START_PARAM,        // eINV_MONITOR_START_PARAM
+            ret_INV_MONITOR_START_IFC_NAME,     // eINV_MONITOR_START_IFC_NAME
+            ret_INV_VERBOSE_LEVEL,              // eINV_VERBOSE_LEVEL
+            ret_ERR_UNKNOWN                     // has to be the last element
     };
 
 #if 0
@@ -116,42 +135,48 @@ namespace com
 
     typedef tRetType (*func_type)(stringstream_type &st, string_type &response);
 
-    typedef struct
+    struct command
     {
         // Length of szCmd shall never exceed kMaxLenToken
         const char *szCmd;
         func_type func;
-    } tCommands;
+    };
 
     /// Max length of a token (how many characters)
     static constexpr util::streamsize kMaxLenToken = 20;
 
+    const char cmd_SET_CV[] ROM_CONST_VAR = "SET_CV";
+    const char cmd_GET_CV[] ROM_CONST_VAR = "GET_CV";
+    const char cmd_MON_LIST[] ROM_CONST_VAR = "MON_LIST";
+    const char cmd_MON_START[] ROM_CONST_VAR = "MON_START";
+    const char cmd_MON_STOP[] ROM_CONST_VAR = "MON_STOP";
+    const char cmd_INIT[] ROM_CONST_VAR = "INIT";
+    const char cmd_SET_VERBOSE[] ROM_CONST_VAR = "SET_VERBOSE";
+    const char cmd_SET_SIGNAL[] ROM_CONST_VAR = "SET_SIGNAL";
+    const char cmd_GET_SIGNAL[] ROM_CONST_VAR = "GET_SIGNAL";
+    const char cmd_GET_PIN_CONFIG[] ROM_CONST_VAR = "GET_PIN_CONFIG";
+    const char cmd_ETO_SET_SIGNAL[] ROM_CONST_VAR = "ETO_SET_SIGNAL";
+
+    /// Array type of supported commands
+    using command_array_type = util::array<struct command, 11>;
+
     // Max Length of strings: kMaxLenToken
-    const util::array<tCommands, 11> commands =
-        {{{"SET_CV", process_set_cv},
-          {"GET_CV", process_get_cv},
-          {"MON_LIST", process_monitor_list},
-          {"MON_START", process_monitor_start},
-          {"MON_STOP", process_monitor_stop},
-          {"INIT", process_set_defaults},
-          {"SET_VERBOSE", process_set_verbose},
-          {"SET_SIGNAL", process_set_signal},
-          {"GET_SIGNAL", process_get_signal},
-          {"GET_PIN_CONFIG", process_get_pin_config},
-          {"ETO_SET_SIGNAL", process_eto_set_signal}
+    const command_array_type commands ROM_CONST_VAR =
+        {{{cmd_SET_CV, process_set_cv},
+          {cmd_GET_CV, process_get_cv},
+          {cmd_MON_LIST, process_monitor_list},
+          {cmd_MON_START, process_monitor_start},
+          {cmd_MON_STOP, process_monitor_stop},
+          {cmd_INIT, process_set_defaults},
+          {cmd_SET_VERBOSE, process_set_verbose},
+          {cmd_SET_SIGNAL, process_set_signal},
+          {cmd_GET_SIGNAL, process_get_signal},
+          {cmd_GET_PIN_CONFIG, process_get_pin_config},
+          {cmd_ETO_SET_SIGNAL, process_eto_set_signal}
         }};
 
     // -----------------------------------------------------------------------------------
-    /// Process the telegram from AsciiTP.
-    ///
-    /// \code
-    ///
-    /// GET SIGNAL id ASPECTS                           returns all (5) aspects for signal 0
-    /// GET SIGNAL id TARGETS                           returns all (5) target ports for signal 0
-    ///
-    /// CPY SIGNAL from SIGNAL to                       copies all aspects and target ports from signal 0 to signal 1
-    /// CPY SIGNAL from SIGNAL to TARGETS               copies all targets from signal 0 to signal 1
-    /// \code
+    /// A new telegram has been received, process it.
     // -----------------------------------------------------------------------------------
     void AsciiCom::update()
     {
@@ -175,21 +200,28 @@ namespace com
     {
         stringstream_type st(telegram);
         char cmd[kMaxLenToken];
+        char cmd_rom[kMaxLenToken];
+        size_t cmd_idx;
         tRetType ret = eINV_CMD;
         string_type sub_response;
 
         st >> util::setw(kMaxLenToken) >> cmd;
         util::string_view sv(cmd);
-        for (auto cmdit = commands.begin(); cmdit != commands.end(); cmdit++)
+        for (cmd_idx = 0U; cmd_idx < commands.size(); cmd_idx++)
         {
-            if (sv.compare(cmdit->szCmd) == 0)
+            struct command cmdit;
+            // read command from PROGMEM, works for x86 too
+            ROM_READ_STRUCT(&cmdit, &commands[cmd_idx], sizeof(struct command));
+            ROM_READ_STRING(cmd_rom, cmdit.szCmd);
+            if (sv.compare(cmd_rom) == 0)
             {
-                ret = cmdit->func(st, sub_response);
+                ret = cmdit.func(st, sub_response);
                 break;
             }
         }
 
-        response = aRetTypeStrings[static_cast<size_type>(ret)];
+        // Prepare the response, read the string from PROGMEM, works for x86 too
+        response = static_cast<const char *>(ROM_READ_PTR(&aRetTypeStrings[static_cast<size_type>(ret)]));
         if (sub_response.size() > 0)
         {
             response += " ";

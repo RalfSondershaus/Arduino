@@ -20,7 +20,9 @@
 #define ROM_READ_BYTE(addr)     (*(const uint8_t*)(addr))
 #define ROM_READ_WORD(addr)     (*(const uint16_t*)(addr))
 #define ROM_READ_DWORD(addr)    (*(const uint32_t*)(addr))
+#define ROM_READ_PTR(addr)      (*(void* const *)addr)
 #define ROM_READ_STRING(dst, src) strcpy((dst), (src))
+#define ROM_READ_STRUCT(dst, src, len) memcpy((dst), (src), (len))
 
 #endif // COMPILER_H
 // EOF

@@ -58,6 +58,7 @@ namespace debug
     bool shall_print(uint8 msg_level) noexcept;
 
     inline size_t print(uint8 verbosity, const char *p)      { return shall_print(verbosity) ? hal::serial::print(p) : 0; }
+    inline size_t print(uint8 verbosity, const __FlashStringHelper *p)      { return shall_print(verbosity) ? hal::serial::print(p) : 0; }
     inline size_t print(uint8 verbosity, char c)             { return shall_print(verbosity) ? hal::serial::print(c) : 0; }
     inline size_t print(uint8 verbosity, unsigned char uc, int base = 10)    { return shall_print(verbosity) ? hal::serial::print(uc, base) : 0; }
     inline size_t print(uint8 verbosity, int n, int base = 10)               { return shall_print(verbosity) ? hal::serial::print(n, base) : 0; }
@@ -67,6 +68,7 @@ namespace debug
     inline size_t print(uint8 verbosity, double d, int digits = 2)            { return shall_print(verbosity) ? hal::serial::print(d, digits) : 0; }
 
     inline size_t println(uint8 verbosity, const char *p)                      { return shall_print(verbosity) ? hal::serial::println(p) : 0; }
+    inline size_t println(uint8 verbosity, const __FlashStringHelper *p)      { return shall_print(verbosity) ? hal::serial::println(p) : 0; }
     inline size_t println(uint8 verbosity, char c)                             { return shall_print(verbosity) ? hal::serial::println(c) : 0; }
     inline size_t println(uint8 verbosity, unsigned char uc, int base = 10)   { return shall_print(verbosity) ? hal::serial::println(uc, base) : 0; }
     inline size_t println(uint8 verbosity, int n, int base = 10)              { return shall_print(verbosity) ? hal::serial::println(n, base) : 0; }

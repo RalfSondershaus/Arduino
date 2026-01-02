@@ -23,6 +23,22 @@
 
 #include <Std_Types.h>
 
+/**
+ * @brief Macro to mark string literals for storage in Flash memory on Arduino platforms.
+ * 
+ * On unit tests, this macro has no effect and simply returns the original string literal.
+ * 
+ * Example:
+ * @code
+ * hal::serial::print(F("Hello, World!"));
+ * @endcode
+ * 
+ * @param string_literal The string literal to be marked for Flash storage.
+ * @return The original string literal.
+ */
+#define F(string_literal) (string_literal)
+class __FlashStringHelper; // needed for namespace debug to avoid #ifdefs
+
 namespace hal
 {
   // -----------------------------------------------------------------------------------
@@ -49,6 +65,7 @@ namespace hal
 
     /// Print functions
     inline size_t print(const char *p)                       { (void) p; return 0; }
+    inline size_t print(const __FlashStringHelper *p)        { return Serial.print(p); }
     inline size_t print(char c)                              { (void) c; return 0; }
     inline size_t print(unsigned char uc, int base = 10)     { (void) uc; (void) base; return 0; }
     inline size_t print(int n, int base = 10)                { (void) n; (void) base; return 0; }
@@ -58,6 +75,7 @@ namespace hal
     inline size_t print(double d, int digits = 2)            { (void) d; (void) digits; return 0; }
 
     inline size_t println(const char *p)                       { (void) p; return 0; }
+    inline size_t println(const __FlashStringHelper *p)        { return Serial.println(p); }
     inline size_t println(char c)                              { (void) c; return 0; }
     inline size_t println(unsigned char uc, int base = 10)     { (void) uc; (void) base; return 0; }
     inline size_t println(int n, int base = 10)                { (void) n; (void) base; return 0; }

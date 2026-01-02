@@ -10,8 +10,6 @@
 
 #include <Util/String_view.h>
 #include <stdint.h>
-#include <array>
-#include <algorithm>
 
 #define CFG_OFF 0
 #define CFG_ON 1
@@ -28,6 +26,8 @@
 // Requires C++17
 #include <string_view>
 #include <iostream>
+#include <array>
+#include <algorithm>
 #endif
 
 // -------------------------------------------------------------------------

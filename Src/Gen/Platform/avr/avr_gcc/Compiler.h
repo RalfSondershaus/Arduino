@@ -25,7 +25,9 @@
 #define ROM_READ_BYTE(addr)     pgm_read_byte(addr)
 #define ROM_READ_WORD(addr)     pgm_read_word(addr)
 #define ROM_READ_DWORD(addr)    pgm_read_dword(addr)
+#define ROM_READ_PTR(addr)      pgm_read_ptr(addr)
 #define ROM_READ_STRING(dst, src) strcpy_P((dst), (src))
+#define ROM_READ_STRUCT(dst, src, len) memcpy_P((dst), (src), (len))
 
 #endif // COMPILER_H
 // EOF

@@ -26,12 +26,21 @@
 
 namespace hal
 {
-  // -----------------------------------------------------------------------------------
-  /// Read values from serial interface (fetch bytes) and store them into a queue.
-  ///
-  /// Remark: For serial communication, Arduino uses a 16 byte buffer (for systems with 
-  /// RAM smaller than 1 KB) or a 64 byte buffer (else).
-  // -----------------------------------------------------------------------------------
+  /**
+   * @brief Sets up serial communication at the specified baud rate.
+   * 
+   * Read values from serial interface (fetch bytes) and store them into a queue.
+   * 
+   * @note The `F()` macro is used to store string literals in Flash memory on Arduino platforms.
+   * On other platforms, such as Windows, this macro has no effect and simply returns the original 
+   * string literal. Example:
+   * @code
+   * hal::serial::print(F("Hello, World!"));
+   * @endcode
+   * 
+   * @note: For serial communication, Arduino uses a 16 byte buffer (for systems with 
+   * RAM smaller than 1 KB) or a 64 byte buffer (else).
+   */
   namespace serial
   {
     /// Start serial communication
@@ -43,6 +52,7 @@ namespace hal
 
     /// Print functions
     inline size_t print(const char *p)                       { return Serial.print(p); }
+    inline size_t print(const __FlashStringHelper *p)        { return Serial.print(p); }
     inline size_t print(char c)                              { return Serial.print(c); }
     inline size_t print(unsigned char uc, int base = DEC)    { return Serial.print(uc, base); }
     inline size_t print(int n, int base = DEC)               { return Serial.print(n, base); }
@@ -52,6 +62,7 @@ namespace hal
     inline size_t print(double d, int digits = 2)            { return Serial.print(d, digits); }
 
     inline size_t println(const char *p)                       { return Serial.println(p); }
+    inline size_t println(const __FlashStringHelper *p)          { return Serial.println(p); }
     inline size_t println(char c)                              { return Serial.println(c); }
     inline size_t println(unsigned char uc, int base = DEC)    { return Serial.println(uc, base); }
     inline size_t println(int n, int base = DEC)               { return Serial.println(n, base); }

@@ -53,6 +53,15 @@ namespace util
      * @note The underlying character array must remain valid for the lifetime of the string_view.
      *       The view does not manage the lifetime of the pointed-to data.
      * 
+     * @note The underlying character array should reside in RAM memory on AVR platforms to ensure
+     *       proper operation. The class relies on char_traits functions that expect RAM-based 
+     *       pointers.
+     * 
+     * @note Pointers to RAM memory point to 0x100 ... RAMEND on AVR platforms. But pointers to 
+     *       Flash memory may, by coincidence, point into this memory area, too.
+
+     * @todo Add support for PROGMEM strings on AVR platforms.
+     * 
      * @warning The character sequence is not required to be null-terminated.
      * 
      * @example
