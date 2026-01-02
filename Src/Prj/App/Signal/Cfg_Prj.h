@@ -34,7 +34,11 @@ namespace cfg
     /** 
      * @brief Maximum number of signals 
      */
-    constexpr uint8 kNrSignals = 8;
+    #ifdef ARDUINO_AVR_MEGA2560
+    constexpr uint8 kNrSignals = 8; // on Arduino Mega2560 we have enough RAM for 8 signals
+    #else  
+    constexpr uint8 kNrSignals = 2;
+    #endif
     /**
      * @brief Maximum number of signal aspects
      */
@@ -53,8 +57,13 @@ namespace cfg
     constexpr uint8 kNrUserDefinedSignals = 2;         ///< Number of user defineable signal IDs (in EEPROM)
     constexpr uint8 kNrBuiltInSignals = 3;             ///< Number of built in signal IDs (in ROM)
 
+    #ifdef ARDUINO_AVR_MEGA2560
     constexpr int kNrOnboardTargets = 54;  ///< We support up to 54 onboard LED targets (some of them with PWM))
     constexpr int kNrExternalTargets = 32; ///< We support up to 32 external outputs (such as 4 shift registers with 8 bit each)
+    #else
+    constexpr int kNrOnboardTargets = 14;   ///< We support up to 14 onboard LED targets (some of them with PWM))
+    constexpr int kNrExternalTargets = 16;  ///< We support up to 16 external outputs (such as 2 shift registers with 8 bit)
+    #endif
     /**
      * @brief Total number of targets (onboard + external)
      * 
