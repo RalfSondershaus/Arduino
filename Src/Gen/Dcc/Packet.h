@@ -355,6 +355,26 @@ namespace dcc
 
         /// Constructor
         packet() { clear(); }
+        /**
+         * @brief Construct a new packet object from raw data.
+         * 
+         * Convenience constructor to create a packet from raw byte data.
+         * The bits are added in MSB-first order.
+         * 
+         * @param data Pointer to the raw byte data.
+         * @param num_bytes Number of bytes in the data.
+         */
+        packet(const uint8 *data, uint8_least num_bytes)
+            : ucNrNbits{0}, bytes{}, decoded_data{ kInvalidAddress, packet_type::Init }, preamble_one_count{0}
+        {
+            for (uint8_least i = 0; i < num_bytes; i++)
+            {
+                for (sint8_fast bit = 7; bit >= 0; bit--)
+                {
+                    addBit((data[i] >> bit) & 0x01U);
+                }
+            }
+        }
         /// clear all decoded_data
         void clear()
         {

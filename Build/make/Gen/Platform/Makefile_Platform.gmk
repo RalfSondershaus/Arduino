@@ -9,7 +9,8 @@
 # See also Arduino's board.txt
 # TARGET_MCU_FAMILY     is used to define ARDUINO_ARCH_xxx and to define output file extension
 # TARGET_MCU_F_CPU      is used to define F_CPU
-# TARGET_MCU_BOARD      is used to define ARDUINO_xxx, e.g., ARDUINO_AVR_MEGA2560
+# TARGET_MCU_BOARD      is used to define ARDUINO_xxx, e.g., ARDUINO_AVR_MEGA2560, which is used
+#                       for project configuration, e.g., number of signals
 # TARGET_MCU_VARIANT    is the path to pins_arduino.h
 # TARGET_MCU_DEVICE     is used for compiler -mmcu
 # ---------------------------------------------------
@@ -31,12 +32,14 @@ endif
 
 ifeq ($(ARG_TARGET_ECU),nano4)
 TARGET_MCU_FAMILY    = arm
+TARGET_MCU_BOARD     = AVR_NANO
 TARGET_MCU_VARIANT   = nano4
 TARGET_MCU_DEVICE    = cortexm4
 endif
 
 ifeq ($(ARG_TARGET_ECU),uno)
 TARGET_MCU_FAMILY    = avr
+TARGET_MCU_BOARD     = AVR_UNO
 TARGET_MCU_VARIANT   = uno
 TARGET_MCU_DEVICE    = atmega328p
 endif
@@ -45,24 +48,28 @@ endif
 #         Folders are named with lowercase letters, so use lowercase letters here.
 ifeq ($(ARG_TARGET_ECU),win32)
 TARGET_MCU_FAMILY    = x86
+TARGET_MCU_BOARD    ?= AVR_MEGA2560
 TARGET_MCU_VARIANT   = x86
 TARGET_MCU_DEVICE    = x86
 endif
 
 ifeq ($(ARG_TARGET_ECU),win64)
 TARGET_MCU_FAMILY    = x64
+TARGET_MCU_BOARD    ?= AVR_MEGA2560
 TARGET_MCU_VARIANT   = x64
 TARGET_MCU_DEVICE    = x64
 endif
 
 ifeq ($(ARG_TARGET_ECU),linux32)
 TARGET_MCU_FAMILY    = x86
+TARGET_MCU_BOARD    ?= AVR_MEGA2560
 TARGET_MCU_VARIANT   = x86
 TARGET_MCU_DEVICE    = x86
 endif
 
 ifeq ($(ARG_TARGET_ECU),linux64)
 TARGET_MCU_FAMILY    = x64
+TARGET_MCU_BOARD    ?= AVR_MEGA2560
 TARGET_MCU_VARIANT   = x64
 TARGET_MCU_DEVICE    = x64
 endif
@@ -512,7 +519,8 @@ C_DEFINES := $(C_DEFINES)  \
              -D _DEBUG     \
              -D _CONSOLE   \
              -D _UNICODE   \
-             -D UNICODE
+             -D UNICODE    \
+             -D ARDUINO_$(TARGET_MCU_BOARD)
 
 else ifeq ($(ARG_TARGET_ECU),win64)
 C_DEFINES := $(C_DEFINES)  \
@@ -520,13 +528,17 @@ C_DEFINES := $(C_DEFINES)  \
              -D _DEBUG     \
              -D _CONSOLE   \
              -D _UNICODE   \
-             -D UNICODE
+             -D UNICODE    \
+             -D ARDUINO_$(TARGET_MCU_BOARD)
 
 else ifeq ($(ARG_TARGET_ECU),linux32)
-C_DEFINES := $(C_DEFINES)
+C_DEFINES := $(C_DEFINES)  \
+             -D ARDUINO_$(TARGET_MCU_BOARD)
+
 
 else ifeq ($(ARG_TARGET_ECU),linux64)
-C_DEFINES := $(C_DEFINES)
+C_DEFINES := $(C_DEFINES) \
+             -D ARDUINO_$(TARGET_MCU_BOARD)
 
 else
 
