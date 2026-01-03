@@ -112,9 +112,9 @@ SPACE   = $(EMPTY) $(EMPTY)
 # ---------------------------------------------------
 PATH_ROOT					= .
 PATH_BUILD                  = $(PATH_ROOT)/Build
-PATH_TMP                    = $(PATH_BUILD)/Tmp/$(PROJECT_NAME)
-PATH_BIN                    = $(PATH_BUILD)/Bin/$(PROJECT_NAME)
-PATH_ERR                    = $(PATH_BUILD)/Tmp/$(PROJECT_NAME)
+PATH_TMP                    = $(PATH_BUILD)/Tmp/$(PROJECT_NAME)/$(ARG_TARGET_ECU)
+PATH_BIN                    = $(PATH_BUILD)/Bin/$(PROJECT_NAME)/$(ARG_TARGET_ECU)
+PATH_ERR                    = $(PATH_BUILD)/Tmp/$(PROJECT_NAME)/$(ARG_TARGET_ECU)
 PATH_TOOLS                  = $(PATH_ROOT)/../../Tools
 PATH_SRC                    = $(PATH_ROOT)/Src
 PATH_SRC_PRJ                = $(PATH_SRC)/Prj
@@ -254,7 +254,7 @@ FILES_O = $(addprefix $(PATH_OBJ)/, $(notdir $(addsuffix .$(OBJ_FILENAME_EXT), \
 # ---------------------------------------------------
 # Target file without extension (i.e. executable or flash file)
 # ---------------------------------------------------
-TARGET_FILENAME_BASE = $(PATH_BIN)/$(PROJECT_NAME)
+TARGET_FILENAME_BASE = $(PATH_BIN)/$(PROJECT_NAME)_$(TARGET_FILENAME_ECU)
 
 # ---------------------------------------------------
 # Finalize compiler include pathes.

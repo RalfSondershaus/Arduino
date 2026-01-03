@@ -68,30 +68,37 @@ TARGET_MCU_DEVICE    = x64
 endif
 
 # ---------------------------------------------------
-# Target file extension
+# Target file extension and ECU extension.
+# The filename is <project>_$(TARGET_FILENAME_ECU).$(TARGET_FILENAME_EXT).
 # ---------------------------------------------------
 ifeq ($(TARGET_MCU_FAMILY),avr)
 TARGET_FILENAME_EXT := hex
+TARGET_FILENAME_ECU := $(ARG_TARGET_ECU)
 endif
 
 ifeq ($(TARGET_MCU_FAMILY),arm)
 TARGET_FILENAME_EXT := hex
+TARGET_FILENAME_ECU := $(ARG_TARGET_ECU)
 endif
 
 ifeq ($(ARG_TARGET_ECU),win32)
 TARGET_FILENAME_EXT := exe
+TARGET_FILENAME_ECU := $(ARG_TARGET_ECU)
 endif
 
 ifeq ($(ARG_TARGET_ECU),win64)
 TARGET_FILENAME_EXT := exe
+TARGET_FILENAME_ECU := $(ARG_TARGET_ECU)
 endif
 
 ifeq ($(ARG_TARGET_ECU),linux32)
 TARGET_FILENAME_EXT := out
+TARGET_FILENAME_ECU := $(ARG_TARGET_ECU)
 endif
 
 ifeq ($(ARG_TARGET_ECU),linux64)
 TARGET_FILENAME_EXT := out
+TARGET_FILENAME_ECU := $(ARG_TARGET_ECU)
 endif
 
 # ---------------------------------------------------
