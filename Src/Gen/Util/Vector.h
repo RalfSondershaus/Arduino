@@ -3,10 +3,10 @@
   *
   * @author Ralf Sondershaus
   *
-  * A Vector class
+  * @brief A simple vector class with static memory allocation.
+  *
+  * SPDX-License-Identifier: Apache-2.0
   */
- *
- * SPDX-License-Identifier: Apache-2.0
 
 #ifndef UTIL_VECTOR_H
 #define UTIL_VECTOR_H
