@@ -7,6 +7,8 @@
  * - LOCAL_INLINE (The compiler abstraction shall provide the LOCAL_INLINE define for abstraction of the keyword inline in functions with �static� scope)
  *
  * @file x86/msvc/Compiler.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef COMPILER_H

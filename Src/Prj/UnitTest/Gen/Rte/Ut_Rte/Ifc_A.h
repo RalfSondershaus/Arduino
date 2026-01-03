@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <Std_Types.h>
 #include <Rte/Rte_Type_Ifc.h>
 

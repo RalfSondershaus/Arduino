@@ -17,6 +17,8 @@
  *   - void invalid(); ///< Called when an invalid bit sequence is detected (state machine reset)
  *   - void one();     ///< Called when a valid "1" bit is detected
  *   - void zero();    ///< Called when a valid "0" bit is detected
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef DCC_BITEXTRACTOR_H

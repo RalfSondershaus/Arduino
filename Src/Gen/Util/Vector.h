@@ -5,6 +5,8 @@
   *
   * A Vector class
   */
+ *
+ * SPDX-License-Identifier: Apache-2.0
 
 #ifndef UTIL_VECTOR_H
 #define UTIL_VECTOR_H

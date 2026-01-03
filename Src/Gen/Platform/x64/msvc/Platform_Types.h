@@ -13,8 +13,10 @@
  * - CPU_BYTE_ORDER (any of HIGH_BYTE_FIRST or LOW_BYTE_FIRST)
  * - TRUE, FALSE
  *
-   * @file msvc/Platform_Types.h
-*/
+ * @file msvc/Platform_Types.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef PLATFORM_TYPES_H
 #define PLATFORM_TYPES_H

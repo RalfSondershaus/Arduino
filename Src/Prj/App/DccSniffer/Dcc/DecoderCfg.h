@@ -7,7 +7,7 @@
  *
  * @copyright Copyright (c) 2025 Ralf Sondershaus
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 

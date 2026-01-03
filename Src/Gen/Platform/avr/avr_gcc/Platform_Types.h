@@ -13,6 +13,8 @@
  * - TRUE, FALSE
  *
  * @file avr-gcc/Platform_Types.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef PLATFORM_TYPES_H

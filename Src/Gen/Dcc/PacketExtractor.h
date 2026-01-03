@@ -4,6 +4,8 @@
  * @author Ralf Sondershaus
  *
  * @brief Extract a DCC packet from a bit stream.
+ * 
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef DCC_PACKETEXTRACTOR_H

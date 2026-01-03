@@ -3,7 +3,9 @@
  *
  * @author Ralf Sondershaus
  *
- * Unity Test for Gen/Util/String.h
+ * @brief Test for Gen/Util/String.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <unity_adapt.h>

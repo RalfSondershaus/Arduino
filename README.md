@@ -15,3 +15,11 @@ The code structure at top level is organized as follows:
 - **Docker** - Docker image configuration (experimental)
 - **.vscode** - JSON files for Visual Studio Code configuration
 - **.github/workflows** - GitHub workflow files
+
+## License
+
+This project is licensed under the Apache License, Version 2.0.
+
+You may use this software in commercial and non-commercial projects, modify it, and redistribute it under the terms of the Apache-2.0 license. A copy of the license is provided in the `LICENSE` file in this repository.
+
+Source files include SPDX identifiers for machine-readable license information.

@@ -34,6 +34,8 @@
  * @note This documentation was partly generated from the source code using Gen AI (GitHub Copilot).
  *
  * @copyright Copyright 2018 - 2025 Ralf Sondershaus
+ * 
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <Std_Types.h>

@@ -3,7 +3,9 @@
  *
  * @author Ralf Sondershaus
  *
- * Google Test for Gen/Util/Sstream.h
+ * @brief Test for Gen/Util/Sstream.h
+ * 
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <stdint.h>
