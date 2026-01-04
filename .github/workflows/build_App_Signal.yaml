@@ -31,8 +31,11 @@ jobs:
           sudo apt update
           sudo apt install -y make gcc-avr avr-libc
 
-      - name: Run Build Script App/Signal
+      - name: Run Build Script App/Signal for mega
         run: ./Build/build.sh App/Signal mega avr_gcc arduino none rebuild
+
+      - name: Run Build Script App/Signal for nano
+        run: ./Build/build.sh App/Signal nano avr_gcc arduino none rebuild
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
@@ -55,8 +58,11 @@ jobs:
           sudo apt update
           sudo apt install -y make gcc-avr avr-libc
 
-      - name: Run Build Script App/Signal
+      - name: Run Build Script App/Signal for mega
         run: ./Build/build.sh App/Signal mega avr_gcc arduino none rebuild
+
+      - name: Run Build Script App/Signal for nano
+        run: ./Build/build.sh App/Signal nano avr_gcc arduino none rebuild
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
@@ -70,3 +76,5 @@ jobs:
           files: |
             Build/Bin/Signal/mega/Signal_mega.hex
             Build/Bin/Signal/mega/Signal_mega.elf
+            Build/Bin/Signal/nano/Signal_nano.hex
+            Build/Bin/Signal/nano/Signal_nano.elf
