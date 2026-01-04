@@ -485,7 +485,8 @@ namespace dcc
         /**
          * @brief Returns the decoded address. Returns 0 until decode() is called.
          * 
-         * The address can be:
+         * Depending on the primary address (which defines the packet type to be Multi-Function, 
+         * Basic Accessory, or Extended Accessory), the address can be:
          * - Multi-Function 7 bit address (1-127)  
          * - Multi-Function 14 bit address
          * - Basic Accessory decoder address (9 bit) - CV29, bit 6 (output address mode) = 0
