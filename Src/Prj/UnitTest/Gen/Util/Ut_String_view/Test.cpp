@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
  
-#include <Unity_adapt.h>
+#include <unity_adapt.h>
 
 #include <Util/String_view.h>
 #include <stdint.h>
