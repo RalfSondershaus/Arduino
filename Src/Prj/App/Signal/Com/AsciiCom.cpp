@@ -36,8 +36,9 @@ namespace com
         uint16 unNrIdx;                    ///< For array types: number of elements to be transmitted
     } port_type;
 
-    /// Return values of process() function family
-    typedef enum
+    /// Return values of process() function family.
+    /// An unscoped enum is used to simplify access to enumerator-list elements.
+    enum ret_type
     {
         eOK = 0,     ///< OK
         eINV_CMD,    ///< Command invalid (or unknown)
@@ -56,9 +57,9 @@ namespace com
         eINV_MONITOR_START_IFC_NAME,
         eINV_VERBOSE_LEVEL,
         eERR_UNKNOWN
-    } tRetType;
+    };
 
-    /// For each tRetType, an error description that is transmitted after
+    /// For each ret_type, an error description that is transmitted after
     /// processing the command.
     const char ret_OK[] ROM_CONST_VAR = "OK";
     const char ret_INV_CMD[] ROM_CONST_VAR = "ERR: Invalid command";
@@ -78,7 +79,7 @@ namespace com
     const char ret_INV_VERBOSE_LEVEL[] ROM_CONST_VAR = "ERR: Invalid verbose level: SET_VERBOSE 0 ... 3";
     const char ret_ERR_UNKNOWN[] ROM_CONST_VAR = "ERR: unknown error";
 
-    static constexpr const string_type::value_type *aRetTypeStrings[] ROM_CONST_VAR =
+    static constexpr const string_type::value_type *responses[] ROM_CONST_VAR =
         {
             ret_OK,                             // eOK
             ret_INV_CMD,                        // eINV_CMD
@@ -103,27 +104,27 @@ namespace com
   static uint8 convertStrToU8(util::string_view sv);
 #endif
 
-    static tRetType process_set_cv(stringstream_type &st, string_type &response);
-    static tRetType process_get_cv(stringstream_type &st, string_type &response);
-    static tRetType process_monitor_list(stringstream_type &st, string_type &response);
-    static tRetType process_monitor_start(stringstream_type &st, string_type &response);
-    static tRetType process_monitor_stop(stringstream_type &st, string_type &response);
-    static tRetType process_set_defaults(stringstream_type &st, string_type &response);
-    static tRetType process_eto_set_signal(stringstream_type &st, string_type &response);
+    static ret_type process_set_cv(stringstream_type &st, string_type &response);
+    static ret_type process_get_cv(stringstream_type &st, string_type &response);
+    static ret_type process_monitor_list(stringstream_type &st, string_type &response);
+    static ret_type process_monitor_start(stringstream_type &st, string_type &response);
+    static ret_type process_monitor_stop(stringstream_type &st, string_type &response);
+    static ret_type process_set_defaults(stringstream_type &st, string_type &response);
+    static ret_type process_eto_set_signal(stringstream_type &st, string_type &response);
     
-    static tRetType process_set_signal(stringstream_type &st, string_type &response);
-    static tRetType process_get_signal(stringstream_type &st, string_type &response);
+    static ret_type process_set_signal(stringstream_type &st, string_type &response);
+    static ret_type process_get_signal(stringstream_type &st, string_type &response);
 
     static bool output_monitor_list(string_type &response);
     static bool output_port_data(port_type &pm, string_type &response);
 
-    static tRetType process_set_verbose(stringstream_type &st, string_type &response);
-    static tRetType process_get_pin_config(stringstream_type &st, string_type &response);
+    static ret_type process_set_verbose(stringstream_type &st, string_type &response);
+    static ret_type process_get_pin_config(stringstream_type &st, string_type &response);
 
     static bool doOutputPortList = false;
     static port_type portMonitor;
 
-    typedef tRetType (*func_type)(stringstream_type &st, string_type &response);
+    typedef ret_type (*func_type)(stringstream_type &st, string_type &response);
 
     struct command
     {
@@ -192,7 +193,7 @@ namespace com
         char cmd[kMaxLenToken];
         char cmd_rom[kMaxLenToken];
         size_t cmd_idx;
-        tRetType ret = eINV_CMD;
+        ret_type ret = eINV_CMD;
         string_type sub_response;
 
         st >> util::setw(kMaxLenToken) >> cmd;
@@ -211,7 +212,7 @@ namespace com
         }
 
         // Prepare the response, read the string from PROGMEM, works for x86 too
-        response = static_cast<const char *>(ROM_READ_PTR(&aRetTypeStrings[static_cast<size_type>(ret)]));
+        response = static_cast<const char *>(ROM_READ_PTR(&responses[static_cast<size_type>(ret)]));
         if (sub_response.size() > 0)
         {
             response += " ";
@@ -348,14 +349,14 @@ namespace com
      *
      * @param st [in] Contains the command string, get pointer points to first element after "SET_CV".
      * @param response [out] The response is stored here, it contains the command parameters.
-     * @return tRetType eOK
-     * @return tRetType eINV_CMD Ill-formed command or CV id is out-of-bounds
-     * @return tRetType eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
+     * @return ret_type eOK
+     * @return ret_type eINV_CMD Ill-formed command or CV id is out-of-bounds
+     * @return ret_type eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
      * 
      */
-    static tRetType process_set_cv(stringstream_type &st, string_type &response)
+    static ret_type process_set_cv(stringstream_type &st, string_type &response)
     {
-        tRetType ret = eINV_CMD;
+        ret_type ret = eINV_CMD;
         uint16 value;
         CV new_cv;
 
@@ -404,14 +405,14 @@ namespace com
      * 
      * @param st [in] Contains the command string, get pointer points to first element after "SET_SIGNAL".
      * @param response [out] The response is stored here, it contains the command parameters.
-     * @return tRetType eOK
-     * @return tRetType eINV_CMD Ill-formed command or signal id is out-of-bounds
-     * @return tRetType eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
+     * @return ret_type eOK
+     * @return ret_type eINV_CMD Ill-formed command or signal id is out-of-bounds
+     * @return ret_type eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
      * 
      */
-    static tRetType process_set_signal(stringstream_type &st, string_type &response)
+    static ret_type process_set_signal(stringstream_type &st, string_type &response)
     {
-        tRetType ret = eINV_CMD;
+        ret_type ret = eINV_CMD;
         uint16 signal_idx;
         uint16 signal_id;
         uint16 output_type;
@@ -537,13 +538,13 @@ namespace com
      *
      * @param st Contains the command string, get pointer points to first element after "GET_SIGNAL".
      * @param response [out] The response is stored here, it contains the command parameters.
-     * @return tRetType eOK
-     * @return tRetType eINV_CMD Ill-formed command or signal index is out-of-bounds
-     * @return tRetType eINV_SIGNAL_IDX signal index is out-of-bounds
+     * @return ret_type eOK
+     * @return ret_type eINV_CMD Ill-formed command or signal index is out-of-bounds
+     * @return ret_type eINV_SIGNAL_IDX signal index is out-of-bounds
      */
-    static tRetType process_get_signal(stringstream_type &st, string_type &response)
+    static ret_type process_get_signal(stringstream_type &st, string_type &response)
     {
-        tRetType ret = eINV_CMD;
+        ret_type ret = eINV_CMD;
         uint16 signal_idx;
         uint16 signal_id;
         uint16 output_type;
@@ -658,14 +659,14 @@ namespace com
      *
      * @param st Contains the command string, get pointer points to first element after "GET_CV".
      * @param response [out] The response is stored here, it contains the command parameters.
-     * @return tRetType eOK
-     * @return tRetType eINV_CMD Ill-formed command or CV id is out-of-bounds
-     * @return tRetType eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
+     * @return ret_type eOK
+     * @return ret_type eINV_CMD Ill-formed command or CV id is out-of-bounds
+     * @return ret_type eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
      * 
      */
-    static tRetType process_get_cv(stringstream_type &st, string_type &response)
+    static ret_type process_get_cv(stringstream_type &st, string_type &response)
     {
-        tRetType ret = eINV_CMD;
+        ret_type ret = eINV_CMD;
         CV cv;
 
         // The response shall contain the command parameters
@@ -709,9 +710,9 @@ namespace com
      *
      * @param st Contains the command string without "MON_LIST"
      * @param response [out] The response is stored here, it contains the number of RTE ports.
-     * @return tRetType eOK
+     * @return ret_type eOK
      */
-    static tRetType process_monitor_list(stringstream_type &st, string_type &response)
+    static ret_type process_monitor_list(stringstream_type &st, string_type &response)
     {
         util::basic_string<4, char> tmp;
         (void)st;
@@ -829,13 +830,13 @@ namespace com
     ///
     /// @return eOK, eINV_MONITOR_START_IFC_NAME, eINV_MONITOR_START_PARAM
     // -----------------------------------------------------------------------------------
-    static tRetType process_monitor_start(stringstream_type &st, string_type &response)
+    static ret_type process_monitor_start(stringstream_type &st, string_type &response)
     {
         char ifc_name[32];
         uint16 unCycleTime;
         uint16 unFirstIdx;
         uint16 unNrIdx;
-        tRetType ret;
+        ret_type ret;
         st >> unCycleTime >> ifc_name;
         if (!st.fail())
         {
@@ -879,7 +880,7 @@ namespace com
     // -----------------------------------------------------------------------------------
     /// Stop the monitor
     // -----------------------------------------------------------------------------------
-    static tRetType process_monitor_stop(stringstream_type &st, string_type &response)
+    static ret_type process_monitor_stop(stringstream_type &st, string_type &response)
     {
         (void)st;
         (void)response;
@@ -892,7 +893,7 @@ namespace com
     // -----------------------------------------------------------------------------------
     /// Write default values to NVM
     // -----------------------------------------------------------------------------------
-    static tRetType process_set_defaults(stringstream_type &st, string_type &response)
+    static ret_type process_set_defaults(stringstream_type &st, string_type &response)
     {
         (void)st;
 
@@ -914,18 +915,18 @@ namespace com
      * 
      * @param st Contains the command string, get pointer points to first element after "GET_CV".
      * @param response [out] The response is stored here, it contains the command parameters.
-     * @return tRetType eOK
-     * @return tRetType eINV_CMD Ill-formed command or CV id is out-of-bounds
-     * @return tRetType eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
+     * @return ret_type eOK
+     * @return ret_type eINV_CMD Ill-formed command or CV id is out-of-bounds
+     * @return ret_type eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
      * 
      */
-    static tRetType process_eto_set_signal(stringstream_type &st, string_type &response)
+    static ret_type process_eto_set_signal(stringstream_type &st, string_type &response)
     {
         uint16 signal_idx;
         uint16 aspect;
         uint16 dim_time_10ms = 10; // default 100 ms
 
-        tRetType ret = eINV_CMD;
+        ret_type ret = eINV_CMD;
         st >> signal_idx;
         st >> aspect;
 
@@ -963,10 +964,10 @@ namespace com
         return ret;
     }
 
-    static tRetType process_set_verbose(stringstream_type &st, string_type &response)
+    static ret_type process_set_verbose(stringstream_type &st, string_type &response)
     {
         uint16 value;
-        tRetType ret = eINV_VERBOSE_LEVEL;
+        ret_type ret = eINV_VERBOSE_LEVEL;
 
         // The response shall contain the command parameters
         response.append(st.str());
@@ -991,12 +992,12 @@ namespace com
      * 
      * @param st 
      * @param response 
-     * @return tRetType 
+     * @return ret_type 
      */
-    static tRetType process_get_pin_config(stringstream_type &st, string_type &response)
+    static ret_type process_get_pin_config(stringstream_type &st, string_type &response)
     {
         uint16 pin;
-        tRetType ret = eINV_CMD;
+        ret_type ret = eINV_CMD;
 
         // The response shall contain the command parameters
         response.append(st.str());
