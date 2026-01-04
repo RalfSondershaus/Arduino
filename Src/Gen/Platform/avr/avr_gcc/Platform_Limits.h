@@ -2,6 +2,8 @@
  * Substitude for <numerical_limit>
  * 
  * @file Platform/avr/avr_gcc/Platform_Limits.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef PLATFORM_LIMITS_H_

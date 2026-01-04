@@ -8,8 +8,10 @@
  * -  (The compiler abstraction shall provide the INLINE define for abstraction of the keyword inline)
  *
  * @file avr-gcc/OS_Type.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
-
+ 
 #ifndef OS_TYPE_H
 #define OS_TYPE_H
 

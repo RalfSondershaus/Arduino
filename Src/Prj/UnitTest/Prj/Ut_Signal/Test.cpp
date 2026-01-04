@@ -5,17 +5,7 @@
  *
  * @copyright Copyright 2022 - 2024 Ralf Sondershaus
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- *
- * See <https://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <unity_adapt.h>
@@ -85,51 +75,6 @@ typedef util::classifier_array<cfg::kNrClassifiers, cfg::kNrClassifierClasses> c
 
 static constexpr uint8 kBuiltInSignalIDAusfahrsignal = 1;
 static constexpr uint8 kBuiltInSignalIDEinfahrsignal = 3;
-
-namespace dcc
-{
-    /// buffer size. Consider 60 interrupts / 1.5 ms = 180 / 4.5 ms ~ 200 / 5 ms ~ 400 / 10 ms
-    static constexpr uint16 kBitStreamSize = 400U;
-    /// A FIFO (queue) is used to exchange data between ISR and dcc::Decoder.
-    using bit_stream_type = BitStream<kBitStreamSize>;
-    /// Share data between ISR and DccDecoder::loop
-    /// The buffers for bits are double-buffered to allow
-    /// the ISR to write into one buffer while the main loop reads from the other.
-    /// The double buffering is implemented with a static index.
-    /// The index is toggled in the ISR and in the main loop.
-    extern bit_stream_type bit_streams[2];
-}
-
-/**
- * @brief 64-character string type.
- *
- * `11111111111 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1`
- */
-using string64 = util::basic_string<64, char>;
-
-/// Helper function: add a valid preamble to a packet
-/// Preamble: at least 10 "1" bits followed by a "0" bit
-void add_preamble_to_stream(dcc::bit_stream_type &bit_stream)
-{
-    // Preamble: at least 10 "1" bits followed by a "0" bit
-    for (size_t i = 0; i < 11U; i++)
-    {
-        bit_stream.push(true, false);
-    }
-    bit_stream.push(false, false);
-}
-/// Helper function: add all bits of a byte to a packet. Start with MSB, end with LSB.
-/// If lastBit is 0, add a "0" bit at the end (for inter-byte separator)
-/// If lastBit is 1, add a "1" bit at the end (for end of packet)
-void add_byte_to_stream(dcc::bit_stream_type &bit_stream, uint8 byte, uint8 lastBit = 0)
-{
-    for (size_t i = 0; i < 8U; i++)
-    {
-        bit_stream.push((byte & static_cast<uint8>(0x80)) ? true : false, false);
-        byte <<= 1U;
-    }
-    bit_stream.push((lastBit == 0) ? false : true, false);
-}
 
 // ---------------------------------------------------------------------------
 /// Set elements of RTE arrays to 0
@@ -1061,7 +1006,7 @@ TEST(Ut_Signal, Signal7_ADC_All)
 }
 
 /**
- * @brief Tests DCC signal aspects 2 and 3 transitions for a railway signal
+ * @brief Tests signal aspects 2 and 3 transitions for kBuiltInSignalIDAusfahrsignal with DCC input.
  *
  * This test function simulates DCC packet reception and verifies correct signal behavior:
  * - Transitions between aspect 2 and 3
@@ -1169,11 +1114,9 @@ void do_signal_dcc_test_aspects_2_3(
     {
         // Simulate DCC packet received by ISR
         {
-            dcc::bit_stream_type &bit_stream = dcc::bit_streams[nStep % 2]; // Use alternating bit streams
-            add_preamble_to_stream(bit_stream);
-            add_byte_to_stream(bit_stream, aSteps[nStep].byte1, 0);
-            add_byte_to_stream(bit_stream, aSteps[nStep].byte2, 0);
-            add_byte_to_stream(bit_stream, aSteps[nStep].byte1 ^ aSteps[nStep].byte2, 1);
+            const uint8 bytes[] = { aSteps[nStep].byte1, aSteps[nStep].byte2, static_cast<uint8>(aSteps[nStep].byte1 ^ aSteps[nStep].byte2) };
+            dcc::decoder::packet_type packet(bytes, sizeof(bytes) / sizeof(bytes[0]));
+            dcc::decoder::get_instance().packet_received(packet);
         }
         hal::stubs::millis = aSteps[nStep].ms;
         hal::stubs::micros = 1000U * hal::stubs::millis;
@@ -1386,11 +1329,9 @@ void do_signal_dcc_test_aspects_0_1_UserDefined(
     {
         // Simulate DCC packet received by ISR
         {
-            dcc::bit_stream_type &bit_stream = dcc::bit_streams[nStep % 2]; // Use alternating bit streams
-            add_preamble_to_stream(bit_stream);
-            add_byte_to_stream(bit_stream, aSteps[nStep].byte1, 0);
-            add_byte_to_stream(bit_stream, aSteps[nStep].byte2, 0);
-            add_byte_to_stream(bit_stream, aSteps[nStep].byte1 ^ aSteps[nStep].byte2, 1);
+            const uint8 bytes[] = { aSteps[nStep].byte1, aSteps[nStep].byte2, static_cast<uint8>(aSteps[nStep].byte1 ^ aSteps[nStep].byte2) };
+            dcc::decoder::packet_type packet(bytes, sizeof(bytes) / sizeof(bytes[0]));
+            dcc::decoder::get_instance().packet_received(packet);
         }
         hal::stubs::millis = aSteps[nStep].ms;
         hal::stubs::micros = 1000U * hal::stubs::millis;

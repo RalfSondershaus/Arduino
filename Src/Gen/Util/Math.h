@@ -1,5 +1,13 @@
 /**
-  * @file UtilMath.h
+  * @file Math.h
+  * 
+  * @author Ralf Sondershaus
+  *
+  * @brief Provides mathematical utility functions.
+  *
+  * @copyright Copyright 2023 Ralf Sondershaus
+  * 
+  * SPDX-License-Identifier: Apache-2.0
   */
 #ifndef UTIL_MATH_H
 #define UTIL_MATH_H

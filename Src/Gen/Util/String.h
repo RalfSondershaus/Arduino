@@ -7,18 +7,7 @@
   *
   * @copyright Copyright 2023 Ralf Sondershaus
   *
-  * This program is free software: you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the
-  * Free Software Foundation, either version 3 of the License, or (at your
-  * option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful, but
-  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-  * for more details.
-  *
-  * You should have received a copy of the GNU General Public License
-  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  * SPDX-License-Identifier: Apache-2.0
   */
 
 #ifndef UTIL_STRING_H
@@ -60,7 +49,6 @@ namespace util
     using int_type = int;
     using off_type = streamoff;
     using pos_type = streampos;
-    //using state_type = util::mbstate_t;
 
     static void assign(char_type& c1, const char_type& c2) noexcept { c1 = c2; }
     static constexpr bool eq(char_type a, char_type b) noexcept { return static_cast<unsigned char>(a) == static_cast<unsigned char>(b); }
@@ -230,13 +218,8 @@ namespace util
       {
         // limit count to the available space
         count = util::min_(count, max_size());
-        auto it = begin();
-        while (count > 0U)
-        {
-          *it++ = *s++;
-          count--;
-        }
-        it_end = it;
+        it_end = traits_type::copy(begin(), s, count);
+        it_end += count;
       }
       return *this;
     }
@@ -246,14 +229,10 @@ namespace util
     {
       if (s != nullptr)
       {
-        auto it = begin();
-        size_t count = max_size();
-        while ((*s != static_cast<value_type>(0)) && (count > 0U))
-        {
-          *it++ = *s++;
-          count--;
-        }
-        it_end = it;
+        size_t count = traits_type::length(s);
+        count = util::min_(count, max_size());
+        it_end = traits_type::copy(begin(), s, count);
+        it_end += count;
       }
       return *this;
     }
@@ -362,13 +341,8 @@ namespace util
       {
         // limit count to the available space
         count = util::min_(count, remaining_size());
-        auto it = end();
-        while (count > 0U)
-        {
-          *it++ = *s++;
-          count--;
-        }
-        it_end = it;
+        it_end = traits_type::copy(end(), s, count);
+        it_end += count;
       }
       return *this;
     }
@@ -378,14 +352,10 @@ namespace util
     {
       if (s != nullptr)
       {
-        auto it = end();
-        size_t count = remaining_size();
-        while ((*s != static_cast<value_type>(0)) && (count > 0U))
-        {
-          *it++ = *s++;
-          count--;
-        }
-        it_end = it;
+        size_t count = traits_type::length(s);
+        count = util::min_(count, remaining_size());
+        it_end = traits_type::copy(end(), s, count);
+        it_end += count;
       }
       return *this;
     }
@@ -424,38 +394,45 @@ namespace util
     {
       size_t ret = npos;
 
-      if (traits_type::length(s) == static_cast<size_t>(0))
+      if (s == nullptr)
       {
-        ret = 0U;
+        return ret;
       }
 
-      if (pos < size())
+      size_t s_len = traits_type::length(s);
+
+      if (s_len == 0)
       {
-        const_pointer pSrc = c_str() + pos; // points to the character of the first character match (if exists)
-        const_pointer pPvt = pSrc;         // points to the character of a substring search
-        const_pointer pStr = s;            // points to the character of a substring search
-        while ((*pSrc != static_cast<value_type>(0)) && (*pStr != static_cast<value_type>(0)) && (*pPvt != static_cast<value_type>(0)))
-        {
-          if (traits_type::eq(*pPvt, *pStr))
-          {
-            // characters are equal, check next character
-            pStr++;
-            pPvt++;
-          }
-          else
-          {
-            // characters are not equal, re-start search beginning at character where search started
-            pStr = s;
-            pSrc++;
-            pPvt = pSrc;
-          }
-        }
-        if ((*pStr == static_cast<value_type>(0)) && (pSrc != pPvt))
-        {
-          ret = pSrc - c_str();
-        }
+        return (pos <= size()) ? pos : npos;
       }
 
+      if (pos >= size())
+      {
+        return ret;
+      }
+
+      // Search for substring
+      size_t search_len = size() - pos;
+      if (s_len > search_len)
+      {
+        return ret;
+      }
+
+      const_pointer search_start = c_str() + pos;
+      const_pointer search_end = c_str() + size() - s_len + 1;
+
+      for (const_pointer p = search_start; p < search_end; ++p)
+      {
+        if (traits_type::eq(*p, *s))
+        {
+          // First character matches, check the rest
+          if (traits_type::compare(p, s, s_len) == 0)
+          {
+            ret = p - c_str();
+            break;
+          }
+        }
+      }
 
       return ret;
     }

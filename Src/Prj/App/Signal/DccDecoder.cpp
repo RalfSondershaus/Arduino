@@ -5,17 +5,7 @@
  *
  * @copyright Copyright 2023 Ralf Sondershaus
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- *
- * See <https://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include "DccDecoder.h"
@@ -204,13 +194,13 @@ namespace signal
     {
         hal::pinMode(kBlinkLedPin, OUTPUT);
 
-        decoder.init(kIntPin);
+        dcc::decoder::get_instance().init(kIntPin);
 
         first_output_address = signal_cal::calc_output_address();
         pass_accessory_filter.set_lo(first_output_address);
         pass_accessory_filter.set_hi(first_output_address + cfg::kNrAddresses);
         pass_accessory_filter.set_cv29(signal_cal::get_cv29());
-        decoder.set_filter(pass_accessory_filter);
+        dcc::decoder::get_instance().set_filter(pass_accessory_filter);
     }
 
     // --------------------------------------------------------------------------
@@ -218,6 +208,7 @@ namespace signal
     // --------------------------------------------------------------------------
     void DccDecoder::cycle()
     {
+        dcc::decoder &dec = dcc::decoder::get_instance();
         // recalculate address because coding data might have changed.
         // TBD: Can be optimized if CalM informs about coding data changes or 
         // if DCC address is publicly available.
@@ -230,33 +221,28 @@ namespace signal
             pass_accessory_filter.set_lo(first_output_address);
             pass_accessory_filter.set_hi(first_output_address + cfg::kNrAddresses);
             pass_accessory_filter.set_cv29(signal_cal::get_cv29());
-            decoder.set_filter(pass_accessory_filter);
+            dec.set_filter(pass_accessory_filter);
         }
 
-        if (decoder.isrOverflow())
-        {
-            hal::serial::println("ISR OVERFLOW");
-        }
-
-        if (decoder.fifoOverflow())
+        if (dec.is_fifo_overflow())
         {
             hal::serial::println("FIFO OVERFLOW");
         }
 
-        decoder.fetch();
-        while (!decoder.empty())
+        dec.fetch();
+        while (!dec.empty())
         {
-            packet_type &pkt = decoder.front();
+            packet_type &pkt = dec.front();
             hal::serial::print("Packet type=");
             hal::serial::print(static_cast<uint8>(pkt.get_type()));
             hal::serial::print(" Packet address=");
             hal::serial::println(pkt.get_address(get_cv29()));
-            if (pass_accessory_filter.filter(pkt))
+            if (pass_accessory_filter.do_filter(pkt))
             {
                 packet_received(pkt);
             }
 
-            decoder.pop();
+            dcc::decoder::get_instance().pop();
         }
         if (toggle_led_pin(kBlinkLedPeriodValid_ms))
         {
@@ -265,9 +251,9 @@ namespace signal
             hal::serial::print(hal::micros());
             hal::serial::print("]");
             hal::serial::print(" isr=");
-            hal::serial::print(decoder.getNrInterrupts());
+            hal::serial::print(dec.getNrInterrupts());
             hal::serial::print(" packets=");
-            hal::serial::println(decoder.getPacketCount());
+            hal::serial::println(dec.getPacketCount());
 #endif
         }
     }

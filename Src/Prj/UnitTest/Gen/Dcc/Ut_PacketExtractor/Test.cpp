@@ -3,41 +3,30 @@
   *
   * @author Ralf Sondershaus
   *
-  * Unit Test for Gen/Dcc/BitExtractor.h and Gen/Dcc/PacketExtractor.h
+  * Unit Test for Gen/Dcc/BitExtractor.h and Gen/Dcc/packet_extractor.h
   *
   * @copyright Copyright 2018 - 2024 Ralf Sondershaus
   *
-  * This program is free software: you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the
-  * Free Software Foundation, either version 3 of the License, or (at your
-  * option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful, but
-  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-  * for more details.
-  *
-  * You should have received a copy of the GNU General Public License
-  * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: Apache-2.0
   */
 
 #include <unity_adapt.h>
 #include <array>
 #include <Dcc/PacketExtractor.h>
 
-typedef dcc::PacketExtractor<> PacketExtractorType;
+typedef dcc::packet_extractor<> packet_extractor_type;
 
 // -----------------------------------------------------------------------
 /// A handler class for new packets.
 // -----------------------------------------------------------------------
-class PacketExtractorHandlerClass : public PacketExtractorType::HandlerIfc
+class PacketExtractorHandlerClass : public packet_extractor_type::handler_ifc
 {
 public:
   int nReceived;
-  PacketType lastpacket;
+  packet_type lastpacket;
   PacketExtractorHandlerClass() : nReceived(0)
   {}
-  virtual void packetReceived(PacketType& pkt) override
+  virtual void packet_received(packet_type& pkt) override
   {
     nReceived++;
     lastpacket = pkt;
@@ -50,7 +39,7 @@ public:
 TEST(Ut_PacketExtractor, packetextractor_preamble_invalid_1_bit)
 {
   PacketExtractorHandlerClass packethandler;
-  PacketExtractorType packetextractor(packethandler);
+  packet_extractor_type packetextractor(packethandler);
   packetextractor.one();
   EXPECT_EQ(packethandler.nReceived, 0);
 }
@@ -70,7 +59,7 @@ TEST(Ut_PacketExtractor, packetextractor_preamble_invalid_9_bit_without_packets)
     0,
   };
   PacketExtractorHandlerClass packethandler;
-  PacketExtractorType packetextractor(packethandler);
+  packet_extractor_type packetextractor(packethandler);
   for (auto it = input.begin(); it != input.end(); it++)
   {
     if (*it == 0)
@@ -100,8 +89,8 @@ TEST(Ut_PacketExtractor, packetextractor_preamble_invalid_9_bit_with_packets)
     1,
   };
   PacketExtractorHandlerClass packethandler;
-  PacketExtractorType packetextractor(packethandler);
-  dcc::Packet<> packet;
+  packet_extractor_type packetextractor(packethandler);
+  dcc::packet<> packet;
 
   packet.refByte(0) = 0b10101010;
   packet.refByte(1) = 0b11101010;
@@ -134,8 +123,8 @@ TEST(Ut_PacketExtractor, packetextractor_preamble_valid_10_bit)
     1,
   };
   PacketExtractorHandlerClass packethandler;
-  PacketExtractorType packetextractor(packethandler);
-  dcc::Packet<> packet;
+  packet_extractor_type packetextractor(packethandler);
+  dcc::packet<> packet;
 
   packet.refByte(0) = 0b10101010;
   packet.refByte(1) = 0b11101010;

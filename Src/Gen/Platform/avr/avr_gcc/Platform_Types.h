@@ -13,6 +13,8 @@
  * - TRUE, FALSE
  *
  * @file avr-gcc/Platform_Types.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef PLATFORM_TYPES_H
@@ -87,6 +89,13 @@ typedef int_least32_t sint32_least;
 typedef uint_least8_t uint8_least;
 typedef uint_least16_t uint16_least;
 typedef uint_least32_t uint32_least;
+
+typedef int_fast8_t sint8_fast;
+typedef int_fast16_t sint16_fast;
+typedef int_fast32_t sint32_fast;
+typedef uint_fast8_t uint8_fast;
+typedef uint_fast16_t uint16_fast;
+typedef uint_fast32_t uint32_fast;
 
 /* floating types */
 typedef float float32;

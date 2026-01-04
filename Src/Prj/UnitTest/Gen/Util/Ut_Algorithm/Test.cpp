@@ -4,6 +4,8 @@
  * @author Ralf Sondershaus
  *
  * Google Test for Gen/Util/algorithm.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <Util/Algorithm.h>

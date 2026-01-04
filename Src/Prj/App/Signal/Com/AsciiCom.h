@@ -12,78 +12,80 @@
  * Capital letters and lower letters can be used. Capital letters are used here to support
  * readability.
  *
- * Set CV
- * - `SET_CV cv_id value` Set the CV with id cv_id to the given value
+ * ## Supported Commands
  *
- * Monitor RTE
- * - `MON_LIST` Print available RTE ports 
- * - `MON_START cycle-time ifc-name [id-first id-nr]` Start to print current values of `ifc-name`
- * - `MON_STOP` Stop to print RTE port
+ * ### Configuration Variables (CV)
+ * - `SET_CV cv_id value` - Set the CV with id cv_id to the given value
+ * - `GET_CV cv_id` - Get the value of the CV with id cv_id
+ *
+ * ### Signal Configuration
+ * - `SET_SIGNAL idx id [ONB,EXT] output_pin step_size [ADC,DIG,DCC] input_pin` - Configure signal at position idx
+ *   - `idx` - Signal index (0 to @ref cfg::kNrSignals - 1)
+ *   - `id` - Signal type ID (built-in or user-defined)
+ *   - `ONB` or `EXT` - Output type (onboard or external)
+ *   - `output_pin` - First output pin number
+ *   - `step_size` - Step size for output pins (-2, -1, 1, or 2; negative values indicate inverse order)
+ *   - `ADC`, `DIG`, or `DCC` - Input type (analog, digital, or DCC)
+ *   - `input_pin` - Input pin number
+ * - `GET_SIGNAL idx` - Get the configuration of signal at position idx
+ *
+ * ### ETO Signal Control
+ * - `ETO_SET_SIGNAL signal_idx aspect [dim_time_10ms]` - Enable/disable ETO signal aspect
+ *   - `aspect` - Aspect value (0 to disable, non-zero to enable)
+ *   - `dim_time_10ms` - Optional dimming time in units of 10 ms (default: 10 = 100 ms)
+ *
+ * ### RTE Port Monitoring
+ * - `MON_LIST` - Print available RTE ports 
+ * - `MON_START cycle-time ifc-name [id-first id-nr]` - Start to print current values of `ifc-name`
+ *   - `cycle-time` - Update interval in milliseconds
+ *   - `ifc-name` - Name of the RTE interface to monitor
+ *   - `id-first` - Optional: first element index for array types
+ *   - `id-nr` - Optional: number of elements to transmit for array types
+ * - `MON_STOP` - Stop monitoring RTE port
  * 
- * Set to defaults
- * - `INIT` Write default values to NVM
+ * ### System Commands
+ * - `INIT` - Write default values to NVM
+ * - `SET_VERBOSE level` - Set verbosity level (0 to 3)
+ * - `GET_PIN_CONFIG pin` - Get the configuration of the specified pin (INPUT or OUTPUT)
  * 
- * Example to configure signal 1 as Ausfahrsignal
- * - `SET_CV 42 1`            Assign Ausfahrsignal (1) to signal 1 (42)
- * - `SET_CV 50 0x0D`         First output pin of signal 1 is internal (0) pin 13 (D)
- * - `SET_CV 58 0x40`         Input is ADC (4) at A0 (0)
- * - `SET_CV 66 0`            Classifier type is type 1 (0)
+ * ## Usage Examples
+ *
+ * ### Configure signal 0 using SET_SIGNAL
+ * ```
+ * SET_SIGNAL 0 1 ONB 10 -1 ADC 54
+ * ```
+ * This configures signal at index 0 to:
+ * - Signal type ID 1 (Ausfahrsignal)
+ * - Onboard output starting at pin 10
+ * - Step size -1 (inverse order, decrementing pin numbers)
+ * - ADC input from pin 54 (A0)
+ *
+ * ### Configure signal using CV commands (alternative method)
+ * ```
+ * SET_CV 42 1      # Assign Ausfahrsignal (1) to signal 1
+ * SET_CV 50 0x0D   # First output pin of signal 1 is onboard (0) pin 13 (D)
+ * SET_CV 58 0x40   # Input is ADC (4) at A0 (0)
+ * SET_CV 66 0      # Classifier type is type 1 (0)
+ * ```
  * 
- * Example to configure signal 1 as Ausfahrsignal
- * - `MON_LIST`
- * - `MON_START 100 ifc_ad_values`
- * - `MON_STOP`
- * 
- * Ideas for future add-ons:
+ * ### Monitor RTE interface
+ * ```
+ * MON_LIST                      # List all available RTE ports
+ * MON_START 100 ifc_ad_values   # Monitor ifc_ad_values every 100 ms
+ * MON_STOP                      # Stop monitoring
+ * ```
  *
- * Set signal id (Ausfahrsignal, Blocksignal, ...)
- * - SET_SIGNAL <signal_pos> ID <signal_id>
- * with 1 <= signal_pos <= @ref cfg::kNrSignals
- *
- * Set first output pin for a signal
- * - SET_SIGNAL <signal_pos> FIRST_OUPUT ONBOARD <pin_nr>
- * - SET_SIGNAL <signal_pos> FIRST_OUPUT EXTERNAL <pin_nr>
- *
- * Set source of commands for a signal
- * - SET_SIGNAL <signal_pos> INPUT ADC <pin_nr>
- * - SET_SIGNAL <signal_pos> INPUT DCC
- * - SET_SIGNAL <signal_pos> INPUT DIG <first_pin_nr> (not implemented yet)
- *
- * Define a user-defined signal
- * - SET_USER_DEFINED_SIGNAL <signal_id> ASPECTS 11000 00100 00000 00000 00000
- * - SET_USER_DEFINED_SIGNAL <signal_id> BLINKS 11000 00100 00000 00000 00000
- * - SET_USER_DEFINED_SIGNAL <signal_id> COT 10 20
- * with 128 <= signal_id <= @ref cfg::kNrUserDefinedSignals
- * The number of aspects is defined by the number of elements in the ASPECTS / BLINKS command.
- * Per signal, a maximum of 8 aspects is supported.
- * The number of LEDs is defined by the number of bits in an element (such as 11000) in the
- * ASPECTS / BLINKS command.
- * Per signal, a maximum of 8 LEDs is supported.
- *
- * Example telegrams can look like:
- * - SET_SIGNAL 1 ID 0      Assign Ausfahrsignal to signal 1
- * - SET_SIGNAL 1 ID 128    Assign first user-defined signal id to signal 1
- * - SET_SIGNAL 1 FIRST_OUTPUT ONBOARD 13  First pin is onboard pin 13
- * - SET_SIGNAL 1 INPUT ADC 54             Input is calculated from ADC input pin 54
- * - SET_SIGNAL 1 INPUT ADC A0
- * - SET_SIGNAL 1 INPUT DCC
- * - SET_USER_DEFINED_SIGNAL 128 ASPECTS 11000 00100 00000 00000 00000
+ * ### ETO Signal Control
+ * ```
+ * ETO_SET_SIGNAL 0 5 20   # Enable ETO for signal 0, aspect 5, dim time 200 ms
+ * ETO_SET_SIGNAL 0 0      # Disable ETO for signal 0
+ * ```
  * 
  * @note Parts of the documentation of this file was created by GitHub Copilot.
  *
  * @copyright Copyright 2024-2025 Ralf Sondershaus
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- *
- * See <https://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef ASCIICOM_H_

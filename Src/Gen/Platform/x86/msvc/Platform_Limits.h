@@ -2,6 +2,8 @@
  * Substitude for <numerical_limit>
  * 
  * @file Platform/x86/msvc/Platform_Limits.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef LIMITS_H_

@@ -2,6 +2,8 @@
  * Specification of Standard Types
  *
  * @file StdTypes.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef STD_TYPES_H

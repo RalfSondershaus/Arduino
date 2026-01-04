@@ -2,6 +2,8 @@
 /// @file vecmath.h
 /// @author Ralf Sondershaus
 ///
+/// SPDX-License-Identifier: Apache-2.0
+///
 /// Declares:
 /// - class Vec2D: A 2D vector
 /// - class Mat2D: A 2x2 matrix

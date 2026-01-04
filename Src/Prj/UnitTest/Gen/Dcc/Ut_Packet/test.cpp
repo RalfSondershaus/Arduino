@@ -3,41 +3,30 @@
  *
  * @author Ralf Sondershaus
  *
- * Unit Test for Gen/Dcc/Packet.h
+ * Unit Test for Gen/Dcc/packet.h
  *
  * @copyright Copyright 2018 - 2024 Ralf Sondershaus
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <unity_adapt.h>
 #include <array>
 #include <Dcc/Packet.h>
 
-using packet_type = dcc::Packet<6>::packet_type;
-using address_type = dcc::Packet<6>::address_type;
+using packet_type = dcc::packet<6>::packet_type;
+using address_type = dcc::packet<6>::address_type;
 
-/// @brief Specialization for T = dcc::Packet<>::packet_type
+/// @brief Specialization for T = dcc::packet<>::packet_type
 template <>
-void EXPECT_EQ<dcc::Packet<>::packet_type, dcc::Packet<>::packet_type>(dcc::Packet<>::packet_type expected, dcc::Packet<>::packet_type actual)
+void EXPECT_EQ<dcc::packet<>::packet_type, dcc::packet<>::packet_type>(dcc::packet<>::packet_type expected, dcc::packet<>::packet_type actual)
 {
     EXPECT_EQ(static_cast<int>(expected), static_cast<int>(actual));
 }
 
 /// Helper function: add all bits of a byte to a packet. Start with MSB, end with LSB.
 template <int N>
-void addByteToPacket(dcc::Packet<N> &pkt, uint8 byte)
+void addByteToPacket(dcc::packet<N> &pkt, uint8 byte)
 {
     for (size_t i = 0; i < 8U; i++)
     {
@@ -49,7 +38,7 @@ void addByteToPacket(dcc::Packet<N> &pkt, uint8 byte)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_001_empty)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
     int i;
 
     for (i = 0; i < 6; i++)
@@ -62,7 +51,7 @@ TEST(Ut_Packet, packet_001_empty)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_002_add_2_bits)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
 
     packet.addBit(1);
     EXPECT_EQ(packet.refByte(0), static_cast<uint8>(1));
@@ -74,7 +63,7 @@ TEST(Ut_Packet, packet_002_add_2_bits)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_003_add_16_bits)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
     std::array<uint8_t, 8> byte0 = {1, 0, 1, 1, 0, 1, 1, 0};
     std::array<uint8_t, 8> byte1 = {0, 1, 1, 0, 0, 0, 0, 1};
     uint8_t byte;
@@ -101,7 +90,7 @@ TEST(Ut_Packet, packet_003_add_16_bits)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_004_copy_constructor)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
     std::array<uint8_t, 8> byte0 = {1, 0, 1, 1, 0, 1, 1, 0};
     std::array<uint8_t, 8> byte1 = {0, 1, 1, 0, 0, 0, 0, 1};
 
@@ -124,8 +113,8 @@ TEST(Ut_Packet, packet_004_copy_constructor)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_005_copy_assignment)
 {
-    dcc::Packet<6> packet;
-    dcc::Packet<6> packet_copy;
+    dcc::packet<6> packet;
+    dcc::packet<6> packet_copy;
     std::array<uint8_t, 8> byte0 = {1, 0, 1, 1, 0, 1, 1, 0};
     std::array<uint8_t, 8> byte1 = {0, 1, 1, 0, 0, 0, 0, 1};
 
@@ -148,8 +137,8 @@ TEST(Ut_Packet, packet_005_copy_assignment)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_006_operator_equal)
 {
-    dcc::Packet<6> packet;
-    dcc::Packet<6> packet_copy;
+    dcc::packet<6> packet;
+    dcc::packet<6> packet_copy;
     std::array<uint8_t, 8> byte0 = {1, 0, 1, 1, 0, 1, 1, 0};
     std::array<uint8_t, 8> byte1 = {0, 1, 1, 0, 0, 0, 0, 1};
 
@@ -175,7 +164,7 @@ TEST(Ut_Packet, packet_006_operator_equal)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_007_checksum_BasicAccessory_Correct)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
     bool result;
 
     // BasicAccessory
@@ -192,7 +181,7 @@ TEST(Ut_Packet, packet_007_checksum_BasicAccessory_Correct)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_008_checksum_BasicAccessory_Incorrect)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
     bool result;
 
     // BasicAccessory
@@ -209,7 +198,7 @@ TEST(Ut_Packet, packet_008_checksum_BasicAccessory_Incorrect)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_009_checksum_ExtendedAccessory_Correct)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
     bool result;
 
     // ExtendedAccessory
@@ -227,7 +216,7 @@ TEST(Ut_Packet, packet_009_checksum_ExtendedAccessory_Correct)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_010_checksum_ExtendedAccessory_Incorrect)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
     bool result;
 
     // ExtendedAccessory
@@ -245,7 +234,7 @@ TEST(Ut_Packet, packet_010_checksum_ExtendedAccessory_Incorrect)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_011_type_BasicAccessory_Correct)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
     // BasicAccessory
     // {preamble} 0 10AAAAAA 0 1AAACDDD 0 EEEEEEEE 1
     // {preamble} 0 10000001 0 1111CDDD 0 EEEEEEEE 1
@@ -253,7 +242,7 @@ TEST(Ut_Packet, packet_011_type_BasicAccessory_Correct)
     addByteToPacket(packet, 0b11110111U);
     addByteToPacket(packet, packet.refByte(0) ^ packet.refByte(1));
 
-    EXPECT_EQ(packet.get_type(), dcc::Packet<6>::packet_type::BasicAccessory);
+    EXPECT_EQ(packet.get_type(), dcc::packet<6>::packet_type::BasicAccessory);
     EXPECT_EQ(packet.ba_get_output_power(), static_cast<uint8>(0U));
     EXPECT_EQ(packet.ba_get_DDD(), static_cast<uint8>(0b111U));
 }
@@ -261,7 +250,7 @@ TEST(Ut_Packet, packet_011_type_BasicAccessory_Correct)
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_012_type_ExtendedAccessory_Correct)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
 
     // ExtendedAccessory
     // {preamble} 0 10AAAAAA 0 0AAA0AA1 0 000XXXXX 0 EEEEEEEE 1
@@ -271,14 +260,14 @@ TEST(Ut_Packet, packet_012_type_ExtendedAccessory_Correct)
     addByteToPacket(packet, 0b00010101U);
     addByteToPacket(packet, (packet.refByte(0) ^ packet.refByte(1)) ^ packet.refByte(2));
 
-    EXPECT_EQ(packet.get_type(), dcc::Packet<6>::packet_type::ExtendedAccessory);
+    EXPECT_EQ(packet.get_type(), dcc::packet<6>::packet_type::ExtendedAccessory);
     EXPECT_EQ(packet.ea_get_aspect(), static_cast<uint8>(0b00010101U));
 }
 
 //-------------------------------------------------------------------------
 TEST(Ut_Packet, packet_013_checksum_MultiFunction7_03_3F_0D_0A)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
     bool result;
 
     // BasicAccessory
@@ -326,7 +315,7 @@ static util::array<Test, 11> test_array = {{
 //-------------------------------------------------------------------------
 void test_address_BasicAccessory_OutputAddress(size_t index)
 {
-    dcc::Packet<6> packet;
+    dcc::packet<6> packet;
     constexpr uint8 cv29 = 0b01000000; // CV29, bit 6 = 1: Output address method
                                        // could be cfg::kBitMask_Cv29_OutputAddressMethod
 
@@ -336,7 +325,7 @@ void test_address_BasicAccessory_OutputAddress(size_t index)
     addByteToPacket(packet, test_array[index].byte2);
     addByteToPacket(packet, packet.refByte(0) ^ packet.refByte(1));
 
-    EXPECT_EQ(packet.get_type(), dcc::Packet<6>::packet_type::BasicAccessory);
+    EXPECT_EQ(packet.get_type(), dcc::packet<6>::packet_type::BasicAccessory);
     EXPECT_EQ(packet.get_address(cv29), static_cast<address_type>(test_array[index].address));
 }
 

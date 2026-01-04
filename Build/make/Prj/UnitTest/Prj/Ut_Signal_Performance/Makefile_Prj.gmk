@@ -4,8 +4,8 @@
 
 # Files
 FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                \
-            $(PATH_SRC_PRJ)/App/Signal/CddLed           \
             $(PATH_SRC_PRJ)/App/Signal/DccDecoder       \
+            $(PATH_SRC_PRJ)/App/Signal/Debug            \
             $(PATH_SRC_PRJ)/App/Signal/InputClassifier  \
             $(PATH_SRC_PRJ)/App/Signal/InputCommand     \
             $(PATH_SRC_PRJ)/App/Signal/LedRouter        \
@@ -19,6 +19,7 @@ FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                \
             $(PATH_SRC_GEN)/Util/Locale                 \
             $(PATH_SRC_HAL)/Stub/Eeprom/Hal/EEPROM      \
             $(PATH_SRC_HAL)/Stub/Gpio/Hal/Gpio          \
+            $(PATH_SRC_HAL)/Stub/Timer/Hal/Timer        \
             $(PATH_SRC_HAL)/Stub/Interrupt/Hal/Interrupt
 
 FILES_PRJ_OPT2 = $(PATH_SRC_GEN)/Dcc/Decoder
@@ -28,5 +29,6 @@ C_INCLUDES_PRJ := $(C_INCLUDES_PRJ)                \
                   -I$(PATH_SRC_PRJ)/App/Signal     \
                   -I$(PATH_SRC_HAL)/Stub/Eeprom    \
                   -I$(PATH_SRC_HAL)/Stub/Interrupt \
-                  -I$(PATH_SRC_HAL)/Stub/Gpio
+                  -I$(PATH_SRC_HAL)/Stub/Gpio      \
+                  -I$(PATH_SRC_HAL)/Stub/Timer
 

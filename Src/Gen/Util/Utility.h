@@ -3,6 +3,9 @@
   *
   * @author Ralf Sondershaus
   *
+  * @brief Utility functions and classes
+  * 
+  * SPDX-License-Identifier: Apache-2.0
   */
 
 #ifndef UTIL_UTILITY_H
