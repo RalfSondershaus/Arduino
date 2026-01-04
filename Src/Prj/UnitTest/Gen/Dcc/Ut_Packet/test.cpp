@@ -12,7 +12,7 @@
 
 #include <unity_adapt.h>
 #include <array>
-#include <Dcc/packet.h>
+#include <Dcc/Packet.h>
 
 using packet_type = dcc::packet<6>::packet_type;
 using address_type = dcc::packet<6>::address_type;
