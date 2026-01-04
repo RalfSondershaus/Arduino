@@ -6,7 +6,7 @@ This is a safety-critical embedded C++ project for Arduino (Mega/Nano) and cross
 
 - **Src/Gen/** - Generic/reusable components organized by layer:
   - `Bsw/` - Basic Software (Arduino/Win platform abstraction)
-  - `Hal/` - Hardware Abstraction Layer
+  - `Hal/` - Hardware Abstraction Layer to abstract `Arduino.h` APIs to hal::adc_*, hal::gpio_*, hal::timer_*, etc.
   - `Rte/` - Runtime Environment (AUTOSAR-inspired communication layer with ports/interfaces)
   - `Dcc/` - DCC protocol decoder (model railroad digital control)
   - `Util/` - Embedded STL-like utilities (`util::basic_string`, `util::fix_queue`, `util::basic_string_view`)
@@ -15,6 +15,7 @@ This is a safety-critical embedded C++ project for Arduino (Mega/Nano) and cross
   - `App/` - Applications (Signal, DccSniffer, BlinkSample, FireFlicker)
   - `UnitTest/` - Unit tests mirroring Gen/ and App/ structure
 - **Build/** - Build system (GNU Make with multi-target support)
+- **.github/** - GitHub CoPilot and GitHub workflow configuration and instructions
 
 ### Key Design Patterns
 
@@ -78,6 +79,9 @@ Follow [CodingStyle.md](CodingStyle.md) strictly:
 - **Namespaces**: Use layer prefixes (`signal::`, `dcc::`, `util::`, `rte::`, `cal::`)
 - **No**: Dynamic memory (`new`/`delete`), RTTI, exceptions, bitfields for hardware registers, STL (use `util::` instead)
 - **Comments**: Doxygen in headers (what), implementation comments (how/why)
+
+Do never include `Arduino.h` directly in `Gen/` or `Prj/App/`; always go through `Hal/`. This 
+ensures platform abstraction and testability with stub implementations.
 
 Example:
 ```cpp
@@ -148,6 +152,27 @@ TEST(String, Append) {
     str.append("test");
     EXPECT_EQ(str.size(), 4);  // Maps to TEST_ASSERT_EQUAL
 }
+```
+
+**Stub Functions**: Arduino-specific functions (e.g., `millis()`, `micros()`) are encapsulated in 
+the HAL, which provides stubs in addition to real implementations. Use stub return value variables
+for testing if required.
+
+In order to use the stubs, include the HAL headers in your test files:
+```cpp
+#include <Hal/Timer.h>
+```
+
+and add the stub implementation files to your test makefile, e.g., stub for `Hal/Timer` in 
+`Build/make/Prj/UnitTest/Prj/Ut_Signal/Makefile_Prj.gmk`:
+```
+# Files
+FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test            \
+            $(PATH_SRC_HAL)/Stub/Timer/Hal/Timer
+
+# Includes
+C_INCLUDES_PRJ := $(C_INCLUDES_PRJ)                \
+                  -I$(PATH_SRC_HAL)/Stub/Timer
 ```
 
 **Cross-Compilation Strategy**: Tests run on both target (Arduino) and host (Windows/Linux) using conditional compilation:
