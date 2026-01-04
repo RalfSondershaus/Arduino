@@ -1,11 +1,11 @@
-#pragma once
-
 /**
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#ifndef SRC_PRJ_UNITTEST_GEN_RTE_UT_RTE_A_H_
+#define SRC_PRJ_UNITTEST_GEN_RTE_UT_RTE_A_H_
+
 #include <Std_Types.h>
-#include <iostream>
 
 class A
 {
@@ -18,3 +18,5 @@ public:
   void init(void) { ulCallsInit++; }
   void func(void) { ulCallsCyc++; }
 };
+
+#endif  // SRC_PRJ_UNITTEST_GEN_RTE_UT_RTE_A_H_

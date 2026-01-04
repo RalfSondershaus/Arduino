@@ -20,6 +20,7 @@
             "options": [
                 "UnitTest/Gen/Dcc/Ut_Packet",
                 "UnitTest/Gen/Dcc/Ut_PacketExtractor",
+                "UnitTest/Gen/Rte/Ut_Rte",
                 "UnitTest/Gen/Util/Ut_Algorithm",
                 "UnitTest/Gen/Util/Ut_Array",
                 "UnitTest/Gen/Util/Ut_Bitset",

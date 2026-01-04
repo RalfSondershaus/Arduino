@@ -3,6 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
+                "${workspaceFolder}/Src/Prj/UnitTest/Gen/Rte",
+                "${workspaceFolder}/Src/Prj/UnitTest/Gen/Rte/**",
                 "${workspaceFolder}/Src/Prj/UnitTest/Prj/Ut_Signal",
                 "${workspaceFolder}/Src/Prj/UnitTest/Gen/Util/Ut_InputClassifier",
                 "${workspaceFolder}/Src/Prj/App/FireFlicker",

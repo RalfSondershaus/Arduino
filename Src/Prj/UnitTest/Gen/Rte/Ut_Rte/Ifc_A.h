@@ -5,7 +5,7 @@
  */
 
 #include <Std_Types.h>
-#include <Rte/Rte_Type_Ifc.h>
+#include <Rte/Rte_Types_Ifc.h>
 
 namespace rte
 {
