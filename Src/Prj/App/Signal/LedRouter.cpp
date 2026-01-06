@@ -5,17 +5,7 @@
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- *
- * See <https://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <Rte/Rte.h>
@@ -31,7 +21,7 @@ namespace signal
     ///
     /// Intensity [0 ... 255] to PWM [0 ... 255]
     // --------------------------------------------------------------------------------------------
-    static const LedRouter::intensity8_255_type::base_type aunIntensity2Pwm[256u] =
+    static const LedRouter::intensity8_255_type::base_type ROM_CONST_VAR aunIntensity2Pwm[256u] =
         {
             /*          0    1    2    3    4    5    6    7    8    9  */
             /*   0 */ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -74,7 +64,7 @@ namespace signal
             {
                 const intensity16_type intensity16{it->step()};
                 const intensity8_255_type intensity{util::convert<intensity8_255_type, intensity16_type>(intensity16)};
-                const intensity8_255_type pwm{aunIntensity2Pwm[intensity]};
+                const intensity8_255_type pwm{ROM_READ_BYTE(&aunIntensity2Pwm[intensity])};
                 rte::ifc_onboard_target_duty_cycles::writeElement(pos, pwm);
                 hal::analogWrite(pos, static_cast<int>(pwm));
             }

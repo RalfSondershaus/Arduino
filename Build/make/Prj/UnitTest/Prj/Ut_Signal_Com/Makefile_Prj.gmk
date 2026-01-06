@@ -13,12 +13,10 @@ FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                \
             $(PATH_SRC_PRJ)/App/Signal/Com/ComR         \
             $(PATH_SRC_PRJ)/App/Signal/Com/SerAsciiTP   \
             $(PATH_SRC_HAL)/Stub/Eeprom/Hal/EEPROM      \
-            $(PATH_SRC_HAL)/Stub/Serial/Hal/Serial      \
             $(PATH_SRC_GEN)/Rte/Rte                     \
             $(PATH_SRC_GEN)/Util/Locale
 
 # Includes
 C_INCLUDES_PRJ := $(C_INCLUDES_PRJ)                     \
                   -I$(PATH_SRC_PRJ)/App/Signal          \
-                  -I$(PATH_SRC_HAL)/Stub/Eeprom         \
-                  -I$(PATH_SRC_HAL)/Stub/Serial
+                  -I$(PATH_SRC_HAL)/Stub/Eeprom

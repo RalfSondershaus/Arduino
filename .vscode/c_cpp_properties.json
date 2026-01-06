@@ -3,11 +3,15 @@
         {
             "name": "Win32",
             "includePath": [
+                "${workspaceFolder}/Src/Prj/UnitTest/Gen/Rte",
+                "${workspaceFolder}/Src/Prj/UnitTest/Gen/Rte/**",
                 "${workspaceFolder}/Src/Prj/UnitTest/Prj/Ut_Signal",
                 "${workspaceFolder}/Src/Prj/UnitTest/Gen/Util/Ut_InputClassifier",
                 "${workspaceFolder}/Src/Prj/App/FireFlicker",
                 "${workspaceFolder}/Src/Prj/App/Signal",
                 "${workspaceFolder}/Src/Prj/App/Signal/**",
+                "${workspaceFolder}/Src/Prj/App/DccSniffer",
+                "${workspaceFolder}/Src/Prj/App/DccSniffer/**",
                 "${workspaceFolder}/Src/Gen/**",
                 "${workspaceFolder}/Src/Gen/Test/unity/src",
                 "${workspaceFolder}/Src/Gen/Hal/Stub/Gpio",
@@ -19,7 +23,11 @@
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-                "ARDUINO"
+                "ARDUINO",
+                "F_CPU=16000000L",
+                "ARDUINO_AVR_MEGA",
+                "__AVR__",
+                "__AVR_ATmega2560__"
             ],
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "g++.exe",

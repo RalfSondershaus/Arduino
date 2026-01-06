@@ -22,8 +22,11 @@ jobs:
           sudo apt update
           sudo apt install -y make gcc-avr avr-libc
 
-      - name: Run Build Script App/DccSniffer
+      - name: Run Build Script App/DccSniffer for Arduino Mega
         run: ./Build/build.sh App/DccSniffer mega avr_gcc arduino none rebuild
+
+      - name: Run Build Script App/DccSniffer for Arduino Nano
+        run: ./Build/build.sh App/DccSniffer nano avr_gcc arduino none rebuild
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4

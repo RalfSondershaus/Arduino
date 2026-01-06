@@ -29,10 +29,25 @@ jobs:
       - name: Navigate to Repository
         run: cd arduino
 
+      - name: Run Build Script UnitTest/Gen/Dcc/Ut_Filter
+        run: |
+          ./Build/build.sh UnitTest/Gen/Dcc/Ut_Filter win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Dcc/Ut_Filter win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Dcc/Ut_Packet
+        run: |
+          ./Build/build.sh UnitTest/Gen/Dcc/Ut_Packet win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Dcc/Ut_Packet win32 gcc win unity run
+
       - name: Run Build Script UnitTest/Gen/Dcc/Ut_PacketExtractor
         run: |
           ./Build/build.sh UnitTest/Gen/Dcc/Ut_PacketExtractor win32 gcc win unity rebuild
           ./Build/build.sh UnitTest/Gen/Dcc/Ut_PacketExtractor win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Gen/Rte/Ut_Rte
+        run: |
+          ./Build/build.sh UnitTest/Gen/Rte/Ut_Rte win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Rte/Ut_Rte win32 gcc win unity run
 
       - name: Run Build Script UnitTest/Gen/Util/Ut_Algorithm
         run: |
@@ -81,8 +96,8 @@ jobs:
 
       - name: Run Build Script UnitTest/Gen/Util/Ut_String_view
         run: |
-          ./Build/build.sh UnitTest/Gen/Util/Ut_InputClassifier win32 gcc win unity rebuild
-          ./Build/build.sh UnitTest/Gen/Util/Ut_InputClassifier win32 gcc win unity run
+          ./Build/build.sh UnitTest/Gen/Util/Ut_String_view win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Gen/Util/Ut_String_view win32 gcc win unity run
 
       - name: Run Build Script UnitTest/Gen/Util/Ut_Vector
         run: |
