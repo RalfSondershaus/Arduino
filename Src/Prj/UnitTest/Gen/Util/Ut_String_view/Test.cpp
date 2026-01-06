@@ -3,15 +3,15 @@
  *
  * @author Ralf Sondershaus
  *
- * Unity Test for Gen/Util/String_view.h
+ * @brief Test for Gen/Util/String_view.h
+ * 
+ * SPDX-License-Identifier: Apache-2.0
  */
-
-#include <Unity_adapt.h>
+ 
+#include <unity_adapt.h>
 
 #include <Util/String_view.h>
 #include <stdint.h>
-#include <array>
-#include <algorithm>
 
 #define CFG_OFF 0
 #define CFG_ON 1
@@ -28,6 +28,8 @@
 // Requires C++17
 #include <string_view>
 #include <iostream>
+#include <array>
+#include <algorithm>
 #endif
 
 // -------------------------------------------------------------------------

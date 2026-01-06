@@ -15,18 +15,7 @@
  *
  * @copyright Copyright 2018 - 2022 Ralf Sondershaus
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef DCC_PACKET_H
@@ -84,7 +73,7 @@ namespace dcc
      * @see [S-9.2.1 2025] NMRA Standard DCC Extended Packet Formats, Jan 24, 2025, www.nmra.org
      */
     template <int kMaxBytes = 6>
-    class Packet
+    class packet
     {
     public:
         /// We are using 16 bit to store addresses.
@@ -131,14 +120,14 @@ namespace dcc
 
     protected:
         /// array of bytes
-        using ByteArray = util::array<uint8, kMaxBytes>;
-        using iterator = typename ByteArray::iterator;
-        using const_iterator = typename ByteArray::const_iterator;
+        using byte_array_type = util::array<uint8, kMaxBytes>;
+        using iterator = typename byte_array_type::iterator;
+        using const_iterator = typename byte_array_type::const_iterator;
 
         /// number of bits received
         uint8_least ucNrNbits;
         /// byte array
-        ByteArray bytes;
+        byte_array_type bytes;
 
         /// Return current byte index (index into array of bytes)
         uint16 byteIdx() const noexcept { return static_cast<uint16>(ucNrNbits / 8u); }
@@ -361,11 +350,31 @@ namespace dcc
 
 
     public:
-        /// number of "1" in the preamble (for debugging)
-        uint8 ucNrOnePreamble;
+        /// number of "1" in the preamble
+        uint8 preamble_one_count;
 
         /// Constructor
-        Packet() { clear(); }
+        packet() { clear(); }
+        /**
+         * @brief Construct a new packet object from raw data.
+         * 
+         * Convenience constructor to create a packet from raw byte data.
+         * The bits are added in MSB-first order.
+         * 
+         * @param data Pointer to the raw byte data.
+         * @param num_bytes Number of bytes in the data.
+         */
+        packet(const uint8 *data, uint8_least num_bytes)
+            : ucNrNbits{0}, bytes{}, decoded_data{ kInvalidAddress, packet_type::Init }, preamble_one_count{0}
+        {
+            for (uint8_least i = 0; i < num_bytes; i++)
+            {
+                for (sint8_fast bit = 7; bit >= 0; bit--)
+                {
+                    addBit((data[i] >> bit) & 0x01U);
+                }
+            }
+        }
         /// clear all decoded_data
         void clear()
         {
@@ -373,6 +382,7 @@ namespace dcc
             bytes.fill(0);
             decoded_data.type = packet_type::Init;
             decoded_data.address = kInvalidAddress;
+            preamble_one_count = 0;
         }
         /// add a bit (0 or 1)
         void addBit(uint8 uc_bit)
@@ -393,7 +403,7 @@ namespace dcc
         size_type getNrBytes() const noexcept { return util::math::ceilt(ucNrNbits, static_cast<uint8_least>(8u)); }
 
         /// equality
-        bool operator==(const Packet &p) const
+        bool operator==(const packet &p) const
         {
             uint16_t i;
 
@@ -475,7 +485,8 @@ namespace dcc
         /**
          * @brief Returns the decoded address. Returns 0 until decode() is called.
          * 
-         * The address can be:
+         * Depending on the primary address (which defines the packet type to be Multi-Function, 
+         * Basic Accessory, or Extended Accessory), the address can be:
          * - Multi-Function 7 bit address (1-127)  
          * - Multi-Function 14 bit address
          * - Basic Accessory decoder address (9 bit) - CV29, bit 6 (output address mode) = 0

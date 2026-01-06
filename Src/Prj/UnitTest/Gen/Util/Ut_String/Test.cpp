@@ -3,7 +3,9 @@
  *
  * @author Ralf Sondershaus
  *
- * Unity Test for Gen/Util/String.h
+ * @brief Test for Gen/Util/String.h
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <unity_adapt.h>
@@ -549,12 +551,12 @@ void Ut_String_Compare_with_string(void)
 }
 
 // -------------------------------------------------------------------------
-void Ut_String_stoi_base0(void)
+void Ut_String_stoi_sint32_base0(void)
 {
   typedef struct
   {
     util::basic_string<16, char> str;
-    int n;
+    sint32 n;
     size_t pos;
   } tStep;
   static const tStep aSteps[] =
@@ -579,24 +581,24 @@ void Ut_String_stoi_base0(void)
     { "017", 8+7, 3U }, // octal base
   };
   size_t i;
-  int n;
+  sint32 n;
   size_t pos;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
-    n = util::stoi<int>(aSteps[i].str, &pos, 0);
+    n = util::stoi<sint32>(aSteps[i].str, &pos, 0);
     EXPECT_EQ(n, aSteps[i].n);
     EXPECT_EQ(pos, aSteps[i].pos);
   }
 }
 
 // -------------------------------------------------------------------------
-void Ut_String_stoi_base10(void)
+void Ut_String_stoi_sint32_base10(void)
 {
   typedef struct
   {
     util::basic_string<16, char> str;
-    int n;
+    sint32 n;
     size_t pos;
   } tStep;
   static const tStep aSteps[] =
@@ -614,24 +616,24 @@ void Ut_String_stoi_base10(void)
     { "word with 1", 0, 0U }
   };
   size_t i;
-  int n;
+  sint32 n;
   size_t pos;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
-    n = util::stoi<int>(aSteps[i].str, &pos);
+    n = util::stoi<sint32>(aSteps[i].str, &pos);
     EXPECT_EQ(n, aSteps[i].n);
     EXPECT_EQ(pos, aSteps[i].pos);
   }
 }
 
 // -------------------------------------------------------------------------
-void Ut_String_stoi_base16(void)
+void Ut_String_stoi_sint32_base16(void)
 {
   typedef struct
   {
     util::basic_string<16, char> str;
-    int n;
+    sint32 n;
     size_t pos;
   } tStep;
   static const tStep aSteps[] =
@@ -651,12 +653,12 @@ void Ut_String_stoi_base16(void)
     { "7FFFFFFFF", 0, 0U },         // out of range for 32 bit architectures
     { "word with 1", 0, 0U }
   };
-  int n;
+  sint32 n;
   size_t pos, i;
 
   for (i = 0; i < sizeof(aSteps) / sizeof(tStep); i++)
   {
-    n = util::stoi<int> (aSteps[i].str, &pos, 16);
+    n = util::stoi<sint32>(aSteps[i].str, &pos, 16);
     EXPECT_EQ(n, aSteps[i].n);
     EXPECT_EQ(pos, aSteps[i].pos);
   }
@@ -1112,9 +1114,9 @@ bool test_loop(void)
   RUN_TEST(Ut_String_Find_character);
   RUN_TEST(Ut_String_Compare_with_const_pointer);
   RUN_TEST(Ut_String_Compare_with_string);
-  RUN_TEST(Ut_String_stoi_base0);
-  RUN_TEST(Ut_String_stoi_base10);
-  RUN_TEST(Ut_String_stoi_base16);
+  RUN_TEST(Ut_String_stoi_sint32_base0);
+  RUN_TEST(Ut_String_stoi_sint32_base10);
+  RUN_TEST(Ut_String_stoi_sint32_base16);
   RUN_TEST(Ut_String_stoui_uint32_base16);
   RUN_TEST(Ut_String_stoui_uint16_base16);
   RUN_TEST(Ut_String_stoui_uint8_base16);

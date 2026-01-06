@@ -7,17 +7,7 @@
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- *
- * See <https://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <Cal/CalM.h>
@@ -130,7 +120,7 @@ namespace cal
         // set all pins to an invalid state
         util::fill(gpio_cfg.pin_modes.begin(), gpio_cfg.pin_modes.end(), 0xFF);
 
-        debug::println(debug::kDetailed, "CALL configure_pins");
+        debug::println(debug::kDetailed, F("CALL configure_pins"));
         for (uint8_least sig_idx = 0U; sig_idx < cfg::kNrSignals; sig_idx++)
         {
             // input pin
@@ -151,7 +141,7 @@ namespace cal
                 const uint8 num_outputs = get_number_of_outputs(get_signal_id(sig_idx));
                 for (uint8_least pin_idx = 0; pin_idx < num_outputs; pin_idx++)
                 {
-                    debug::print(debug::kVeryDetailed, "    Configuring onboard output pin ");
+                    debug::print(debug::kVeryDetailed, F("    Configuring onboard output pin "));
                     debug::println(debug::kVeryDetailed, output.pin);
                     gpio_cfg.pin_modes[output.pin] = OUTPUT;
                     output.pin = static_cast<uint8>(static_cast<sint8>(output.pin) + pin_inc);

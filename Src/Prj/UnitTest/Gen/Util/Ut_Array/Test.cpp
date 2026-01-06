@@ -3,7 +3,9 @@
  *
  * @author Ralf Sondershaus
  *
- * Google Test for Gen/Util/Array.h
+ * @brief Test for Gen/Util/Array.h 
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <Util/Array.h>

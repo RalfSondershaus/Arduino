@@ -26,9 +26,6 @@ FILES_BSW :=  $(FILES_BSW)                             \
               $(PATH_SRC_ARDUINO_CORE)/CDC             \
               $(PATH_SRC_ARDUINO_CORE)/HardwareSerial  \
               $(PATH_SRC_ARDUINO_CORE)/HardwareSerial0 \
-              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial1 \
-              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial2 \
-              $(PATH_SRC_ARDUINO_CORE)/HardwareSerial3 \
               $(PATH_SRC_ARDUINO_CORE)/hooks           \
               $(PATH_SRC_ARDUINO_CORE)/IPAddress       \
               $(PATH_SRC_ARDUINO_CORE)/main            \
@@ -82,6 +79,7 @@ C_INCLUDES_BSW := -I$(PATH_SRC_WIN_CORE)                    \
                   -I$(PATH_SRC_GEN)/Hal/Win/Eeprom          \
                   -I$(PATH_SRC_GEN)/Hal/Win/Gpio            \
                   -I$(PATH_SRC_GEN)/Hal/Win/Random          \
+                  -I$(PATH_SRC_GEN)/Hal/Win/Serial          \
                   -I$(PATH_SRC_GEN)/Hal/Win/Timer
 
 endif

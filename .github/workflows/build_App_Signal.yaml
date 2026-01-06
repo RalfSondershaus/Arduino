@@ -31,8 +31,11 @@ jobs:
           sudo apt update
           sudo apt install -y make gcc-avr avr-libc
 
-      - name: Run Build Script App/Signal
+      - name: Run Build Script App/Signal for mega
         run: ./Build/build.sh App/Signal mega avr_gcc arduino none rebuild
+
+      - name: Run Build Script App/Signal for nano
+        run: ./Build/build.sh App/Signal nano avr_gcc arduino none rebuild
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
@@ -41,7 +44,9 @@ jobs:
           path: Build/Bin/
 
   build_release:
-    if: ${{ github.event_name == 'release' }}
+    # Trigger this job only for releases with 'signal' in the tag name (case-insensitive).
+    # You can normalize strings using toJSON() (a trick that forces lowercase for ASCII letters):
+    if: ${{ github.event_name == 'release' && contains(toJSON(github.event.release.tag_name), 'signal') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -55,8 +60,11 @@ jobs:
           sudo apt update
           sudo apt install -y make gcc-avr avr-libc
 
-      - name: Run Build Script App/Signal
+      - name: Run Build Script App/Signal for mega
         run: ./Build/build.sh App/Signal mega avr_gcc arduino none rebuild
+
+      - name: Run Build Script App/Signal for nano
+        run: ./Build/build.sh App/Signal nano avr_gcc arduino none rebuild
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
@@ -68,5 +76,7 @@ jobs:
         uses: softprops/action-gh-release@v2.4.0
         with:
           files: |
-            Build/Bin/Signal/Signal.hex
-            Build/Bin/Signal/Signal.elf
+            Build/Bin/Signal/mega/Signal_mega.hex
+            Build/Bin/Signal/mega/Signal_mega.elf
+            Build/Bin/Signal/nano/Signal_nano.hex
+            Build/Bin/Signal/nano/Signal_nano.elf

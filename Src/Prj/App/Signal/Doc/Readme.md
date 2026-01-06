@@ -55,6 +55,20 @@ Each signal can be controlled by a DCC command.
     Build/build.sh App/Signal mega avr_gcc arduino none run
     ```
 
+    > Note: You can verify the size of a section (such as `.data` or `.bss`) with
+
+    ```sh
+    objdump -s -j <section> Signal.elf
+    ```
+
+    > Note: You can verify the size of data in `.bss` and `.data` sections with the below `nm`
+    command. But constants such as string initializers are not listed here but are visible
+    with the above `objdump` command.
+
+    ```sh
+    nm --size-sort --radix=d Serial.elf | c++filt
+    ```
+
 ## Configuration
 
 The application can be configured via a serial interface, e.g., USB, using a Ascii protocol. 
