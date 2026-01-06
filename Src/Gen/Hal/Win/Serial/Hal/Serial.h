@@ -5,7 +5,7 @@
  *
  * @copyright Copyright 2024 Ralf Sondershaus
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #ifndef HAL_SERIAL_H_
