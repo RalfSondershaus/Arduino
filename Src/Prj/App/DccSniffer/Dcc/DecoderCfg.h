@@ -5,7 +5,7 @@
  * 
  * @brief DCC Decoder configuration definitions for DccSniffer application.
  *
- * @copyright Copyright (c) 2025 Ralf Sondershaus
+ * @copyright Copyright (c) 2025-2026 Ralf Sondershaus
  *
  * SPDX-License-Identifier: Apache-2.0
  */
