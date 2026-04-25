@@ -1,12 +1,23 @@
 /**
  * @file Rte_Cfg_Prj.h
+ * 
+ * @brief RTE (Runtime Environment) configuration for the BlinkSample project.
  *
+ * This header file defines the runtime environment setup for the BlinkSample application,
+ * including object instantiation, initialization runnables, and cyclic tasks.
+ *
+ * @details
+ * - Declares a Blinker object instance 'b'
+ * - Defines an initialization runnable that calls Blinker::init()
+ * - Defines a cyclic runnable that calls Blinker::run() with a period of 1000ms
+ *
+ * @note This file intentionally contains no include guards as it is meant to be
+ *       included multiple times with different macro definitions for RTE processing.
+ *
+ * @see Blinker.h for the Blinker class definition
+ * 
  * @author Ralf Sondershaus
- *
- * @brief RTE declaration for BlinkSample2.
- *
- * This file has no include guards.
- *
+ * 
  * @copyright Copyright 2022 Ralf Sondershaus
  *
  * SPDX-License-Identifier: Apache-2.0
