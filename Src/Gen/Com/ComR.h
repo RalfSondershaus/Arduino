@@ -1,5 +1,5 @@
 /**
- * @file Signal/Com/ComR.h
+ * @file Gen/Com/ComR.h
  *
  * @brief 
  *

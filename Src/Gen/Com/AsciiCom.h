@@ -1,5 +1,5 @@
 /**
- * @file Signal/Com/AsciiCom.h
+ * @file Gen/Com/AsciiCom.h
  *
  * @brief Handles ASCII-based telegram communication for signal control.
  *

@@ -1,5 +1,5 @@
 /**
- * @file Signal/Com/ComDrv.h
+ * @file Gen/Com/SerComDrv.h
  *
  * @brief Interface for communication drivers
  *

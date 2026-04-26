@@ -1,5 +1,5 @@
 /**
- * @file Signal/Com/SerAsciiTP.cpp
+ * @file Gen/Com/SerAsciiTP.cpp
  *
  * @brief 
  *

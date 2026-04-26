@@ -1,5 +1,5 @@
 /**
- * @file Com/ComR.cpp
+ * @file Gen/Com/ComR.cpp
  *
  * @brief 
  *
