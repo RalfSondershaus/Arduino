@@ -71,12 +71,7 @@ Related diagrams:
 - `docs/components/signal-architecture.puml`
 - `docs/components/signal-classes.puml`
 
-Embedded view (PlantUML include):
-
-```plantuml
-' Renderers with PlantUML support can inline this diagram.
-!include ../components/signal-arc42-building-block.puml
-```
+![Signal Arc42 Building Block](../components/Signal_Arc42_Building_Block.png)
 
 ## 6. Runtime View
 
@@ -102,12 +97,8 @@ Related diagrams:
 - `docs/components/signal-sequences.puml`
 - `docs/components/signal-statemachines.puml`
 
-Embedded view (PlantUML include):
+![Signal Arc42 Building Block](../components/Signal_Arc42_Runtime.png)
 
-```plantuml
-' Renderers with PlantUML support can inline this diagram.
-!include ../components/signal-arc42-runtime.puml
-```
 
 ## 7. Deployment View
 
@@ -121,12 +112,7 @@ Relevant visualization:
 
 - `docs/components/signal-deployment.puml`
 
-Embedded view (PlantUML include):
-
-```plantuml
-' Renderers with PlantUML support can inline this diagram.
-!include ../components/signal-deployment.puml
-```
+![Signal Deployment](../components/Signal_Deployment.png)
 
 ## 8. Crosscutting Concepts
 
