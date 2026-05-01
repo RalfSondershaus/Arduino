@@ -257,7 +257,17 @@
                 "panel": "shared"
             },
             "problemMatcher": []
-        }
+        },
+        {
+            "label": "Export PlantUML PNG",
+            "type": "shell",
+            "command": ".\\Tools\\scripts\\export-plantuml-png.bat",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "problemMatcher": []
+        }    
     ],
     "version": "2.0.0"
 }

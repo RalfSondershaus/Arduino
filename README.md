@@ -12,9 +12,14 @@ Note that for DCC, you need additional hardware.
 The code structure at top level is organized as follows:
 - **Build** - everything to build a project. We use make, so this folder contains the makefiles.
 - **Src** - the source code
+- **docs** - additional project documentation (including AI agent/prompt usage)
 - **Docker** - Docker image configuration (experimental)
 - **.vscode** - JSON files for Visual Studio Code configuration
 - **.github/workflows** - GitHub workflow files
+
+## AI Agents and Prompts
+
+For architecture-documentation prompts and usage examples, see [docs/agents/README.md](docs/agents/README.md).
 
 ## License
 

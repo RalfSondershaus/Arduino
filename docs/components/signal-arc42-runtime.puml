@@ -1,0 +1,53 @@
+@startuml Signal_Arc42_Runtime
+!theme plain
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+title Signal - arc42 Runtime View (Cyclic Flow)
+
+actor loop as MainLoop
+participant "rte::exec" as RteExec
+participant "InputClassifier" as InputClassifier
+participant "DccDecoder (app wrapper)" as DccDecoderApp
+participant "InputCommand" as InputCommand
+participant "SignalHandler" as SignalHandler
+participant "Signal (single instance)" as Signal
+participant "LedRouter" as LedRouter
+participant "ComR" as ComR
+database "RTE Ports" as Ports
+
+MainLoop -> RteExec : loop()
+activate RteExec
+
+RteExec -> InputClassifier : cycle()
+InputClassifier -> Ports : write ifc_classified_values
+
+RteExec -> DccDecoderApp : cycle()
+DccDecoderApp -> Ports : write ifc_dcc_commands
+
+RteExec -> InputCommand : cycle()
+InputCommand -> Ports : read classified + dcc
+InputCommand -> Ports : write merged command state
+
+RteExec -> SignalHandler : cycle()
+loop for each signal
+  SignalHandler -> Signal : exec()
+  Signal -> Ports : read config/command state
+  Signal -> LedRouter : setIntensityAndSpeed(...)
+end
+
+RteExec -> LedRouter : cycle()
+LedRouter -> Ports : write ifc_onboard_target_duty_cycles
+
+RteExec -> ComR : cycle()
+ComR -> Ports : optional monitor/read or server access
+
+RteExec --> MainLoop : cycle done
+deactivate RteExec
+
+note right of DccDecoderApp
+Underlying packet capture/decode is interrupt-driven
+in generic decoder layer, consumption is cyclic here.
+end note
+
+@enduml
