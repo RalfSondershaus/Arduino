@@ -1,4 +1,7 @@
 {
+    "plantuml.exportFormat": "png",
+    "plantuml.exportOutDir": "Build/Doc/plantuml-png",
+    "plantuml.render": "Local",
     "makefile.makefilePath": "Build/make/Makefile.gmk",
     "makefile.makePath": "make",
     "makefile.configurations": [
