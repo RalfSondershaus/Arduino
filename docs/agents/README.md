@@ -29,9 +29,9 @@ Run these prompts in Copilot Chat using slash commands (prompt filename without 
 Examples:
 
 ```text
-/arc42-architect Src/Prj/App/Signal
-/arc42-context Src/Prj/App/Signal
-/arc42-diagram Src/Prj/App/Signal runtime
+/arc42-create-architect Src/Prj/App/Signal
+/arc42-extract-context Src/Prj/App/Signal
+/arc42-create-update-diagram Src/Prj/App/Signal runtime
 /arc42-write Src/Prj/App/Signal
 /arc42-review docs/arc42/signal.md
 /arc42-sync Src/Prj/App/Signal
