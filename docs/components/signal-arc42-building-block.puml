@@ -1,0 +1,66 @@
+@startuml Signal_Arc42_Building_Block
+!theme plain
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+title Signal - arc42 Building Block View
+
+package "Signal App (Src/Prj/App/Signal)" {
+  [SignalHandler] as SignalHandler
+  [Signal (xN)] as Signal
+  [InputClassifier] as InputClassifier
+  [InputCommand] as InputCommand
+  [LedRouter] as LedRouter
+  [DccDecoder (app wrapper)] as DccDecoderApp
+  [CalM] as CalM
+  [ComR / Ascii command handling] as ComR
+}
+
+package "RTE Interfaces" {
+  [ifc_classified_values] as IfcClassified
+  [ifc_dcc_commands] as IfcDcc
+  [ifc_onboard_target_duty_cycles] as IfcDuty
+  [server interfaces] as IfcServers
+}
+
+package "Generic Layers (Src/Gen)" {
+  [dcc::decoder] as DccDecoderGen
+  [Util ramps/classifier/array] as Util
+  [HAL: gpio/adc/timer/serial/eeprom] as Hal
+}
+
+InputClassifier --> IfcClassified : write classified/adc values
+DccDecoderApp --> IfcDcc : write DCC commands
+InputCommand --> IfcClassified : read
+InputCommand --> IfcDcc : read
+InputCommand --> SignalHandler : provide merged command intent
+
+SignalHandler --> Signal : orchestrates signals
+Signal --> IfcServers : read config and set output intent
+LedRouter --> IfcDuty : write duty cycles
+
+Signal --> LedRouter : set intensity/speed
+ComR --> IfcServers : serial command access
+CalM --> IfcServers : CV services
+
+DccDecoderApp --> DccDecoderGen : fetch filtered packets
+InputClassifier --> Util
+Signal --> Util
+LedRouter --> Util
+
+ComR --> Hal
+CalM --> Hal
+InputClassifier --> Hal
+LedRouter --> Hal
+DccDecoderApp --> Hal
+
+note right of DccDecoderApp
+App wrapper maps protocol packets
+to Signal command semantics.
+end note
+
+note bottom of SignalHandler
+Main control path is cyclic via RTE runnables.
+end note
+
+@enduml

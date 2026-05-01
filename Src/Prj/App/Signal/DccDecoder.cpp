@@ -110,9 +110,9 @@ namespace signal
             // 0 - 3: Signal 0
             // 4 - 7: Signal 1
             // ...
-            const size_t idx = (pkt_address - get_first_output_address()) % cfg::kNrDccAddressesPerSignal;
+            const uint16 idx = (pkt_address - get_first_output_address()) % cfg::kNrDccAddressesPerSignal;
             // and position on RTE
-            const size_t pos = (pkt_address - get_first_output_address()) / cfg::kNrDccAddressesPerSignal;
+            const uint16 pos = (pkt_address - get_first_output_address()) / cfg::kNrDccAddressesPerSignal;
             // command: 0 = 1R, 1 = 1G, 2 = 2R, 3 = 2G, ...
             const uint8 cmd = static_cast<uint8>(2U*idx + pkt.ba_get_output_direction());
             hal::serial::print("Basic Accessory Packet received: addr=");
@@ -141,7 +141,7 @@ namespace signal
      */
     void DccDecoder::extended_packet_received(packet_type& pkt)
     {
-        const size_t pos = pkt.get_address(get_cv29()) - get_first_output_address();
+        const uint16 pos = pkt.get_address(get_cv29()) - get_first_output_address();
         hal::serial::print("Extended Accessory Packet received: addr=");
         hal::serial::println(pkt.get_address(get_cv29()));
         hal::serial::print(" pos=");
@@ -171,13 +171,14 @@ namespace signal
      */
     void DccDecoder::packet_received(packet_type &pkt)
     {
+        using pkt_enum_type = packet_type::packet_type;
         // TBD could be improved by defining sub classes for packet_type
         switch (pkt.get_type())
         {
-        case packet_type::packet_type::BasicAccessory:
+        case pkt_enum_type::BasicAccessory:
             basic_packet_received(pkt);
             break;
-        case packet_type::packet_type::ExtendedAccessory:
+        case pkt_enum_type::ExtendedAccessory:
             extended_packet_received(pkt);
             break;
         default:
