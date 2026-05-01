@@ -22,6 +22,9 @@ namespace com
         mySerAsciiTP.setDriver(mySerDrv);
         myAsciiCom.listen_to(mySerAsciiTP);
         myAsciiCom.set_command_handler(mySignalAsciiCommandHandler);
+        // Register project command registry with AsciiCom for direct lookup
+        // This eliminates the need for virtual dispatch in process()
+        ascii_com_registry::set_project_command_finder(signal_com_registry::find_command);
     }
 
     void ComR::cycle()

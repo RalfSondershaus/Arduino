@@ -12,6 +12,7 @@ FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                \
             $(PATH_SRC_PRJ)/App/Signal/Com/ComR_Prj     \
             $(PATH_SRC_PRJ)/App/Signal/Com/SignalAsciiCommandHandler \
             $(PATH_SRC_GEN)/Com/AsciiCom                \
+            $(PATH_SRC_GEN)/Com/AsciiCommandRegistry    \
             $(PATH_SRC_GEN)/Com/SerAsciiTP              \
             $(PATH_SRC_HAL)/Stub/Eeprom/Hal/EEPROM      \
             $(PATH_SRC_GEN)/Rte/Rte                     \

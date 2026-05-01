@@ -8,17 +8,67 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <Cfg_Prj.h>
-#include <Compiler.h>
-#include <Platform_Limits.h>
-#include <Cal/CalM_Types.h>
 #include <Com/SignalAsciiCommandHandler.h>
+#include <Com/AsciiCommandRegistry.h>
 #include <Debug.h>
+#include <Util/Array.h>
 #include <Util/String_view.h>
 #include <Rte/Rte.h>
 
 namespace com
 {
+    namespace signal_com_registry
+    {
+        /**
+         * @brief Project-level command registry lookup function.
+         *
+         * Finds a project-specific command by name and returns its handler.
+         * This function is registered with AsciiCom at initialization.
+         *
+         * @param cmd Command token to lookup.
+         * @param handler [out] Handler function pointer if found (not used in this implementation).
+         * @return true Command found.
+         * @return false Command not found (invalid command).
+         */
+        boolean find_command(const char *cmd, ascii_com_registry::command_handler_type &handler)
+        {
+            // Forward declaration names (must match command_type array in anonymous namespace below)
+            static constexpr const char cmd_INIT[] ROM_CONST_VAR = "INIT";
+            static constexpr const char cmd_SET_VERBOSE[] ROM_CONST_VAR = "SET_VERBOSE";
+            static constexpr const char cmd_SET_SIGNAL[] ROM_CONST_VAR = "SET_SIGNAL";
+            static constexpr const char cmd_GET_SIGNAL[] ROM_CONST_VAR = "GET_SIGNAL";
+            static constexpr const char cmd_GET_PIN_CONFIG[] ROM_CONST_VAR = "GET_PIN_CONFIG";
+            static constexpr const char cmd_ETO_SET_SIGNAL[] ROM_CONST_VAR = "ETO_SET_SIGNAL";
+
+            static constexpr const char * const cmd_list[] ROM_CONST_VAR =
+            {
+                cmd_INIT,
+                cmd_SET_VERBOSE,
+                cmd_SET_SIGNAL,
+                cmd_GET_SIGNAL,
+                cmd_GET_PIN_CONFIG,
+                cmd_ETO_SET_SIGNAL
+            };
+
+            util::string_view sv(cmd);
+            size_t idx;
+
+            for (idx = 0U; idx < 6U; idx++)
+            {
+                char cmd_rom[ascii_com_registry::kMaxLenToken];
+                ROM_READ_STRING(cmd_rom, static_cast<const char *>(ROM_READ_PTR(&cmd_list[idx])));
+                if (sv.compare(cmd_rom) == 0)
+                {
+                    handler = nullptr;  // Placeholder; actual dispatch calls process_command()
+                    return true;
+                }
+            }
+
+            handler = nullptr;
+            return false;
+        }
+    }
+
     namespace
     {
         enum ret_type
@@ -74,6 +124,31 @@ namespace com
         const char cmd_GET_SIGNAL[] ROM_CONST_VAR = "GET_SIGNAL";
         const char cmd_GET_PIN_CONFIG[] ROM_CONST_VAR = "GET_PIN_CONFIG";
         const char cmd_ETO_SET_SIGNAL[] ROM_CONST_VAR = "ETO_SET_SIGNAL";
+
+        static ret_type process_set_defaults(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response);
+        static ret_type process_eto_set_signal(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response);
+        static ret_type process_set_signal(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response);
+        static ret_type process_get_signal(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response);
+        static ret_type process_set_verbose(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response);
+        static ret_type process_get_pin_config(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response);
+
+        using command_handler_type = ret_type (*)(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response);
+
+        struct command_type
+        {
+            const char *cmd;
+            command_handler_type handler;
+        };
+
+        using command_array_type = util::array<command_type, 6>;
+
+        static constexpr command_array_type commands =
+            {{{cmd_INIT, process_set_defaults},
+              {cmd_SET_VERBOSE, process_set_verbose},
+              {cmd_SET_SIGNAL, process_set_signal},
+              {cmd_GET_SIGNAL, process_get_signal},
+              {cmd_GET_PIN_CONFIG, process_get_pin_config},
+              {cmd_ETO_SET_SIGNAL, process_eto_set_signal}}};
 
         static ret_type process_set_defaults(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response)
         {
@@ -365,53 +440,34 @@ namespace com
             return ret;
         }
 
-        static void format_response(ret_type ret, const IfcAsciiCommandHandler::string_type &sub_response, IfcAsciiCommandHandler::string_type &response)
-        {
-            response = static_cast<const char *>(ROM_READ_PTR(&responses[static_cast<size_t>(ret)]));
-            if (sub_response.size() > 0)
-            {
-                response.append(" ");
-                response.append(sub_response);
-            }
-        }
+
     }
 
     bool SignalAsciiCommandHandler::process_command(const char *cmd, stringstream_type &st, string_type &response)
     {
+        size_t idx;
+        boolean found = false;
         ret_type ret = eINV_CMD;
         string_type sub_response;
         util::string_view sv(cmd);
 
-        if (sv.compare(cmd_INIT) == 0)
+        for (idx = 0U; idx < commands.size(); idx++)
         {
-            ret = process_set_defaults(st, sub_response);
+            if (sv.compare(commands[idx].cmd) == 0)
+            {
+                ret = commands[idx].handler(st, sub_response);
+                found = true;
+                break;
+            }
         }
-        else if (sv.compare(cmd_SET_VERBOSE) == 0)
-        {
-            ret = process_set_verbose(st, sub_response);
-        }
-        else if (sv.compare(cmd_SET_SIGNAL) == 0)
-        {
-            ret = process_set_signal(st, sub_response);
-        }
-        else if (sv.compare(cmd_GET_SIGNAL) == 0)
-        {
-            ret = process_get_signal(st, sub_response);
-        }
-        else if (sv.compare(cmd_GET_PIN_CONFIG) == 0)
-        {
-            ret = process_get_pin_config(st, sub_response);
-        }
-        else if (sv.compare(cmd_ETO_SET_SIGNAL) == 0)
-        {
-            ret = process_eto_set_signal(st, sub_response);
-        }
-        else
+
+        if (!found)
         {
             return false;
         }
 
-        format_response(ret, sub_response, response);
+        const char *response_text = static_cast<const char *>(ROM_READ_PTR(&responses[static_cast<size_t>(ret)]));
+        ascii_com_registry::format_response(response_text, sub_response, response);
         return true;
     }
 

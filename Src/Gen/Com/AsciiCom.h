@@ -63,11 +63,11 @@
 namespace com
 {
     /**
-    * Receives and processes ASCII telegrams.
+     * Receives and processes ASCII telegrams.
      *
      * This class listens to a SerAsciiTP instance and processes incoming telegrams
-    * related to generic commands. Project-specific command sets can be integrated
-    * via @ref set_command_handler.
+     * related to generic commands. Project-specific command sets can be integrated
+     * via @ref set_command_handler.
      *
      * For communication, it uses ASCII-formatted telegrams where commands and parameters
      * are separated by spaces. The class can handle various commands such as `SET_CV`,
