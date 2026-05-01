@@ -1,3 +1,9 @@
+rem ============================================================
+rem export-plantuml-png.bat
+rem Exports all PlantUML (.puml) diagrams found under
+rem docs\components to PNG files using plantuml.jar.
+rem Download plantuml.jar from: https://plantuml.com/download.
+rem ============================================================
 @echo off
 setlocal
 
