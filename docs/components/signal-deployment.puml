@@ -1,0 +1,286 @@
+@startuml Signal_Deployment
+!theme plain
+
+title Signal Application - Deployment Diagram\nHardware Mapping and Pin Configuration
+
+' Hardware node
+node "Arduino Mega 2560" as MEGA {
+    
+    ' Processor
+    component "ATmega2560\n16 MHz" as CPU {
+        artifact "Flash: 256 KB" as FLASH
+        artifact "SRAM: 8 KB" as SRAM
+        artifact "EEPROM: 4 KB" as EEPROM_MEM
+    }
+    
+    ' Memory regions
+    package "Memory Layout" {
+        artifact ".text\nProgram Code" as TEXT
+        artifact ".data\nInitialized Data" as DATA
+        artifact ".bss\nUninitialized Data" as BSS
+        artifact "Stack" as STACK
+        artifact "Heap\n(Unused)" as HEAP
+        
+        note right of HEAP
+            No dynamic allocation
+            Heap remains empty
+        end note
+    }
+    
+    ' Peripheral blocks
+    component "Peripherals" {
+        artifact "ADC\n10-bit, 16 channels" as ADC
+        artifact "Timers\nTimer0/1/2/3/4/5" as TIMERS
+        artifact "UART0\n115200 baud" as UART
+        artifact "PWM\n15 channels" as PWM
+        artifact "GPIO\n54 digital pins" as GPIO
+        artifact "External INT\nINT0-INT7" as EXTINT
+    }
+}
+
+' EEPROM Storage Structure
+database "EEPROM Layout" as EEPROM_LAYOUT {
+    card "Standard CVs" as STD_CV {
+        artifact "CV1: Decoder Addr LSB" as CV1
+        artifact "CV8: Manufacturer ID" as CV8
+        artifact "CV9: Decoder Addr MSB" as CV9
+        artifact "CV29: Configuration" as CV29
+    }
+    
+    card "Signal Configuration" as SIG_CV {
+        artifact "CV42-49: Signal IDs" as CV42
+        artifact "CV50-57: Output Pins" as CV50
+        artifact "CV58-65: Input Pins" as CV58
+        artifact "CV74-81: Pin Config" as CV74
+    }
+    
+    card "Classifier Thresholds" as CLASS_CV {
+        artifact "CV112+: Thresholds" as CV112
+    }
+    
+    card "User-Defined Signals" as USER_CV {
+        artifact "CV134+: Custom Signals\n(2 × 19 bytes)" as CV134
+    }
+}
+
+' External connections
+cloud "DCC Command Station" as DCC_STATION
+cloud "Serial Terminal\n(USB)" as TERMINAL
+
+' Input devices
+component "Input Devices" {
+    artifact "Buttons/Switches" as BUTTONS
+    artifact "Resistor Network" as RESISTORS
+    artifact "DCC Optocoupler" as OPTO
+}
+
+' Output devices
+component "Output Devices" {
+    artifact "Signal LEDs\n(Red/Yellow/Green)" as LEDS
+    artifact "MOSFET Drivers\n(Optional)" as MOSFETS
+}
+
+' Pin mappings
+package "Pin Assignments" {
+    
+    rectangle "Digital I/O" as DIGITAL {
+        card "D0-D1: UART (Reserved)" as D01 #LightGray
+        card "D2: DCC Input (INT0)" as D2 #LightBlue
+        card "D3-D13: PWM/GPIO" as D3_13 #LightGreen
+        card "D13: Onboard LED\n(DCC Valid Blink)" as D13 #Yellow
+        card "D14-D53: GPIO" as D14_53 #LightGreen
+        
+        note right of D2
+            Pin 2 (INT0) receives DCC signal
+            Pin change ISR captures timestamps
+            Must be <26μs responsive
+        end note
+        
+        note right of D3_13
+            PWM-capable pins (6 channels):
+            D3, D4, D5, D6, D7, D8, D9, D10, D11, D12, D13
+            
+            Used for smooth LED dimming
+            Timer prescaler configured for
+            appropriate PWM frequency
+        end note
+    }
+    
+    rectangle "Analog Inputs" as ANALOG {
+        card "A0-A15: ADC Inputs" as A0_15 #LightCyan
+        
+        note right of A0_15
+            10-bit ADC: 0-1023 range
+            Reference: 5V (AVCC)
+            
+            Typical connection:
+            Button → Resistor Network → ADC
+            
+            Voltage levels map to signal aspects:
+            0-200: Aspect 0
+            200-400: Aspect 1
+            400-600: Aspect 2
+            600-800: Aspect 3
+            800-1023: Aspect 4
+        end note
+    }
+}
+
+' Software deployment
+node "Signal Application Binary\n(Signal.hex)" as APP_BIN {
+    component "Application Layer" as APP_LAYER {
+        artifact "SignalHandler" as SIG_HAND
+        artifact "InputClassifier" as INPUT_CL
+        artifact "LedRouter" as LED_RT
+        artifact "DccDecoder" as DCC_DEC
+        artifact "AsciiCom" as ASCII
+    }
+    
+    component "Runtime Environment" as RTE_LAYER {
+        artifact "RTE Core" as RTE_C
+        artifact "Port Interfaces" as RTE_PORTS
+    }
+    
+    component "Calibration" as CAL_LAYER {
+        artifact "CalM" as CALM
+    }
+    
+    component "Generic Layers" as GEN_LAYER {
+        artifact "DCC Protocol Stack" as DCC_STACK
+        artifact "HAL" as HAL
+        artifact "Utilities" as UTILS
+    }
+}
+
+' Hardware to peripherals
+CPU --> FLASH : "Program execution"
+CPU --> SRAM : "Runtime data"
+CPU --> EEPROM_MEM : "Persistent storage"
+
+TEXT -[hidden]-> FLASH
+DATA -[hidden]-> SRAM
+BSS -[hidden]-> SRAM
+STACK -[hidden]-> SRAM
+
+EEPROM_MEM <--> EEPROM_LAYOUT : "CV storage\n(4 KB)"
+
+' Peripheral connections
+ADC <-- ANALOG : "Read 10-bit values"
+GPIO <-- DIGITAL : "Read/Write digital"
+PWM --> DIGITAL : "Duty cycle output"
+EXTINT <-- D2 : "Pin change interrupt"
+UART <-- D01 : "Serial communication"
+
+' External device connections
+DCC_STATION --> OPTO : "DCC signal\n±15V bipolar"
+OPTO --> D2 : "5V logic\nZero-crossing"
+
+BUTTONS --> RESISTORS : "User input"
+RESISTORS --> A0_15 : "Voltage divider"
+
+D3_13 --> LEDS : "PWM control"
+D14_53 --> LEDS : "Digital control"
+D3_13 --> MOSFETS : "Driver enable"
+
+TERMINAL <--> D01 : "115200 8N1\nCommand/Response"
+
+' Software to hardware mapping
+APP_BIN -[hidden]down-> FLASH
+
+SIG_HAND --> CPU : "Executes on"
+INPUT_CL --> ADC : "Reads from"
+LED_RT --> PWM : "Writes to"
+DCC_DEC --> EXTINT : "ISR handler"
+ASCII --> UART : "Serial I/O"
+
+RTE_C --> SRAM : "Port data storage"
+CALM --> EEPROM_MEM : "CV read/write"
+
+DCC_STACK --> TIMERS : "Timestamp capture"
+HAL --> GPIO : "Abstraction layer"
+
+' Timing constraints
+note as TIMING
+    **Performance Constraints:**
+    
+    DCC ISR: <26μs (half shortest bit period)
+    Main cycle: 10ms (100 Hz)
+    ADC read: ~100μs per channel
+    EEPROM write: ~3.3ms per byte
+    Serial TX: ~86μs per character @ 115200
+    
+    **Stack Usage:**
+    Max observed: ~500 bytes
+    Safety margin: 1 KB reserved
+    
+    **Code Size:**
+    Signal.elf: ~40-50 KB
+    Available: 256 KB
+    
+    **RAM Usage:**
+    Static: ~2-3 KB
+    RTE ports: ~1 KB
+    Available: 8 KB
+end note
+
+' Pin configuration example
+note as PIN_CONFIG
+    **Example Configuration (Signal 0):**
+    
+    CV42 = 1 → Built-in Signal ID 1 (Ausfahrsignal)
+    CV50 = 0x06 → ONB (0b00) + Pin 6 (0b000110)
+    CV58 = 0x36 → ADC (0b01) + Pin A0/54 (0b110110)
+    CV74 = 0x02 → Step=1 (0b0), Inverse=No (0b0), Reserved (0b10)
+    
+    Result:
+    - Input: ADC pin A0 (pin 54)
+    - Outputs: Pins 6,7,8,9 (4 outputs, step size 1)
+    - Classification: Thresholds from CV112+
+    
+    **Typical Signal Wiring:**
+    ```
+    Pin 6 (Green LED) ────┬─── +5V
+    Pin 7 (Yellow LED)────┤
+    Pin 8 (Red LED 1) ────┤
+    Pin 9 (Red LED 2) ────┘
+    
+    A0 ────[ Buttons & Resistors ]──── GND
+    
+    Pin 2 ────[ Optocoupler ]──── DCC Signal
+    ```
+end note
+
+' CV access patterns
+note as CV_ACCESS
+    **EEPROM Access Patterns:**
+    
+    Startup: Read all 4KB → RAM buffer (eeprom_data_buffer)
+    Runtime: All reads from RAM (fast)
+    CV write: RAM update + EEPROM update + verify
+    Wear leveling: ~100,000 write cycles per location
+    
+    **Write Protection:**
+    - CalM validates CV ID bounds
+    - Pin reconfiguration on specific CVs (42,50,58,74-81)
+    - Immediate persistence for configuration commands
+    
+    **Built-in Signals (ROM):**
+    - Signal ID 1-3 stored in PROGMEM (Flash)
+    - Read via ROM_READ_BYTE() macro
+    - User-defined signals (128-129) in EEPROM
+end note
+
+legend right
+    |<#LightBlue> | DCC Input Path |
+    |<#LightGreen> | GPIO / PWM Output |
+    |<#LightCyan> | Analog Input (ADC) |
+    |<#Yellow> | Status Indication |
+    |<#LightGray> | Reserved / System |
+    
+    **Hardware Platform:** Arduino Mega 2560
+    **MCU:** ATmega2560 @ 16 MHz
+    **Compiler:** avr-gcc with -Os optimization
+    **Toolchain:** AVR GCC + avrdude
+endlegend
+
+@enduml
