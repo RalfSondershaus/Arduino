@@ -1,20 +1,28 @@
 # AI Agents and Prompts
 
-This repository includes reusable Copilot agent/prompt definitions for architecture documentation.
+This repository includes reusable Copilot agent/prompt definitions for 
+
+- architecture documentation
+- MISRA / static analysis
+- Coding, testing, and refactoring workflows
+
+Where to find:
 
 - Agent definitions: `.github/agents/`
 - Prompt definitions: `.github/prompts/`
 
+## Architecture documentation
+
 The arc42 + PlantUML prompt set added for documentation workflows is:
 
-- `arc42-architect`
-- `arc42-context`
-- `arc42-diagram`
+- `arc42-create-architect`
+- `arc42-extract-context`
+- `arc42-create-update-diagram`
 - `arc42-write`
 - `arc42-review`
 - `arc42-sync`
 
-## How To Use
+### How To Use
 
 Run these prompts in Copilot Chat using slash commands (prompt filename without `.prompt.md`).
 
@@ -29,7 +37,7 @@ Examples:
 /arc42-sync Src/Prj/App/Signal
 ```
 
-## Recommended Flow
+### Recommended Flow
 
 1. Extract context from code.
 2. Build/refresh arc42 structure.
@@ -48,9 +56,9 @@ Typical sequence:
 /arc42-review docs/arc42/<module>.md
 ```
 
-## Prompt Quick Reference
+### Prompt Quick Reference
 
-### /arc42-architect
+#### /arc42-create-architect
 
 Creates or refines arc42 section structure for a module.
 
@@ -62,7 +70,7 @@ Output:
 
 - `docs/arc42/<module>.md` scaffold and filled sections where evidence exists.
 
-### /arc42-context
+#### /arc42-extract-context
 
 Extracts implementation-grounded architecture facts from source/build files.
 
@@ -74,7 +82,7 @@ Output:
 
 - `docs/arc42/_context/<module>-context.md`
 
-### /arc42-diagram
+#### /arc42-create-update-diagram
 
 Creates/updates PlantUML diagrams aligned to arc42 views.
 
@@ -86,7 +94,7 @@ Output:
 
 - `.puml` files in `docs/components/`
 
-### /arc42-write
+#### /arc42-write
 
 Writes or updates complete arc42 Markdown using extracted evidence.
 
@@ -98,7 +106,7 @@ Output:
 
 - `docs/arc42/<module>.md` with concrete content and known gaps.
 
-### /arc42-review
+#### /arc42-review
 
 Performs QA on arc42 docs/diagrams and reports issues by severity.
 
@@ -110,7 +118,7 @@ Output:
 
 - Structured findings and fix suggestions.
 
-### /arc42-sync
+#### /arc42-sync
 
 Updates only impacted docs/diagrams after code changes.
 
@@ -122,17 +130,13 @@ Output:
 
 - Targeted updates in `docs/arc42/`, `docs/components/`, and sync log updates.
 
-## Tips
+### Tips
 
 - Keep inputs explicit (module path + optional viewpoint) for best results.
 - Treat generated docs as draft architecture assets and review them in PRs.
 - Re-run `/arc42-sync` after major refactors to prevent documentation drift.
 
-## Other Existing Agents and Prompts
-
-This repo also ships coding, testing, refactoring, and MISRA-focused workflows.
-
-### Additional Prompt Commands
+## MISRA and static analysis
 
 These are available as slash commands from `.github/prompts/`:
 
@@ -147,7 +151,7 @@ Examples:
 /misra-fix Src/Prj/App/Signal/DccDecoder.cpp: [Line 113] implicit narrowing conversion
 ```
 
-#### /misra-review
+### /misra-review
 
 Purpose:
 
@@ -162,7 +166,7 @@ Use when:
 
 - You want a static-analysis style audit before refactoring or feature work.
 
-#### /misra-fix
+### /misra-fix
 
 Purpose:
 
@@ -176,47 +180,7 @@ Note:
 
 - This flow is intentionally one-fix-per-run.
 
-### Additional Agents
-
-These are defined in `.github/agents/` and can be selected in Copilot Chat by agent name.
-
-#### Feature Developer
-
-Use for:
-
-- New functionality and component implementation across `Gen`/`Prj` layers.
-- RTE port additions, CV additions, and architecture-aligned feature work.
-
-Good input examples:
-
-- "Implement a new reusable utility in `Src/Gen/Util/...` and add unit tests."
-- "Add a new Signal app capability and wire required RTE/CV updates."
-
-#### Test Author
-
-Use for:
-
-- Creating or improving unit tests (Unity/googletest adaptation).
-- Adding required HAL stubs and unit-test makefile wiring.
-
-Good input examples:
-
-- "Add tests for `Src/Gen/Dcc/PacketExtractor` edge cases."
-- "Create `Ut_<Component>` project wiring and runnable tests on win32."
-
-#### Refactoring Specialist
-
-Use for:
-
-- Behavior-preserving cleanup, renaming, and code-structure improvements.
-- Applying style and MISRA-oriented refactors safely.
-
-Good input examples:
-
-- "Refactor this module to remove naming/style violations without behavior changes."
-- "Extract duplicated helper logic while keeping interfaces stable."
-
-#### MISRA Reviewer
+### MISRA Reviewer
 
 Use for:
 
@@ -228,18 +192,55 @@ Good input examples:
 
 ### Suggested Combined Workflows
 
-#### MISRA loop
-
 ```text
 /misra-review <file-or-module>
 /misra-fix <single violation>
 /misra-review <same scope>
 ```
 
-#### Feature loop
+## Coding, testing, and refactoring workflows
+
+These are defined in `.github/agents/` and can be selected in Copilot Chat by agent name.
+
+### Feature Developer
+
+Use for:
+
+- New functionality and component implementation across `Gen`/`Prj` layers.
+- RTE port additions, CV additions, and architecture-aligned feature work.
+
+Good input examples:
+
+- "Implement a new reusable utility in `Src/Gen/Util/...` and add unit tests."
+- "Add a new Signal app capability and wire required RTE/CV updates."
+
+### Test Author
+
+Use for:
+
+- Creating or improving unit tests (Unity/googletest adaptation).
+- Adding required HAL stubs and unit-test makefile wiring.
+
+Good input examples:
+
+- "Add tests for `Src/Gen/Dcc/PacketExtractor` edge cases."
+- "Create `Ut_<Component>` project wiring and runnable tests on win32."
+
+### Refactoring Specialist
+
+Use for:
+
+- Behavior-preserving cleanup, renaming, and code-structure improvements.
+- Applying style and MISRA-oriented refactors safely.
+
+Good input examples:
+
+- "Refactor this module to remove naming/style violations without behavior changes."
+- "Extract duplicated helper logic while keeping interfaces stable."
+
+### Suggested Combined Workflows
 
 1. Use Feature Developer for implementation.
 2. Use Test Author for coverage and test wiring.
-3. Use `/misra-review` for compliance audit.
-4. Use Refactoring Specialist or `/misra-fix` for targeted cleanup.
+3. Use Refactoring Specialist for targeted cleanup.
 
