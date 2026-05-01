@@ -1,7 +1,7 @@
 /**
  * @file Gen/Com/ComR.cpp
  *
- * @brief 
+ * @brief Runtime wiring for the generic serial ASCII communication stack.
  *
  * @copyright Copyright 2023 Ralf Sondershaus
  *
@@ -31,7 +31,7 @@ namespace com
   }
 
   // -----------------------------------------------------------------------------------
-  /// 
+  /// Execute one communication cycle.
   // -----------------------------------------------------------------------------------
   void ComR::cycle()
   {
