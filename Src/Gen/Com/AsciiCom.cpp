@@ -11,7 +11,7 @@
 #include <Compiler.h>
 #include <Platform_Limits.h>
 #include <Com/AsciiCom.h>
-#include <Com/AsciiCommandRegistry.h>
+#include <Util/String_view.h>
 #include <Util/Timer.h>
 #include <Rte/Rte.h>
 #include <Rte/Rte_Cfg_Cod.h>
@@ -101,33 +101,71 @@ namespace com
     // -----------------------------------------------------------------------------------
     void AsciiCom::process(const string_type &telegram, string_type &response)
     {
-        ascii_com_registry::command_handler_type handler;
-        stringstream_type st(telegram);
-        char cmd[ascii_com_registry::kMaxLenToken];
-        ret_type ret;
-        string_type sub_response;
+        static constexpr size_type kMaxLenToken = 20U;
 
-        st >> util::setw(static_cast<util::streamsize>(ascii_com_registry::kMaxLenToken)) >> cmd;
-        
-        // Try generic registry first
-        if (ascii_com_registry::find_command(cmd, handler))
+        using generic_handler_type = ret_type (*)(stringstream_type &, string_type &);
+        struct command_entry_type
         {
-            ret = static_cast<ret_type>(handler(st, sub_response));
+            const char *cmd;
+            generic_handler_type handler;
+        };
+
+        static const char generic_cmd_set_cv[]    ROM_CONST_VAR = "SET_CV";
+        static const char generic_cmd_get_cv[]    ROM_CONST_VAR = "GET_CV";
+        static const char generic_cmd_mon_list[]  ROM_CONST_VAR = "MON_LIST";
+        static const char generic_cmd_mon_start[] ROM_CONST_VAR = "MON_START";
+        static const char generic_cmd_mon_stop[]  ROM_CONST_VAR = "MON_STOP";
+
+        using command_table_type = util::array<command_entry_type, 5U>;
+        static const command_table_type commands ROM_CONST_VAR =
+            {{{generic_cmd_set_cv,    process_set_cv},
+              {generic_cmd_get_cv,    process_get_cv},
+              {generic_cmd_mon_list,  process_monitor_list},
+              {generic_cmd_mon_start, process_monitor_start},
+              {generic_cmd_mon_stop,  process_monitor_stop}}};
+
+        stringstream_type st(telegram);
+        char cmd[kMaxLenToken];
+        char cmd_rom[kMaxLenToken];
+        ret_type ret = eINV_CMD;
+        string_type sub_response;
+        boolean found = false;
+        size_type idx;
+
+        st >> util::setw(static_cast<util::streamsize>(kMaxLenToken)) >> cmd;
+
+        util::string_view sv(cmd);
+        for (idx = 0U; idx < commands.size(); idx++)
+        {
+            command_entry_type entry;
+            ROM_READ_STRUCT(&entry, &commands[idx], sizeof(command_entry_type));
+            ROM_READ_STRING(cmd_rom, entry.cmd);
+            if (sv.compare(cmd_rom) == 0)
+            {
+                ret = entry.handler(st, sub_response);
+                found = true;
+                break;
+            }
         }
-        // If not found, try project registry
-        else if (ascii_com_registry::find_project_command(cmd, handler))
+
+        if (!found)
         {
-            ret = static_cast<ret_type>(handler(st, sub_response));
-        }
-        else 
-        {
-            // Command not found in either registry, it is an invalid command
+            if (command_handler && command_handler->process_command(cmd, st, response))
+            {
+                // response fully assembled by project handler
+                return;
+            }
             ret = eINV_CMD;
         }
 
-        // Prepare the response, read the string from PROGMEM, works for x86 too
+        // Assemble response: status text + optional sub-response
         const char *response_text = static_cast<const char *>(ROM_READ_PTR(&responses[static_cast<size_type>(ret)]));
-        ascii_com_registry::format_response(response_text, sub_response, response);
+        response = response_text;
+        if (sub_response.size() > 0U)
+        {
+            response.append(" ");
+            response.append(sub_response);
+        }
     }
 
     // -----------------------------------------------------------------------------------
@@ -425,32 +463,6 @@ namespace com
         portMonitor.pPortData = nullptr;
 
         return eOK;
-    }
-
-    // Registry adapter wrappers keep current handler implementations unchanged.
-    ascii_com_registry::ret_type ascii_com_cmd_set_cv(ascii_com_registry::stream_type &st, ascii_com_registry::string_type &response)
-    {
-        return static_cast<ascii_com_registry::ret_type>(process_set_cv(st, response));
-    }
-
-    ascii_com_registry::ret_type ascii_com_cmd_get_cv(ascii_com_registry::stream_type &st, ascii_com_registry::string_type &response)
-    {
-        return static_cast<ascii_com_registry::ret_type>(process_get_cv(st, response));
-    }
-
-    ascii_com_registry::ret_type ascii_com_cmd_monitor_list(ascii_com_registry::stream_type &st, ascii_com_registry::string_type &response)
-    {
-        return static_cast<ascii_com_registry::ret_type>(process_monitor_list(st, response));
-    }
-
-    ascii_com_registry::ret_type ascii_com_cmd_monitor_start(ascii_com_registry::stream_type &st, ascii_com_registry::string_type &response)
-    {
-        return static_cast<ascii_com_registry::ret_type>(process_monitor_start(st, response));
-    }
-
-    ascii_com_registry::ret_type ascii_com_cmd_monitor_stop(ascii_com_registry::stream_type &st, ascii_com_registry::string_type &response)
-    {
-        return static_cast<ascii_com_registry::ret_type>(process_monitor_stop(st, response));
     }
 
 } // namespace com

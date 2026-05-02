@@ -9,7 +9,6 @@
  */
 
 #include <Com/SignalAsciiCommandHandler.h>
-#include <Com/AsciiCommandRegistry.h>
 #include <Debug.h>
 #include <Util/Array.h>
 #include <Util/String_view.h>
@@ -17,57 +16,6 @@
 
 namespace com
 {
-    namespace signal_com_registry
-    {
-        /**
-         * @brief Project-level command registry lookup function.
-         *
-         * Finds a project-specific command by name and returns its handler.
-         * This function is registered with AsciiCom at initialization.
-         *
-         * @param cmd Command token to lookup.
-         * @param handler [out] Handler function pointer if found (not used in this implementation).
-         * @return true Command found.
-         * @return false Command not found (invalid command).
-         */
-        boolean find_command(const char *cmd, ascii_com_registry::command_handler_type &handler)
-        {
-            // Forward declaration names (must match command_type array in anonymous namespace below)
-            static constexpr const char cmd_INIT[] ROM_CONST_VAR = "INIT";
-            static constexpr const char cmd_SET_VERBOSE[] ROM_CONST_VAR = "SET_VERBOSE";
-            static constexpr const char cmd_SET_SIGNAL[] ROM_CONST_VAR = "SET_SIGNAL";
-            static constexpr const char cmd_GET_SIGNAL[] ROM_CONST_VAR = "GET_SIGNAL";
-            static constexpr const char cmd_GET_PIN_CONFIG[] ROM_CONST_VAR = "GET_PIN_CONFIG";
-            static constexpr const char cmd_ETO_SET_SIGNAL[] ROM_CONST_VAR = "ETO_SET_SIGNAL";
-
-            static constexpr const char * const cmd_list[] ROM_CONST_VAR =
-            {
-                cmd_INIT,
-                cmd_SET_VERBOSE,
-                cmd_SET_SIGNAL,
-                cmd_GET_SIGNAL,
-                cmd_GET_PIN_CONFIG,
-                cmd_ETO_SET_SIGNAL
-            };
-
-            util::string_view sv(cmd);
-            size_t idx;
-
-            for (idx = 0U; idx < 6U; idx++)
-            {
-                char cmd_rom[ascii_com_registry::kMaxLenToken];
-                ROM_READ_STRING(cmd_rom, static_cast<const char *>(ROM_READ_PTR(&cmd_list[idx])));
-                if (sv.compare(cmd_rom) == 0)
-                {
-                    handler = nullptr;  // Placeholder; actual dispatch calls process_command()
-                    return true;
-                }
-            }
-
-            handler = nullptr;
-            return false;
-        }
-    }
 
     namespace
     {
@@ -103,20 +51,21 @@ namespace com
         const char ret_ERR_UNKNOWN[] ROM_CONST_VAR = "ERR: unknown error";
 
         static constexpr const char *responses[] ROM_CONST_VAR =
-            {
-                ret_OK,
-                ret_ERR_EEPROM,
-                ret_INV_CMD,
-                ret_INV_SIGNAL_IDX,
-                ret_INV_SIGNAL_ID,
-                ret_INV_FIRST_OUTPUT_TYPE,
-                ret_INV_OUTPUT_CONFIG_STEP_SIZE,
-                ret_INV_INPUT_TYPE,
-                ret_INV_OUTPUT_PIN,
-                ret_INV_INPUT_PIN,
-                ret_INV_PARAM,
-                ret_INV_VERBOSE_LEVEL,
-                ret_ERR_UNKNOWN};
+        {
+            ret_OK,
+            ret_ERR_EEPROM,
+            ret_INV_CMD,
+            ret_INV_SIGNAL_IDX,
+            ret_INV_SIGNAL_ID,
+            ret_INV_FIRST_OUTPUT_TYPE,
+            ret_INV_OUTPUT_CONFIG_STEP_SIZE,
+            ret_INV_INPUT_TYPE,
+            ret_INV_OUTPUT_PIN,
+            ret_INV_INPUT_PIN,
+            ret_INV_PARAM,
+            ret_INV_VERBOSE_LEVEL,
+            ret_ERR_UNKNOWN
+        };
 
         const char cmd_INIT[] ROM_CONST_VAR = "INIT";
         const char cmd_SET_VERBOSE[] ROM_CONST_VAR = "SET_VERBOSE";
@@ -445,15 +394,18 @@ namespace com
 
     bool SignalAsciiCommandHandler::process_command(const char *cmd, stringstream_type &st, string_type &response)
     {
+        static constexpr size_t kMaxLenToken = 20U;
         size_t idx;
         boolean found = false;
         ret_type ret = eINV_CMD;
         string_type sub_response;
         util::string_view sv(cmd);
+        char cmd_rom[kMaxLenToken];
 
         for (idx = 0U; idx < commands.size(); idx++)
         {
-            if (sv.compare(commands[idx].cmd) == 0)
+            ROM_READ_STRING(cmd_rom, commands[idx].cmd);
+            if (sv.compare(cmd_rom) == 0)
             {
                 ret = commands[idx].handler(st, sub_response);
                 found = true;
@@ -467,7 +419,12 @@ namespace com
         }
 
         const char *response_text = static_cast<const char *>(ROM_READ_PTR(&responses[static_cast<size_t>(ret)]));
-        ascii_com_registry::format_response(response_text, sub_response, response);
+        response = response_text;
+        if (sub_response.size() > 0U)
+        {
+            response.append(" ");
+            response.append(sub_response);
+        }
         return true;
     }
 

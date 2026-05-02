@@ -1,5 +1,5 @@
 /**
- * @file Prj/App/Signal/Com/ComR.h
+ * @file Prj/App/Signal/Com/ComR_Prj.h
  *
  * @brief COM module wiring for Signal application.
  *
@@ -8,18 +8,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef COMR_H_
-#define COMR_H_
+#ifndef COMR_PRJ_H_
+#define COMR_PRJ_H_
 
-#include <Com/AsciiCom.h>
-#include <Com/SerAsciiTP.h>
-#include <Com/SerComDrv.h>
+#include <Com/ComR.h>
 #include <Com/SignalAsciiCommandHandler.h>
 
 namespace com
 {
-    class ComR
+    class ComR_Prj : public ComR
     {
+        using parent_class = ComR;
+        
     protected:
         AsciiCom myAsciiCom;
         SerAsciiTP mySerAsciiTP;
@@ -27,10 +27,10 @@ namespace com
         SignalAsciiCommandHandler mySignalAsciiCommandHandler;
 
     public:
-        ComR();
+        ComR_Prj();
         void init();
         void cycle();
     };
 }
 
-#endif // COMR_H_
+#endif // COMR_PRJ_H_

@@ -8,28 +8,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <Com/ComR.h>
+#include <Com/ComR_Prj.h>
 
 namespace com
 {
-    ComR::ComR()
+    ComR_Prj::ComR_Prj()
     {
     }
 
-    void ComR::init()
+    void ComR_Prj::init()
     {
-        mySerAsciiTP.init();
-        mySerAsciiTP.setDriver(mySerDrv);
-        myAsciiCom.listen_to(mySerAsciiTP);
+        parent_class::init(); // Call base class init if needed (not strictly necessary here since we override it completely)
+        // Register the project-specific command handler with AsciiCom
         myAsciiCom.set_command_handler(mySignalAsciiCommandHandler);
-        // Register project command registry with AsciiCom for direct lookup
-        // This eliminates the need for virtual dispatch in process()
-        ascii_com_registry::set_project_command_finder(signal_com_registry::find_command);
     }
 
-    void ComR::cycle()
+    void ComR_Prj::cycle()
     {
-        mySerAsciiTP.cycle();
-        myAsciiCom.cycle();
+        parent_class::cycle(); // Call base class cycle if needed (not strictly necessary here since we override it completely)
     }
 }

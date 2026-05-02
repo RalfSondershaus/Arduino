@@ -12,9 +12,9 @@ FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/DccDecoder      \
             $(PATH_SRC_PRJ_PROJECT)/SignalMain      \
             $(PATH_SRC_PRJ_PROJECT)/Cal/CalM        \
             $(PATH_SRC_PRJ_PROJECT)/Com/ComR_Prj    \
+            $(PATH_SRC_GEN)/Com/ComR                \
             $(PATH_SRC_PRJ_PROJECT)/Com/SignalAsciiCommandHandler \
             $(PATH_SRC_GEN)/Com/AsciiCom            \
-            $(PATH_SRC_GEN)/Com/AsciiCommandRegistry \
             $(PATH_SRC_GEN)/Com/SerAsciiTP          \
             $(PATH_SRC_GEN)/Util/Algorithm          \
             $(PATH_SRC_GEN)/Util/Locale             \
@@ -28,5 +28,4 @@ FILES_PRJ_OPT4 = \
             $(PATH_SRC_PRJ_PROJECT)/Com/ComR_Prj    \
             $(PATH_SRC_PRJ_PROJECT)/Com/SignalAsciiCommandHandler \
             $(PATH_SRC_GEN)/Com/AsciiCom            \
-            $(PATH_SRC_GEN)/Com/AsciiCommandRegistry \
             $(PATH_SRC_GEN)/Com/SerAsciiTP          \
