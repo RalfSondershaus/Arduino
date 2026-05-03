@@ -19,10 +19,12 @@
 
 namespace cal
 {
+    /**
+     * @brief EEPROM indices for calibration data.
+     */
     namespace eeprom
     {
         // Depends on hardware platform.
-        /// EEPROM indices.
         /// @note MEGA: max 4 KB
         /// @note NANO: max 1 KB
         constexpr uint16 kDecoderAddressLSB                 = cv::kDecoderAddressLSB;
@@ -47,6 +49,11 @@ namespace cal
         ///< One past last element = number of bytes in EEPROM
     }
 
+    /** @defgroup CalMConfig Constants for calibration module
+      * @ingroup CalM
+      * @{
+     * @brief Constants for calibration module
+     */
     constexpr uint8 kAddressLSB = 1; /* DCC Address LSB */
     constexpr uint8 kAddressMSB = 0; /* DCC Address MSB */
     constexpr uint8 kAuxAct = 0;

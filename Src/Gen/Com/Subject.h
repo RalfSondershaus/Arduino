@@ -1,5 +1,5 @@
 /**
- * @file Signal/Com/Subject.h
+ * @file Gen/Com/Subject.h
  *
  * @brief Observer interface for ASCII communication
  *

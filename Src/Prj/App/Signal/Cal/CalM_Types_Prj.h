@@ -18,14 +18,37 @@ namespace cal
 {
     namespace cv
     {
-        /// 19 bytes per signal (with 8 aspects)
-        constexpr uint16 kSignalLength = 19;
-        constexpr uint16 kClassifierLength = 11; // 11 bytes per classifier type (with 5 classes)
+        constexpr uint16 kSignalLength = 19; ///< 19 bytes per signal (with 8 aspects)
+        constexpr uint16 kClassifierLength = 11; ///< 11 bytes per classifier type (with 5 classes)
 
         /**
-         * @brief CVs and CV base addresses
+         * @brief Configuration Variables (CVs) and CV base addresses
          *
-         * The CV numbers are independent of the hardware platform.
+         * Defines CV numbers for calibration parameters following DCC accessory
+         * decoder conventions (NMRA S-9.2.1). CV numbers are platform-independent (e.g., Arduino 
+         * Mega or Nano) and map directly to EEPROM byte offsets.
+         * 
+         * **Standard CVs (NMRA-defined):**
+         * - CV1, CV9: Decoder address (11-bit accessory address)
+         * - CV8: Manufacturer ID
+         * - CV29: Configuration register (decoder type, addressing mode)
+         * 
+         * **Project-specific CVs:**
+         * - CV42-49: Signal type IDs (@ref cfg::kNrSignals entries)
+         * - CV50-57: First output pin configuration
+         * - CV58-65: Input source configuration (ADC/DCC/Digital)
+         * - CV74-81: Output pin ordering and step size
+         * - CV112+: Input classifier thresholds
+         * - CV134+: User-defined signal definitions
+         * 
+         * All CVs are read from/written to EEPROM at startup and when changed via
+         * serial commands (SET_CV) or DCC programming. See @ref CalM::get_cv() and
+         * @ref CalM::set_cv() for runtime access.
+         * 
+         * @note CV addressing is zero-based for EEPROM access but follows one-based
+         *       DCC convention in documentation and serial commands.
+         * @see @ref CalM::get_cv(), @ref CalM::set_cv()
+         * @see NMRA S-9.2.1 (DCC Accessory Decoder Conventions)
          */
         constexpr uint16 kDecoderAddressLSB = 1;
         constexpr uint16 kAuxiliaryActivation = 2;

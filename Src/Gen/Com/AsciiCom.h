@@ -1,13 +1,10 @@
 /**
- * @file Signal/Com/AsciiCom.h
+ * @file Gen/Com/AsciiCom.h
  *
- * @brief Handles ASCII-based telegram communication for signal control.
+ * @brief Handles ASCII-based telegram communication.
  *
  * The AsciiCom class is responsible for receiving,
- * processing, and responding to ASCII telegrams related to signal configuration
- * and status queries. The supported telegrams allow setting and getting signal
- * aspects, blinks, targets, input classification, and change-over times, as well
- * as copying signal configurations between IDs.
+ * processing, and responding to ASCII telegrams.
  *
  * Capital letters and lower letters can be used. Capital letters are used here to support
  * readability.
@@ -18,21 +15,8 @@
  * - `SET_CV cv_id value` - Set the CV with id cv_id to the given value
  * - `GET_CV cv_id` - Get the value of the CV with id cv_id
  *
- * ### Signal Configuration
- * - `SET_SIGNAL idx id [ONB,EXT] output_pin step_size [ADC,DIG,DCC] input_pin` - Configure signal at position idx
- *   - `idx` - Signal index (0 to @ref cfg::kNrSignals - 1)
- *   - `id` - Signal type ID (built-in or user-defined)
- *   - `ONB` or `EXT` - Output type (onboard or external)
- *   - `output_pin` - First output pin number
- *   - `step_size` - Step size for output pins (-2, -1, 1, or 2; negative values indicate inverse order)
- *   - `ADC`, `DIG`, or `DCC` - Input type (analog, digital, or DCC)
- *   - `input_pin` - Input pin number
- * - `GET_SIGNAL idx` - Get the configuration of signal at position idx
- *
- * ### ETO Signal Control
- * - `ETO_SET_SIGNAL signal_idx aspect [dim_time_10ms]` - Enable/disable ETO signal aspect
- *   - `aspect` - Aspect value (0 to disable, non-zero to enable)
- *   - `dim_time_10ms` - Optional dimming time in units of 10 ms (default: 10 = 100 ms)
+ * Project-specific commands are delegated to an optional
+ * @ref IfcAsciiCommandHandler implementation.
  *
  * ### RTE Port Monitoring
  * - `MON_LIST` - Print available RTE ports 
@@ -43,24 +27,9 @@
  *   - `id-nr` - Optional: number of elements to transmit for array types
  * - `MON_STOP` - Stop monitoring RTE port
  * 
- * ### System Commands
- * - `INIT` - Write default values to NVM
- * - `SET_VERBOSE level` - Set verbosity level (0 to 3)
- * - `GET_PIN_CONFIG pin` - Get the configuration of the specified pin (INPUT or OUTPUT)
- * 
  * ## Usage Examples
  *
- * ### Configure signal 0 using SET_SIGNAL
- * ```
- * SET_SIGNAL 0 1 ONB 10 -1 ADC 54
- * ```
- * This configures signal at index 0 to:
- * - Signal type ID 1 (Ausfahrsignal)
- * - Onboard output starting at pin 10
- * - Step size -1 (inverse order, decrementing pin numbers)
- * - ADC input from pin 54 (A0)
- *
- * ### Configure signal using CV commands (alternative method)
+ * ### Configure signal using CV commands
  * ```
  * SET_CV 42 1      # Assign Ausfahrsignal (1) to signal 1
  * SET_CV 50 0x0D   # First output pin of signal 1 is onboard (0) pin 13 (D)
@@ -75,12 +44,6 @@
  * MON_STOP                      # Stop monitoring
  * ```
  *
- * ### ETO Signal Control
- * ```
- * ETO_SET_SIGNAL 0 5 20   # Enable ETO for signal 0, aspect 5, dim time 200 ms
- * ETO_SET_SIGNAL 0 0      # Disable ETO for signal 0
- * ```
- * 
  * @note Parts of the documentation of this file was created by GitHub Copilot.
  *
  * @copyright Copyright 2024-2025 Ralf Sondershaus
@@ -92,6 +55,7 @@
 #define ASCIICOM_H_
 
 #include <Std_Types.h>
+#include <Com/IfcAsciiCommandHandler.h>
 #include <Com/Observer.h>
 #include <Com/SerAsciiTP.h>
 #include <Util/Array.h>
@@ -99,12 +63,11 @@
 namespace com
 {
     /**
-     * Receives and processes ASCII telegrams for signal control.
+     * Receives and processes ASCII telegrams.
      *
      * This class listens to a SerAsciiTP instance and processes incoming telegrams
-     * related to signal configuration and status queries. It supports commands for
-     * setting and getting signal aspects, blinks, targets, input classification,
-     * and change-over times, as well as configuring classifiers.
+     * related to generic commands. Project-specific command sets can be integrated
+     * via @ref set_command_handler.
      *
      * For communication, it uses ASCII-formatted telegrams where commands and parameters
      * are separated by spaces. The class can handle various commands such as `SET_CV`,
@@ -127,6 +90,7 @@ namespace com
          * is used to listen to the SerAsciiTP instance for incoming telegrams.
          */
         util::ptr<SerAsciiTP> asciiTP;
+        util::ptr<IfcAsciiCommandHandler> command_handler;
         /**
          * @brief Stores the response telegram as a string.
          *
@@ -167,6 +131,19 @@ namespace com
         {
             asciiTP = &tp;
             tp.attach(*this);
+        }
+
+        /**
+         * @brief Register a handler for project-specific commands.
+         *
+         * The generic command set is still handled by AsciiCom itself.
+         * Unknown commands are delegated to the registered handler.
+         *
+         * @param handler Project-specific command handler.
+         */
+        void set_command_handler(IfcAsciiCommandHandler &handler)
+        {
+            command_handler = &handler;
         }
 
         /**
