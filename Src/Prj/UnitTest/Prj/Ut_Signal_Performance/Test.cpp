@@ -3,6 +3,9 @@
  *
  * @brief Unit tests to measure run time of project Signal
  *
+ * @note Builds with avr-gcc compiler for Arduino only, as it is intended to measure run time on the 
+ *       target platform.
+ * 
  * @copyright Copyright 2025 Ralf Sondershaus
  *
  * SPDX-License-Identifier: Apache-2.0
