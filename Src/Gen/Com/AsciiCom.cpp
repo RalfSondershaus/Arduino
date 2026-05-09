@@ -1,7 +1,9 @@
 /**
- * @file Gen/Com/AsciiCom.cpp
+ * @file AsciiCom.cpp
  *
- * @brief
+ * @author Ralf Sondershaus
+ *
+ * @brief Implements ASCII command parsing and monitor output handling.
  *
  * @copyright Copyright 2024 Ralf Sondershaus
  *
@@ -22,7 +24,9 @@ namespace com
     using string_type = AsciiCom::string_type; // string of size 64
     using stringstream_type = util::basic_istringstream<SerAsciiTP::kMaxLenTelegram, char_type>;
 
-    /// To monitor a RTE port
+    /**
+     * @brief Stores runtime state for RTE port monitoring output.
+     */
     typedef struct
     {
         const rte::port_data_t *pPortData; ///< Pointer to the RTE data
@@ -40,9 +44,9 @@ namespace com
         eINV_CMD,    ///< Command invalid (or unknown)
         eINV_CV_ID,  ///< SET_CV with an invalid CV id
         eCV_VALUE_OUT_OF_RANGE, ///< SET_CV with an invalid CV value
-        eINV_MONITOR_START_PARAM,
-        eINV_MONITOR_START_IFC_NAME,
-        eERR_UNKNOWN
+        eINV_MONITOR_START_PARAM,          ///< MON_START parameters are malformed
+        eINV_MONITOR_START_IFC_NAME,       ///< MON_START interface name was not found
+        eERR_UNKNOWN                       ///< Unexpected internal error
     };
 
     /// For each ret_type, an error description that is transmitted after
@@ -78,9 +82,11 @@ namespace com
     static bool doOutputPortList = false;
     static port_type portMonitor;
 
-    // -----------------------------------------------------------------------------------
-    /// A new telegram has been received, process it.
-    // -----------------------------------------------------------------------------------
+    /**
+     * @brief Processes a newly received telegram and transmits a response.
+     *
+     * This callback is invoked by the observed transport layer.
+     */
     void AsciiCom::update()
     {
         if (asciiTP)
@@ -96,14 +102,23 @@ namespace com
         }
     }
 
-    // -----------------------------------------------------------------------------------
-    ///
-    // -----------------------------------------------------------------------------------
+    /**
+     * @brief Parses and executes a single ASCII telegram.
+     *
+     * Generic commands are resolved first. Unknown commands are delegated to the
+     * optional project-specific command handler.
+     *
+     * @param[in] telegram Input telegram including command token and parameters.
+     * @param[out] response Response telegram text.
+     */
     void AsciiCom::process(const string_type &telegram, string_type &response)
     {
         static constexpr size_type kMaxLenToken = 20U;
 
         using generic_handler_type = ret_type (*)(stringstream_type &, string_type &);
+        /**
+         * @brief Maps a command token to its generic command handler.
+         */
         struct command_entry_type
         {
             const char *cmd;
@@ -168,8 +183,11 @@ namespace com
         }
     }
 
-    // -----------------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------------
+    /**
+     * @brief Executes cyclic monitor output handling.
+     *
+     * Sends pending MON_LIST output lines and periodic monitored port values.
+     */
     void AsciiCom::cycle()
     {
         if (asciiTP)
@@ -193,12 +211,11 @@ namespace com
     /**
      * @brief Implements command SET_CV <cv_id> <value>
      *
-     * @param st [in] Contains the command string, get pointer points to first element after "SET_CV".
-     * @param response [out] The response is stored here, it contains the command parameters.
-     * @return ret_type eOK
-     * @return ret_type eINV_CMD Ill-formed command or CV id is out-of-bounds
-     * @return ret_type eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
-     * 
+      * @param[in] st Command stream after token "SET_CV".
+      * @param[out] response Echo of command parameters for response composition.
+      * @return eOK Valid command and value written to CV.
+      * @return eINV_CMD Ill-formed command parameters.
+      * @return eCV_VALUE_OUT_OF_RANGE Value is outside uint8 range.
      */
     static ret_type process_set_cv(stringstream_type &st, string_type &response)
     {
@@ -236,12 +253,11 @@ namespace com
     /**
      * @brief Implements command GET_CV <cv_id>
      *
-     * @param st Contains the command string, get pointer points to first element after "GET_CV".
-     * @param response [out] The response is stored here, it contains the command parameters.
-     * @return ret_type eOK
-     * @return ret_type eINV_CMD Ill-formed command or CV id is out-of-bounds
-     * @return ret_type eCV_VALUE_OUT_OF_RANGE CV value is out-of-bounds
-     * 
+      * @param[in] st Command stream after token "GET_CV".
+      * @param[out] response Echo of command parameters plus CV value on success.
+      * @return eOK CV id is valid and value appended to response.
+      * @return eINV_CMD Ill-formed command parameters.
+      * @return eINV_CV_ID CV id is not valid.
      */
     static ret_type process_get_cv(stringstream_type &st, string_type &response)
     {
@@ -283,9 +299,9 @@ namespace com
      * The cyclic process of printing is enabled. The output itself is done by
      * @ref output_monitor_list.
      *
-     * @param st Contains the command string without "MON_LIST"
-     * @param response [out] The response is stored here, it contains the number of RTE ports.
-     * @return ret_type eOK
+    * @param[in] st Command stream after token "MON_LIST" (unused).
+    * @param[out] response Initial response containing number of registered ports.
+    * @return eOK Command accepted and list output enabled.
      */
     static ret_type process_monitor_list(stringstream_type &st, string_type &response)
     {
@@ -307,7 +323,7 @@ namespace com
      * Once all ports have been listed, the index resets to 0 and the function returns false.
      * Otherwise, it returns true to indicate that more ports remain to be listed.
      *
-     * @param response [out] A reference to a string that will be populated with the current RTE
+     * @param[out] response A reference to a string that will be populated with the current RTE
      *                 port's index and name in the format "index : name"
      * @return true: continue to next list element
      * @return false: stop, end of list
@@ -351,9 +367,9 @@ namespace com
      * or uint32). If the timer has not expired, the function returns false and does not modify the 
      * response.
      *
-     * @param pm Reference to the RTE port monitoring structure containing timer and data buffer 
+     * @param[in,out] pm Reference to the RTE port monitoring structure containing timer and data buffer 
      *           information.
-     * @param response Reference to a string that will be populated with formatted output data if 
+     * @param[out] response A string that will be populated with formatted output data if 
      *                 applicable.
      *
      * @return true if the timer expired and data was written to the response; false otherwise.
@@ -400,11 +416,17 @@ namespace com
         return ret;
     }
 
-    // -----------------------------------------------------------------------------------
-    /// <MON_START> cycle-time ifc-name [first-idx nr-idx]
-    ///
-    /// @return eOK, eINV_MONITOR_START_IFC_NAME, eINV_MONITOR_START_PARAM
-    // -----------------------------------------------------------------------------------
+    /**
+     * @brief Implements command MON_START <cycle-time> <ifc-name> [first-idx nr-idx].
+     *
+     * Starts periodic monitoring output for the selected RTE interface.
+     *
+     * @param[in] st Command stream after token "MON_START".
+     * @param[out] response Response containing the selected interface name on success.
+     * @return eOK Monitoring started.
+     * @return eINV_MONITOR_START_IFC_NAME Interface name is unknown.
+     * @return eINV_MONITOR_START_PARAM Parameters are malformed.
+     */
     static ret_type process_monitor_start(stringstream_type &st, string_type &response)
     {
         char ifc_name[32];
@@ -452,9 +474,16 @@ namespace com
         return ret;
     }
 
-    // -----------------------------------------------------------------------------------
-    /// Stop the monitor
-    // -----------------------------------------------------------------------------------
+    /**
+     * @brief Implements command MON_STOP. 
+     * 
+     * The command stops the periodic monitoring output started by MON_START and clears the 
+     * monitoring state.
+     *
+     * @param[in] st Command stream after token "MON_STOP" (unused).
+     * @param[out] response Response text (unused).
+     * @return eOK Monitor stopped.
+     */
     static ret_type process_monitor_stop(stringstream_type &st, string_type &response)
     {
         (void)st;

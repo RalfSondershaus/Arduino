@@ -1,50 +1,19 @@
 /**
- * @file Gen/Com/AsciiCom.h
+ * @file AsciiCom.h
  *
- * @brief Handles ASCII-based telegram communication.
+ * @author Ralf Sondershaus
  *
- * The AsciiCom class is responsible for receiving,
- * processing, and responding to ASCII telegrams.
+ * @brief ASCII telegram communication interface for generic COM commands.
  *
- * Capital letters and lower letters can be used. Capital letters are used here to support
- * readability.
+ * The AsciiCom class receives telegrams from SerAsciiTP, handles generic commands,
+ * and can delegate unknown commands to an optional project-specific handler.
  *
- * ## Supported Commands
- *
- * ### Configuration Variables (CV)
- * - `SET_CV cv_id value` - Set the CV with id cv_id to the given value
- * - `GET_CV cv_id` - Get the value of the CV with id cv_id
- *
- * Project-specific commands are delegated to an optional
- * @ref IfcAsciiCommandHandler implementation.
- *
- * ### RTE Port Monitoring
- * - `MON_LIST` - Print available RTE ports 
- * - `MON_START cycle-time ifc-name [id-first id-nr]` - Start to print current values of `ifc-name`
- *   - `cycle-time` - Update interval in milliseconds
- *   - `ifc-name` - Name of the RTE interface to monitor
- *   - `id-first` - Optional: first element index for array types
- *   - `id-nr` - Optional: number of elements to transmit for array types
- * - `MON_STOP` - Stop monitoring RTE port
- * 
- * ## Usage Examples
- *
- * ### Configure signal using CV commands
- * ```
- * SET_CV 42 1      # Assign Ausfahrsignal (1) to signal 1
- * SET_CV 50 0x0D   # First output pin of signal 1 is onboard (0) pin 13 (D)
- * SET_CV 58 0x40   # Input is ADC (4) at A0 (0)
- * SET_CV 66 0      # Classifier type is type 1 (0)
- * ```
- * 
- * ### Monitor RTE interface
- * ```
- * MON_LIST                      # List all available RTE ports
- * MON_START 100 ifc_ad_values   # Monitor ifc_ad_values every 100 ms
- * MON_STOP                      # Stop monitoring
- * ```
- *
- * @note Parts of the documentation of this file was created by GitHub Copilot.
+ * ## Supported Generic Commands
+ * - `SET_CV cv_id value`
+ * - `GET_CV cv_id`
+ * - `MON_LIST`
+ * - `MON_START cycle-time ifc-name [id-first id-nr]`
+ * - `MON_STOP`
  *
  * @copyright Copyright 2024-2025 Ralf Sondershaus
  *
@@ -63,16 +32,17 @@
 namespace com
 {
     /**
-     * Receives and processes ASCII telegrams.
+    * @brief Receives and processes ASCII telegrams.
      *
      * This class listens to a SerAsciiTP instance and processes incoming telegrams
      * related to generic commands. Project-specific command sets can be integrated
      * via @ref set_command_handler.
      *
      * For communication, it uses ASCII-formatted telegrams where commands and parameters
-     * are separated by spaces. The class can handle various commands such as `SET_CV`,
-     * `MON_LIST`, `MON_START`, `MON_STOP`, and `INIT`. It generates appropriate responses
-     * based on the processed commands. See the readme.md documentation for telegram descriptions 
+     * are separated by spaces. The class handles generic commands such as `SET_CV`,
+     * `GET_CV`, `MON_LIST`, `MON_START`, and `MON_STOP`.
+     * Unknown commands can be delegated to a project-specific handler.
+     * It generates appropriate responses based on the processed commands. See readme documentation
      * and usage examples.
      */
     class AsciiCom : public Observer
@@ -90,7 +60,7 @@ namespace com
          * is used to listen to the SerAsciiTP instance for incoming telegrams.
          */
         util::ptr<SerAsciiTP> asciiTP;
-        util::ptr<IfcAsciiCommandHandler> command_handler;
+        util::ptr<IfcAsciiCommandHandler> command_handler; ///< Optional handler for project-specific commands.
         /**
          * @brief Stores the response telegram as a string.
          *
@@ -125,7 +95,7 @@ namespace com
          * This method sets the internal pointer to the provided SerAsciiTP object and
          * registers this object as an observer by calling the attach method on the SerAsciiTP instance.
          *
-         * @param tp Reference to the SerAsciiTP object to listen to.
+         * @param[in] tp Reference to the SerAsciiTP object to listen to.
          */
         void listen_to(SerAsciiTP &tp)
         {
@@ -139,7 +109,7 @@ namespace com
          * The generic command set is still handled by AsciiCom itself.
          * Unknown commands are delegated to the registered handler.
          *
-         * @param handler Project-specific command handler.
+         * @param[in] handler Project-specific command handler.
          */
         void set_command_handler(IfcAsciiCommandHandler &handler)
         {
@@ -152,8 +122,8 @@ namespace com
          * This function takes an input telegram, performs the necessary processing,
          * and writes the result to the response parameter.
          *
-         * @param telegram The input string containing the telegram to be processed.
-         * @param response Reference to a string where the generated response will be stored.
+         * @param[in] telegram The input string containing the telegram to be processed.
+         * @param[out] response Reference to a string where the generated response will be stored.
          */
         void process(const string_type &telegram, string_type &response);
 
