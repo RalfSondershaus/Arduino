@@ -10,6 +10,7 @@
 
 #include <Com/SignalAsciiCommandHandler.h>
 #include <Debug.h>
+#include <Util/Algorithm.h>
 #include <Util/Array.h>
 #include <Util/String_view.h>
 #include <Rte/Rte.h>
@@ -19,26 +20,26 @@ namespace com
 
     namespace
     {
-        enum ret_type
-        {
-            eOK = 0,
-            eERR_EEPROM,
-            eINV_CMD,
-            eINV_SIGNAL_IDX,
-            eINV_SIGNAL_ID,
-            eINV_FIRST_OUTPUT_TYPE,
-            eINV_OUTPUT_CONFIG_STEP_SIZE,
-            eINV_INPUT_TYPE,
-            eINV_OUTPUT_PIN,
-            eINV_INPUT_PIN,
-            eINV_PARAM,
-            eINV_VERBOSE_LEVEL,
-            eERR_UNKNOWN
-        };
+        using ret_type = IfcAsciiCommandHandler::ret_type;
 
-        const char ret_OK[] ROM_CONST_VAR = "OK";
+        // Aliases for the interface sentinels (used by internal handlers)
+        static constexpr ret_type kIfcOK     = IfcAsciiCommandHandler::kIfcOK;
+        static constexpr ret_type kIfcInvCmd = IfcAsciiCommandHandler::kIfcInvCmd;
+
+        // Project-specific error codes, indexed from kIfcProjectBase
+        static constexpr ret_type kErrEeprom               = IfcAsciiCommandHandler::kIfcProjectBase + 0;
+        static constexpr ret_type kInvSignalIdx            = IfcAsciiCommandHandler::kIfcProjectBase + 1;
+        static constexpr ret_type kInvSignalId             = IfcAsciiCommandHandler::kIfcProjectBase + 2;
+        static constexpr ret_type kInvFirstOutputType      = IfcAsciiCommandHandler::kIfcProjectBase + 3;
+        static constexpr ret_type kInvOutputConfigStepSize = IfcAsciiCommandHandler::kIfcProjectBase + 4;
+        static constexpr ret_type kInvInputType            = IfcAsciiCommandHandler::kIfcProjectBase + 5;
+        static constexpr ret_type kInvOutputPin            = IfcAsciiCommandHandler::kIfcProjectBase + 6;
+        static constexpr ret_type kInvInputPin             = IfcAsciiCommandHandler::kIfcProjectBase + 7;
+        static constexpr ret_type kInvParam                = IfcAsciiCommandHandler::kIfcProjectBase + 8;
+        static constexpr ret_type kInvVerboseLevel         = IfcAsciiCommandHandler::kIfcProjectBase + 9;
+
+        // Project-specific error strings only; "OK" and "ERR: Invalid command" are owned by AsciiCom.
         const char ret_ERR_EEPROM[] ROM_CONST_VAR = "ERR: EEPROM failure";
-        const char ret_INV_CMD[] ROM_CONST_VAR = "ERR: Invalid command";
         const char ret_INV_SIGNAL_IDX[] ROM_CONST_VAR = "ERR: Invalid signal index";
         const char ret_INV_SIGNAL_ID[] ROM_CONST_VAR = "ERR: Invalid signal id";
         const char ret_INV_FIRST_OUTPUT_TYPE[] ROM_CONST_VAR = "ERR: Invalid first output type";
@@ -48,23 +49,40 @@ namespace com
         const char ret_INV_INPUT_PIN[] ROM_CONST_VAR = "ERR: Invalid input pin";
         const char ret_INV_PARAM[] ROM_CONST_VAR = "ERR: Invalid parameter";
         const char ret_INV_VERBOSE_LEVEL[] ROM_CONST_VAR = "ERR: Invalid verbose level: SET_VERBOSE 0 ... 3";
-        const char ret_ERR_UNKNOWN[] ROM_CONST_VAR = "ERR: unknown error";
+
+        constexpr size_t max_constexpr(size_t a) { return a; }
+
+        template<typename... Args>
+        constexpr size_t max_constexpr(size_t a, Args... rest)
+        {
+            return a > max_constexpr(rest...) ? a : max_constexpr(rest...);
+        }
+
+        static constexpr size_t kMaxResponseLen = max_constexpr(
+            sizeof(ret_ERR_EEPROM) - 1U,
+            sizeof(ret_INV_SIGNAL_IDX) - 1U,
+            sizeof(ret_INV_SIGNAL_ID) - 1U,
+            sizeof(ret_INV_FIRST_OUTPUT_TYPE) - 1U,
+            sizeof(ret_INV_OUTPUT_CONFIG_STEP_SIZE) - 1U,
+            sizeof(ret_INV_INPUT_TYPE) - 1U,
+            sizeof(ret_INV_OUTPUT_PIN) - 1U,
+            sizeof(ret_INV_INPUT_PIN) - 1U,
+            sizeof(ret_INV_PARAM) - 1U,
+            sizeof(ret_INV_VERBOSE_LEVEL) - 1U
+        );
 
         static constexpr const char *responses[] ROM_CONST_VAR =
         {
-            ret_OK,
-            ret_ERR_EEPROM,
-            ret_INV_CMD,
-            ret_INV_SIGNAL_IDX,
-            ret_INV_SIGNAL_ID,
-            ret_INV_FIRST_OUTPUT_TYPE,
-            ret_INV_OUTPUT_CONFIG_STEP_SIZE,
-            ret_INV_INPUT_TYPE,
-            ret_INV_OUTPUT_PIN,
-            ret_INV_INPUT_PIN,
-            ret_INV_PARAM,
-            ret_INV_VERBOSE_LEVEL,
-            ret_ERR_UNKNOWN
+            ret_ERR_EEPROM,                  // kIfcProjectBase + 0  (kErrEeprom)
+            ret_INV_SIGNAL_IDX,              // kIfcProjectBase + 1  (kInvSignalIdx)
+            ret_INV_SIGNAL_ID,               // kIfcProjectBase + 2  (kInvSignalId)
+            ret_INV_FIRST_OUTPUT_TYPE,       // kIfcProjectBase + 3  (kInvFirstOutputType)
+            ret_INV_OUTPUT_CONFIG_STEP_SIZE, // kIfcProjectBase + 4  (kInvOutputConfigStepSize)
+            ret_INV_INPUT_TYPE,              // kIfcProjectBase + 5  (kInvInputType)
+            ret_INV_OUTPUT_PIN,              // kIfcProjectBase + 6  (kInvOutputPin)
+            ret_INV_INPUT_PIN,               // kIfcProjectBase + 7  (kInvInputPin)
+            ret_INV_PARAM,                   // kIfcProjectBase + 8  (kInvParam)
+            ret_INV_VERBOSE_LEVEL,           // kIfcProjectBase + 9  (kInvVerboseLevel)
         };
 
         const char cmd_INIT[] ROM_CONST_VAR = "INIT";
@@ -103,7 +121,7 @@ namespace com
         {
             (void)st;
             response.append(st.str());
-            return rte::ifc_cal_set_defaults() ? eOK : eERR_EEPROM;
+            return rte::ifc_cal_set_defaults() ? kIfcOK : kErrEeprom;
         }
 
         static ret_type process_eto_set_signal(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response)
@@ -111,7 +129,7 @@ namespace com
             uint16 signal_idx;
             uint16 aspect;
             uint16 dim_time_10ms = 10;
-            ret_type ret = eINV_CMD;
+            ret_type ret = kIfcInvCmd;
 
             st >> signal_idx;
             st >> aspect;
@@ -133,11 +151,11 @@ namespace com
                         enabled,
                         static_cast<uint8>(aspect),
                         static_cast<uint8>(dim_time_10ms));
-                    ret = eOK;
+                    ret = kIfcOK;
                 }
                 else
                 {
-                    ret = eINV_SIGNAL_IDX;
+                    ret = kInvSignalIdx;
                 }
             }
 
@@ -146,7 +164,7 @@ namespace com
 
         static ret_type process_set_signal(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response)
         {
-            ret_type ret = eINV_CMD;
+            ret_type ret = kIfcInvCmd;
             uint16 signal_idx;
             uint16 signal_id;
             uint16 output_type;
@@ -202,31 +220,31 @@ namespace com
 
                 if (signal_idx >= cfg::kNrSignals)
                 {
-                    ret = eINV_SIGNAL_IDX;
+                    ret = kInvSignalIdx;
                 }
                 else if (!rte::sig::is_built_in(signal_id) && !rte::sig::is_user_defined(signal_id))
                 {
-                    ret = eINV_SIGNAL_ID;
+                    ret = kInvSignalId;
                 }
                 else if ((output_type != cal::constants::kOnboard) && (output_type != cal::constants::kExternal))
                 {
-                    ret = eINV_FIRST_OUTPUT_TYPE;
+                    ret = kInvFirstOutputType;
                 }
                 else if ((step_size < -2) || (step_size > 2) || (step_size == 0))
                 {
-                    ret = eINV_OUTPUT_CONFIG_STEP_SIZE;
+                    ret = kInvOutputConfigStepSize;
                 }
                 else if (input_type > cal::constants::kDig)
                 {
-                    ret = eINV_INPUT_TYPE;
+                    ret = kInvInputType;
                 }
                 else if (first_output_pin >= platform::numeric_limits<uint8>::max_())
                 {
-                    ret = eINV_OUTPUT_PIN;
+                    ret = kInvOutputPin;
                 }
                 else if (input_pin >= platform::numeric_limits<uint8>::max_())
                 {
-                    ret = eINV_INPUT_PIN;
+                    ret = kInvInputPin;
                 }
                 else
                 {
@@ -245,7 +263,7 @@ namespace com
                         tmp |= 0b00000010U;
                     }
                     rte::set_cv(cal::cv::kSignalOutputConfigBase + signal_idx, tmp);
-                    ret = eOK;
+                    ret = kIfcOK;
                 }
             }
 
@@ -254,7 +272,7 @@ namespace com
 
         static ret_type process_get_signal(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response)
         {
-            ret_type ret = eINV_CMD;
+            ret_type ret = kIfcInvCmd;
             uint16 signal_idx;
             uint16 signal_id;
             uint16 output_type;
@@ -270,7 +288,7 @@ namespace com
             {
                 if (signal_idx >= cfg::kNrSignals)
                 {
-                    ret = eINV_SIGNAL_IDX;
+                    ret = kInvSignalIdx;
                 }
                 else
                 {
@@ -340,7 +358,7 @@ namespace com
                     response.append(" ");
                     util::to_string(static_cast<int>(input_pin), tmp_str);
                     response.append(tmp_str);
-                    ret = eOK;
+                    ret = kIfcOK;
                 }
             }
 
@@ -350,7 +368,7 @@ namespace com
         static ret_type process_set_verbose(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response)
         {
             uint16 value;
-            ret_type ret = eINV_VERBOSE_LEVEL;
+            ret_type ret = kInvVerboseLevel;
 
             response.append(st.str());
             st >> value;
@@ -359,7 +377,7 @@ namespace com
                 if (value <= debug::kVeryDetailed)
                 {
                     debug::enable(static_cast<uint8>(value));
-                    ret = eOK;
+                    ret = kIfcOK;
                 }
             }
 
@@ -369,7 +387,7 @@ namespace com
         static ret_type process_get_pin_config(IfcAsciiCommandHandler::stringstream_type &st, IfcAsciiCommandHandler::string_type &response)
         {
             uint16 pin;
-            ret_type ret = eINV_CMD;
+            ret_type ret = kIfcInvCmd;
 
             response.append(st.str());
             st >> pin;
@@ -378,11 +396,11 @@ namespace com
                 if (pin < cfg::kNrOnboardTargets)
                 {
                     rte::sig::is_output_pin(pin) ? response.append(" OUTPUT") : response.append(" INPUT");
-                    ret = eOK;
+                    ret = kIfcOK;
                 }
                 else
                 {
-                    ret = eINV_PARAM;
+                    ret = kInvParam;
                 }
             }
 
@@ -392,40 +410,49 @@ namespace com
 
     }
 
-    bool SignalAsciiCommandHandler::process_command(const char *cmd, stringstream_type &st, string_type &response)
+    IfcAsciiCommandHandler::ret_type SignalAsciiCommandHandler::process_command(
+        const char *cmd, 
+        stringstream_type &st, 
+        string_type &sub_response)
     {
-        static constexpr size_t kMaxLenToken = 20U;
         size_t idx;
-        boolean found = false;
-        ret_type ret = eINV_CMD;
-        string_type sub_response;
+        ret_type ret = kIfcInvCmd;
         util::string_view sv(cmd);
         char cmd_rom[kMaxLenToken];
 
         for (idx = 0U; idx < commands.size(); idx++)
         {
-            ROM_READ_STRING(cmd_rom, commands[idx].cmd);
+            ROM_READ_STRING_N(cmd_rom, commands[idx].cmd, kMaxLenToken);
             if (sv.compare(cmd_rom) == 0)
             {
                 ret = commands[idx].handler(st, sub_response);
-                found = true;
                 break;
             }
         }
 
-        if (!found)
+        if (idx == commands.size())
         {
-            return false;
+            // Command not found; ret is already set to kIfcInvCmd
+            sub_response.append(cmd);
         }
 
-        const char *response_text = static_cast<const char *>(ROM_READ_PTR(&responses[static_cast<size_t>(ret)]));
-        response = response_text;
-        if (sub_response.size() > 0U)
+        return ret;
+    }
+
+    void SignalAsciiCommandHandler::get_error_string(IfcAsciiCommandHandler::ret_type ret, string_type &dst)
+    {
+        if ((ret >= kIfcProjectBase) && 
+            (static_cast<size_t>(ret - kIfcProjectBase) < util::size(responses)))
         {
-            response.append(" ");
-            response.append(sub_response);
+            char buf[dst.max_size()];
+            const char *ptr = static_cast<const char *>(ROM_READ_PTR(&responses[ret - kIfcProjectBase]));
+            ROM_READ_STRING_N(buf, ptr, sizeof(buf));
+            dst = buf;
         }
-        return true;
+        else
+        {
+            // silently ignore invalid ret codes, AsciiCom will handle kOk and kIfcInvCmd itself.
+        }
     }
 
 } // namespace com

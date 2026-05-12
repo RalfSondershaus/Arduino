@@ -1,7 +1,9 @@
 /**
- * @file Gen/Com/ComR.h
+ * @file ComR.h
  *
- * @brief 
+ * @author Ralf Sondershaus
+ *
+ * @brief Generic serial ASCII communication stack runtime wiring.
  *
  * @copyright Copyright 2023 Ralf Sondershaus
  *
@@ -111,22 +113,59 @@ namespace com
   //    0 ... 65535 bytes
   //
 
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
+  /**
+   * @brief Composes SerComDrv, SerAsciiTP and AsciiCom into an operational
+   *        serial ASCII communication stack.
+   *
+   * ComR owns and wires all three layers:
+   * - @ref SerComDrv   — byte-level HAL adapter (reads/writes `hal::serial`).
+   * - @ref SerAsciiTP  — transport layer; accumulates bytes until `\n`,
+   *                      then notifies @ref AsciiCom.
+   * - @ref AsciiCom    — command parser; handles generic commands and
+   *                      delegates unknown tokens to an optional project
+   *                      handler registered via
+   *                      @ref AsciiCom::set_command_handler().
+   *
+   * Typical usage:
+   * @code
+   * com::ComR comR;
+   * comR.init();   // call once at startup
+   * // in main loop:
+   * comR.cycle();  // call cyclically
+   * @endcode
+   *
+   * @note Must be called cyclically at application rate.
+   * @see ComR_Prj, AsciiCom, SerAsciiTP
+   */
   class ComR
   {
     protected:
-    AsciiCom myAsciiCom;
-    SerAsciiTP mySerAsciiTP;
-    SerComDrv mySerDrv;
+    AsciiCom    myAsciiCom;    ///< Command parser; handles generic commands and forwards unknown tokens to a project handler
+    SerAsciiTP  mySerAsciiTP;  ///< Transport layer; accumulates characters until '\n' and notifies myAsciiCom
+    SerComDrv   mySerDrv;      ///< HAL adapter; reads bytes from hal::serial and writes responses back
     
     public:
-    /// Construct
+    /// Default constructor. Members are default-constructed; call @ref init() before @ref cycle().
     ComR();
 
-    /// Initialization
+    /**
+     * @brief Initialise the communication stack.
+     *
+     * Wires @ref mySerDrv into @ref mySerAsciiTP and registers @ref myAsciiCom
+     * as an observer of @ref mySerAsciiTP. Must be called once before the first
+     * call to @ref cycle().
+     */
     void init();
-    /// Receive data from low level drivers and process them
+
+    /**
+     * @brief Execute one communication cycle.
+     *
+     * Drives @ref SerAsciiTP (byte reception and telegram assembly) and
+     * @ref AsciiCom (cyclic monitor output). Must be called periodically
+     * from the application main loop.
+     *
+     * @note Must be called cyclically.
+     */
     void cycle();
 
   };

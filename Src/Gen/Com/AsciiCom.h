@@ -52,6 +52,9 @@ namespace com
         using string_type = SerAsciiTP::string_type;
         using size_type = string_type::size_type;
 
+        /// @brief Maximum length of a command token, used for parsing incoming telegrams.
+        static constexpr size_type kMaxLenToken = 20U;
+
     protected:
         /**
          * @brief Smart pointer to a SerAsciiTP object.

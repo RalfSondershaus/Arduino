@@ -1,7 +1,9 @@
 /**
- * @file Gen/Com/SerComDrv.h
+ * @file SerComDrv.h
  *
- * @brief Interface for communication drivers
+ * @author Ralf Sondershaus
+ *
+ * @brief HAL adapter exposing hal::serial as a byte-level serial communication driver.
  *
  * @copyright Copyright 2023 Ralf Sondershaus
  *
@@ -17,25 +19,42 @@
 
 namespace com
 {
-  // -----------------------------------------------------------------------------------
-  // -----------------------------------------------------------------------------------
+  /**
+   * @brief Byte-level serial driver; thin adapter over @ref hal::serial.
+   *
+   * Provides a uniform interface so that @ref SerAsciiTP can read from and
+   * write to the hardware serial port without a direct dependency on the HAL.
+   *
+   * @see SerAsciiTP, hal::serial
+   */
   class SerComDrv
   {
   public:
-    using size_type = size_t;
-    using base_type = uint8_t;
+    using size_type = size_t;   ///< Unsigned size / byte-count type
+    using base_type = uint8_t;  ///< Type of a single serial byte
 
   public:
     SerComDrv() = default;
 
-    /// Start serial communication
+    /**
+     * @brief Open the serial port at the given baud rate.
+     *
+     * @param[in] baudrate Desired baud rate (e.g. 9600, 115200).
+     */
     void begin(unsigned long baudrate) { hal::serial::begin(baudrate); }
-    /// Get the number of bytes (characters) available for reading from the serial port.
+
+    /// Return the number of bytes available to read from the serial port (0 if none).
     int available(void)             { return hal::serial::available(); }
-    /// The first byte of incoming serial data available (or -1 if no data is available).
+
+    /// Return the next incoming byte (0…255), or -1 if no data is available.
     int read(void) const noexcept   { return hal::serial::read(); }
-    
-    /// Write a character string to the serial port
+
+    /**
+     * @brief Write a null-terminated string to the serial port.
+     *
+     * @param[in] p Null-terminated character string to transmit.
+     * @return Number of bytes written.
+     */
     int write(const char* p)        { return hal::serial::print(p); }
 
   };

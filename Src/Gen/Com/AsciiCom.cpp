@@ -24,6 +24,9 @@ namespace com
     using string_type = AsciiCom::string_type; // string of size 64
     using stringstream_type = util::basic_istringstream<SerAsciiTP::kMaxLenTelegram, char_type>;
 
+    /// Return type shared with IfcAsciiCommandHandler.
+    using ret_type = IfcAsciiCommandHandler::ret_type;
+
     /**
      * @brief Stores runtime state for RTE port monitoring output.
      */
@@ -36,18 +39,60 @@ namespace com
         uint16 unNrIdx;                    ///< For array types: number of elements to be transmitted
     } port_type;
 
-    /// Return values of process() function family.
-    /// An unscoped enum is used to simplify access to enumerator-list elements.
-    enum ret_type
+    /**
+     * @defgroup AsciiCom commands
+     * @{
+     */
+    static const char generic_cmd_set_cv[]    ROM_CONST_VAR = "SET_CV";
+    static const char generic_cmd_get_cv[]    ROM_CONST_VAR = "GET_CV";
+    static const char generic_cmd_mon_list[]  ROM_CONST_VAR = "MON_LIST";
+    static const char generic_cmd_mon_start[] ROM_CONST_VAR = "MON_START";
+    static const char generic_cmd_mon_stop[]  ROM_CONST_VAR = "MON_STOP";
+
+    using generic_handler_type = ret_type (*)(stringstream_type &, string_type &);
+
+    static ret_type process_set_cv(stringstream_type &st, string_type &response);
+    static ret_type process_get_cv(stringstream_type &st, string_type &response);
+    static ret_type process_monitor_list(stringstream_type &st, string_type &response);
+    static ret_type process_monitor_start(stringstream_type &st, string_type &response);
+    static ret_type process_monitor_stop(stringstream_type &st, string_type &response);
+
+    /**
+     * @brief Maps a command token to its generic command handler.
+     */
+    struct command_entry_type
     {
-        eOK = 0,     ///< OK
-        eINV_CMD,    ///< Command invalid (or unknown)
-        eINV_CV_ID,  ///< SET_CV with an invalid CV id
-        eCV_VALUE_OUT_OF_RANGE, ///< SET_CV with an invalid CV value
-        eINV_MONITOR_START_PARAM,          ///< MON_START parameters are malformed
-        eINV_MONITOR_START_IFC_NAME,       ///< MON_START interface name was not found
-        eERR_UNKNOWN                       ///< Unexpected internal error
+        const char *cmd_ptr;
+        generic_handler_type handler;
     };
+    
+    using command_table_type = util::array<command_entry_type, 5U>;
+
+    static const command_table_type commands ROM_CONST_VAR =
+        {{{generic_cmd_set_cv,    process_set_cv},
+          {generic_cmd_get_cv,    process_get_cv},
+          {generic_cmd_mon_list,  process_monitor_list},
+          {generic_cmd_mon_start, process_monitor_start},
+          {generic_cmd_mon_stop,  process_monitor_stop}}};
+    /** 
+     * @}
+     */
+
+    /**
+     * @defgroup AsciiComReturnCodes AsciiCom return codes
+     * 
+     * Return values of process() function family.
+     */
+    
+    /**
+     * @ingroup AsciiComReturnCodes
+     */
+    static constexpr ret_type kOk                     = IfcAsciiCommandHandler::kIfcOK; ///< OK
+    static constexpr ret_type kInvCmd                 = IfcAsciiCommandHandler::kIfcInvCmd; ///< Command invalid (or unknown)
+    static constexpr ret_type kInvCvId                = IfcAsciiCommandHandler::kIfcProjectBase + 0; ///< SET_CV with an invalid CV id
+    static constexpr ret_type kCvValueOutOfRange      = IfcAsciiCommandHandler::kIfcProjectBase + 1; ///< SET_CV with an invalid CV value
+    static constexpr ret_type kInvMonitorStartParam   = IfcAsciiCommandHandler::kIfcProjectBase + 2; ///< MON_START parameters are malformed
+    static constexpr ret_type kInvMonitorStartIfcName = IfcAsciiCommandHandler::kIfcProjectBase + 3; ///< MON_START interface name was not found
 
     /// For each ret_type, an error description that is transmitted after
     /// processing the command.
@@ -60,21 +105,32 @@ namespace com
     const char ret_ERR_UNKNOWN[] ROM_CONST_VAR = "ERR: unknown error";
 
     static constexpr const string_type::value_type *responses[] ROM_CONST_VAR =
-        {
-            ret_OK,                             // eOK
-            ret_INV_CMD,                        // eINV_CMD
-            ret_INV_CV_ID,                      // eINV_CV_ID
-            ret_CV_VALUE_OUT_OF_RANGE,          // eCV_VALUE_OUT_OF_RANGE
-            ret_INV_MONITOR_START_PARAM,        // eINV_MONITOR_START_PARAM
-            ret_INV_MONITOR_START_IFC_NAME,     // eINV_MONITOR_START_IFC_NAME
-            ret_ERR_UNKNOWN                     // has to be the last element
+    {
+        ret_OK,                             // kOk
+        ret_INV_CMD,                        // kInvCmd
+        ret_INV_CV_ID,                      // kInvCvId
+        ret_CV_VALUE_OUT_OF_RANGE,          // kCvValueOutOfRange
+        ret_INV_MONITOR_START_PARAM,        // kInvMonitorStartParam
+        ret_INV_MONITOR_START_IFC_NAME,     // kInvMonitorStartIfcName
+        ret_ERR_UNKNOWN                     // has to be the last element
     };
+    constexpr size_t max_constexpr(size_t a) { return a; }
 
-    static ret_type process_set_cv(stringstream_type &st, string_type &response);
-    static ret_type process_get_cv(stringstream_type &st, string_type &response);
-    static ret_type process_monitor_list(stringstream_type &st, string_type &response);
-    static ret_type process_monitor_start(stringstream_type &st, string_type &response);
-    static ret_type process_monitor_stop(stringstream_type &st, string_type &response);
+    template<typename... Args>
+    constexpr size_t max_constexpr(size_t a, Args... rest)
+    {
+        return a > max_constexpr(rest...) ? a : max_constexpr(rest...);
+    }
+
+    static constexpr size_t kMaxResponseLen = max_constexpr(
+        sizeof(ret_OK) - 1U,
+        sizeof(ret_INV_CMD) - 1U,
+        sizeof(ret_INV_CV_ID) - 1U,
+        sizeof(ret_CV_VALUE_OUT_OF_RANGE) - 1U,
+        sizeof(ret_INV_MONITOR_START_PARAM) - 1U,
+        sizeof(ret_INV_MONITOR_START_IFC_NAME) - 1U,
+        sizeof(ret_ERR_UNKNOWN) - 1U
+    );
 
     static bool output_monitor_list(string_type &response);
     static bool output_port_data(port_type &pm, string_type &response);
@@ -113,36 +169,12 @@ namespace com
      */
     void AsciiCom::process(const string_type &telegram, string_type &response)
     {
-        static constexpr size_type kMaxLenToken = 20U;
-
-        using generic_handler_type = ret_type (*)(stringstream_type &, string_type &);
-        /**
-         * @brief Maps a command token to its generic command handler.
-         */
-        struct command_entry_type
-        {
-            const char *cmd;
-            generic_handler_type handler;
-        };
-
-        static const char generic_cmd_set_cv[]    ROM_CONST_VAR = "SET_CV";
-        static const char generic_cmd_get_cv[]    ROM_CONST_VAR = "GET_CV";
-        static const char generic_cmd_mon_list[]  ROM_CONST_VAR = "MON_LIST";
-        static const char generic_cmd_mon_start[] ROM_CONST_VAR = "MON_START";
-        static const char generic_cmd_mon_stop[]  ROM_CONST_VAR = "MON_STOP";
-
-        using command_table_type = util::array<command_entry_type, 5U>;
-        static const command_table_type commands ROM_CONST_VAR =
-            {{{generic_cmd_set_cv,    process_set_cv},
-              {generic_cmd_get_cv,    process_get_cv},
-              {generic_cmd_mon_list,  process_monitor_list},
-              {generic_cmd_mon_start, process_monitor_start},
-              {generic_cmd_mon_stop,  process_monitor_stop}}};
-
         stringstream_type st(telegram);
-        char cmd[kMaxLenToken];
-        char cmd_rom[kMaxLenToken];
-        ret_type ret = eINV_CMD;
+        // buffer for command token, used for parsing incoming telegrams.
+        char cmd[kMaxLenToken]; 
+        // buffer for command token read from ROM, used for comparing with the parsed command token.
+        char cmd_rom[kMaxLenToken]; 
+        ret_type ret = kInvCmd;
         string_type sub_response;
         boolean found = false;
         size_type idx;
@@ -154,28 +186,39 @@ namespace com
         {
             command_entry_type entry;
             ROM_READ_STRUCT(&entry, &commands[idx], sizeof(command_entry_type));
-            ROM_READ_STRING(cmd_rom, entry.cmd);
+            ROM_READ_STRING_N(cmd_rom, entry.cmd_ptr, kMaxLenToken);
             if (sv.compare(cmd_rom) == 0)
             {
                 ret = entry.handler(st, sub_response);
                 found = true;
+                response.append(cmd_rom); // The response shall contain the command token
                 break;
             }
         }
 
-        if (!found)
+        if (!found && command_handler)
         {
-            if (command_handler && command_handler->process_command(cmd, st, response))
+            ret = command_handler->process_command(cmd, st, sub_response);
+            if (IfcAsciiCommandHandler::is_project_specific_error(ret))
             {
-                // response fully assembled by project handler
-                return;
+                // Project-specific error: obtain string from the handler
+                command_handler->get_error_string(ret, response);
             }
-            ret = eINV_CMD;
         }
 
-        // Assemble response: status text + optional sub-response
-        const char *response_text = static_cast<const char *>(ROM_READ_PTR(&responses[static_cast<size_type>(ret)]));
-        response = response_text;
+        if (found || !IfcAsciiCommandHandler::is_project_specific_error(ret))
+        {
+            // ret is either a generic command return code or OK / Invalid command.
+            // In both cases, the response string is composed of the status text plus the sub_response (if any).
+            // Status text for error codes or "OK" for successful command execution, used for response composition.
+            char response_text[response.max_size()];
+            // First, read the pointer to the response text from ROM, then read the string itself 
+            // from ROM to a RAM buffer, and finally assign it to the response.
+            const char* response_text_ptr = static_cast<const char *>(ROM_READ_PTR(&responses[static_cast<size_type>(ret)]));
+            ROM_READ_STRING_N(response_text, response_text_ptr, util::size(response_text));
+            response = response_text;
+        }
+
         if (sub_response.size() > 0U)
         {
             response.append(" ");
@@ -213,13 +256,13 @@ namespace com
      *
       * @param[in] st Command stream after token "SET_CV".
       * @param[out] response Echo of command parameters for response composition.
-      * @return eOK Valid command and value written to CV.
-      * @return eINV_CMD Ill-formed command parameters.
-      * @return eCV_VALUE_OUT_OF_RANGE Value is outside uint8 range.
+      * @return kOk Valid command and value written to CV.
+      * @return kInvCmd Ill-formed command parameters.
+      * @return kCvValueOutOfRange Value is outside uint8 range.
      */
     static ret_type process_set_cv(stringstream_type &st, string_type &response)
     {
-        ret_type ret = eINV_CMD;
+        ret_type ret = kInvCmd;
         uint16 value;
         CV new_cv;
 
@@ -239,11 +282,11 @@ namespace com
             {
                 new_cv.val = static_cast<uint8>(value);
                 rte::set_cv(new_cv.id, new_cv.val);
-                ret = eOK;
+                ret = kOk;
             }
             else
             {
-                ret = eCV_VALUE_OUT_OF_RANGE;
+                ret = kCvValueOutOfRange;
             }
         }
 
@@ -255,13 +298,13 @@ namespace com
      *
       * @param[in] st Command stream after token "GET_CV".
       * @param[out] response Echo of command parameters plus CV value on success.
-      * @return eOK CV id is valid and value appended to response.
-      * @return eINV_CMD Ill-formed command parameters.
-      * @return eINV_CV_ID CV id is not valid.
+      * @return kOk CV id is valid and value appended to response.
+      * @return kInvCmd Ill-formed command parameters.
+      * @return kInvCvId CV id is not valid.
      */
     static ret_type process_get_cv(stringstream_type &st, string_type &response)
     {
-        ret_type ret = eINV_CMD;
+        ret_type ret = kInvCmd;
         CV cv;
 
         // The response shall contain the command parameters
@@ -282,11 +325,11 @@ namespace com
                 util::to_string(static_cast<int>(cv.val), tmp);
                 response.append(" ");
                 response.append(tmp);
-                ret = eOK;
+                ret = kOk;
             }
             else
             {
-                ret = eINV_CV_ID;
+                ret = kInvCvId;
             }
         }
 
@@ -301,7 +344,7 @@ namespace com
      *
     * @param[in] st Command stream after token "MON_LIST" (unused).
     * @param[out] response Initial response containing number of registered ports.
-    * @return eOK Command accepted and list output enabled.
+    * @return kOk Command accepted and list output enabled.
      */
     static ret_type process_monitor_list(stringstream_type &st, string_type &response)
     {
@@ -310,7 +353,7 @@ namespace com
         util::to_string(rte::getNrPorts(), tmp);
         response.append("number of ports=").append(tmp);
         doOutputPortList = true;
-        return eOK;
+        return kOk;
     }
 
     /**
@@ -423,9 +466,9 @@ namespace com
      *
      * @param[in] st Command stream after token "MON_START".
      * @param[out] response Response containing the selected interface name on success.
-     * @return eOK Monitoring started.
-     * @return eINV_MONITOR_START_IFC_NAME Interface name is unknown.
-     * @return eINV_MONITOR_START_PARAM Parameters are malformed.
+     * @return kOk Monitoring started.
+     * @return kInvMonitorStartIfcName Interface name is unknown.
+     * @return kInvMonitorStartParam Parameters are malformed.
      */
     static ret_type process_monitor_start(stringstream_type &st, string_type &response)
     {
@@ -460,16 +503,16 @@ namespace com
                         portMonitor.unNrIdx = pPortData->size - unFirstIdx;
                     }
                 }
-                ret = eOK;
+                ret = kOk;
             }
             else
             {
-                ret = eINV_MONITOR_START_IFC_NAME;
+                ret = kInvMonitorStartIfcName;
             }
         }
         else
         {
-            ret = eINV_MONITOR_START_PARAM;
+            ret = kInvMonitorStartParam;
         }
         return ret;
     }
@@ -482,7 +525,7 @@ namespace com
      *
      * @param[in] st Command stream after token "MON_STOP" (unused).
      * @param[out] response Response text (unused).
-     * @return eOK Monitor stopped.
+     * @return kOk Monitor stopped.
      */
     static ret_type process_monitor_stop(stringstream_type &st, string_type &response)
     {
@@ -491,7 +534,7 @@ namespace com
 
         portMonitor.pPortData = nullptr;
 
-        return eOK;
+        return kOk;
     }
 
 } // namespace com

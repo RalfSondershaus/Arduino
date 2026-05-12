@@ -21,9 +21,6 @@ namespace com
         using parent_class = ComR;
         
     protected:
-        AsciiCom myAsciiCom;
-        SerAsciiTP mySerAsciiTP;
-        SerComDrv mySerDrv;
         SignalAsciiCommandHandler mySignalAsciiCommandHandler;
 
     public:
