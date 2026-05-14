@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+ #define CFG_NO_LOGGER
 #include <unity_adapt.h>
 #include <Test/Logger.h>
 #include <Cal/CalM.h>

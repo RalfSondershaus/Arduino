@@ -17,6 +17,38 @@
                 "${workspaceFolder}/Src/Gen/Test/unity/src",
                 "${workspaceFolder}/Src/Gen/Hal/Stub/Gpio",
                 "${workspaceFolder}/Src/Gen/Hal/Stub/Timer",
+                "${workspaceFolder}/Src/Gen/Bsw/Win/cores/**",
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "WIN32",
+                "_WIN32"
+            ],
+            "windowsSdkVersion": "10.0.22000.0",
+            "compilerPath": "g++.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-gcc-x64"
+        },
+        {
+            "name": "Arduino",
+            "includePath": [
+                "${workspaceFolder}/Src/Prj/UnitTest/Gen/Rte",
+                "${workspaceFolder}/Src/Prj/UnitTest/Gen/Rte/**",
+                "${workspaceFolder}/Src/Prj/UnitTest/Prj/Ut_Signal",
+                "${workspaceFolder}/Src/Prj/UnitTest/Gen/Util/Ut_InputClassifier",
+                "${workspaceFolder}/Src/Prj/App/FireFlicker",
+                "${workspaceFolder}/Src/Prj/App/Signal",
+                "${workspaceFolder}/Src/Prj/App/Signal/**",
+                "${workspaceFolder}/Src/Prj/App/DccSniffer",
+                "${workspaceFolder}/Src/Prj/App/DccSniffer/**",
+                "${workspaceFolder}/Src/Prj/App/BlinkSample/**",
+                "${workspaceFolder}/Src/Gen/**",
+                "${workspaceFolder}/Src/Gen/Test/unity/src",
+                "${workspaceFolder}/Src/Gen/Hal/Stub/Gpio",
+                "${workspaceFolder}/Src/Gen/Hal/Stub/Timer",
                 "${workspaceFolder}/Src/Gen/Bsw/Arduino/avr/**",
                 "${workspaceFolder}/../../tools/avr8-gnu-toolchain/3.7.0.1796/avr/include/**"
             ],
