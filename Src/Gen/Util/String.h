@@ -291,10 +291,10 @@ namespace util
     size_t length() const { return size(); }
 
     /// Returns the maximum number of elements the string is able to hold
-    constexpr size_t max_size() const { return Size; }
+    static constexpr size_t max_size() { return static_cast<size_t>(Size); }
 
     /// Returns the number of characters that can be held in currently allocated storage
-    constexpr size_t capacity() { return max_size(); }
+    static constexpr size_t capacity() { return max_size(); }
 
     /// Modifiers
 
