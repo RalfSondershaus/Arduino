@@ -9,6 +9,8 @@
 FILES_PRJ = $(PATH_SRC_PRJ_PROJECT)/Test                \
             $(PATH_SRC_GEN)/Rte/Rte                     \
             $(PATH_SRC_PRJ)/App/Signal/LedRouter        \
+            $(PATH_SRC_PRJ)/App/Signal/Debug            \
+            $(PATH_SRC_HAL)/Stub/EEPROM/Hal/EEPROM      \
             $(PATH_SRC_HAL)/Stub/Gpio/Hal/Gpio          \
             $(PATH_SRC_HAL)/Stub/Timer/Hal/Timer
 

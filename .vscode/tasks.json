@@ -115,7 +115,8 @@
             "problemMatcher": [
                 "$gcc"
             ],
-            "group": "build"
+            "group": "build",
+            "dependsOn": "Build App avr_gcc"
         },
         {
             "type": "cppbuild",

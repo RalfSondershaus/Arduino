@@ -64,13 +64,22 @@ When restructuring across files:
 3. Plan all renames/moves as a list (use todo tool)
 4. Apply changes in small, verifiable steps
 5. After each logical group of changes, run a build check:
-   ```
-   Build/build.bat <project> win32 gcc win none all
-   ```
+  ```
+  Build/build.bat App/... mega avr_gcc arduino none all
+  ```
 6. If unit tests exist for affected code, run them:
    ```
    Build/build.bat UnitTest/... win32 gcc win unity run
    ```
+
+### Build Task Preference
+
+- Prefer VS Code tasks when available (task-aligned invocation and reproducibility).
+- For Signal application validation on target, use the equivalent of task `Build App avr_gcc`:
+  ```
+  Build/build.bat App/Signal mega avr_gcc arduino none all
+  ```
+- Keep a host build for fast checks and use AVR build for target-specific verification before finishing.
 
 ## What NOT to Change
 

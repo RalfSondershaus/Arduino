@@ -1,9 +1,14 @@
 /**
- * @file BlinkSample2.h
+ * @file Blinker.h
  *
  * @author Ralf Sondershaus
  *
- * @brief Declares class Blinker
+ * @brief Declares class Blinker for controlling LED blinking functionality
+ *
+ * This module provides a Blinker class that manages LED blinking on an Arduino board.
+ * It supports PWM intensity control via pin 13 (on-board LED) and optional MOSFET control
+ * via pin 2. The class implements a breathing/fading effect with configurable intensity
+ * levels from 0 to 255.
  *
  * @copyright Copyright 2022 Ralf Sondershaus
  *

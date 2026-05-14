@@ -12,6 +12,7 @@
 
 #include <unity_adapt.h>
 #include <Com/AsciiCom.h>
+#include <Com/SignalAsciiCommandHandler.h>
 #include <Cal/CalM_config.h>
 #include <Rte/Rte.h>
 #include <Hal/EEPROM.h>
@@ -26,6 +27,8 @@ template<> void EXPECT_EQ<string_type>(string_type actual, string_type expected)
 TEST(Ut_Signal_Com, AsciiCom_process_SET_CV_SignalIDs)
 {
   AsciiCom asciiCom;
+  com::SignalAsciiCommandHandler signal_handler;
+  asciiCom.set_command_handler(signal_handler);
   string_type telegram = "SET_CV 42 1";
   string_type response;
   asciiCom.process(telegram, response);
@@ -42,6 +45,8 @@ TEST(Ut_Signal_Com, AsciiCom_process_SET_CV_SignalIDs)
 TEST(Ut_Signal_Com, AsciiCom_process_SET_SIGNAL_ONB_ADC)
 {
   AsciiCom asciiCom;
+  com::SignalAsciiCommandHandler signal_handler;
+  asciiCom.set_command_handler(signal_handler);
   string_type telegram = "SET_SIGNAL 0 1 ONB 10 -1 ADC 54";
   string_type response;
   asciiCom.process(telegram, response);
@@ -56,6 +61,8 @@ TEST(Ut_Signal_Com, AsciiCom_process_SET_SIGNAL_ONB_ADC)
 TEST(Ut_Signal_Com, AsciiCom_process_SET_SIGNAL_ONB_DCC)
 {
   AsciiCom asciiCom;
+  com::SignalAsciiCommandHandler signal_handler;
+  asciiCom.set_command_handler(signal_handler);
   string_type telegram = "SET_SIGNAL 0 1 ONB 10 -1 DCC 54";
   string_type response;
   asciiCom.process(telegram, response);
@@ -70,6 +77,8 @@ TEST(Ut_Signal_Com, AsciiCom_process_SET_SIGNAL_ONB_DCC)
 TEST(Ut_Signal_Com, AsciiCom_process_SET_SIGNAL_EXT_DIG)
 {
   AsciiCom asciiCom;
+  com::SignalAsciiCommandHandler signal_handler;
+  asciiCom.set_command_handler(signal_handler);
   string_type telegram = "SET_SIGNAL 0 1 EXT 10 2 DIG 22";
   string_type response;
   asciiCom.process(telegram, response);
@@ -84,6 +93,8 @@ TEST(Ut_Signal_Com, AsciiCom_process_SET_SIGNAL_EXT_DIG)
 TEST(Ut_Signal_Com, AsciiCom_process_ETO_SET_SIGNAL)
 {
   AsciiCom asciiCom;
+  com::SignalAsciiCommandHandler signal_handler;
+  asciiCom.set_command_handler(signal_handler);
   uint8 cmd = 0;
   signal::signal_aspect aspect;
   constexpr uint8 aspect_builtin = 0b00011000;
@@ -119,6 +130,8 @@ TEST(Ut_Signal_Com, AsciiCom_process_ETO_SET_SIGNAL)
 TEST(Ut_Signal_Com, AsciiCom_process_ETO_SET_SIGNAL_OPTIONAL_DIM_TIME)
 {
   AsciiCom asciiCom;
+  com::SignalAsciiCommandHandler signal_handler;
+  asciiCom.set_command_handler(signal_handler);
   uint8 cmd = 0;
   signal::signal_aspect aspect;
   constexpr uint8 aspect_builtin = 0b00011000;
@@ -154,6 +167,8 @@ TEST(Ut_Signal_Com, AsciiCom_process_ETO_SET_SIGNAL_OPTIONAL_DIM_TIME)
 TEST(Ut_Signal_Com, AsciiCom_process_ETO_SET_SIGNAL_INVALID_IDX)
 {
   AsciiCom asciiCom;
+  com::SignalAsciiCommandHandler signal_handler;
+  asciiCom.set_command_handler(signal_handler);
   uint8 cmd = 0;
   signal::signal_aspect aspect;
   constexpr uint8 aspect_builtin = 0b00011000;
@@ -181,6 +196,8 @@ TEST(Ut_Signal_Com, AsciiCom_process_ETO_SET_SIGNAL_INVALID_IDX)
 TEST(Ut_Signal_Com, AsciiCom_process_INIT)
 {
   AsciiCom asciiCom;
+  com::SignalAsciiCommandHandler signal_handler;
+  asciiCom.set_command_handler(signal_handler);
   string_type telegram = "INIT";
   string_type response;
   asciiCom.process(telegram, response);

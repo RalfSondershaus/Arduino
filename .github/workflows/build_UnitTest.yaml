@@ -113,3 +113,8 @@ jobs:
         run: |
           ./Build/build.sh UnitTest/Prj/Ut_Signal_Com win32 gcc win unity rebuild
           ./Build/build.sh UnitTest/Prj/Ut_Signal_Com win32 gcc win unity run
+
+      - name: Run Build Script UnitTest/Prj/Ut_Signal_LedRouter
+        run: |
+          ./Build/build.sh UnitTest/Prj/Ut_Signal_LedRouter win32 gcc win unity rebuild
+          ./Build/build.sh UnitTest/Prj/Ut_Signal_LedRouter win32 gcc win unity run

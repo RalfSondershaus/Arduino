@@ -165,6 +165,26 @@ namespace util
   }
 
   // ------------------------------------------------------------------------------
+  /// Returns the number of elements in an array.
+  /// Equivalent to std::size (C++17).
+  // ------------------------------------------------------------------------------
+  template<class T, size_t N>
+  constexpr size_t size(const T (&)[N]) noexcept
+  {
+    return N;
+  }
+
+  // ------------------------------------------------------------------------------
+  /// Returns the number of elements in a container with a size() member.
+  /// Equivalent to std::size (C++17).
+  // ------------------------------------------------------------------------------
+  template<class C>
+  constexpr size_t size(const C& c) noexcept
+  {
+    return c.size();
+  }
+
+  // ------------------------------------------------------------------------------
   /// Returns s1 + s2 and limits the sum to max value of T
   // ------------------------------------------------------------------------------
   template<typename T>
